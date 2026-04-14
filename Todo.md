@@ -6,7 +6,6 @@ Next ticket number: RMC-26
 
 | Key | Title | Description | Blocked By |
 |-----|-------|-------------|------------|
-| RMC-19 | How does magic work? | Define the casting process and its participants: what is a caster, what is an executor, how do they relate, and what are the steps when a spell activates. The Inspiration docs describe one model; this ticket is to agree on the actual design. | |
 | RMC-21 | Define entity properties | What properties do entities have in general? What is type-specific? How do general and specific properties relate? | RMC-20 |
 | RMC-22 | Define the scope and spatial model | What does it mean for an entity to be "in scope" of another? Define containment, proximity, and touch semantics. Feeds into how LA, caster-scope, and executor-scope are resolved. | RMC-19, RMC-20 |
 | RMC-23 | Define power sources in the world | What makes something a power source or reservoir in the world? Is it a type, a property, a role? How are things like life and mana crystals represented as world entities? | RMC-20 |
@@ -42,3 +41,4 @@ Next ticket number: RMC-26
 |-----|-------|
 | RMC-1 | Convert the source documents to a readable format |
 | RMC-20 | Define entity taxonomy |
+| RMC-19 | How does magic work? |
