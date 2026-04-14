@@ -14,6 +14,7 @@
 - Do not start implementing anything without explicit permission from the user.
   Discussing a ticket, explaining what it means, or asking questions about it is NOT permission to implement it.
   Wait for a clear instruction like "implement this" or "go ahead" before writing any code.
+- At this stage of the project, the main risk is deferred decisions, not bad ones. Assist the user to make a call, document it in `Design/`, and move on. The codebase is small enough to swivel if something turns out wrong.
 
 ## Git
 
@@ -28,7 +29,15 @@
   - Not needed when passing a well-named variable (the variable name documents its purpose)
   - Not needed when the method name already makes the argument's role obvious (e.g. `RegisterInput("look")`, `SendOutput("hello")`)
 
+## Design
+
+- Settled decisions are documented in `Design/` as per-area markdown files (e.g. `WorldModel.md`, `TypeSystem.md`).
+- `Design/` is distinct from `Inspiration/`, which contains rough initial ideas and is not considered authoritative.
+- When a ticket produces settled decisions, write them into the relevant `Design/` file before moving the ticket to Ready for Review.
+- Keep design docs lightweight — prose with headings, no formal structure required.
+
 ## Todo
 
 - Work is tracked in `Todo.md` at the repo root.
+- The To Do list is ordered by priority, top to bottom.
 - Never move a ticket to "Done", move it to "Ready for Review" and the user will put it in "Done" when the user feels it is done.
