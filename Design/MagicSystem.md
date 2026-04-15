@@ -13,19 +13,18 @@ A spell can be **spoken** or **inscribed**.
 
 When a spell activates, the following steps happen in order.
 
-### 1. Establish Variables
+### 1. Establish Context
 
-Three variables are set at the start of every spell:
+Two entity references are resolved at the start of every spell:
 
-| Variable | Rune | Value |
-|----------|------|-------|
-| Caster | `MJORNER(caster)` | The entity that spoke or wrote the spell |
-| Executor | `A(this)` | The entity in whose context the spell runs |
-| Local scope | `LA(local scope)` | Defaults to the executor unless overridden |
+| Rune | Value |
+|------|-------|
+| `A(me)` | The entity that spoke or wrote the spell |
+| `OH(this)` | The entity in whose context the spell runs |
 
 The caster and executor are usually the same entity. They differ when a spell is inscribed: the caster is whoever activates the inscription, but the executor is the entity the spell is inscribed on.
 
-Local scope begins as the scope of the executor. It can be reassigned within the spell using `TWYAR(assign)`, typically to an area defined by `DWOR(in range)` or `DUMER(contained by)`.
+`LA(scope of)` takes an Entity and returns its scope. It defaults to `OH`, so bare `LA` is equivalent to `LA OH` — the executor's scope.
 
 ### 2. Parse the Spell
 

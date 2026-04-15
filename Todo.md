@@ -2,12 +2,11 @@
 
 ## To Do
 
-Next ticket number: RMC-31
+Next ticket number: RMC-32
 
 | Key | Title | Description | Blocked By |
 |-----|-------|-------------|------------|
-| RMC-6 | Formalize the type system | Define all types used in the rune system (Statement, ExecutedStatement, PowerSource, PowerReservoir, Number, Property, Position, Group, Area, Scope, Action, boolean, object, etc.), their relationships, and how subtyping/coercion works. Each type must have a clear concept of how it maps onto the world — if there is no plausible execution semantics for a type, it does not belong in the system. | |
-| RMC-27 | Define the initial rune set | The runes in Inspiration/ are rough and not final. Produce a settled rune set in Design/ — names, meanings, types, and any open questions resolved. This becomes the authoritative reference for all subsequent tickets. | RMC-6 |
+| RMC-31 | Add weight to entities | Making entities have weight makes the VUN rune's cost function more intuitive and fun | |
 | RMC-12 | Design the parser | Turning a string of rune words into a typed expression tree. Direction: recursive descent where each rune implements its own Parse method, consuming its arguments from the remaining token stream — adding a rune stays self-contained. Parsing is the prerequisite for evaluation (type-checking) and distinct from execution (world application). Define how parse errors are surfaced. | RMC-6 |
 | RMC-28 | Design the evaluator | Given a parsed expression tree, determine whether the spell is valid and what it costs. This is the type-checking phase: resolving rune output types against expected input types, surfacing type errors, computing power requirements. | RMC-6, RMC-12, RMC-27 |
 | RMC-29 | Design the executor | Given a validated, costed spell, apply its effects against the world state. Defines what "executing" each rune means in terms of world mutations. Excludes power sourcing (RMC-15). | RMC-25, RMC-28 |
@@ -43,3 +42,5 @@ Next ticket number: RMC-31
 | RMC-26 | Build the SVG canvas panel |
 | RMC-5 | Design the interaction model |
 | RMC-25 | Implement the world model |
+| RMC-6 | Formalize the type system |
+| RMC-27 | Define the initial rune set |
