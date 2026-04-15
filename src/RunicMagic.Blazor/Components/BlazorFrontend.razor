@@ -1,5 +1,6 @@
 @using RunicMagic.Players.Abstractions
 @using RunicMagic.Blazor.Helpers
+@using RunicMagic.Players.Models
 
 <Xterm @ref="_terminal" 
 Options="_options" 
@@ -23,39 +24,50 @@ OnKey="@OnKey"/>
 
     private async Task OnFirstRender()
     {
-        _playerService.SetDataHandlers(OnDataAvailable, OnTickComplete);
+        _playerService.SetDataHandlers(OnTextDataAvailable, OnRenderingDataAvailable, OnFlush);
 
-        await _playerService.RegisterInput("intro");
+        await _terminal.Write(_playerService.Prompt);
     }
 
     private List<string> collectedData = new List<string>();
-    private Task OnDataAvailable(string data)
+    private Task OnTextDataAvailable(string data)
     {
         collectedData.Add(data);
 
         return Task.CompletedTask;
     }
 
-    private bool writing = false;
-    private async Task OnTickComplete()
+    private List<EntityRenderingModel> collectedRenderings = new List<EntityRenderingModel>();
+    private Task OnRenderingDataAvailable(EntityRenderingModel data)
     {
-        if (collectedData.Count == 0 || writing) return;
-        writing = true;
+        collectedRenderings.Add(data);
+
+        return Task.CompletedTask;
+    }
+
+    private async Task OnFlush()
+    {
+        if (collectedData.Count == 0 && collectedRenderings.Count == 0) return;
 
         await _terminal.WriteLine("");
 
-        List<string> toHandle = new List<string>(collectedData);
-        collectedData.Clear();
+        List<string> textToHandle = new List<string>(collectedData);
 
-        foreach (var line in toHandle)
+        foreach (var line in collectedData)
         {
             if (line != "")
                 await _terminal.WriteLine(line);
         }
+        collectedData.Clear();
 
         await _terminal.Write(_playerService.Prompt);
 
-        writing = false;
+        foreach (var rendering in collectedRenderings)
+        {
+            // TODO: Handle renderings
+            await Task.CompletedTask;
+        }
+        collectedRenderings.Clear();
     }
 
     private InputBuffer inputBuffer = new();

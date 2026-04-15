@@ -1,3 +1,5 @@
+using RunicMagic.Players;
+
 namespace Mud.Blazor;
 
 internal class Program
@@ -26,5 +28,7 @@ internal class Program
     {
         services.AddRazorPages();
         services.AddServerSideBlazor();
+
+        services.RegisterPlayersModule();
     }
 }

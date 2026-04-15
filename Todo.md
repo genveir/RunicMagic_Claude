@@ -2,11 +2,11 @@
 
 ## To Do
 
-Next ticket number: RMC-26
+Next ticket number: RMC-27
 
 | Key | Title | Description | Blocked By |
 |-----|-------|-------------|------------|
-| RMC-10 | Build the UI | Implement the chosen UI layout in Blazor. | RMC-9 |
+| RMC-26 | Build the SVG canvas panel | Add an SVG canvas above the terminal that renders world entities as labelled rectangles. Wire it to the `onRenderingDataAvailable` and `onTickComplete` callbacks on `IPlayerViewInterface`. Canvas is responsible for mapping world coordinates to screen coordinates. Entities are styled by capability flags (`HasLife`, `HasAgency`, etc.). | RMC-10 |
 | RMC-25 | Implement the world model | Implement entity storage, querying, and identity in code. How are entities stored at runtime? How are they queried by type, scope, or property? How is identity represented? | RMC-20, RMC-22, RMC-23, RMC-24 |
 | RMC-6 | Formalize the type system | Define all types used in the rune system (Statement, ExecutedStatement, PowerSource, PowerReservoir, Number, Property, Position, Group, Area, Scope, Action, boolean, object, etc.), their relationships, and how subtyping/coercion works. | |
 | RMC-5 | Design the interaction model | How does a user interact with the evaluator? Options: REPL (type runes, see effects), scripted world with simulated entities, something else? | |
@@ -38,3 +38,4 @@ Next ticket number: RMC-26
 | RMC-23 | Define power sources in the world |
 | RMC-24 | Define how magic references entities |
 | RMC-9 | Decide on the UI layout |
+| RMC-10 | Build the UI |
