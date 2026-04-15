@@ -1,0 +1,179 @@
+@using RunicMagic.Players.Abstractions
+@using RunicMagic.Blazor.Helpers
+
+<Xterm @ref="_terminal" 
+Options="_options" 
+OnFirstRender="@OnFirstRender"
+OnKey="@OnKey"/>
+
+@code
+{
+    [Inject]
+    private IPlayerViewInterface _playerService { get; set; } = null!;
+    private Xterm _terminal = null!;
+
+    private TerminalOptions _options = new TerminalOptions
+        {
+            CursorBlink = true,
+            CursorStyle = CursorStyle.Block,
+            DisableStdin = false,
+            Rows = 70,
+            Columns = 180
+        };
+
+    private async Task OnFirstRender()
+    {
+        _playerService.SetDataHandlers(OnDataAvailable, OnTickComplete);
+
+        await _playerService.RegisterInput("intro");
+    }
+
+    private List<string> collectedData = new List<string>();
+    private Task OnDataAvailable(string data)
+    {
+        collectedData.Add(data);
+
+        return Task.CompletedTask;
+    }
+
+    private bool writing = false;
+    private async Task OnTickComplete()
+    {
+        if (collectedData.Count == 0 || writing) return;
+        writing = true;
+
+        await _terminal.WriteLine("");
+
+        List<string> toHandle = new List<string>(collectedData);
+        collectedData.Clear();
+
+        foreach (var line in toHandle)
+        {
+            if (line != "")
+                await _terminal.WriteLine(line);
+        }
+
+        await _terminal.Write(_playerService.Prompt);
+
+        writing = false;
+    }
+
+    private InputBuffer inputBuffer = new();
+
+    private string input = "";
+    private int cursorOffset = 0;
+    private async Task OnKey(KeyEventArgs args)
+    {
+        if (args.Key == INPUT_BACKSPACE)
+        {
+            var beforeCursor = input.Substring(0, input.Length - cursorOffset);
+            if (beforeCursor.Length == 0) return;
+
+            var afterCursor = input.Substring(input.Length - cursorOffset);
+
+            input = beforeCursor.Substring(0, beforeCursor.Length - 1) + afterCursor;
+            await _terminal.Write(
+                CURSOR_LEFT + 
+                (afterCursor.Length == 0 ? "" : afterCursor[0]) + 
+                (afterCursor.Length > 1 ? afterCursor.Substring(1): "") + 
+                ' ' +
+                MoveCursorLeft(cursorOffset + 1));
+        }
+        else if (args.Key == INPUT_CURSOR_UP)
+        {
+            var lastInput = inputBuffer.GetNext() ?? "";
+
+            if (lastInput.Length == 0) return;
+
+            var clearOldInput = ClearInput();
+
+            input = lastInput;
+            cursorOffset = 0;
+
+            await _terminal.Write(clearOldInput + input);
+        }
+        else if (args.Key == INPUT_CURSOR_DOWN)
+        {
+            var nextInput = inputBuffer.GetPrevious() ?? "";
+
+            if (nextInput.Length == 0) return;
+
+            var clearOldInput = ClearInput();
+
+            input = nextInput;
+            cursorOffset = 0;
+
+            await _terminal.Write(clearOldInput + input);
+        }
+        else if (args.Key == INPUT_CURSOR_LEFT)
+        {
+            if (input.Length - cursorOffset > 0)
+            {
+                cursorOffset++;
+                await _terminal.Write(CURSOR_LEFT);
+            }
+        }
+        else if (args.Key == INPUT_CURSOR_RIGHT)
+        {
+            if (cursorOffset > 0)
+            {
+                cursorOffset--;
+                await _terminal.Write(CURSOR_RIGHT);
+            }
+        }
+        else if (args.Key == INPUT_DELETE)
+        {
+            var afterCursor = input.Substring(input.Length - cursorOffset);
+            if (afterCursor.Length == 0) return;
+
+            var beforeCursor = input.Substring(0, input.Length - cursorOffset);
+
+            input = beforeCursor + afterCursor.Substring(1);
+            cursorOffset--;
+            await _terminal.Write(
+                (afterCursor.Length > 1 ? afterCursor.Substring(1) : "") +
+                ' ' +
+                MoveCursorLeft(cursorOffset + 1));
+        }
+        else
+        {
+            var asChar = args.Key[0];
+            if (asChar > 31 && asChar < 127)
+            {
+                var beforeCursor = input.Substring(0, input.Length - cursorOffset);
+                var afterCursor = input.Substring(input.Length - cursorOffset);
+
+                input = beforeCursor + asChar + afterCursor;
+                await _terminal.Write(args.Key + afterCursor + MoveCursorLeft(cursorOffset));
+            }
+            else if (asChar == 13)
+            {
+                await _playerService.RegisterInput(input);
+
+                inputBuffer.Add(input);
+                input = "";
+                cursorOffset = 0;
+            }
+        }
+    }
+
+    private const string INPUT_BACKSPACE = "\u007f";
+    private const string INPUT_DELETE = "\u001b[3~";
+    private const string INPUT_CURSOR_RIGHT = "\u001b[C";
+    private const string INPUT_CURSOR_LEFT = "\u001b[D";
+    private const string INPUT_CURSOR_UP = "\u001b[A";
+    private const string INPUT_CURSOR_DOWN = "\u001b[B";
+
+    private const string CURSOR_RIGHT = "\u001b[1C";
+    private const string CURSOR_LEFT = "\u001b[1D";
+
+    private string MoveCursorLeft(int count) =>
+        count == 0 ? "" : $"\u001b[{count}D";
+
+    private string ClearInput()
+    {
+        return MoveCursorLeft(input.Length - cursorOffset) +
+               new string(' ', input.Length) +
+               MoveCursorLeft(input.Length);
+    }
+}

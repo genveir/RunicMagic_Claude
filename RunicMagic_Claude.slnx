@@ -1,3 +1,4 @@
 <Solution>
-  <Project Path="RunicMagic_Claude/RunicMagic_Claude.csproj" />
+  <Project Path="src/RunicMagic.Blazor/RunicMagic.Blazor.csproj" />
+  <Project Path="src/RunicMagic.Players/RunicMagic.Players.csproj" />
 </Solution>
