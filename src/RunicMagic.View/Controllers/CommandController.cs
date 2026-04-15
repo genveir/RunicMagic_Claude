@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
-using RunicMagic.Players.Abstractions;
-using RunicMagic.Players.Models;
+using RunicMagic.Controller.Abstractions;
+using RunicMagic.Controller.Models;
 
-namespace RunicMagic.Blazor.Controllers;
+namespace RunicMagic.View.Controllers;
 
 [ApiController]
 [Route("[controller]")]

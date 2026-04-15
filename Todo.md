@@ -6,7 +6,6 @@ Next ticket number: RMC-27
 
 | Key | Title | Description | Blocked By |
 |-----|-------|-------------|------------|
-| RMC-25 | Implement the world model | Implement entity storage, querying, and identity in code. How are entities stored at runtime? How are they queried by type, scope, or property? How is identity represented? | RMC-20, RMC-22, RMC-23, RMC-24 |
 | RMC-6 | Formalize the type system | Define all types used in the rune system (Statement, ExecutedStatement, PowerSource, PowerReservoir, Number, Property, Position, Group, Area, Scope, Action, boolean, object, etc.), their relationships, and how subtyping/coercion works. | |
 | RMC-12 | Design the parser | Turning a string of rune words into a typed expression tree is a distinct concern from evaluation. Direction: recursive descent where each rune implements its own Parse method, consuming its arguments from the remaining token stream. This means adding a rune is self-contained. Define how type errors are surfaced. | RMC-6 |
 | RMC-8 | Design the evaluator and executor | Define how spell expressions are evaluated for cost and executed against the world state. Excludes parsing (RMC-12) and power sourcing (RMC-15). | RMC-25, RMC-6, RMC-12 |
@@ -19,6 +18,9 @@ Next ticket number: RMC-27
 | RMC-16 | Design inscribed spells on objects | Spells inscribed on objects have different executor/caster semantics. Define how the world model represents inscribed spells, how they are activated, and how the evaluator handles the executor being an object rather than a creature. | RMC-25 |
 
 ## In Progress
+| Key | Title | Description | Remarks |
+|-----|-------|-------------|---------|
+| RMC-25 | Implement the world model | Implement entity storage, querying, and identity in code. How are entities stored at runtime? How are they queried by type, scope, or property? How is identity represented? | Just picked it up, haven't started yet |
 
 ## Ready For Review
 

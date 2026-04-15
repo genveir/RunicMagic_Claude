@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using RunicMagic.Players.Abstractions;
-using RunicMagic.Players.Services;
+using RunicMagic.Controller.Abstractions;
+using RunicMagic.Controller.Services;
 
-namespace RunicMagic.Players
+namespace RunicMagic.Controller
 {
     public static class PlayersModule
     {

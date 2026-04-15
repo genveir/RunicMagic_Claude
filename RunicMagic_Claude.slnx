@@ -1,4 +1,7 @@
 <Solution>
-  <Project Path="src/RunicMagic.Blazor/RunicMagic.Blazor.csproj" />
-  <Project Path="src/RunicMagic.Players/RunicMagic.Players.csproj" />
+  <Project Path="src/RunicMagic.View/RunicMagic.View.csproj" />
+  <Project Path="src/RunicMagic.Database/RunicMagic.Database.csproj" />
+  <Project Path="src/RunicMagic.Magic/RunicMagic.Magic.csproj" />
+  <Project Path="src/RunicMagic.Controller/RunicMagic.Controller.csproj" />
+  <Project Path="src/RunicMagic.World/RunicMagic.World.csproj" />
 </Solution>

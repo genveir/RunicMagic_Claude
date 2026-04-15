@@ -1,7 +1,7 @@
-using RunicMagic.Players.Abstractions;
-using RunicMagic.Players.Models;
+using RunicMagic.Controller.Abstractions;
+using RunicMagic.Controller.Models;
 
-namespace RunicMagic.Players.Services;
+namespace RunicMagic.Controller.Services;
 
 internal class PlayerService : IPlayerViewInterface, IPlayerOutputSink
 {

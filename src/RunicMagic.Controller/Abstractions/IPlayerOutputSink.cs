@@ -1,6 +1,6 @@
-using RunicMagic.Players.Models;
+using RunicMagic.Controller.Models;
 
-namespace RunicMagic.Players.Abstractions;
+namespace RunicMagic.Controller.Abstractions;
 
 // The world model's side of the player interface.
 // Call these during RegisterInput processing to accumulate output for the current command.

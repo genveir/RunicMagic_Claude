@@ -1,8 +1,7 @@
-using RunicMagic.Players;
-using RunicMagic.Players.Abstractions;
+using RunicMagic.Controller;
 using System.Text.Json;
 
-namespace RunicMagic.Blazor;
+namespace RunicMagic.View;
 
 public class Program
 {
