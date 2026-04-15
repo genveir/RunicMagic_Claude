@@ -1,10 +1,11 @@
+using Microsoft.Extensions.Logging;
 using RunicMagic.Database;
 using RunicMagic.World;
 using RunicMagic.World.Capabilities;
 
 namespace RunicMagic.Controller;
 
-public class EntityFactory(WorldModel world)
+public class EntityFactory(WorldModel world, ILogger<EntityFactory> logger)
 {
     public Entity Create(EntityData data)
     {
@@ -40,9 +41,13 @@ public class EntityFactory(WorldModel world)
                 entity.Scope = () => [.. world.GetTouchingEntities(entity)];
                 entity.Reservoir = amount =>
                 {
-                    var life = entity.Life!;
-                    var given = Math.Min(amount, life.CurrentHitPoints);
-                    life.CurrentHitPoints -= given;
+                    if (entity.Life is null)
+                    {
+                        logger.LogWarning("Creature {EntityId} ({Label}) has no LifeCapability — returning 0 power", entity.Id, entity.Label);
+                        return 0;
+                    }
+                    var given = Math.Min(amount, entity.Life.CurrentHitPoints);
+                    entity.Life.CurrentHitPoints -= given;
                     return given;
                 };
                 break;
@@ -50,9 +55,13 @@ public class EntityFactory(WorldModel world)
             case EntityType.ManaSource:
                 entity.Reservoir = amount =>
                 {
-                    var charge = entity.Charge!;
-                    var given = Math.Min(amount, charge.CurrentCharge);
-                    charge.CurrentCharge -= given;
+                    if (entity.Charge is null)
+                    {
+                        logger.LogWarning("ManaSource {EntityId} ({Label}) has no ChargeCapability — returning 0 power", entity.Id, entity.Label);
+                        return 0;
+                    }
+                    var given = Math.Min(amount, entity.Charge.CurrentCharge);
+                    entity.Charge.CurrentCharge -= given;
                     return given;
                 };
                 break;

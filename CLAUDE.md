@@ -29,6 +29,8 @@
 
 - SQL keywords are lowercase (`select`, `from`, `where`, `insert into`, etc.).
 
+- Do not use column-aligned whitespace (extra spaces to align `=`, `=>`, `:`, or property values into columns). The project uses an auto-formatter on save that strips this, so it creates noise in diffs.
+
 - Use named arguments when the purpose of an argument isn't obvious from the call site:
   - Always for inline lambdas (you can't tell from the lambda body alone which parameter it maps to)
   - Always for literals (bools, strings, numbers) where the meaning isn't self-evident from the method name

@@ -2,7 +2,7 @@ namespace RunicMagic.World;
 
 public enum EntityType
 {
-    Creature  = 1,
+    Creature = 1,
     ManaSource = 2,
-    Object    = 3,
+    Object = 3,
 }

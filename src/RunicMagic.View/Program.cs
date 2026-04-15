@@ -1,5 +1,6 @@
 using RunicMagic.Controller;
 using RunicMagic.Controller.Services;
+using Serilog;
 using System.Text.Json;
 
 namespace RunicMagic.View;
@@ -9,6 +10,9 @@ public class Program
     public static async Task Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
+
+        builder.Host.UseSerilog((ctx, lc) => lc
+            .WriteTo.Console());
 
         var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
             ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");

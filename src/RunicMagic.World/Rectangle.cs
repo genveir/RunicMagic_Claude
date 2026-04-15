@@ -2,7 +2,7 @@ namespace RunicMagic.World;
 
 public readonly record struct Rectangle(int X, int Y, int Width, int Height)
 {
-    public int Right  => X + Width;
+    public int Right => X + Width;
     public int Bottom => Y + Height;
 
     public bool Contains(Rectangle other) =>
