@@ -9,6 +9,10 @@
 
 - Never use the `AskUserQuestion` widget. Ask questions as plain open-ended text instead.
 
+## Architecture
+
+- The solution follows a hub-and-spokes model. `Controller` is the hub and the only assembly that communicates between other assemblies. Spoke assemblies (`World`, `Database`, `Magic`, etc.) must not reference each other. If two spokes need to share a concept, it either lives in `Controller` or is intentionally represented differently in each spoke (e.g. `EntityData` uses `int TypeId` rather than `EntityType` to avoid `Database` depending on `World`).
+
 ## General
 
 - Do not start implementing anything without explicit permission from the user.
@@ -22,6 +26,10 @@
   Never run a Git command that would change the state of the repository, working directory, index, or any remote. If a command could alter, create, or delete any ref, file, object, or configuration, do not run it.
 
 ## Code Style
+
+- SQL keywords are lowercase (`select`, `from`, `where`, `insert into`, etc.).
+
+- Do not use column-aligned whitespace (extra spaces to align `=`, `=>`, `:`, or property values into columns). The project uses an auto-formatter on save that strips this, so it creates noise in diffs.
 
 - Use named arguments when the purpose of an argument isn't obvious from the call site:
   - Always for inline lambdas (you can't tell from the lambda body alone which parameter it maps to)

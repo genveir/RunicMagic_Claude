@@ -20,12 +20,12 @@ Next ticket number: RMC-27
 ## In Progress
 | Key | Title | Description | Remarks |
 |-----|-------|-------------|---------|
-| RMC-25 | Implement the world model | Implement entity storage, querying, and identity in code. How are entities stored at runtime? How are they queried by type, scope, or property? How is identity represented? | Just picked it up, haven't started yet |
 
 ## Ready For Review
 
 | Key | Title |
 |-----|-------|
+| RMC-25 | Implement the world model |
 
 ## Done
 
