@@ -39,9 +39,9 @@
 
 ## Design
 
-- Settled decisions are documented in `Design/` as per-area markdown files (e.g. `WorldModel.md`, `TypeSystem.md`).
+- `Design/` contains settled decisions as per-area markdown files (e.g. `WorldModel.md`, `TypeSystem.md`).
 - `Design/` is distinct from `Inspiration/`, which contains rough initial ideas and is not considered authoritative.
-- When a ticket produces settled decisions, write them into the relevant `Design/` file before moving the ticket to Ready for Review.
+- The project is past the upfront design phase. New design documents are unlikely to be needed — from here on work is predominantly implementation. Do not propose writing design docs unless there is a genuine unresolved question that blocks building.
 - Keep design docs lightweight — prose with headings, no formal structure required.
 
 ## Todo
