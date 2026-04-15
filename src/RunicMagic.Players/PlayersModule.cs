@@ -10,6 +10,7 @@ namespace RunicMagic.Players
         {
             services.AddSingleton<PlayerService>();
             services.AddSingleton<IPlayerViewInterface>(svc => svc.GetRequiredService<PlayerService>());
+            services.AddSingleton<IPlayerOutputSink>(svc => svc.GetRequiredService<PlayerService>());
 
             return services;
         }

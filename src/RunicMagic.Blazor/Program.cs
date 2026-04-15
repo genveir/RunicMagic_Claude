@@ -1,34 +1,27 @@
 using RunicMagic.Players;
+using RunicMagic.Players.Abstractions;
+using System.Text.Json;
 
-namespace Mud.Blazor;
+namespace RunicMagic.Blazor;
 
-internal class Program
+public class Program
 {
-    private static void Main(string[] args)
+    public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        ConfigureServices(builder.Services);
+        builder.Services.RegisterPlayersModule();
+
+        builder.Services.AddControllers()
+            .AddJsonOptions(options =>
+                options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase);
 
         var app = builder.Build();
 
-        app.UseHttpsRedirection();
-
         app.UseStaticFiles();
-
-        app.UseRouting();
-
-        app.MapBlazorHub();
-        app.MapFallbackToPage("/_Host");
+        app.MapControllers();
+        app.MapFallbackToFile("index.html");
 
         app.Run();
-    }
-
-    private static void ConfigureServices(IServiceCollection services)
-    {
-        services.AddRazorPages();
-        services.AddServerSideBlazor();
-
-        services.RegisterPlayersModule();
     }
 }

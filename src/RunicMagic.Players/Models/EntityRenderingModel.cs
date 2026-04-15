@@ -1,7 +1,7 @@
 ﻿namespace RunicMagic.Players.Models
 {
     [Flags]
-    public enum EntityRenderingFlags { HasLife = 1, HasAgency = 2 }
+    public enum EntityRenderingFlags { None = 0, HasLife = 1, HasAgency = 2 }
 
     public class EntityRenderingModel
     {

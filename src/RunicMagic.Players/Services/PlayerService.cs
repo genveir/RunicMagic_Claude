@@ -1,54 +1,48 @@
-﻿using RunicMagic.Players.Abstractions;
+using RunicMagic.Players.Abstractions;
 using RunicMagic.Players.Models;
 
-namespace RunicMagic.Players.Services
+namespace RunicMagic.Players.Services;
+
+internal class PlayerService : IPlayerViewInterface, IPlayerOutputSink
 {
-    internal class PlayerService : IPlayerViewInterface
+    private readonly List<string> _pendingText = [];
+    private readonly List<EntityRenderingModel> _pendingEntities = [];
+
+    public string Prompt => ">";
+
+    public async Task<CommandResult> RegisterInput(string input)
     {
-        public string Prompt => ">";
+        // Not yet wired to the spell processor — echo input back to confirm IO is working.
+        await SendText($"you wrote: {input}");
 
-        public async Task RegisterInput(string input)
-        {
-            // we're not yet handling input, just echo it back to the player to show that the system is working.
-            await SendTextOutput($"you wrote: {input}");
-            await FlushOutput();
-        }
+        await SendEntity(new EntityRenderingModel(
+            x: 100,
+            y: 10,
+            width: 50, height: 75,
+            label: "a test entity",
+            flags: EntityRenderingFlags.HasLife));
+        await SendEntity(new EntityRenderingModel(
+            x: -100,
+            y: -80,
+            width: 10, height: 20,
+            label: "another test entity",
+            flags: EntityRenderingFlags.HasLife | EntityRenderingFlags.HasAgency));
 
-        public void SetDataHandlers(Func<string, Task> onTextDataAvailable, Func<EntityRenderingModel, Task> onRenderingDataAvailable, Func<Task> onFlush)
-        {
-            _onTextDataAvailable = onTextDataAvailable;
-            _onRenderingDataAvailable = onRenderingDataAvailable;
-            _onFlush = onFlush;
-        }
+        var result = new CommandResult([.. _pendingText], [.. _pendingEntities]);
+        _pendingText.Clear();
+        _pendingEntities.Clear();
+        return result;
+    }
 
-        public async Task SendTextOutput(string text)
-        {
-            if (_onTextDataAvailable != null)
-            {
-                await _onTextDataAvailable(text);
-            }
-        }
+    public Task SendText(string text)
+    {
+        _pendingText.Add(text);
+        return Task.CompletedTask;
+    }
 
-        // may not want to use the EntityRenderingModel here, but map to it from the entity when we make it.
-        public async Task SendRenderingOutput(EntityRenderingModel renderingData)
-        {
-            if (_onRenderingDataAvailable != null)
-            {
-                await _onRenderingDataAvailable(renderingData);
-            }
-        }
-
-        public async Task FlushOutput()
-        {
-            if (_onFlush != null)
-            {
-                await _onFlush();
-            }
-        }
-
-
-        private Func<string, Task>? _onTextDataAvailable;
-        private Func<EntityRenderingModel, Task>? _onRenderingDataAvailable;
-        private Func<Task>? _onFlush;
+    public Task SendEntity(EntityRenderingModel entity)
+    {
+        _pendingEntities.Add(entity);
+        return Task.CompletedTask;
     }
 }
