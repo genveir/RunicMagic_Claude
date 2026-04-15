@@ -4,4 +4,5 @@
   <Project Path="src/RunicMagic.Magic/RunicMagic.Magic.csproj" />
   <Project Path="src/RunicMagic.Controller/RunicMagic.Controller.csproj" />
   <Project Path="src/RunicMagic.World/RunicMagic.World.csproj" />
+  <Project Path="tests/RunicMagic.Tests/RunicMagic.Tests.csproj" />
 </Solution>
