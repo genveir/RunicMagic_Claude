@@ -6,13 +6,11 @@ Next ticket number: RMC-26
 
 | Key | Title | Description | Blocked By |
 |-----|-------|-------------|------------|
-| RMC-24 | Define how magic references entities | How does the magic system identify a target? By proximity, explicit naming, relationship (touched, contained)? Distinct from how the code stores entity identity. | RMC-19, RMC-20 |
+| RMC-10 | Build the UI | Implement the chosen UI layout in Blazor. | RMC-9 |
 | RMC-25 | Implement the world model | Implement entity storage, querying, and identity in code. How are entities stored at runtime? How are they queried by type, scope, or property? How is identity represented? | RMC-20, RMC-22, RMC-23, RMC-24 |
 | RMC-6 | Formalize the type system | Define all types used in the rune system (Statement, ExecutedStatement, PowerSource, PowerReservoir, Number, Property, Position, Group, Area, Scope, Action, boolean, object, etc.), their relationships, and how subtyping/coercion works. | |
 | RMC-5 | Design the interaction model | How does a user interact with the evaluator? Options: REPL (type runes, see effects), scripted world with simulated entities, something else? | |
-| RMC-9 | Decide on the UI layout | Two candidates: (1) full-screen terminal, (2) tile-based world view taking 80–90% of the screen with a spell-input terminal at the bottom. The tile view makes spatial relationships and spell effects visible but requires a world rendering layer. Decide before building the UI. | |
 | RMC-12 | Design the parser | Turning a string of rune words into a typed expression tree is a distinct concern from evaluation. Direction: recursive descent where each rune implements its own Parse method, consuming its arguments from the remaining token stream. This means adding a rune is self-contained. Define how type errors are surfaced. | RMC-6 |
-| RMC-10 | Build the UI | Implement the chosen UI layout in Blazor. | RMC-9 |
 | RMC-8 | Design the evaluator and executor | Define how spell expressions are evaluated for cost and executed against the world state. Excludes parsing (RMC-12) and power sourcing (RMC-15). | RMC-25, RMC-6, RMC-12 |
 | RMC-18 | 🏁 Walking skeleton — boot and cast anything | Milestone. Minimal world with a handful of hardcoded entities, minimal type system, minimal parser, minimal executor. Goal: a user can launch the UI and successfully cast at least one spell that does something observable. Everything can be rough — correctness and completeness come later. | RMC-25, RMC-6, RMC-8, RMC-9, RMC-10, RMC-12 |
 | RMC-17 | Re-evaluate runes against the formalized systems | Once the type system and world model are settled, review all runes in Runes.md for consistency, gaps, and anything that no longer makes sense. Update the design document accordingly. | RMC-20, RMC-22, RMC-6 |
@@ -38,3 +36,5 @@ Next ticket number: RMC-26
 | RMC-19 | How does magic work? |
 | RMC-22 | Define the scope and spatial model |
 | RMC-23 | Define power sources in the world |
+| RMC-24 | Define how magic references entities |
+| RMC-9 | Decide on the UI layout |

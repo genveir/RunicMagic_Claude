@@ -66,6 +66,12 @@ A scope can be derived in two ways:
 
 `LA(local scope)` is a variable that holds a scope, not a type of scope in itself. It defaults to the executor's entity-defined scope at the start of a spell and can be reassigned using `TWYAR(assign)`. It is a convenience — it gives the caster a scope they can reference multiple times without re-evaluating it.
 
+## Targeting
+
+Spell effects target entities within a scope. A rune such as `BUZD(all)` or `NJEL(any)` selects entities from a scope; the effect then applies to whatever was selected. There is no targeting mechanism outside of scope membership — if an entity is not in scope, it cannot be affected.
+
+How casters construct and manipulate scopes beyond the defaults (`LA(local scope)`, `MJORNER(caster)`, `A(this)`) is left for later design.
+
 ---
 
 ## Power Sourcing
