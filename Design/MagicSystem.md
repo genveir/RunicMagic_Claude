@@ -35,25 +35,48 @@ Example: `ZU(execute) MUR(add) MUR(add) HET(one) HET(one) HET(one)` — `ZU(exec
 
 *(Parser design: RMC-12)*
 
-### 3. Calculate Cost
+### 3. Calculate Evaluation Cost
 
 The evaluation cost is the total rune count — including all defaults filled in automatically — divided by 5, rounded down. This cost is paid before execution begins.
 
 Example: a spell that expands to 11 runes including defaults costs 2 power.
 
-### 4. Source Power
+### 4. Source Evaluation Power
 
-Power is drawn to cover the evaluation cost.
-
-*(Power sourcing design: RMC-15, RMC-23)*
+Power is drawn to cover the evaluation cost. 
 
 ### 5. Execute
 
-The expression tree is evaluated against the world state. Effects are applied as expressions resolve.
+The expression tree is evaluated against the world state. Effects are applied as expressions resolve, and each effect draws power proportional to its magnitude at the point it resolves. This execution cost is separate from and independent of the evaluation cost — it taxes what the spell *does*, not how it is structured.
+
+Each effect-producing rune is responsible for defining its own execution cost. A fireball with radius 1 and a fireball with radius 1000 are the same spell structurally, and cost the same to evaluate; but the execution cost scales with the effect, so magnitude has real consequence.
 
 *(Evaluator design: RMC-8)*
 
 ---
+
+## Scope
+
+A scope is a set of entities. Scopes are used both for targeting (what can a spell reach?) and for power sourcing (where can power be drawn from?).
+
+A scope can be derived in two ways:
+
+- **Entity-defined** — the set of entities produced by evaluating an entity's `HasScope` capability. What this means is up to the entity: a cave's scope is everything it contains; a person's scope is everything they are touching.
+- **Spell-defined** — a set explicitly constructed within a spell, typically using `DWOR(in range)` or `DUMER(contained by)`.
+
+`LA(local scope)` is a variable that holds a scope, not a type of scope in itself. It defaults to the executor's entity-defined scope at the start of a spell and can be reassigned using `TWYAR(assign)`. It is a convenience — it gives the caster a scope they can reference multiple times without re-evaluating it.
+
+---
+
+## Power Sourcing
+
+Power is drawn twice per spell: once upfront to cover the evaluation cost (step 4), and once per effect as it resolves during execution (step 5). Both draws use the same cascade and the same `Draw` interface — the sourcing mechanism does not distinguish between the two.
+
+The engine works through a cascade of power sources, calling `Draw(amount)` on each in turn and carrying forward any shortfall until the cost is met. A source returns however much it can actually provide — which may be less than asked. The engine never inspects a source's internals or queries its reserves; it just takes what it gets and moves on.
+
+What it means to be drained is entirely up to the entity. A mana crystal depletes its stored charge; a creature loses life. The engine has no special cases for any of this — it is all self-defined by the entity via its `IsReservoir` capability.
+
+*(Cascade ordering and preference rules: RMC-15)*
 
 ## Failure
 
