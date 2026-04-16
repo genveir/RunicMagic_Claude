@@ -2,10 +2,11 @@
 
 ## To Do
 
-Next ticket number: RMC-32
+Next ticket number: RMC-34
 
 | Key | Title | Description | Blocked By |
 |-----|-------|-------------|------------|
+| RMC-32 | Check Design documents and memories | Go through the design documents and memories carefully and determine if everything is still up to date (it isn't) | |
 | RMC-31 | Add weight to entities | Making entities have weight makes the VUN rune's cost function more intuitive and fun | |
 | RMC-12 | Design the parser | Turning a string of rune words into a typed expression tree. Direction: recursive descent where each rune implements its own Parse method, consuming its arguments from the remaining token stream — adding a rune stays self-contained. Parsing is the prerequisite for evaluation (type-checking) and distinct from execution (world application). Define how parse errors are surfaced. | RMC-6 |
 | RMC-28 | Design the evaluator | Given a parsed expression tree, determine whether the spell is valid and what it costs. This is the type-checking phase: resolving rune output types against expected input types, surfacing type errors, computing power requirements. | RMC-6, RMC-12, RMC-27 |
@@ -44,3 +45,4 @@ Next ticket number: RMC-32
 | RMC-25 | Implement the world model |
 | RMC-6 | Formalize the type system |
 | RMC-27 | Define the initial rune set |
+| RMC-33 | Consider set theory for types |

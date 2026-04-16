@@ -16,50 +16,43 @@ Nothing can consume ExecutableStatement — ZU must appear first in the token st
 
 | Rune | Meaning | Signature |
 |------|---------|-----------|
-| `VUN` | push | (Group, Number, Location = PAR(A)) → Statement |
+| `VUN` | push | (Set, Number, Location = PAR(A)) → Statement |
 
-Moves every entity in the Group away from the given Location by the given Number of
+Moves every entity in the Set away from the given Location by the given Number of
 centimetres. Direction is determined per entity as the unit vector from Location to
 the entity's centre. The default origin is the caster's position.
 
 Execution cost scales with distance × number of entities pushed.
 
-## Selection
+## Sets
 
 | Rune | Meaning | Signature |
 |------|---------|-----------|
-| `BUZD` | all | (Scope) → Group |
+| `LA` | scope of | (Set = OH) → Set |
 
-Selects every entity currently in the given Scope.
-
-## Scope
-
-| Rune | Meaning | Signature |
-|------|---------|-----------|
-| `LA` | scope of | (Entity = OH) → Scope |
-
-Resolves an Entity to its scope by calling the entity's scope delegate. Defaults to `OH`,
-so bare `LA` is equivalent to `LA OH`. `LA A` gives the caster's scope.
+Maps each member of the input Set to its scope (via the entity's scope delegate) and
+returns the union. Defaults to `OH`, so bare `LA` maps the executor's scope.
+`LA A` gives the union of the caster's scope.
 
 ## Entity References
 
 | Rune | Meaning | Signature |
 |------|---------|-----------|
-| `A` | me | () → Entity |
-| `OH` | this | () → Entity |
+| `A` | me | () → Set |
+| `OH` | this | () → Set |
 
-`A` produces the caster entity; `OH` produces the executor entity. They are identical for
-spoken spells and diverge for inscribed spells (where the executor is the inscribed object).
-Both are used as targeting references and, in the power sourcing context (RMC-15), as
-reservoir references.
+`A` produces a singleton Set containing the caster; `OH` produces a singleton Set
+containing the executor. They are identical for spoken spells and diverge for inscribed
+spells (where the executor is the inscribed object). Both are used as targeting references
+and, in the power sourcing context (RMC-15), as reservoir references.
 
 ## Location
 
 | Rune | Meaning | Signature |
 |------|---------|-----------|
-| `PAR` | location of | (Entity) → Location |
+| `PAR` | location of | (Set) → Location |
 
-Resolves an Entity to its centre point at evaluation time.
+Resolves a Set to the centroid of its members' bounding rectangles.
 
 ## Numbers
 
@@ -85,7 +78,7 @@ Numbers are expressed as powers of 14. Representative values:
 ### Milestone spell — push everything touching the caster
 
 ```
-ZU  VUN  BUZD  LA  FOTIR FOTIR HET
+ZU  VUN  LA  FOTIR FOTIR HET
 ```
 
 Pushes all entities in the caster's local scope 196 cm away from the caster.
@@ -96,8 +89,8 @@ This is the target spell for the RMC-18 walking skeleton.
 ```
 ZU
 └── VUN
-    ├── BUZD
-    │   └── LA
+    ├── LA
+    │   └── [default] OH
     ├── FOTIR
     │   └── FOTIR
     │       └── HET
@@ -112,15 +105,15 @@ ZU
 | `HET` | Number | 1 |
 | `FOTIR HET` | Number | 14 |
 | `FOTIR FOTIR HET` | Number | 196 |
-| `LA` | Scope | scope of the executor (default argument `A` consumed implicitly) |
-| `BUZD LA` | Group | all entities in that scope |
-| `A` | Entity | the caster |
-| `PAR A` | Location | centre point of the caster's bounding rectangle |
-| `VUN BUZD LA  FOTIR FOTIR HET  PAR A` | Statement | move each entity in the Group 196 cm away from the caster's centre |
+| `OH` | Set | singleton set containing the executor |
+| `LA OH` | Set | scope of the executor (default argument `OH` consumed implicitly) |
+| `A` | Set | singleton set containing the caster |
+| `PAR A` | Location | centroid of the caster's bounding rectangle |
+| `VUN LA  FOTIR FOTIR HET  PAR A` | Statement | move each entity in the Set 196 cm away from the caster's centre |
 | `ZU VUN …` | ExecutableStatement | execute the Statement |
 
-The third argument to VUN (`PAR A`) is not present in the token stream — the parser
-substitutes it as the declared default when no Location-producing token follows the Number.
+Both `LA` and `PAR A` use their declared defaults — neither `OH` nor `A` appears in the
+token stream.
 
 `LA` could be replaced with `LA OH` (explicit) or `LA A` (caster's scope) and the result
 would be identical for this spell, since the caster is also the executor. They diverge

@@ -54,22 +54,29 @@ Each effect-producing rune is responsible for defining its own execution cost. A
 
 ---
 
-## Scope
+## Sets and Targeting
 
-A scope is a set of entities. Scopes are used both for targeting (what can a spell reach?) and for power sourcing (where can power be drawn from?).
+The magic system operates on Sets — predicates over world entities evaluated at execution
+time. There is no distinction between "scope" and "group"; everything is a Set.
 
-A scope can be derived in two ways:
+Sets are used both for targeting (what does this effect apply to?) and for power sourcing
+(where can power be drawn from?). An entity can only be affected by a spell if it appears
+in the Set the effect is applied to.
 
-- **Entity-defined** — the set of entities produced by evaluating an entity's `HasScope` capability. What this means is up to the entity: a cave's scope is everything it contains; a person's scope is everything they are touching.
-- **Spell-defined** — a set explicitly constructed within a spell, typically using `DWOR(in range)` or `DUMER(contained by)`.
+Sets can be derived several ways:
 
-`LA(local scope)` is a variable that holds a scope, not a type of scope in itself. It defaults to the executor's entity-defined scope at the start of a spell and can be reassigned using `TWYAR(assign)`. It is a convenience — it gives the caster a scope they can reference multiple times without re-evaluating it.
+- **Entity references** — `A(me)` and `OH(this)` produce singleton Sets.
+- **Scope expansion** — `LA` maps a Set to the union of its members' scopes, where each
+  entity's scope is defined by its `HasScope` capability (a cave's scope is its contents,
+  a person's scope is what they are touching).
+- **Spatial construction** — future runes such as `DWOR(in range)` or `DUMER(contained by)`
+  build Sets from spatial predicates.
+- **Set operations** — union, intersection, difference, and property filters are natural
+  future rune primitives.
 
-## Targeting
-
-Spell effects target entities within a scope. A rune such as `BUZD(all)` or `NJEL(any)` selects entities from a scope; the effect then applies to whatever was selected. There is no targeting mechanism outside of scope membership — if an entity is not in scope, it cannot be affected.
-
-How casters construct and manipulate scopes beyond the defaults (`LA(local scope)`, `MJORNER(caster)`, `A(this)`) is left for later design.
+Sets are always evaluated at the point of execution against current world state. A Set
+referenced twice in a spell may yield different results if the world changed between the
+two evaluations.
 
 ---
 
