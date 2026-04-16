@@ -8,7 +8,7 @@ Spatial relationships between entities:
 
 - **Containment** — entity A is contained by entity B if A's rectangle fits entirely within B's rectangle
 - **Touch** — entities whose rectangles are adjacent or overlapping
-- **Proximity** — the measurable distance between two entities, used by `DWOR(in range)`
+- **Proximity** — the measurable distance between two entities
 
 ## Entity Taxonomy
 

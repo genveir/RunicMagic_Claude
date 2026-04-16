@@ -5,7 +5,7 @@
 A spell can be **spoken** or **inscribed**.
 
 - A **spoken** spell activates the moment the caster intends to stop speaking runes.
-- An **inscribed** spell activates once when triggered (e.g. by touch, or by another spell referencing it via `BEH(the spell in context)`). If the effect can be channeled, it remains active as long as power is supplied to it.
+- An **inscribed** spell activates once when triggered. If the effect can be channeled, it remains active as long as power is supplied to it.
 
 ---
 
@@ -19,18 +19,16 @@ Two entity references are resolved at the start of every spell:
 
 | Rune | Value |
 |------|-------|
-| `A(me)` | The entity that spoke or wrote the spell |
-| `OH(this)` | The entity in whose context the spell runs |
+| `A(me)` | The caster: The entity that spoke or wrote the spell |
+| `OH(this)` | The executor: The entity in whose context the spell runs |
 
 The caster and executor are usually the same entity. They differ when a spell is inscribed: the caster is whoever activates the inscription, but the executor is the entity the spell is inscribed on.
-
-`LA(scope of)` takes an Entity and returns its scope. It defaults to `OH`, so bare `LA` is equivalent to `LA OH` — the executor's scope.
 
 ### 2. Parse the Spell
 
 The rune string is parsed into an expression tree. Each rune consumes its arguments from the remaining token stream. Arguments not of the expected type stop evaluation at that point — the invalid rune and everything after it is ignored.
 
-Example: `ZU(execute) MUR(add) MUR(add) HET(one) HET(one) HET(one)` — `ZU(execute)` expects a `Statement`, but `MUR(add)` returns a `Number`. Only `ZU(execute)` is evaluated; the rest is ignored.
+Example: `ZU(execute) HET(one)` — `ZU` expects a `Statement`, but `HET` returns a `Number`. Only `ZU` is evaluated; the rest is ignored.
 
 *(Parser design: RMC-12)*
 
@@ -42,7 +40,7 @@ Example: a spell that expands to 11 runes including defaults costs 2 power.
 
 ### 4. Source Evaluation Power
 
-Power is drawn to cover the evaluation cost. 
+Power is drawn to cover the evaluation cost. This power is always drawn, even when the spell will not execute. If it can't be drawn, the executor disintegrates.
 
 ### 5. Execute
 
@@ -50,33 +48,26 @@ The expression tree is evaluated against the world state. Effects are applied as
 
 Each effect-producing rune is responsible for defining its own execution cost. A fireball with radius 1 and a fireball with radius 1000 are the same spell structurally, and cost the same to evaluate; but the execution cost scales with the effect, so magnitude has real consequence.
 
-*(Evaluator design: RMC-8)*
+All Sets are resolved at the time of their execution. If a previous part of a spell has altered state, that altered state is carried forward. Runes being executed always only see the state as it is when they're executed.
+
+*(Evaluator design: RMC-28)*
 
 ---
 
 ## Sets and Targeting
 
-The magic system operates on Sets — predicates over world entities evaluated at execution
-time. There is no distinction between "scope" and "group"; everything is a Set.
+The magic system operates on Sets — predicates over world entities evaluated at execution time. 
 
-Sets are used both for targeting (what does this effect apply to?) and for power sourcing
-(where can power be drawn from?). An entity can only be affected by a spell if it appears
-in the Set the effect is applied to.
+Sets are used both for targeting (what does this effect apply to?) and for power sourcing (where can power be drawn from?). An entity can only be affected by a spell if it appears in the Set the effect is applied to.
 
 Sets can be derived several ways:
 
 - **Entity references** — `A(me)` and `OH(this)` produce singleton Sets.
-- **Scope expansion** — `LA` maps a Set to the union of its members' scopes, where each
-  entity's scope is defined by its `HasScope` capability (a cave's scope is its contents,
-  a person's scope is what they are touching).
-- **Spatial construction** — future runes such as `DWOR(in range)` or `DUMER(contained by)`
-  build Sets from spatial predicates.
-- **Set operations** — union, intersection, difference, and property filters are natural
-  future rune primitives.
+- **Scope expansion** — `LA(scope of)` maps a Set to the union of its members' scopes, where each entity's scope is defined by its `HasScope` capability (a cave's scope is its contents, a person's scope is what they are touching).
+- **Spatial construction** — future runes may build Sets from spatial predicates.
+- **Set operations** — union, intersection, difference, and property filters are natural future rune primitives.
 
-Sets are always evaluated at the point of execution against current world state. A Set
-referenced twice in a spell may yield different results if the world changed between the
-two evaluations.
+Sets are always evaluated at the point of execution against current world state. A Set referenced twice in a spell may yield different results if the world changed between the two evaluations.
 
 ---
 
