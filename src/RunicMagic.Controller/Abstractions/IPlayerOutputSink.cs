@@ -1,5 +1,3 @@
-using RunicMagic.Controller.Models;
-
 namespace RunicMagic.Controller.Abstractions;
 
 // The world model's side of the player interface.

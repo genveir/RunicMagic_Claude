@@ -13,18 +13,24 @@ public class EntityRenderingMapperTests
         LifeCapability? life = null, ChargeCapability? charge = null) =>
         new(EntityId.New(), type, "test")
         {
-            Bounds = new Rectangle(10, 20, 30, 40),
+            X = 10,
+            Y = 20,
+            Width = 30,
+            Height = 40,
             HasAgency = hasAgency,
             Life = life,
             Charge = charge,
         };
 
     [Fact]
-    public void Maps_BoundsAndLabel()
+    public void Maps_LocationAndLabel()
     {
         var entity = new Entity(EntityId.New(), EntityType.Object, "rock")
         {
-            Bounds = new Rectangle(5, 15, 25, 35),
+            X = 5,
+            Y = 15,
+            Width = 25,
+            Height = 35,
         };
 
         var model = EntityRenderingMapper.ToRenderingModel(entity);

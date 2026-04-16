@@ -19,7 +19,10 @@ public class EntityFactory(WorldModel world, ILogger<EntityFactory> logger)
 
         var entity = new Entity(new EntityId(data.Id), type, data.Label)
         {
-            Bounds = new Rectangle(data.X, data.Y, data.Width, data.Height),
+            X = data.X,
+            Y = data.Y,
+            Width = data.Width,
+            Height = data.Height,
             HasAgency = data.HasAgency,
             Weight = data.Weight,
         };

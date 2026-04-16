@@ -7,7 +7,10 @@ public class Entity(EntityId id, EntityType type, string label)
     public EntityId Id { get; } = id;
     public EntityType Type { get; } = type;
     public string Label { get; set; } = label;
-    public Rectangle Bounds { get; set; }
+    public int X { get; set; }
+    public int Y { get; set; }
+    public int Width { get; set; }
+    public int Height { get; set; }
 
     public LifeCapability? Life { get; set; }
     public ChargeCapability? Charge { get; set; }

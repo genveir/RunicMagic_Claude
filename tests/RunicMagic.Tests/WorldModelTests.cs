@@ -6,7 +6,7 @@ namespace RunicMagic.Tests;
 public class WorldModelTests
 {
     private static Entity MakeEntity(int x, int y, int width, int height) =>
-        new(EntityId.New(), EntityType.Object, "test") { Bounds = new Rectangle(x, y, width, height) };
+        new(EntityId.New(), EntityType.Object, "test") { X = x, Y = y, Width = width, Height = height };
 
     // ── GetEntitiesInArea ─────────────────────────────────────────────────────
 
@@ -39,10 +39,10 @@ public class WorldModelTests
     {
         // Adjacent entity shares an edge but does not overlap — not returned by IntersectsWith.
         var world = new WorldModel();
-        var entity = MakeEntity(x: 50, y: 0, width: 10, height: 10);
+        var entity = MakeEntity(x: 30, y: 0, width: 10, height: 10);
         world.Add(entity);
 
-        // Area ends at x=50; entity starts at x=50 — edge-adjacent, no overlap.
+        // Area right edge at x=25; entity left edge at x=25 — edge-adjacent, no overlap.
         var result = world.GetEntitiesInArea(new Rectangle(0, 0, 50, 50));
 
         Assert.DoesNotContain(entity, result);
@@ -69,7 +69,7 @@ public class WorldModelTests
     {
         var world = new WorldModel();
         var source = MakeEntity(x: 0, y: 0, width: 20, height: 20);
-        var other = MakeEntity(x: 20, y: 0, width: 10, height: 10); // shares right edge of source
+        var other = MakeEntity(x: 15, y: 0, width: 10, height: 10); // left edge (10) == source right edge (10)
         world.Add(source);
         world.Add(other);
 

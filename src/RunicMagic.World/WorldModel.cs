@@ -11,11 +11,13 @@ public class WorldModel
     public IReadOnlyList<Entity> GetAll() => [.. _entities.Values];
 
     public IReadOnlyList<Entity> GetEntitiesInArea(Rectangle area) =>
-        [.. _entities.Values.Where(e => e.Bounds.IntersectsWith(area))];
+        [.. _entities.Values.Where(e => Bounds(e).IntersectsWith(area))];
 
     public IReadOnlyList<Entity> GetTouchingEntities(Entity source) =>
-        [.. _entities.Values.Where(e => e.Id != source.Id && source.Bounds.Touches(e.Bounds))];
+        [.. _entities.Values.Where(e => e.Id != source.Id && Bounds(source).Touches(Bounds(e)))];
 
     public IReadOnlyList<Entity> GetContainedEntities(Entity container) =>
-        [.. _entities.Values.Where(e => e.Id != container.Id && container.Bounds.Contains(e.Bounds))];
+        [.. _entities.Values.Where(e => e.Id != container.Id && Bounds(container).Contains(Bounds(e)))];
+
+    private static Rectangle Bounds(Entity e) => new(e.X, e.Y, e.Width, e.Height);
 }

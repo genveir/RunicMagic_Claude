@@ -49,3 +49,4 @@ Next ticket number: RMC-37
 | RMC-31 | Add weight to entities |
 | RMC-34 | Seed the database for the walking skeleton |
 | RMC-35 | Wire up world rendering output | 
+| BUG-1 | Fix entity rendering coordinates |

@@ -13,7 +13,10 @@ public class WorldRenderingServiceTests
         bool hasAgency = false, LifeCapability? life = null) =>
         new(EntityId.New(), EntityType.Object, label)
         {
-            Bounds = new Rectangle(x, y, width, height),
+            X = x,
+            Y = y,
+            Width = width,
+            Height = height,
             HasAgency = hasAgency,
             Life = life,
         };

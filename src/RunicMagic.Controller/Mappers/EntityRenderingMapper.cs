@@ -12,10 +12,10 @@ public static class EntityRenderingMapper
         if (entity.HasAgency) flags |= EntityRenderingFlags.HasAgency;
 
         return new EntityRenderingModel(
-            x: entity.Bounds.X,
-            y: entity.Bounds.Y,
-            width: entity.Bounds.Width,
-            height: entity.Bounds.Height,
+            x: entity.X,
+            y: entity.Y,
+            width: entity.Width,
+            height: entity.Height,
             label: entity.Label,
             flags: flags);
     }

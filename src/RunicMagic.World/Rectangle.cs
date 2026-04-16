@@ -1,20 +1,24 @@
 namespace RunicMagic.World;
 
+// X and Y are the center of the rectangle. Width and Height are the full extents.
 public readonly record struct Rectangle(int X, int Y, int Width, int Height)
 {
-    public int Right => X + Width;
-    public int Bottom => Y + Height;
-
     public bool Contains(Rectangle other) =>
-        other.X >= X && other.Y >= Y &&
-        other.Right <= Right && other.Bottom <= Bottom;
+        X - Width / 2 <= other.X - other.Width / 2 &&
+        other.X + other.Width / 2 <= X + Width / 2 &&
+        Y - Height / 2 <= other.Y - other.Height / 2 &&
+        other.Y + other.Height / 2 <= Y + Height / 2;
 
     public bool IntersectsWith(Rectangle other) =>
-        X < other.Right && other.X < Right &&
-        Y < other.Bottom && other.Y < Bottom;
+        X - Width / 2 < other.X + other.Width / 2 &&
+        other.X - other.Width / 2 < X + Width / 2 &&
+        Y - Height / 2 < other.Y + other.Height / 2 &&
+        other.Y - other.Height / 2 < Y + Height / 2;
 
     // Overlap or shared edge — used for the "touch" spatial relationship.
     public bool Touches(Rectangle other) =>
-        X <= other.Right && other.X <= Right &&
-        Y <= other.Bottom && other.Y <= Bottom;
+        X - Width / 2 <= other.X + other.Width / 2 &&
+        other.X - other.Width / 2 <= X + Width / 2 &&
+        Y - Height / 2 <= other.Y + other.Height / 2 &&
+        other.Y - other.Height / 2 <= Y + Height / 2;
 }
