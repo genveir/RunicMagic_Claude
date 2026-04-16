@@ -2,7 +2,7 @@
 
 ## Spatial Model
 
-The world is a 2D coordinate space measured in centimeters. Every Entity has a position and dimensions, represented as an axis-aligned rectangle. There are no entities without spatial representation.
+The world is a 2D coordinate space measured in millimeters. Every Entity has a position and dimensions, represented as an axis-aligned rectangle. There are no entities without spatial representation.
 
 Spatial relationships between entities:
 
@@ -62,4 +62,4 @@ The world is loaded in full at startup into a `Dictionary<EntityId, Entity>`. Th
 - `GetTouchingEntities(Entity)` — entities whose bounds overlap or share an edge with the given entity
 - `GetContainedEntities(Entity)` — entities whose bounds fit entirely within the given entity's bounds
 
-`Rectangle` is a custom `readonly record struct` (integer centimetres) with no dependency on `System.Drawing`.
+`Rectangle` is a custom `readonly record struct` (integer millimetres) with no dependency on `System.Drawing`.

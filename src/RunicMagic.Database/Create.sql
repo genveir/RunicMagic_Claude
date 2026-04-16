@@ -16,7 +16,8 @@ create table Entities (
     Y            int              not null,
     Width        int              not null,
     Height       int              not null,
-    HasAgency    bit              not null constraint DF_Entities_HasAgency default 0
+    HasAgency    bit              not null constraint DF_Entities_HasAgency default 0,
+    Weight       int              not null
 );
 
 create table EntityLife (

@@ -20,6 +20,7 @@ public class EntityFactoryTests
         Label: "creature",
         X: 0, Y: 0, Width: 10, Height: 10,
         HasAgency: false,
+        Weight: 0,
         MaxHitPoints: maxHp,
         CurrentHitPoints: currentHp);
 
@@ -29,6 +30,7 @@ public class EntityFactoryTests
         Label: "mana source",
         X: 0, Y: 0, Width: 10, Height: 10,
         HasAgency: false,
+        Weight: 0,
         MaxCharge: maxCharge,
         CurrentCharge: currentCharge);
 
@@ -79,7 +81,7 @@ public class EntityFactoryTests
         var logger = new Mock<ILogger<EntityFactory>>();
         var entity = new EntityFactory(world, logger.Object).Create(new EntityData(
             Guid.NewGuid(), (int)EntityType.Creature, "lifeless creature",
-            X: 0, Y: 0, Width: 10, Height: 10, HasAgency: false));
+            X: 0, Y: 0, Width: 10, Height: 10, HasAgency: false, Weight: 0));
         world.Add(entity);
 
         var drawn = entity.Reservoir!(50);
@@ -130,7 +132,7 @@ public class EntityFactoryTests
         var logger = new Mock<ILogger<EntityFactory>>();
         var entity = new EntityFactory(world, logger.Object).Create(new EntityData(
             Guid.NewGuid(), (int)EntityType.ManaSource, "uncharged source",
-            X: 0, Y: 0, Width: 10, Height: 10, HasAgency: false));
+            X: 0, Y: 0, Width: 10, Height: 10, HasAgency: false, Weight: 0));
         world.Add(entity);
 
         var drawn = entity.Reservoir!(50);
@@ -154,7 +156,7 @@ public class EntityFactoryTests
         var world = new WorldModel();
         var caster = Factory(world).Create(CreatureData(maxHp: 100, currentHp: 100) with { X = 0, Y = 0 });
         var nearby = Factory(world).Create(new EntityData(Guid.NewGuid(), (int)EntityType.Object, "nearby",
-            X: 10, Y: 0, Width: 10, Height: 10, HasAgency: false));
+            X: 10, Y: 0, Width: 10, Height: 10, HasAgency: false, Weight: 0));
         world.Add(caster);
         world.Add(nearby);
 
@@ -169,7 +171,7 @@ public class EntityFactoryTests
         var world = new WorldModel();
         var caster = Factory(world).Create(CreatureData(maxHp: 100, currentHp: 100) with { X = 0, Y = 0 });
         var distant = Factory(world).Create(new EntityData(Guid.NewGuid(), (int)EntityType.Object, "distant",
-            X: 500, Y: 500, Width: 10, Height: 10, HasAgency: false));
+            X: 500, Y: 500, Width: 10, Height: 10, HasAgency: false, Weight: 0));
         world.Add(caster);
         world.Add(distant);
 
@@ -186,7 +188,7 @@ public class EntityFactoryTests
         var world = new WorldModel();
         var entity = Factory(world).Create(new EntityData(
             Guid.NewGuid(), (int)EntityType.Object, "rock",
-            X: 0, Y: 0, Width: 5, Height: 5, HasAgency: false));
+            X: 0, Y: 0, Width: 5, Height: 5, HasAgency: false, Weight: 0));
 
         entity.Reservoir.Should().BeNull();
         entity.Scope.Should().BeNull();

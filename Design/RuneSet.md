@@ -18,11 +18,11 @@ Nothing can consume ExecutableStatement — ZU must appear first in the token st
 |------|---------|-----------|
 | `VUN` | push | (Set, Number, Location = PAR(A)) → Statement |
 
-Moves every entity in the Set away from the given Location by the given Number of centimetres. 
+Moves every entity in the Set away from the given Location by the given Number of millimetres.
 
 Direction is determined per entity as the unit vector from Location to the entity's centre. The default origin is the caster's position.
 
-Execution cost scales with distance × number of entities pushed.
+Execution cost scales with distance × summed weight of entities pushed.
 
 ## Sets
 
@@ -79,10 +79,10 @@ Numbers are expressed as powers of 14. Representative values:
 ### Milestone spell — push everything touching the caster
 
 ```
-ZU VUN LA FOTIR FOTIR HET
+ZU VUN LA FOTIR FOTIR FOTIR HET
 ```
 
-Pushes all entities in the caster's local scope 196 cm away from the caster.
+Pushes all entities in the caster's local scope 2 744 mm (~2.7 m) away from the caster.
 This is the target spell for the RMC-18 walking skeleton.
 
 **Parse tree:**
@@ -94,7 +94,8 @@ ZU
     │   └── [default] OH
     ├── FOTIR
     │   └── FOTIR
-    │       └── HET
+    │       └── FOTIR
+    │           └── HET
     └── [default] PAR
         └── A
 ```
@@ -106,11 +107,12 @@ ZU
 | `HET` | Number | 1 |
 | `FOTIR HET` | Number | 14 |
 | `FOTIR FOTIR HET` | Number | 196 |
+| `FOTIR FOTIR FOTIR HET` | Number | 2 744 |
 | `OH` | Set | singleton set containing the executor |
 | `LA OH` | Set | scope of the executor (default argument `OH` consumed implicitly) |
 | `A` | Set | singleton set containing the caster |
 | `PAR A` | Location | centroid of the caster's bounding rectangle |
-| `VUN LA  FOTIR FOTIR HET  PAR A` | Statement | move each entity in the Set 196 cm away from the caster's centre |
+| `VUN LA  FOTIR FOTIR FOTIR HET  PAR A` | Statement | move each entity in the Set 2 744 mm away from the caster's centre |
 | `ZU VUN …` | ExecutableStatement | execute the Statement |
 
 Both `LA` and `PAR A` use their declared defaults — neither `OH` nor `A` appears in the

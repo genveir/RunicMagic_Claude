@@ -21,6 +21,7 @@ public class EntityFactory(WorldModel world, ILogger<EntityFactory> logger)
         {
             Bounds = new Rectangle(data.X, data.Y, data.Width, data.Height),
             HasAgency = data.HasAgency,
+            Weight = data.Weight,
         };
 
         if (data.MaxHitPoints.HasValue && data.CurrentHitPoints.HasValue)

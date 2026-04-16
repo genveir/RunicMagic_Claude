@@ -9,6 +9,7 @@ public record EntityData(
     int Width,
     int Height,
     bool HasAgency,
+    int Weight,
     int? MaxHitPoints = null,
     int? CurrentHitPoints = null,
     int? MaxCharge = null,

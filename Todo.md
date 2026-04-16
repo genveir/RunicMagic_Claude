@@ -2,16 +2,18 @@
 
 ## To Do
 
-Next ticket number: RMC-34
+Next ticket number: RMC-37
 
 | Key | Title | Description | Blocked By |
 |-----|-------|-------------|------------|
-| RMC-31 | Add weight to entities | Making entities have weight makes the VUN rune's cost function more intuitive and fun | |
+| RMC-34 | Seed the database for the walking skeleton | Insert the entities needed to run the RMC-18 milestone scenario. Exact entities TBD when the ticket is picked up. | |
+| RMC-35 | Wire up world rendering output | The SVG canvas needs to reflect world state — populated on load | RMC-25 |
 | RMC-12 | Design the parser | Turning a string of rune words into a typed expression tree. Direction: recursive descent where each rune implements its own Parse method, consuming its arguments from the remaining token stream — adding a rune stays self-contained. Parsing is the prerequisite for evaluation (type-checking) and distinct from execution (world application). Define how parse errors are surfaced. | RMC-6 |
 | RMC-28 | Design the evaluator | Given a parsed expression tree, determine whether the spell is valid and what it costs. This is the type-checking phase: resolving rune output types against expected input types, surfacing type errors, computing power requirements. | RMC-6, RMC-12, RMC-27 |
 | RMC-29 | Design the executor | Given a validated, costed spell, apply its effects against the world state. Defines what "executing" each rune means in terms of world mutations. Excludes power sourcing (RMC-15). | RMC-25, RMC-28 |
 | RMC-30 | Wire up the spell casting pipeline | Build the SpellCastingService (or equivalent) in Controller that connects parser → evaluator → executor into a single callable entry point for the UI. Interface is derived from the implemented components rather than designed upfront. | RMC-12, RMC-28, RMC-29 |
-| RMC-18 | 🏁 Walking skeleton — boot and cast anything | Milestone. Minimal world with a handful of hardcoded entities, minimal type system, minimal parser, minimal executor. Power source for the skeleton is caster health — find the caster entity and draw from its Reservoir directly. Goal: a user can launch the UI and successfully cast at least one spell that does something observable. Everything can be rough — correctness and completeness come later. | RMC-25, RMC-6, RMC-9, RMC-10, RMC-12, RMC-28, RMC-29, RMC-30 |
+| RMC-36 | Display world state after spell casting | The UI needs to be updated after spell resolution. Without this, spells execute silently in the backend with no visible effect. | RMC-35 |
+| RMC-18 | 🏁 Walking skeleton — boot and cast anything | Milestone. Minimal world with a handful of hardcoded entities, minimal type system, minimal parser, minimal executor. Power source for the skeleton is caster health — find the caster entity and draw from its Reservoir directly. Goal: a user can launch the UI and successfully cast at least one spell that does something observable. Everything can be rough — correctness and completeness come later. | RMC-25, RMC-6, RMC-9, RMC-10, RMC-12, RMC-28, RMC-29, RMC-30, RMC-34, RMC-35, RMC-36 |
 | RMC-13 | Design spell failure modes | RunicMagic.md has "[the spell fails]" as a placeholder. Beyond the executor-disintegrates rule for insufficient evaluation power, define what failure looks like for invalid spells, type mismatches, missing targets, etc. | |
 | RMC-7 | Identify missing runes | HOR returns a Property but there is no comparison or conditional branching rune. Audit the full rune set for gaps needed to write meaningful spells. | RMC-6 |
 | RMC-14 | Design channeling and persistent effects | Written runes stay active while power is channeled. Define what "channeling" means mechanically — what keeps a spell alive, how it is terminated, and how the executor tracks ongoing effects. | RMC-25 |
@@ -46,3 +48,4 @@ Next ticket number: RMC-34
 | RMC-27 | Define the initial rune set |
 | RMC-33 | Consider set theory for types |
 | RMC-32 | Check Design documents and memories |
+| RMC-31 | Add weight to entities |
