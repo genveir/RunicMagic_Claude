@@ -9,6 +9,9 @@ namespace RunicMagic.View.Controllers;
 public class WorldController(WorldRenderingService worldRendering) : ControllerBase
 {
     [HttpGet]
-    public IReadOnlyList<EntityRenderingModel> Get() =>
-        worldRendering.GetAllRenderingModels();
+    public IReadOnlyList<EntityRenderingModel> Get()
+    {
+        var models = worldRendering.GetAllRenderingModels();
+        return models;
+    }
 }

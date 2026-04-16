@@ -33,6 +33,20 @@
 
 - Object initializers with multiple properties use one property per line — do not pack multiple assignments onto a single line.
 
+- Do not use expression-bodied methods (`=> expression`). Always use block bodies, assign the result to a named local variable, and return that variable. This makes every intermediate value visible in the debugger's Locals/Watch windows:
+  ```csharp
+  // wrong
+  public Entity? Find(EntityId id) => _entities.GetValueOrDefault(id);
+
+  // right
+  public Entity? Find(EntityId id)
+  {
+      var entity = _entities.GetValueOrDefault(id);
+      return entity;
+  }
+  ```
+  Void methods that have nothing to return are exempt.
+
 - Use named arguments when the purpose of an argument isn't obvious from the call site:
   - Always for inline lambdas (you can't tell from the lambda body alone which parameter it maps to)
   - Always for literals (bools, strings, numbers) where the meaning isn't self-evident from the method name

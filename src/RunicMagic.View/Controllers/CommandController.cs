@@ -9,6 +9,10 @@ namespace RunicMagic.View.Controllers;
 public class CommandController(IPlayerViewInterface player) : ControllerBase
 {
     [HttpPost]
-    public async Task<CommandResult> Post([FromBody] string input) =>
-        await player.RegisterInput(input);
+    public async Task<CommandResult> Post([FromBody] string input)
+    {
+        var result = await player.RegisterInput(input);
+
+        return result;
+    }
 }
