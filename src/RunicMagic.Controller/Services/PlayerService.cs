@@ -3,7 +3,7 @@ using RunicMagic.Controller.Models;
 
 namespace RunicMagic.Controller.Services;
 
-internal class PlayerService : IPlayerViewInterface, IPlayerOutputSink
+internal class PlayerService(WorldRenderingService worldRendering) : IPlayerViewInterface, IPlayerOutputSink
 {
     private readonly List<string> _pendingText = [];
     private readonly List<EntityRenderingModel> _pendingEntities = [];
@@ -14,19 +14,7 @@ internal class PlayerService : IPlayerViewInterface, IPlayerOutputSink
     {
         // Not yet wired to the spell processor — echo input back to confirm IO is working.
         await SendText($"you wrote: {input}");
-
-        await SendEntity(new EntityRenderingModel(
-            x: 100,
-            y: 10,
-            width: 50, height: 75,
-            label: "a test entity",
-            flags: EntityRenderingFlags.HasLife));
-        await SendEntity(new EntityRenderingModel(
-            x: -100,
-            y: -80,
-            width: 10, height: 20,
-            label: "another test entity",
-            flags: EntityRenderingFlags.HasLife | EntityRenderingFlags.HasAgency));
+        await SendWorldEntities();
 
         var result = new CommandResult([.. _pendingText], [.. _pendingEntities]);
         _pendingText.Clear();
@@ -40,9 +28,9 @@ internal class PlayerService : IPlayerViewInterface, IPlayerOutputSink
         return Task.CompletedTask;
     }
 
-    public Task SendEntity(EntityRenderingModel entity)
+    public Task SendWorldEntities()
     {
-        _pendingEntities.Add(entity);
+        _pendingEntities.AddRange(worldRendering.GetAllRenderingModels());
         return Task.CompletedTask;
     }
 }

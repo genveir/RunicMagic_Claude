@@ -14,6 +14,7 @@ namespace RunicMagic.Controller
 
             services.AddSingleton<EntityFactory>();
             services.AddSingleton<WorldLoadingService>();
+            services.AddSingleton<WorldRenderingService>();
 
             return services;
         }

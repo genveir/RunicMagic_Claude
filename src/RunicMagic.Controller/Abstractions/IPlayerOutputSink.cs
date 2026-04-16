@@ -7,5 +7,5 @@ namespace RunicMagic.Controller.Abstractions;
 public interface IPlayerOutputSink
 {
     Task SendText(string text);
-    Task SendEntity(EntityRenderingModel entity);
+    Task SendWorldEntities();
 }

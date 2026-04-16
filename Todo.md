@@ -6,8 +6,6 @@ Next ticket number: RMC-37
 
 | Key | Title | Description | Blocked By |
 |-----|-------|-------------|------------|
-| RMC-34 | Seed the database for the walking skeleton | Insert the entities needed to run the RMC-18 milestone scenario. Exact entities TBD when the ticket is picked up. | |
-| RMC-35 | Wire up world rendering output | The SVG canvas needs to reflect world state — populated on load | RMC-25 |
 | RMC-12 | Design the parser | Turning a string of rune words into a typed expression tree. Direction: recursive descent where each rune implements its own Parse method, consuming its arguments from the remaining token stream — adding a rune stays self-contained. Parsing is the prerequisite for evaluation (type-checking) and distinct from execution (world application). Define how parse errors are surfaced. | RMC-6 |
 | RMC-28 | Design the evaluator | Given a parsed expression tree, determine whether the spell is valid and what it costs. This is the type-checking phase: resolving rune output types against expected input types, surfacing type errors, computing power requirements. | RMC-6, RMC-12, RMC-27 |
 | RMC-29 | Design the executor | Given a validated, costed spell, apply its effects against the world state. Defines what "executing" each rune means in terms of world mutations. Excludes power sourcing (RMC-15). | RMC-25, RMC-28 |
@@ -49,3 +47,5 @@ Next ticket number: RMC-37
 | RMC-33 | Consider set theory for types |
 | RMC-32 | Check Design documents and memories |
 | RMC-31 | Add weight to entities |
+| RMC-34 | Seed the database for the walking skeleton |
+| RMC-35 | Wire up world rendering output | 

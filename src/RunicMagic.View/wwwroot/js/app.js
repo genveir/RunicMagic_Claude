@@ -237,7 +237,10 @@ document.addEventListener('mouseup', () => {
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 
-updateCanvas([]);
+async function init() {
+    const entities = await fetch('/world').then(r => r.json());
+    updateCanvas(entities);
+    writePrompt();
+}
 
-// Defer prompt until xterm has finished attaching to the DOM.
-setTimeout(writePrompt, 0);
+init();

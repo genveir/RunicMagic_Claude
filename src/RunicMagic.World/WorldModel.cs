@@ -8,6 +8,8 @@ public class WorldModel
     public void Remove(EntityId id) => _entities.Remove(id);
     public Entity? Find(EntityId id) => _entities.GetValueOrDefault(id);
 
+    public IReadOnlyList<Entity> GetAll() => [.. _entities.Values];
+
     public IReadOnlyList<Entity> GetEntitiesInArea(Rectangle area) =>
         [.. _entities.Values.Where(e => e.Bounds.IntersectsWith(area))];
 
