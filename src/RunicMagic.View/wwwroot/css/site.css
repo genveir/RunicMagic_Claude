@@ -3,88 +3,88 @@
 *, *::before, *::after { box-sizing: border-box; }
 
 html {
-    margin:  0;
+    margin: 0;
     padding: 0;
 }
 
 body {
-    margin:         0;
-    padding:        0;
-    height:         100dvh;
-    overflow:       hidden;
-    background:     #111;
-    color:          #ccc;
-    display:        flex;
+    margin: 0;
+    padding: 0;
+    height: 100dvh;
+    overflow: hidden;
+    background: #f5f5f5;
+    color: #111;
+    display: flex;
     flex-direction: column;
 }
 
 #canvas-container {
-    flex:       1;
+    flex: 1;
     min-height: 0;
-    background: #111;
+    background: #f5f5f5;
 }
 
 #divider {
-    flex-shrink:    0;
-    height:         5px;
-    background:     #333;
-    cursor:         ns-resize;
-    transition:     background 0.15s;
+    flex-shrink: 0;
+    height: 5px;
+    background: #ccc;
+    cursor: ns-resize;
+    transition: background 0.15s;
 }
 
 #divider:hover {
-    background: #555;
+    background: #aaa;
 }
 
 #world-canvas {
-    width:  100%;
+    width: 100%;
     height: 100%;
     display: block;
 }
 
 #terminal-container {
     flex-shrink: 0;
-    height:      30vh;
-    padding:     4px;
-    background:  #111;
-    overflow:    hidden;
+    height: 30vh;
+    padding: 4px;
+    background: #111;
+    overflow: hidden;
 }
 
 
 /* ── SVG entity rendering ───────────────────────────────────────────────── */
 
 .entity {
-    stroke-width:  2;
-    fill-opacity:  0.15;
+    stroke-width: 2;
+    fill-opacity: 0.15;
 }
 
 .entity-creature {
-    stroke: #c85b5b;
-    fill:   #c85b5b;
+    stroke: #8b0000;
+    fill: #8b0000;
 }
 
 .entity-life {
-    stroke: #3d8a3d;
-    fill:   #3d8a3d;
+    stroke: #005500;
+    fill: #005500;
 }
 
 .entity-agency {
-    stroke: #4a7ebe;
-    fill:   #4a7ebe;
+    stroke: #003a99;
+    fill: #003a99;
 }
 
 .entity-object {
-    stroke: #888;
-    fill:   #888;
+    stroke: #333;
+    fill: #333;
 }
 
 .entity-label {
-    fill:        #ddd;
+    fill: #111;
     font-family: monospace;
 }
 
 .canvas-placeholder {
-    fill:        #444;
-    font-size:   24px;
+    fill: #999;
+    font-size: 24px;
     font-family: monospace;
 }
