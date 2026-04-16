@@ -13,7 +13,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\RunicMagic.Database\RunicMagic.Database.csproj" />
-    <ProjectReference Include="..\RunicMagic.Magic\RunicMagic.Magic.csproj" />
     <ProjectReference Include="..\RunicMagic.World\RunicMagic.World.csproj" />
   </ItemGroup>
 

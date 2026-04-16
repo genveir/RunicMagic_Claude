@@ -1,11 +1,17 @@
 <Solution>
+  <Folder Name="/Design/">
+    <File Path="Design/MagicSystem.md" />
+    <File Path="Design/RuneSet.md" />
+    <File Path="Design/TypeSystem.md" />
+    <File Path="Design/UI.md" />
+    <File Path="Design/WorldModel.md" />
+  </Folder>
   <Folder Name="/Solution Items/">
     <File Path="CLAUDE.md" />
     <File Path="Todo.md" />
   </Folder>
   <Project Path="src/RunicMagic.Controller/RunicMagic.Controller.csproj" />
   <Project Path="src/RunicMagic.Database/RunicMagic.Database.csproj" />
-  <Project Path="src/RunicMagic.Magic/RunicMagic.Magic.csproj" />
   <Project Path="src/RunicMagic.View/RunicMagic.View.csproj" />
   <Project Path="src/RunicMagic.World/RunicMagic.World.csproj" />
   <Project Path="tests/RunicMagic.Tests/RunicMagic.Tests.csproj">
