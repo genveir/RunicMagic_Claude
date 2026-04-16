@@ -33,3 +33,18 @@ create table EntityCharge (
     MaxCharge     int              not null,
     CurrentCharge int              not null
 );
+
+-- Seed data for the RMC-18 walking skeleton scenario
+-- Scene: caster standing at a doorway between two walls
+-- Milestone spell: ZU VUN LA FOTIR FOTIR FOTIR HET
+--   pushes all entities touching the caster 2744mm away
+
+insert into Entities (Id, EntityTypeId, Label, X, Y, Width, Height, HasAgency, Weight) values
+    ('a0000000-0000-0000-0000-000000000001', 3, 'Wall Left',  0,    0,   5000, 500, 0, 5000000),
+    ('a0000000-0000-0000-0000-000000000002', 3, 'Wall Right', 5900, 0,   5000, 500, 0, 5000000),
+    ('a0000000-0000-0000-0000-000000000003', 3, 'Door',       5000, 225, 900,  50,  0, 30000),
+    ('a0000000-0000-0000-0000-000000000004', 1, 'Caster',     5200, 275, 500,  300, 1, 70000);
+--  ('a0000000-0000-0000-0000-000000000004', 1, 'Caster',     5400, 275, 500,  300, 1, 70000); -- touching Wall Right (scope includes door + wall right)
+
+insert into EntityLife (EntityId, MaxHitPoints, CurrentHitPoints) values
+    ('a0000000-0000-0000-0000-000000000004', 1000, 1000);
