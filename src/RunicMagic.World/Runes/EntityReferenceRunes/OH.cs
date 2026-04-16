@@ -6,5 +6,10 @@ namespace RunicMagic.World.Runes.EntityReferenceRunes
     public class OH : IEntitySet
     {
         public OH() { }
+
+        public override string ToString()
+        {
+            return "OH";
+        }
     }
 }

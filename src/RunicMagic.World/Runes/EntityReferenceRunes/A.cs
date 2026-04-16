@@ -6,5 +6,10 @@ namespace RunicMagic.World.Runes.EntityReferenceRunes
     public class A : IEntitySet
     {
         public A() { }
+
+        public override string ToString()
+        {
+            return "A";
+        }
     }
 }

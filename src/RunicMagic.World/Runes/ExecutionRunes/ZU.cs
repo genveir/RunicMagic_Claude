@@ -11,5 +11,11 @@ namespace RunicMagic.World.Runes.ExecutionRunes
         {
             Statement = statement;
         }
+
+        public override string ToString()
+        {
+            var result = $"ZU ( {Statement} )";
+            return result;
+        }
     }
 }

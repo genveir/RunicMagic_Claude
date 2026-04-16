@@ -11,5 +11,11 @@ namespace RunicMagic.World.Runes.EntitySetRunes
         {
             ToGetScopeOf = toGetScopeOf;
         }
+
+        public override string ToString()
+        {
+            var result = $"LA ( {ToGetScopeOf} )";
+            return result;
+        }
     }
 }

@@ -15,5 +15,11 @@ namespace RunicMagic.World.Runes.EffectRunes
             HowFar = howFar;
             Origin = origin;
         }
+
+        public override string ToString()
+        {
+            var result = $"VUN ( {ToMove}, {HowFar}, {Origin} )";
+            return result;
+        }
     }
 }

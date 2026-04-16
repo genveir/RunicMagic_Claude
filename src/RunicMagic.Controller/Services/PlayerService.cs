@@ -1,5 +1,6 @@
 using RunicMagic.Controller.Abstractions;
 using RunicMagic.Controller.Models;
+using RunicMagic.Controller.RuneParsing;
 
 namespace RunicMagic.Controller.Services;
 
@@ -12,8 +13,17 @@ internal class PlayerService(WorldRenderingService worldRendering) : IPlayerView
 
     public async Task<CommandResult> RegisterInput(string input)
     {
-        // Not yet wired to the spell processor — echo input back to confirm IO is working.
-        await SendText($"you wrote: {input}");
+        var (_, parseResult) = SpellParser.Parse(input);
+
+        if (parseResult.Succeeded)
+        {
+            await SendText(parseResult.Value.ToString()!);
+        }
+        else
+        {
+            await SendText(parseResult.ErrorMessage);
+        }
+
         await SendWorldEntities();
 
         var result = new CommandResult([.. _pendingText], [.. _pendingEntities]);

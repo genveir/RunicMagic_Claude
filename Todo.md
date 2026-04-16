@@ -6,7 +6,7 @@ Next ticket number: RMC-37
 
 | Key | Title | Description | Blocked By |
 |-----|-------|-------------|------------|
-| RMC-29 | Design the executor | Given a parsed, costed spell, apply its effects against the world state. Defines what "executing" each rune means in terms of world mutations. Excludes power sourcing (RMC-15). | RMC-25, RMC-12 |
+| RMC-29 | Design and implement the executor | Given a parsed, costed spell, apply its effects against the world state. Defines what "executing" each rune means in terms of world mutations. Excludes power sourcing (RMC-15). | RMC-25, RMC-12 |
 | RMC-30 | Wire up the spell casting pipeline | Build the SpellCastingService (or equivalent) in Controller that connects parser → executor into a single callable entry point for the UI. Interface is derived from the implemented components rather than designed upfront. | RMC-12, RMC-29 |
 | RMC-36 | Display world state after spell casting | The UI needs to be updated after spell resolution. Without this, spells execute silently in the backend with no visible effect. | RMC-35 |
 | RMC-18 | 🏁 Walking skeleton — boot and cast anything | Milestone. Minimal world with a handful of hardcoded entities, minimal type system, minimal parser, minimal executor. Power source for the skeleton is caster health — find the caster entity and draw from its Reservoir directly. Goal: a user can launch the UI and successfully cast at least one spell that does something observable. Everything can be rough — correctness and completeness come later. | RMC-25, RMC-6, RMC-9, RMC-10, RMC-12, RMC-29, RMC-30, RMC-34, RMC-35, RMC-36 |
@@ -19,7 +19,6 @@ Next ticket number: RMC-37
 ## In Progress
 | Key | Title | Description | Remarks |
 |-----|-------|-------------|---------|
-| RMC-12 | Design the parser | Turning a string of rune words into a typed expression tree. Direction: recursive descent where each rune implements its own Parse method, consuming its arguments from the remaining token stream — adding a rune stays self-contained. Type-checking is implicit in the recursive descent: a rune that expects a Statement and sees a Number simply stops. The parser also tracks the total rune count (consumed + inserted defaults) and returns it alongside the tree; this count drives evaluation cost (count / 5, rounded down). Define how parse errors are surfaced. |
 
 ## Ready For Review
 
@@ -49,3 +48,4 @@ Next ticket number: RMC-37
 | RMC-34 | Seed the database for the walking skeleton |
 | RMC-35 | Wire up world rendering output | 
 | BUG-1 | Fix entity rendering coordinates |
+| RMC-12 | Design and implement the parser |

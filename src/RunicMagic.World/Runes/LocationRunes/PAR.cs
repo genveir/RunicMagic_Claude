@@ -11,5 +11,11 @@ namespace RunicMagic.World.Runes.LocationRunes
         {
             EntitySet = entitySet;
         }
+
+        public override string ToString()
+        {
+            var result = $"PAR ( {EntitySet} )";
+            return result;
+        }
     }
 }

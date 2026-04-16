@@ -11,5 +11,11 @@ namespace RunicMagic.World.Runes.NumberRunes
         {
             Multiplicand = multiplicand;
         }
+
+        public override string ToString()
+        {
+            var result = $"FOTIR ( {Multiplicand} )";
+            return result;
+        }
     }
 }

@@ -6,5 +6,10 @@ namespace RunicMagic.World.Runes.NumberRunes
     public class HET : INumber
     {
         public HET() { }
+
+        public override string ToString()
+        {
+            return "HET";
+        }
     }
 }
