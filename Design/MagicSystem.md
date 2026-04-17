@@ -87,6 +87,8 @@ If the spell is structurally invalid at a point in the expression tree, evaluati
 
 If the evaluation cost cannot be met in full, the executor disintegrates.
 
+The system makes no attempt to pre-validate whether a spell can be afforded before drawing begins. There are no guardrails — power is drawn, effects fire, and consequences follow. A spell that cannot be completed will still drain every source it can reach before failing.
+
 *(Full failure mode design: RMC-13)*
 
 ---

@@ -65,5 +65,6 @@
 ## Todo
 
 - Work is tracked in `Todo.md` at the repo root.
-- The To Do list is ordered by priority, top to bottom.
+- **To Do — Milestone N** contains the focused set of tickets on the critical path to the next milestone flag. These are the priority.
+- **To Do — Other** contains valid tickets that are out of scope for the current milestone.
 - Never move a ticket to "Done", move it to "Ready for Review" and the user will put it in "Done" when the user feels it is done.

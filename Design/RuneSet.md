@@ -34,18 +34,30 @@ Maps each member of the input Set to its scope (via the entity's scope delegate)
 
 Defaults to `OH`, so bare `LA` maps the executor's scope.
 
+## Invocation
+
+| Rune | Meaning | Signature |
+|------|---------|-----------|
+| `GWYAH` | invoke | (Set) → Statement |
+
+Activates all inscriptions found on entities in the Set. Returns a Statement that, when executed, fires those inscriptions in order. The inscribed-on entity becomes the executor of each activated inscription; the caster of the invoking spell becomes its caster.
+
 ## Entity References
 
 | Rune | Meaning | Signature |
 |------|---------|-----------|
 | `A` | me | () → Set |
 | `OH` | this | () → Set |
+| `KAL` | touching | () → Set |
+| `DAN` | pointing at | () → Set |
 
-`A` produces a singleton Set containing the caster; `OH` produces a singleton Set containing the executor. 
+`A` produces a singleton Set containing the caster; `OH` produces a singleton Set containing the executor.
 
-They are identical for spoken spells and diverge for inscribed spells (where the executor is the inscribed object). 
+They are identical for spoken spells and diverge for inscribed spells (where the executor is the inscribed object).
 
 Both are used as targeting references and, in the power sourcing context (RMC-15), as reservoir references.
+
+`KAL` and `DAN` are conscious-action references set by the player via UI before casting. `KAL` is the entity the caster is deliberately touching; `DAN` is the entity the caster is pointing at, resolved by ray-casting from the caster through the aimed direction and returning the first non-translucent entity hit. Both return an empty Set if no target is active.
 
 ## Location
 
@@ -121,14 +133,49 @@ token stream.
 `LA` could be replaced with `LA OH` (explicit) or `LA A` (caster's scope) and the result
 would be identical for this spell, since the caster is also the executor.
 
+### Mini-milestone spell — push whatever you're pointing at
+
+```
+ZU VUN DAN FOTIR FOTIR FOTIR HET
+```
+
+Pushes the aimed-at entity 2 744 mm away from the caster. Identical in structure to the Milestone 1 spell with `DAN` substituted for `LA` — targeting a single conscious-action reference rather than the full executor scope.
+
+### Milestone 2 spell — trigger the inscription on whatever you're pointing at
+
+```
+ZU GWYAH DAN
+```
+
+Activates all inscriptions on the entity the caster is pointing at.
+This is the target spoken spell for the Milestone 2 scenario.
+
+**Parse tree:**
+
+```
+ZU
+└── GWYAH
+    └── DAN
+```
+
+**Node by node:**
+
+| Expression | Type | Value |
+|------------|------|-------|
+| `DAN` | Set | singleton set containing the aimed-at entity |
+| `GWYAH DAN` | Statement | activate inscriptions on that entity |
+| `ZU GWYAH DAN` | ExecutableStatement | execute the Statement |
+
+It will execute an inscription on a rock inside a room, which will open the door to the room. The spell on this rock needs to be designed as part of the milestone.
+
 ### Future: cast the spell in context
 
 ```
 ZU  BEH
 ```
 
-Executes the spell currently in context (e.g. an inscribed spell being activated).
-Requires BEH (future rune).
+Executes the inscriptions on the entity the caster is touching.
+Requires BEH (future rune). Equivalent to `ZU GWYAH KAL` but central to the lore and cannot be changed.
 
 ### Future: protect power
 
