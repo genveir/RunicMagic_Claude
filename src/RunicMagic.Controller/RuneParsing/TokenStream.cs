@@ -13,10 +13,17 @@
 
         public void InsertAtCursor(string[] toInsert)
         {
+            var insertAt = Math.Min(index + 1, tokens.Count);
             for (int i = toInsert.Length - 1; i >= 0; i--)
             {
-                tokens.Insert(index, toInsert[i]);
+                tokens.Insert(insertAt, toInsert[i]);
             }
+            index = insertAt - 1;
+        }
+
+        public void Backtrack()
+        {
+            index--;
         }
 
         public string? Next()

@@ -49,3 +49,4 @@ Next ticket number: RMC-37
 | RMC-35 | Wire up world rendering output | 
 | BUG-1 | Fix entity rendering coordinates |
 | RMC-12 | Design and implement the parser |
+| BUG-2 | Fix tokenStream / dispatcher interaction on inserts |

@@ -94,5 +94,18 @@ namespace RunicMagic.Tests.RuneParsing
 
             tokenStream.Next().Should().Be("inserted1");
         }
+
+        [Fact]
+        public void Backtrack_MovesCursorBack()
+        {
+            var tokenStream = new TokenStream("token1 token2");
+
+            tokenStream.Next().Should().Be("token1");
+            tokenStream.Next().Should().Be("token2");
+
+            tokenStream.Backtrack();
+
+            tokenStream.Next().Should().Be("token2");
+        }
     }
 }

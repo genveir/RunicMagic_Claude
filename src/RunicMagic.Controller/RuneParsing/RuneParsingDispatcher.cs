@@ -24,14 +24,17 @@
             if (next == null)
             {
                 tokenStream.InsertAtCursor(defaultTokens);
-                return ParseCurrentRune<TRuneType>(tokenStream, defaultTokens[0]);
+                next = tokenStream.Next()!;
+                return ParseCurrentRune<TRuneType>(tokenStream, next);
             }
 
             var runeTypeParser = ParserLookup.FindRuneParserByName<TRuneType>(next);
             if (runeTypeParser == null)
             {
+                tokenStream.Backtrack();
                 tokenStream.InsertAtCursor(defaultTokens);
-                return ParseCurrentRune<TRuneType>(tokenStream, defaultTokens[0]);
+                next = tokenStream.Next()!;
+                return ParseCurrentRune<TRuneType>(tokenStream, next);
             }
 
             return ParseCurrentRune<TRuneType>(tokenStream, next);
