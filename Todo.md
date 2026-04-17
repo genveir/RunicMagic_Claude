@@ -40,10 +40,11 @@ Next bugfix number: BUG-3
 
 | Key | Title |
 |-----|-------|
-| RMC-49 | Add pointing direction to entity model |
 
 ## Done
 
 | Key | Title |
 |-----|-------|
-| RMC-54 | Clarify entity property model — capabilities, state, and transient data | 
+| RMC-54 | Clarify entity property model — capabilities, state, and transient data |
+| RMC-49 | Add pointing direction to entity model |
+| RMC-55 | Add GER rune for weighted centering |

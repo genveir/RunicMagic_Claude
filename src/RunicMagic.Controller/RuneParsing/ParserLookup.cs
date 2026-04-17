@@ -78,6 +78,7 @@ namespace RunicMagic.Controller.RuneParsing
         private static void FillLocationRuneParsers()
         {
             locationRuneParsers["PAR"] = new PARParser(); // location of
+            locationRuneParsers["GER"] = new GERParser(); // centering
         }
     }
 }

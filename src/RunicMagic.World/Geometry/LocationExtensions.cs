@@ -20,4 +20,20 @@ public static class LocationExtensions
         var result = new Location(avgX, avgY);
         return result;
     }
+
+    // Falls back to unweighted centroid when total weight is zero.
+    public static Location WeightedCentroid(this IEnumerable<(Location Location, int Weight)> items)
+    {
+        var list = items.ToList();
+        var totalWeight = list.Sum(i => i.Weight);
+        if (totalWeight == 0)
+        {
+            var result = list.Select(i => i.Location).Centroid();
+            return result;
+        }
+        var x = (int)Math.Round(list.Sum(i => (double)i.Location.X * i.Weight) / totalWeight);
+        var y = (int)Math.Round(list.Sum(i => (double)i.Location.Y * i.Weight) / totalWeight);
+        var weighted = new Location(x, y);
+        return weighted;
+    }
 }

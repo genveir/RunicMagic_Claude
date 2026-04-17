@@ -73,4 +73,46 @@ public class LocationExtensionsTests
 
         result.Should().Be(new Location(42, 99));
     }
+
+    [Fact]
+    public void WeightedCentroid_PullsTowardHeavierPoint()
+    {
+        var items = new[]
+        {
+            (new Location(0, 0), 1),
+            (new Location(100, 0), 3),
+        };
+
+        var result = items.WeightedCentroid();
+
+        result.Should().Be(new Location(75, 0));
+    }
+
+    [Fact]
+    public void WeightedCentroid_EqualWeights_MatchesUnweightedCentroid()
+    {
+        var items = new[]
+        {
+            (new Location(0, 0), 2),
+            (new Location(100, 200), 2),
+        };
+
+        var result = items.WeightedCentroid();
+
+        result.Should().Be(new Location(50, 100));
+    }
+
+    [Fact]
+    public void WeightedCentroid_AllZeroWeights_FallsBackToUnweightedCentroid()
+    {
+        var items = new[]
+        {
+            (new Location(0, 0), 0),
+            (new Location(100, 0), 0),
+        };
+
+        var result = items.WeightedCentroid();
+
+        result.Should().Be(new Location(50, 0));
+    }
 }
