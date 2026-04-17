@@ -5,16 +5,16 @@ namespace RunicMagic.Controller.RuneParsing.ExecutionRunes
 {
     internal class ZUParser : IRuneParser<IExecutableStatement>
     {
-        public TemporarySimpleResult<IExecutableStatement> Parse(TokenStream tokenStream)
+        public ParsingResult<IExecutableStatement> Parse(TokenStream tokenStream)
         {
             var statementResult = RuneParsingDispatcher.ParseNextRune<IStatement>(tokenStream);
 
             if (!statementResult.Succeeded)
             {
-                return TemporarySimpleResult<IExecutableStatement>.Fail(statementResult.ErrorMessage);
+                return ParsingResult<IExecutableStatement>.Fail(statementResult.Error);
             }
 
-            return TemporarySimpleResult<IExecutableStatement>.Succeed(new ZU(statementResult.Value));
+            return ParsingResult<IExecutableStatement>.Succeed(new ZU(statementResult.Value));
         }
     }
 }

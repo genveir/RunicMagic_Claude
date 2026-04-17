@@ -5,27 +5,27 @@ namespace RunicMagic.Controller.RuneParsing.EffectRunes
 {
     internal class VUNParser : IRuneParser<IStatement>
     {
-        public TemporarySimpleResult<IStatement> Parse(TokenStream tokenStream)
+        public ParsingResult<IStatement> Parse(TokenStream tokenStream)
         {
             var toMoveResult = RuneParsingDispatcher.ParseNextRune<IEntitySet>(tokenStream);
             if (!toMoveResult.Succeeded)
             {
-                return TemporarySimpleResult<IStatement>.Fail(toMoveResult.ErrorMessage);
+                return ParsingResult<IStatement>.Fail(toMoveResult.Error);
             }
 
             var howFarResult = RuneParsingDispatcher.ParseNextRune<INumber>(tokenStream);
             if (!howFarResult.Succeeded)
             {
-                return TemporarySimpleResult<IStatement>.Fail(howFarResult.ErrorMessage);
+                return ParsingResult<IStatement>.Fail(howFarResult.Error);
             }
 
             var originResult = RuneParsingDispatcher.ParseNextRune<ILocation>(tokenStream, ["PAR", "A"]);
             if (!originResult.Succeeded)
             {
-                return TemporarySimpleResult<IStatement>.Fail(originResult.ErrorMessage);
+                return ParsingResult<IStatement>.Fail(originResult.Error);
             }
 
-            return TemporarySimpleResult<IStatement>.Succeed(new VUN(toMove: toMoveResult.Value, howFar: howFarResult.Value, origin: originResult.Value));
+            return ParsingResult<IStatement>.Succeed(new VUN(toMove: toMoveResult.Value, howFar: howFarResult.Value, origin: originResult.Value));
         }
 
 

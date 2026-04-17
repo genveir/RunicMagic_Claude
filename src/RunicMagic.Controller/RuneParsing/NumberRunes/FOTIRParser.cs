@@ -5,17 +5,17 @@ namespace RunicMagic.Controller.RuneParsing.NumberRunes
 {
     internal class FOTIRParser : IRuneParser<INumber>
     {
-        public TemporarySimpleResult<INumber> Parse(TokenStream tokenStream)
+        public ParsingResult<INumber> Parse(TokenStream tokenStream)
         {
             var multiplicandResult = RuneParsingDispatcher.ParseNextRune<INumber>(tokenStream);
 
             if (!multiplicandResult.Succeeded)
             {
-                return TemporarySimpleResult<INumber>.Fail(multiplicandResult.ErrorMessage);
+                return ParsingResult<INumber>.Fail(multiplicandResult.Error);
             }
 
             var result = new FOTIR(multiplicandResult.Value);
-            return TemporarySimpleResult<INumber>.Succeed(result);
+            return ParsingResult<INumber>.Succeed(result);
         }
     }
 }

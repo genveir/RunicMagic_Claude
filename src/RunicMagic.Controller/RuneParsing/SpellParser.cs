@@ -4,7 +4,7 @@ namespace RunicMagic.Controller.RuneParsing
 {
     internal static class SpellParser
     {
-        public static (int parsedTokens, TemporarySimpleResult<IExecutableStatement>) Parse(string spellString)
+        public static (int parsedTokens, ParsingResult<IExecutableStatement>) Parse(string spellString)
         {
             var tokenStream = new TokenStream(spellString);
 

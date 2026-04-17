@@ -33,23 +33,23 @@ internal class MockParser<T> : IRuneParser<T>
         _value = value;
     }
 
-    public TemporarySimpleResult<T> Parse(TokenStream tokenStream)
+    public ParsingResult<T> Parse(TokenStream tokenStream)
     {
-        return TemporarySimpleResult<T>.Succeed(_value);
+        return ParsingResult<T>.Succeed(_value);
     }
 }
 
 internal class MockFailingParser<T> : IRuneParser<T>
 {
-    private readonly string _errorMessage;
+    private readonly ParseEvent _error;
 
-    internal MockFailingParser(string errorMessage)
+    internal MockFailingParser(ParseEvent error)
     {
-        _errorMessage = errorMessage;
+        _error = error;
     }
 
-    public TemporarySimpleResult<T> Parse(TokenStream tokenStream)
+    public ParsingResult<T> Parse(TokenStream tokenStream)
     {
-        return TemporarySimpleResult<T>.Fail(_errorMessage);
+        return ParsingResult<T>.Fail(_error);
     }
 }

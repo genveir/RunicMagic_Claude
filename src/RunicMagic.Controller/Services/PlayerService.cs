@@ -1,10 +1,9 @@
 using RunicMagic.Controller.Abstractions;
 using RunicMagic.Controller.Models;
-using RunicMagic.Controller.RuneParsing;
 
 namespace RunicMagic.Controller.Services;
 
-internal class PlayerService(WorldRenderingService worldRendering) : IPlayerViewInterface, IPlayerOutputSink
+internal class PlayerService(WorldRenderingService worldRendering, SpellCastingService spellCasting) : IPlayerViewInterface, IPlayerOutputSink
 {
     private readonly List<string> _pendingText = [];
     private readonly List<EntityRenderingModel> _pendingEntities = [];
@@ -13,15 +12,10 @@ internal class PlayerService(WorldRenderingService worldRendering) : IPlayerView
 
     public async Task<CommandResult> RegisterInput(string input)
     {
-        var (_, parseResult) = SpellParser.Parse(input);
-
-        if (parseResult.Succeeded)
+        var responseLines = spellCasting.Cast(input);
+        foreach (var line in responseLines)
         {
-            await SendText(parseResult.Value.ToString()!);
-        }
-        else
-        {
-            await SendText(parseResult.ErrorMessage);
+            await SendText(line);
         }
 
         await SendWorldEntities();

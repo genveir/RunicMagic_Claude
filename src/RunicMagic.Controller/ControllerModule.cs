@@ -12,6 +12,8 @@ namespace RunicMagic.Controller
             services.AddSingleton<IPlayerViewInterface>(svc => svc.GetRequiredService<PlayerService>());
             services.AddSingleton<IPlayerOutputSink>(svc => svc.GetRequiredService<PlayerService>());
 
+            services.AddSingleton<SpellCastingService>();
+
             services.AddSingleton<EntityFactory>();
             services.AddSingleton<WorldLoadingService>();
             services.AddSingleton<WorldRenderingService>();

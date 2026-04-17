@@ -5,9 +5,9 @@ namespace RunicMagic.Controller.RuneParsing.EntityReferenceRunes
 {
     internal class OHParser : IRuneParser<IEntitySet>
     {
-        public TemporarySimpleResult<IEntitySet> Parse(TokenStream tokenStream)
+        public ParsingResult<IEntitySet> Parse(TokenStream tokenStream)
         {
-            return TemporarySimpleResult<IEntitySet>.Succeed(new OH());
+            return ParsingResult<IEntitySet>.Succeed(new OH());
         }
     }
 }

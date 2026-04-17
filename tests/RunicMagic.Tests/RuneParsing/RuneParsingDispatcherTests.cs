@@ -39,7 +39,7 @@ public class RuneParsingDispatcherTests
     [Fact]
     public void ParseNextRune_WhenParserFails_PropagatesFailure()
     {
-        ParserLookup.AddRuneParser("Dispatcher_FailingParser_IEntitySet", new MockFailingParser<IEntitySet>("test error"));
+        ParserLookup.AddRuneParser("Dispatcher_FailingParser_IEntitySet", new MockFailingParser<IEntitySet>(new UnexpectedTokenEvent("test", "IEntitySet")));
 
         var result = RuneParsingDispatcher.ParseNextRune<IEntitySet>(new TokenStream("Dispatcher_FailingParser_IEntitySet"));
 

@@ -1,19 +1,19 @@
-﻿namespace RunicMagic.Controller.RuneParsing
+namespace RunicMagic.Controller.RuneParsing
 {
     internal static class RuneParsingDispatcher
     {
-        internal static TemporarySimpleResult<TRuneType> ParseNextRune<TRuneType>(TokenStream tokenStream)
+        internal static ParsingResult<TRuneType> ParseNextRune<TRuneType>(TokenStream tokenStream)
         {
             var next = tokenStream.Next();
             if (next == null)
             {
-                return TemporarySimpleResult<TRuneType>.Fail("This should be a typed result signifying a spell ran out of tokens and is incomplete");
+                return ParsingResult<TRuneType>.Fail(new RanOutOfTokensEvent());
             }
 
             return ParseCurrentRune<TRuneType>(tokenStream, next!);
         }
 
-        internal static TemporarySimpleResult<TRuneType> ParseNextRune<TRuneType>(TokenStream tokenStream, string[] defaultTokens)
+        internal static ParsingResult<TRuneType> ParseNextRune<TRuneType>(TokenStream tokenStream, string[] defaultTokens)
         {
             if (defaultTokens.Length == 0)
             {
@@ -40,18 +40,18 @@
             return ParseCurrentRune<TRuneType>(tokenStream, next);
         }
 
-        private static TemporarySimpleResult<TRuneType> ParseCurrentRune<TRuneType>(TokenStream tokenStream, string current)
+        private static ParsingResult<TRuneType> ParseCurrentRune<TRuneType>(TokenStream tokenStream, string current)
         {
             var runeTypeParser = ParserLookup.FindRuneParserByName<TRuneType>(current);
             if (runeTypeParser == null)
             {
-                return TemporarySimpleResult<TRuneType>.Fail("This should be a typed result signifying an invalid token was encountered");
+                return ParsingResult<TRuneType>.Fail(new UnexpectedTokenEvent(current, typeof(TRuneType).Name));
             }
 
             var parseResult = runeTypeParser.Parse(tokenStream);
             return parseResult.Succeeded
-                ? TemporarySimpleResult<TRuneType>.Succeed(parseResult.Value)
-                : TemporarySimpleResult<TRuneType>.Fail(parseResult.ErrorMessage);
+                ? ParsingResult<TRuneType>.Succeed(parseResult.Value)
+                : ParsingResult<TRuneType>.Fail(parseResult.Error);
         }
     }
 }

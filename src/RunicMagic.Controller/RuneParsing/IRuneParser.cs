@@ -2,6 +2,6 @@
 {
     internal interface IRuneParser<T>
     {
-        TemporarySimpleResult<T> Parse(TokenStream tokenStream);
+        ParsingResult<T> Parse(TokenStream tokenStream);
     }
 }
