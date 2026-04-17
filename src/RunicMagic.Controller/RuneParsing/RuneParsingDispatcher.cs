@@ -4,17 +4,22 @@
     {
         internal static TemporarySimpleResult<TRuneType> ParseNextRune<TRuneType>(TokenStream tokenStream)
         {
-            if (!tokenStream.HasMore)
+            var next = tokenStream.Next();
+            if (next == null)
             {
                 return TemporarySimpleResult<TRuneType>.Fail("This should be a typed result signifying a spell ran out of tokens and is incomplete");
             }
 
-            var next = tokenStream.Next();
             return ParseCurrentRune<TRuneType>(tokenStream, next!);
         }
 
         internal static TemporarySimpleResult<TRuneType> ParseNextRune<TRuneType>(TokenStream tokenStream, string[] defaultTokens)
         {
+            if (defaultTokens.Length == 0)
+            {
+                throw new InvalidOperationException("Cannot provide an empty array of default tokens.");
+            }
+
             var next = tokenStream.Next();
             if (next == null)
             {

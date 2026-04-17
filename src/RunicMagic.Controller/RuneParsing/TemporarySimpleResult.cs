@@ -19,7 +19,7 @@
             return new TemporarySimpleResult<T>(false, default, errorMessage);
         }
 
-        public bool Succeeded { get; set; }
+        public bool Succeeded { get; }
 
         private T? _value;
         public T Value
