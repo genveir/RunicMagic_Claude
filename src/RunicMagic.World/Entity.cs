@@ -1,5 +1,6 @@
 using RunicMagic.World.Capabilities;
 using RunicMagic.World.Execution;
+using RunicMagic.World.Geometry;
 
 namespace RunicMagic.World;
 
@@ -19,4 +20,5 @@ public class Entity(EntityId id, EntityType type, string label)
     public int Weight { get; set; }
     public Func<Entity[]>? Scope { get; set; }
     public Func<int, ReservoirDraw>? Reservoir { get; set; }
+    public Direction? PointingDirection { get; set; }
 }

@@ -1,4 +1,5 @@
 using RunicMagic.World.Execution;
+using RunicMagic.World.Geometry;
 using RunicMagic.World.Runes.RuneTypes;
 
 namespace RunicMagic.World.Runes.EffectRunes
@@ -38,25 +39,11 @@ namespace RunicMagic.World.Runes.EffectRunes
 
             foreach (var entity in toMove.Entities)
             {
-                var dx = (double)(entity.X - origin.X);
-                var dy = (double)(entity.Y - origin.Y);
-                var length = Math.Sqrt(dx * dx + dy * dy);
-
-                double dirX, dirY;
-                if (length == 0.0)
-                {
-                    var angle = Random.Shared.NextDouble() * 2 * Math.PI;
-                    dirX = Math.Cos(angle);
-                    dirY = Math.Sin(angle);
-                }
-                else
-                {
-                    dirX = dx / length;
-                    dirY = dy / length;
-                }
-
-                entity.X += (int)Math.Round(dirX * distance);
-                entity.Y += (int)Math.Round(dirY * distance);
+                var entityLocation = new Location(entity.X, entity.Y);
+                var direction = Direction.FromPoints(origin, entityLocation);
+                var destination = entityLocation.Translate(direction, distance);
+                entity.X = destination.X;
+                entity.Y = destination.Y;
                 context.Result.Add(new EntityPushedEvent(entity, distance));
             }
         }

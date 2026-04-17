@@ -7,7 +7,6 @@ Next bugfix number: BUG-3
 
 | Key | Title | Description | Blocked By |
 |-----|-------|-------------|------------|
-| RMC-49 | Add pointing direction to entity model | Add a transient `PointingDirection` property to the entity model (no DB persistence). Represents the direction the entity is consciously aiming; initially null. | |
 | RMC-50 | UI knows which entity is the caster | The UI currently renders entities without knowing which one is controlled by the player. Expose the caster's entity identity to the UI so it can be used as an anchor for interactions (e.g. drawing an aim line from the correct position). | |
 | RMC-51 | UI point-to-aim interaction | Add a UI mode where the next canvas click sets the caster's pointing direction. Draw a line from the caster to the cursor as visual feedback. On click, compute the direction and report it to PlayerService, which writes it to the caster entity's `PointingDirection`. | RMC-49 RMC-50 |
 | RMC-53 | Add translucency capability to entity model and database | Add a persistent `Translucency` capability to the world model and database. Windows are translucent; walls, doors, and other solid entities are not. | |
@@ -41,6 +40,7 @@ Next bugfix number: BUG-3
 
 | Key | Title |
 |-----|-------|
+| RMC-49 | Add pointing direction to entity model |
 
 ## Done
 

@@ -1,4 +1,5 @@
 using RunicMagic.World.Execution;
+using RunicMagic.World.Geometry;
 using RunicMagic.World.Runes.RuneTypes;
 
 namespace RunicMagic.World.Runes.LocationRunes
@@ -20,9 +21,7 @@ namespace RunicMagic.World.Runes.LocationRunes
             {
                 return new Location(0, 0);
             }
-            var avgX = (int)Math.Round(entities.Average(e => (double)e.X));
-            var avgY = (int)Math.Round(entities.Average(e => (double)e.Y));
-            var result = new Location(avgX, avgY);
+            var result = entities.Select(e => new Location(e.X, e.Y)).Centroid();
             return result;
         }
 
