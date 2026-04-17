@@ -43,9 +43,10 @@ public class EntityFactoryTests
         var entity = Factory(world).Create(CreatureData(maxHp: 100, currentHp: 100));
         world.Add(entity);
 
-        var drawn = entity.Reservoir!(50);
+        var draw = entity.Reservoir!(50);
 
-        drawn.Should().Be(50);
+        draw.Amount.Should().Be(50);
+        draw.IsDrained.Should().BeFalse();
         entity.Life!.CurrentHitPoints.Should().Be(50);
     }
 
@@ -56,9 +57,10 @@ public class EntityFactoryTests
         var entity = Factory(world).Create(CreatureData(maxHp: 100, currentHp: 30));
         world.Add(entity);
 
-        var drawn = entity.Reservoir!(50);
+        var draw = entity.Reservoir!(50);
 
-        drawn.Should().Be(30);
+        draw.Amount.Should().Be(30);
+        draw.IsDrained.Should().BeTrue();
         entity.Life!.CurrentHitPoints.Should().Be(0);
     }
 
@@ -69,9 +71,10 @@ public class EntityFactoryTests
         var entity = Factory(world).Create(CreatureData(maxHp: 100, currentHp: 0));
         world.Add(entity);
 
-        var drawn = entity.Reservoir!(50);
+        var draw = entity.Reservoir!(50);
 
-        drawn.Should().Be(0);
+        draw.Amount.Should().Be(0);
+        draw.IsDrained.Should().BeFalse();
     }
 
     [Fact]
@@ -84,9 +87,9 @@ public class EntityFactoryTests
             X: 0, Y: 0, Width: 10, Height: 10, HasAgency: false, Weight: 0));
         world.Add(entity);
 
-        var drawn = entity.Reservoir!(50);
+        var draw = entity.Reservoir!(50);
 
-        drawn.Should().Be(0);
+        draw.Amount.Should().Be(0);
         logger.Verify(
             x => x.Log(
                 LogLevel.Warning,
@@ -106,9 +109,10 @@ public class EntityFactoryTests
         var entity = Factory(world).Create(ManaSourceData(maxCharge: 200, currentCharge: 200));
         world.Add(entity);
 
-        var drawn = entity.Reservoir!(75);
+        var draw = entity.Reservoir!(75);
 
-        drawn.Should().Be(75);
+        draw.Amount.Should().Be(75);
+        draw.IsDrained.Should().BeFalse();
         entity.Charge!.CurrentCharge.Should().Be(125);
     }
 
@@ -119,9 +123,10 @@ public class EntityFactoryTests
         var entity = Factory(world).Create(ManaSourceData(maxCharge: 200, currentCharge: 40));
         world.Add(entity);
 
-        var drawn = entity.Reservoir!(100);
+        var draw = entity.Reservoir!(100);
 
-        drawn.Should().Be(40);
+        draw.Amount.Should().Be(40);
+        draw.IsDrained.Should().BeTrue();
         entity.Charge!.CurrentCharge.Should().Be(0);
     }
 
@@ -135,9 +140,9 @@ public class EntityFactoryTests
             X: 0, Y: 0, Width: 10, Height: 10, HasAgency: false, Weight: 0));
         world.Add(entity);
 
-        var drawn = entity.Reservoir!(50);
+        var draw = entity.Reservoir!(50);
 
-        drawn.Should().Be(0);
+        draw.Amount.Should().Be(0);
         logger.Verify(
             x => x.Log(
                 LogLevel.Warning,

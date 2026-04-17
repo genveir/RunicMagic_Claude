@@ -1,12 +1,28 @@
 using RunicMagic.Controller.RuneParsing;
+using RunicMagic.World.Execution;
 using RunicMagic.World.Runes.RuneTypes;
 
 namespace RunicMagic.Tests.RuneParsing;
 
-internal class MockEntitySet : IEntitySet { }
-internal class MockNumber : INumber { }
-internal class MockLocation : ILocation { }
-internal class MockStatement : IStatement { }
+internal class MockEntitySet : IEntitySet
+{
+    public EntitySet Resolve(SpellContext context) => throw new NotImplementedException();
+}
+
+internal class MockNumber : INumber
+{
+    public Number Evaluate(SpellContext context) => throw new NotImplementedException();
+}
+
+internal class MockLocation : ILocation
+{
+    public Location Evaluate(SpellContext context) => throw new NotImplementedException();
+}
+
+internal class MockStatement : IStatement
+{
+    public void Execute(SpellContext context) => throw new NotImplementedException();
+}
 
 internal class MockParser<T> : IRuneParser<T>
 {

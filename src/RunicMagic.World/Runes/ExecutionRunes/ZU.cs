@@ -1,4 +1,5 @@
-﻿using RunicMagic.World.Runes.RuneTypes;
+using RunicMagic.World.Execution;
+using RunicMagic.World.Runes.RuneTypes;
 
 namespace RunicMagic.World.Runes.ExecutionRunes
 {
@@ -10,6 +11,11 @@ namespace RunicMagic.World.Runes.ExecutionRunes
         public ZU(IStatement statement)
         {
             Statement = statement;
+        }
+
+        public void Execute(SpellContext context)
+        {
+            Statement.Execute(context);
         }
 
         public override string ToString()

@@ -1,5 +1,10 @@
 # Mud — Claude Workflow
 
+## Implementation Permission - IMPORTANT
+- NEVER start implementing ANYTHING without getting express permission from the user.
+  Discussing a ticket, explaining what it means, or asking questions about it is NOT permission to implement it.
+  Wait for a clear instruction like "implement this", "go ahead" before writing any code.
+
 ## Testing
 
 - Everything except the terminal/UI layer must be unit testable. Design all components accordingly — no integration tests should be necessary.
@@ -15,9 +20,6 @@
 
 ## General
 
-- Do not start implementing anything without explicit permission from the user.
-  Discussing a ticket, explaining what it means, or asking questions about it is NOT permission to implement it.
-  Wait for a clear instruction like "implement this" or "go ahead" before writing any code.
 - At this stage of the project, the main risk is deferred decisions, not bad ones. Assist the user to make a call, document it in `Design/`, and move on. The codebase is small enough to swivel if something turns out wrong.
 
 ## Git

@@ -1,4 +1,5 @@
-﻿using RunicMagic.World.Runes.RuneTypes;
+using RunicMagic.World.Execution;
+using RunicMagic.World.Runes.RuneTypes;
 
 namespace RunicMagic.World.Runes.EntitySetRunes
 {
@@ -10,6 +11,28 @@ namespace RunicMagic.World.Runes.EntitySetRunes
         public LA(IEntitySet toGetScopeOf)
         {
             ToGetScopeOf = toGetScopeOf;
+        }
+
+        public EntitySet Resolve(SpellContext context)
+        {
+            var inputSet = ToGetScopeOf.Resolve(context);
+            var seen = new HashSet<EntityId>();
+            var union = new List<Entity>();
+
+            foreach (var entity in inputSet.Entities)
+            {
+                var scope = entity.Scope?.Invoke() ?? [];
+                foreach (var member in scope)
+                {
+                    if (seen.Add(member.Id))
+                    {
+                        union.Add(member);
+                    }
+                }
+            }
+
+            var result = new EntitySet(union);
+            return result;
         }
 
         public override string ToString()

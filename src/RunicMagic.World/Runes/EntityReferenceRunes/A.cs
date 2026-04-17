@@ -1,4 +1,5 @@
-﻿using RunicMagic.World.Runes.RuneTypes;
+using RunicMagic.World.Execution;
+using RunicMagic.World.Runes.RuneTypes;
 
 namespace RunicMagic.World.Runes.EntityReferenceRunes
 {
@@ -6,6 +7,12 @@ namespace RunicMagic.World.Runes.EntityReferenceRunes
     public class A : IEntitySet
     {
         public A() { }
+
+        public EntitySet Resolve(SpellContext context)
+        {
+            var result = context.Caster;
+            return result;
+        }
 
         public override string ToString()
         {

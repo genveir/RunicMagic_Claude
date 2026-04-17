@@ -1,4 +1,5 @@
-﻿using RunicMagic.World.Runes.RuneTypes;
+using RunicMagic.World.Execution;
+using RunicMagic.World.Runes.RuneTypes;
 
 namespace RunicMagic.World.Runes.NumberRunes
 {
@@ -10,6 +11,13 @@ namespace RunicMagic.World.Runes.NumberRunes
         public FOTIR(INumber multiplicand)
         {
             Multiplicand = multiplicand;
+        }
+
+        public Number Evaluate(SpellContext context)
+        {
+            var multiplicand = Multiplicand.Evaluate(context);
+            var result = new Number(multiplicand.Value * 14);
+            return result;
         }
 
         public override string ToString()
