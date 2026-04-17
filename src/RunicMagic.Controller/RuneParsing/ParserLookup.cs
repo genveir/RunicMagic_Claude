@@ -10,66 +10,74 @@ namespace RunicMagic.Controller.RuneParsing
 {
     internal static class ParserLookup
     {
+        private static readonly Dictionary<string, IRuneParser<IExecutableStatement>> executableStatementRuneParsers = new();
+        private static readonly Dictionary<string, IRuneParser<IStatement>> statementRuneParsers = new();
+        private static readonly Dictionary<string, IRuneParser<IEntitySet>> entitySetRuneParsers = new();
+        private static readonly Dictionary<string, IRuneParser<INumber>> numberRuneParsers = new();
+        private static readonly Dictionary<string, IRuneParser<ILocation>> locationRuneParsers = new();
+
+        static ParserLookup()
+        {
+            FillExecutableStatementRuneParsers();
+            FillStatementRuneParsers();
+            FillEntitySetRuneParsers();
+            FillNumberRuneParsers();
+            FillLocationRuneParsers();
+        }
+
+        public static void AddRuneParser<TRuneType>(string name, IRuneParser<TRuneType> parser)
+        {
+            switch (parser)
+            {
+                case IRuneParser<IExecutableStatement> executableStatementParser: executableStatementRuneParsers[name] = executableStatementParser; break;
+                case IRuneParser<IStatement> statementParser: statementRuneParsers[name] = statementParser; break;
+                case IRuneParser<IEntitySet> entitySetParser: entitySetRuneParsers[name] = entitySetParser; break;
+                case IRuneParser<INumber> numberParser: numberRuneParsers[name] = numberParser; break;
+                case IRuneParser<ILocation> locationParser: locationRuneParsers[name] = locationParser; break;
+                default:
+                    throw new InvalidOperationException($"Unsupported rune type: {typeof(TRuneType).Name}");
+            }
+        }
+
         public static IRuneParser<TRuneType>? FindRuneParserByName<TRuneType>(string name)
         {
             return typeof(TRuneType) switch
             {
-                _ when typeof(TRuneType) == typeof(IExecutableStatement) => FindExecutableStatementRuneParserByName(name) as IRuneParser<TRuneType>,
-                _ when typeof(TRuneType) == typeof(IStatement) => FindStatementRuneParserByName(name) as IRuneParser<TRuneType>,
-                _ when typeof(TRuneType) == typeof(IEntitySet) => FindEntitySetRuneParserByName(name) as IRuneParser<TRuneType>,
-                _ when typeof(TRuneType) == typeof(INumber) => FindNumberRuneParserByName(name) as IRuneParser<TRuneType>,
-                _ when typeof(TRuneType) == typeof(ILocation) => FindLocationRuneParserByName(name) as IRuneParser<TRuneType>,
+                _ when typeof(TRuneType) == typeof(IExecutableStatement) => executableStatementRuneParsers.GetValueOrDefault(name) as IRuneParser<TRuneType>,
+                _ when typeof(TRuneType) == typeof(IStatement) => statementRuneParsers.GetValueOrDefault(name) as IRuneParser<TRuneType>,
+                _ when typeof(TRuneType) == typeof(IEntitySet) => entitySetRuneParsers.GetValueOrDefault(name) as IRuneParser<TRuneType>,
+                _ when typeof(TRuneType) == typeof(INumber) => numberRuneParsers.GetValueOrDefault(name) as IRuneParser<TRuneType>,
+                _ when typeof(TRuneType) == typeof(ILocation) => locationRuneParsers.GetValueOrDefault(name) as IRuneParser<TRuneType>,
                 _ => null
             };
         }
 
-        private static IRuneParser<IExecutableStatement>? FindExecutableStatementRuneParserByName(string name)
+        private static void FillExecutableStatementRuneParsers()
         {
-            return name switch
-            {
-                "ZU" => new ZUParser(),
-                _ => null
-            };
+            executableStatementRuneParsers["ZU"] = new ZUParser(); // execute
         }
 
-        private static IRuneParser<IStatement>? FindStatementRuneParserByName(string name)
+        private static void FillStatementRuneParsers()
         {
-            return name switch
-            {
-                "VUN" => new VUNParser(),
-                _ => null
-            };
+            statementRuneParsers["VUN"] = new VUNParser(); // push
         }
 
-        private static IRuneParser<IEntitySet>? FindEntitySetRuneParserByName(string name)
+        private static void FillEntitySetRuneParsers()
         {
-            return name switch
-            {
-                "A" => new AParser(),
-                "OH" => new OHParser(),
-                "LA" => new LAParser(),
-                _ => null
-            };
+            entitySetRuneParsers["A"] = new AParser(); // me, caster
+            entitySetRuneParsers["OH"] = new OHParser(); // this, executor
+            entitySetRuneParsers["LA"] = new LAParser(); // context of
         }
 
-        private static IRuneParser<INumber>? FindNumberRuneParserByName(string name)
+        private static void FillNumberRuneParsers()
         {
-            return name switch
-            {
-                "HET" => new HETParser(),
-                "FOTIR" => new FOTIRParser(),
-                _ => null
-            };
+            numberRuneParsers["HET"] = new HETParser(); // one
+            numberRuneParsers["FOTIR"] = new FOTIRParser(); // times fourteen
         }
 
-        private static IRuneParser<ILocation>? FindLocationRuneParserByName(string name)
+        private static void FillLocationRuneParsers()
         {
-            return name switch
-            {
-                "PAR" => new PARParser(),
-                _ => null
-            };
-
+            locationRuneParsers["PAR"] = new PARParser(); // location of
         }
     }
 }

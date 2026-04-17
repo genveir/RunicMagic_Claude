@@ -52,4 +52,36 @@ public class SpellParserTests
         var par = vun.Origin.Should().BeOfType<PAR>().Subject;
         par.EntitySet.Should().BeOfType<A>();
     }
+
+    [Fact]
+    public void Parse_EmptyString_Fails()
+    {
+        var (_, result) = SpellParser.Parse("");
+
+        result.Succeeded.Should().BeFalse();
+    }
+
+    [Fact]
+    public void Parse_WhitespaceString_Fails()
+    {
+        var (_, result) = SpellParser.Parse("   ");
+
+        result.Succeeded.Should().BeFalse();
+    }
+
+    [Fact]
+    public void Parse_WithInvalidRune_Fails()
+    {
+        var (_, result) = SpellParser.Parse("ZU NOTARUNE");
+
+        result.Succeeded.Should().BeFalse();
+    }
+
+    [Fact]
+    public void Parse_WithEndOfStream_Fails()
+    {
+        var (_, result) = SpellParser.Parse("ZU VUN A");
+
+        result.Succeeded.Should().BeFalse();
+    }
 }

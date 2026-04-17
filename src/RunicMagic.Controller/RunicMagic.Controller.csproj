@@ -12,6 +12,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <InternalsVisibleTo Include="RunicMagic.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\RunicMagic.Database\RunicMagic.Database.csproj" />
     <ProjectReference Include="..\RunicMagic.World\RunicMagic.World.csproj" />
   </ItemGroup>
