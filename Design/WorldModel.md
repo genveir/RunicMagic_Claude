@@ -12,41 +12,70 @@ Spatial relationships between entities:
 
 ## Entity Taxonomy
 
-Everything in the world is an `Entity`. There is no type hierarchy in the magic system — the magic system operates purely on entities and their properties/capabilities.
+Everything in the world is an `Entity`. There is no type hierarchy in the magic system — the magic system operates purely on entities and their data.
 
-Capabilities are first-class properties on an entity. The starting set:
+### Entity data categories
 
-- **HasLife** — the entity is alive; can be targeted by life-affecting magic, can die
-- **HasAgency** — the entity can act autonomously
-- **HasScope** — the entity defines its own scope: the set of entities the magic system considers reachable from it. What this means varies by entity — a cave's scope is its contents, a person's scope is what they are touching.
-- **IsReservoir** — the entity can provide power. Exposes a single `Draw(amount)` method that returns how much power was actually given (which may be less than requested). The entity self-defines what draining means — a mana crystal depletes its reserves, a creature loses life. The engine never inspects a reservoir's internals; it just calls `Draw` and works with what it gets.
+| Category | Meaning | Absent expressed as |
+|---|---|---|
+| **Attribute** | Mandatory, always present, persisted | N/A |
+| **Property** | Optional, persisted | `false` (boolean), `null` (scalar or complex) |
+| **Transient** | Session-only, not persisted | `null` |
+| **Derived** | Computed from other state; no own storage | N/A |
 
-The implementation may use convenience classes (e.g. `Creature`) to stamp out entities with common property combinations, but these are purely an implementation concern. The magic system has no knowledge of them.
+Current entity data:
+
+| Name | Category | Type | Notes |
+|---|---|---|---|
+| `Id`, `Label` | Attribute | — | Out-of-world concerns: persistence identity and display |
+| `Weight`, bounds | Attribute | scalar | |
+| `HasAgency` | Property | boolean | `false` = no agency |
+| `IsTranslucent` | Property | boolean | `false` = opaque; used by ray-cast runes |
+| `Life` | Property | complex | `LifeCapability`: `MaxHitPoints` + `CurrentHitPoints`; null = not alive |
+| `Charge` | Property | complex | `ChargeCapability`: `MaxCharge` + `CurrentCharge`; null = uncharged |
+| `PointingDirection` | Transient | scalar | The direction the entity is consciously aiming; null = not pointing |
+| `Scope` | Derived | delegate | Returns the set of entities reachable from this entity |
+| `Reservoir` | Derived | delegate | Draws power; closes over whichever property holds its state |
+
+A complex property's null object is its own "absent" marker — no separate boolean needed. A boolean property uses `false` as its absent marker.
+
+The implementation may use convenience classes (e.g. `Creature`) to stamp out entities with common data combinations, but these are purely an implementation concern. The magic system has no knowledge of them.
 
 ## Implementation Model
 
 ### Entity structure
 
-`Entity` is a mutable class with typed nullable capability properties:
+`Entity` is a mutable class. Its data maps to the categories above:
 
-- `LifeCapability? Life` — `MaxHitPoints` + `CurrentHitPoints`
-- `ChargeCapability? Charge` — `MaxCharge` + `CurrentCharge`
-- `bool HasAgency`
-- `Func<Entity[]>? Scope` — computed on call; closes over the world state
-- `Func<int, int>? Reservoir` — takes amount requested, returns amount drawn; closes over whichever capability holds its state
+**Attributes** (always present):
+- `EntityId Id`
+- `string Label`
+- `int Weight`
+- Spatial bounds: `int X, Y, Width, Height`
 
-A null property means the entity does not have that capability.
+**Properties** (optional, persisted):
+- `bool HasAgency` — false = absent
+- `bool IsTranslucent` — false = absent
+- `LifeCapability? Life` — null = absent; holds `MaxHitPoints` + `CurrentHitPoints`
+- `ChargeCapability? Charge` — null = absent; holds `MaxCharge` + `CurrentCharge`
 
-### Capability delegates
+**Transient** (session-only):
+- `Direction? PointingDirection` — null = not pointing
 
-`Reservoir` and `Scope` are delegates rather than interface implementations. Their state lives in the capability objects (`LifeCapability`, `ChargeCapability`) that the closures capture — not inside the delegate itself. This keeps state inspectable and persistable.
+**Derived** (wired at load, no persistence):
+- `Func<Entity[]>? Scope` — computed on call; closes over world state
+- `Func<int, ReservoirDraw>? Reservoir` — takes amount requested, returns draw result; closes over whichever property holds its state
+
+### Derived delegates
+
+`Reservoir` and `Scope` are delegates rather than interface implementations. Their state lives in the property objects (`LifeCapability`, `ChargeCapability`) that the closures capture — not inside the delegate itself. This keeps state inspectable and persistable.
 
 Examples:
 - A creature's `Reservoir` closes over its `LifeCapability` and draws from `CurrentHitPoints`.
 - A mana source's `Reservoir` closes over its `ChargeCapability` and draws from `CurrentCharge`.
 - A creature's `Scope` closes over the `WorldModel` and returns entities whose bounds touch the creature's bounds.
 
-Capabilities are orthogonal. An entity that has both `Life` and `Charge` could wire a `Reservoir` that draws from either. The engine never inspects which.
+Properties are orthogonal. An entity that has both `Life` and `Charge` could wire a `Reservoir` that draws from either. The engine never inspects which.
 
 ### EntityType and persistence
 

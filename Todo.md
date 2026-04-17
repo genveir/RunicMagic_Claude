@@ -2,20 +2,24 @@
 
 ## To Do — Milestone 2
 
-Next ticket number: RMC-49
+Next ticket number: RMC-55
 Next bugfix number: BUG-3
 
 | Key | Title | Description | Blocked By |
 |-----|-------|-------------|------------|
-| RMC-41 | DAN rune and pointing mechanic | Implement the DAN(pointing at) rune, which returns a singleton Set containing the entity the caster is consciously aiming at. Requires: a translucency capability on entities (windows are translucent, walls and doors are not); a line-of-sight algorithm that casts a ray from the caster and returns the first non-translucent entity hit; and a UI affordance (canvas click) to set the active aim target. | |
+| RMC-49 | Add pointing direction to entity model | Add a transient `PointingDirection` property to the entity model (no DB persistence). Represents the direction the entity is consciously aiming; initially null. | |
+| RMC-50 | UI knows which entity is the caster | The UI currently renders entities without knowing which one is controlled by the player. Expose the caster's entity identity to the UI so it can be used as an anchor for interactions (e.g. drawing an aim line from the correct position). | |
+| RMC-51 | UI point-to-aim interaction | Add a UI mode where the next canvas click sets the caster's pointing direction. Draw a line from the caster to the cursor as visual feedback. On click, compute the direction and report it to PlayerService, which writes it to the caster entity's `PointingDirection`. | RMC-49 RMC-50 |
+| RMC-53 | Add translucency capability to entity model and database | Add a persistent `Translucency` capability to the world model and database. Windows are translucent; walls, doors, and other solid entities are not. | |
+| RMC-52 | DAN(pointing at) rune | Implement the DAN(pointing at) rune in the parser and rune system. DAN casts a ray from the caster in their `PointingDirection`, applying a translucency capability check (windows are translucent, walls and doors are not), and returns a singleton Set containing the first non-translucent entity hit. | RMC-49 RMC-51 RMC-53 |
 | RMC-46 | Move caster position in-game | Add a UI affordance to reposition the caster without touching the database. Useful for testing line-of-sight scenarios without reseeding. | |
-| RMC-47 | 🚩 Mini-milestone — point at an entity and push it | With the milestone world seeded, the player clicks an entity to aim at it and casts `ZU VUN DAN FOTIR FOTIR FOTIR HET`. The aimed-at entity is pushed 2 744 mm away from the caster. | RMC-41 RMC-46 |
+| RMC-47 | 🚩 Mini-milestone — point at an entity and push it | With the milestone world seeded, the player clicks an entity to aim at it and casts `ZU VUN DAN FOTIR FOTIR FOTIR HET`. The aimed-at entity is pushed 2 744 mm away from the caster. | RMC-51 RMC-52 RMC-46 |
 | RMC-15 | Design power sourcing implementation | The sourcing rules (explicit > executor-scope > caster-scope > local-scope, with preference ordering) are complex enough to deserve their own design and implementation ticket. | |
 | RMC-16 | Design inscribed spells on objects | Spells inscribed on objects have different executor/caster semantics. Define how the world model represents inscribed spells, how they are activated, and how the evaluator handles the executor being an object rather than a creature. | |
 | RMC-40 | GWYAH rune — invoke inscriptions on a Set | Implement the GWYAH(invoke) rune: takes a Set, activates all inscriptions found on entities in that Set, and returns a Statement. The entity the inscription is on becomes the executor; the caster of the invoking spell becomes the caster of the activated inscription. | RMC-16 |
 | RMC-43 | Seed the milestone world | Build the seeded world for the Milestone 2 scenario: a room entity containing walls, windows (translucent), a door, and a rock with an inscription. The caster's starting position is randomised so they may or may not have line of sight to the rock through a window. | RMC-16 |
 | RMC-44 | Design the inscription spell | Determine what the rock's inscription says. The spell must open the door when activated via GWYAH. Work out which runes are needed (filtering a Set to the door, the open/close effect, etc.) and raise any missing-rune tickets that fall out of the design. | RMC-16 RMC-40 |
-| RMC-45 | 🏁 Milestone 2 — trigger an inscription through a window | A room contains walls, windows, a door, and a rock with an inscription. The caster is seeded at a random position — either with or without line of sight to the rock through a window. The player clicks the rock to aim, casts `ZU GWYAH DAN`, and the inscription on the rock opens the door. | RMC-15 RMC-16 RMC-37 RMC-38 RMC-39 RMC-40 RMC-41 RMC-43 RMC-44 |
+| RMC-45 | 🏁 Milestone 2 — trigger an inscription through a window | A room contains walls, windows, a door, and a rock with an inscription. The caster is seeded at a random position — either with or without line of sight to the rock through a window. The player clicks the rock to aim, casts `ZU GWYAH DAN`, and the inscription on the rock opens the door. | RMC-15 RMC-16 RMC-37 RMC-38 RMC-39 RMC-40 RMC-51 RMC-52 RMC-43 RMC-44 |
 
 ## To Do — Other
 
@@ -42,3 +46,4 @@ Next bugfix number: BUG-3
 
 | Key | Title |
 |-----|-------|
+| RMC-54 | Clarify entity property model — capabilities, state, and transient data | 
