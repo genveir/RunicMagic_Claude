@@ -3,16 +3,19 @@
 const term = new Terminal({
     cursorBlink: true,
     cursorStyle: 'block',
-    rows: 24,
-    cols: 180,
     theme: {
         background: '#111111',
         foreground: '#cccccc',
-        cursor:     '#cccccc',
+        cursor: '#cccccc',
     },
 });
 
+const fitAddon = new FitAddon.FitAddon();
+term.loadAddon(fitAddon);
 term.open(document.getElementById('terminal'));
+term.onResize(() => term.scrollToBottom());
+
+new ResizeObserver(() => fitAddon.fit()).observe(document.getElementById('terminal-container'));
 
 function writePrompt(prompt) {
     term.write(prompt ?? '>');
@@ -117,6 +120,7 @@ async function submitInput() {
 
     updateCanvas(result.entities);
     writePrompt(result.prompt);
+    term.scrollToBottom();
 }
 
 
@@ -305,6 +309,7 @@ svg.addEventListener('click', async e => {
     }
     updateCanvas(result.entities);
     writePrompt(result.prompt);
+    term.scrollToBottom();
 });
 
 async function sendModeClick(mode, x, y) {
