@@ -14,8 +14,8 @@ const term = new Terminal({
 
 term.open(document.getElementById('terminal'));
 
-function writePrompt() {
-    term.write('>');
+function writePrompt(prompt) {
+    term.write(prompt ?? '>');
 }
 
 
@@ -116,7 +116,7 @@ async function submitInput() {
     }
 
     updateCanvas(result.entities);
-    writePrompt();
+    writePrompt(result.prompt);
 }
 
 
@@ -252,7 +252,7 @@ svg.addEventListener('click', async e => {
         if (line) term.writeln(line);
     }
     updateCanvas(result.entities);
-    writePrompt();
+    writePrompt(result.prompt);
 });
 
 async function sendModeClick(mode, x, y) {
@@ -303,7 +303,7 @@ document.addEventListener('mouseup', () => {
 async function init() {
     const entities = await fetch('/world').then(r => r.json());
     updateCanvas(entities);
-    writePrompt();
+    writePrompt('[no caster] >');
 }
 
 init();

@@ -2,6 +2,7 @@ using FluentAssertions;
 using RunicMagic.Controller.Models;
 using RunicMagic.Controller.Services;
 using RunicMagic.World;
+using RunicMagic.World.Capabilities;
 using RunicMagic.World.Execution;
 using Xunit;
 
@@ -120,5 +121,36 @@ public class PlayerServiceTests
         var result = await service.RegisterInput("ZU VUN LA FOTIR FOTIR FOTIR HET");
 
         result.Text.Should().Contain(l => l.Contains("No caster selected"));
+    }
+
+    [Fact]
+    public void Prompt_NoCasterSelected_ReturnsNoCasterPrompt()
+    {
+        var (service, _) = MakeService();
+
+        service.Prompt.Should().Be("[no caster] >");
+    }
+
+    [Fact]
+    public async Task Prompt_CasterSelectedWithLife_ShowsHitPoints()
+    {
+        var (service, world) = MakeService();
+        var entity = MakeAgencyEntity(x: 0, y: 0);
+        entity.Life = new LifeCapability(maxHitPoints: 20, currentHitPoints: 15);
+        world.Add(entity);
+        await service.SetCaster(new WorldCoordinate(0, 0));
+
+        service.Prompt.Should().Be("(15/20) >");
+    }
+
+    [Fact]
+    public async Task Prompt_CasterSelectedWithoutLife_ReturnsDeadCasterPrompt()
+    {
+        var (service, world) = MakeService();
+        var entity = MakeAgencyEntity(x: 0, y: 0);
+        world.Add(entity);
+        await service.SetCaster(new WorldCoordinate(0, 0));
+
+        service.Prompt.Should().Be("[dead caster] >");
     }
 }

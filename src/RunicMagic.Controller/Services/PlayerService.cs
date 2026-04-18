@@ -15,7 +15,25 @@ internal class PlayerService(
     private readonly List<string> _pendingText = [];
     private readonly List<EntityRenderingModel> _pendingEntities = [];
 
-    public string Prompt => ">";
+    public string Prompt
+    {
+        get
+        {
+            if (casterId == null)
+            {
+                return "[no caster] >";
+            }
+
+            var caster = world.Find(casterId.Value);
+            if (caster?.Life == null)
+            {
+                return "[dead caster] >";
+            }
+
+            var prompt = $"({caster.Life.CurrentHitPoints}/{caster.Life.MaxHitPoints}) >";
+            return prompt;
+        }
+    }
 
     public Task<CommandResult> RegisterInput(string input)
     {
@@ -86,7 +104,7 @@ internal class PlayerService(
     {
         SendWorldEntities();
 
-        var result = new CommandResult([.. _pendingText], [.. _pendingEntities]);
+        var result = new CommandResult([.. _pendingText], [.. _pendingEntities], Prompt);
         _pendingText.Clear();
         _pendingEntities.Clear();
         return result;

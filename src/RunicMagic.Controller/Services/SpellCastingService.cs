@@ -9,13 +9,6 @@ internal class SpellCastingService(WorldModel world, SpellExecutor spellExecutor
     public IReadOnlyList<string> Cast(string input, EntityId? casterId)
     {
         var responseLines = new List<string>();
-        var (runeCount, parseResult) = SpellParser.Parse(input);
-
-        if (!parseResult.Succeeded)
-        {
-            responseLines.Add(Describe(parseResult.Error));
-            return responseLines;
-        }
 
         if (casterId == null)
         {
@@ -27,6 +20,14 @@ internal class SpellCastingService(WorldModel world, SpellExecutor spellExecutor
         if (casterEntity == null)
         {
             responseLines.Add("Caster not found in world.");
+            return responseLines;
+        }
+
+        var (runeCount, parseResult) = SpellParser.Parse(input);
+
+        if (!parseResult.Succeeded)
+        {
+            responseLines.Add(Describe(parseResult.Error));
             return responseLines;
         }
 
