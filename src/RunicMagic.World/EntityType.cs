@@ -1,6 +1,6 @@
 namespace RunicMagic.World;
 
-public enum EntityType
+public enum EntityType : long
 {
     Creature = 1,
     ManaSource = 2,

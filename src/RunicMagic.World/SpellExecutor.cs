@@ -12,7 +12,7 @@ public class SpellExecutor
         _world = world;
     }
 
-    public SpellResult Execute(IExecutableStatement spell, int runeCount, EntitySet caster, EntitySet executor)
+    public SpellResult Execute(IExecutableStatement spell, long runeCount, EntitySet caster, EntitySet executor)
     {
         var result = new SpellResult();
         var context = new SpellContext(caster, executor, _world, result);

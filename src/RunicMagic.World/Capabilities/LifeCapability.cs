@@ -1,7 +1,7 @@
 namespace RunicMagic.World.Capabilities;
 
-public class LifeCapability(int maxHitPoints, int currentHitPoints)
+public class LifeCapability(long maxHitPoints, long currentHitPoints)
 {
-    public int MaxHitPoints { get; } = maxHitPoints;
-    public int CurrentHitPoints { get; set; } = currentHitPoints;
+    public long MaxHitPoints { get; } = maxHitPoints;
+    public long CurrentHitPoints { get; set; } = currentHitPoints;
 }

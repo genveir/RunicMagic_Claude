@@ -21,11 +21,11 @@ namespace RunicMagic.World.Runes.EffectRunes
         public void Execute(SpellContext context)
         {
             var toMove = ToMove.Resolve(context);
-            var distance = HowFar.Evaluate(context).Value;
+            long distance = HowFar.Evaluate(context).Value;
             var origin = Origin.Evaluate(context);
 
-            var totalWeight = toMove.Entities.Sum(e => e.Weight);
-            var executionCost = distance * totalWeight / 1_000_000;
+            long totalWeight = toMove.Entities.Sum(e => e.Weight);
+            long executionCost = distance * totalWeight / 1_000_000;
 
             var drawn = context.DrawPower(executionCost);
             if (drawn < executionCost)

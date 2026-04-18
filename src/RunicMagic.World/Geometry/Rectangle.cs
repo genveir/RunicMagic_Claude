@@ -1,7 +1,7 @@
 namespace RunicMagic.World.Geometry;
 
 // X and Y are the center of the rectangle. Width and Height are the full extents.
-public readonly record struct Rectangle(int X, int Y, int Width, int Height)
+public readonly record struct Rectangle(long X, long Y, long Width, long Height)
 {
     public bool Contains(Rectangle other)
     {
@@ -12,7 +12,7 @@ public readonly record struct Rectangle(int X, int Y, int Width, int Height)
         return result;
     }
 
-    public bool Contains(int x, int y)
+    public bool Contains(long x, long y)
     {
         var result = X - Width / 2 <= x && x <= X + Width / 2 &&
             Y - Height / 2 <= y && y <= Y + Height / 2;

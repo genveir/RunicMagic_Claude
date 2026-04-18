@@ -44,7 +44,7 @@ public class VUNTests
     [Fact]
     public void Execute_DrawsPowerFromCaster()
     {
-        var drawn = new List<int>();
+        var drawn = new List<long>();
         var casterEntity = TestFixtures.MakeEntity();
         casterEntity.Reservoir = amount => { drawn.Add(amount); return new ReservoirDraw(amount, false); };
         var caster = new EntitySet([casterEntity]);
@@ -66,8 +66,8 @@ public class VUNTests
     [Fact]
     public void Execute_DrawsFromExecutorFirst_ThenCaster()
     {
-        var executorDrawn = new List<int>();
-        var casterDrawn = new List<int>();
+        var executorDrawn = new List<long>();
+        var casterDrawn = new List<long>();
 
         var executorEntity = TestFixtures.MakeEntity();
         executorEntity.Reservoir = amount => { executorDrawn.Add(amount); return new ReservoirDraw(amount / 2, false); };
@@ -158,7 +158,7 @@ public class VUNTests
     [Fact]
     public void Execute_EmptySet_DrawsNoPower()
     {
-        var drawn = new List<int>();
+        var drawn = new List<long>();
         var casterEntity = TestFixtures.MakeEntity();
         casterEntity.Reservoir = amount => { drawn.Add(amount); return new ReservoirDraw(amount, false); };
         var caster = new EntitySet([casterEntity]);

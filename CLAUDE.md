@@ -16,7 +16,7 @@
 
 ## Architecture
 
-- The solution follows a hub-and-spokes model. `Controller` is the hub and the only assembly that communicates between other assemblies. Spoke assemblies (`World`, `Database`, `Magic`, etc.) must not reference each other. If two spokes need to share a concept, it either lives in `Controller` or is intentionally represented differently in each spoke (e.g. `EntityData` uses `int TypeId` rather than `EntityType` to avoid `Database` depending on `World`).
+- The solution follows a hub-and-spokes model. `Controller` is the hub and the only assembly that communicates between other assemblies. Spoke assemblies (`World`, `Database`, `Magic`, etc.) must not reference each other. If two spokes need to share a concept, it either lives in `Controller` or is intentionally represented differently in each spoke (e.g. `EntityData` uses `long TypeId` rather than `EntityType` to avoid `Database` depending on `World`).
 
 ## General
 
@@ -28,6 +28,10 @@
   Never run a Git command that would change the state of the repository, working directory, index, or any remote. If a command could alter, create, or delete any ref, file, object, or configuration, do not run it.
 
 ## Code Style
+
+- Use `long` (not `int`) for all domain numeric values. All measurements in the system are in millimetres and grams, making `int` overflow-prone. The only exceptions are indices, counts, and other values required to be `int` by .NET or external APIs.
+
+- In the database schema, use `bigint` (not `int`) for all numeric columns under our control.
 
 - SQL keywords are lowercase (`select`, `from`, `where`, `insert into`, etc.).
 

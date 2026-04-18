@@ -1,3 +1,3 @@
 namespace RunicMagic.World.Execution;
 
-public readonly record struct ReservoirDraw(int Amount, bool IsDrained);
+public readonly record struct ReservoirDraw(long Amount, bool IsDrained);

@@ -17,7 +17,7 @@ public class EntitySet
         }
     }
 
-    public int DrawPower(int amount, SpellResult result)
+    public long DrawPower(long amount, SpellResult result)
     {
         if (amount == 0)
         {
@@ -28,11 +28,11 @@ public class EntitySet
         {
             return 0;
         }
-        var perEntity = (int)Math.Ceiling((double)amount / sources.Count);
-        var totalDrawn = 0;
+        var perEntity = (long)Math.Ceiling((double)amount / sources.Count);
+        var totalDrawn = 0L;
         foreach (var entity in sources)
         {
-            var draw = entity.Reservoir!.Invoke(perEntity);
+            var draw = entity.Reservoir!(perEntity);
             totalDrawn += draw.Amount;
             if (draw.Amount > 0)
             {

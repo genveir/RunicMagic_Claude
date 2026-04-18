@@ -79,8 +79,8 @@ public class LocationExtensionsTests
     {
         var items = new[]
         {
-            (new Location(0, 0), 1),
-            (new Location(100, 0), 3),
+            (new Location(0, 0), 1L),
+            (new Location(100, 0), 3L),
         };
 
         var result = items.WeightedCentroid();
@@ -93,8 +93,8 @@ public class LocationExtensionsTests
     {
         var items = new[]
         {
-            (new Location(0, 0), 2),
-            (new Location(100, 200), 2),
+            (new Location(0, 0), 2L),
+            (new Location(100, 200), 2L),
         };
 
         var result = items.WeightedCentroid();
@@ -107,8 +107,8 @@ public class LocationExtensionsTests
     {
         var items = new[]
         {
-            (new Location(0, 0), 0),
-            (new Location(100, 0), 0),
+            (new Location(0, 0), 0L),
+            (new Location(100, 0), 0L),
         };
 
         var result = items.WeightedCentroid();

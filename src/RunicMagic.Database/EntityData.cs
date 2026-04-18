@@ -2,16 +2,16 @@ namespace RunicMagic.Database;
 
 public record EntityData(
     Guid Id,
-    int TypeId,
+    long TypeId,
     string Label,
-    int X,
-    int Y,
-    int Width,
-    int Height,
+    long X,
+    long Y,
+    long Width,
+    long Height,
     bool HasAgency,
-    int Weight,
+    long Weight,
     bool IsTranslucent = false,
-    int? MaxHitPoints = null,
-    int? CurrentHitPoints = null,
-    int? MaxCharge = null,
-    int? CurrentCharge = null);
+    long? MaxHitPoints = null,
+    long? CurrentHitPoints = null,
+    long? MaxCharge = null,
+    long? CurrentCharge = null);

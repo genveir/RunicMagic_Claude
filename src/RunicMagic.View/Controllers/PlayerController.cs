@@ -17,7 +17,7 @@ public class PlayerController : ControllerBase
     [HttpPost("pick-caster")]
     public async Task<CommandResult> PickCaster([FromBody] CanvasClickRequest request)
     {
-        var worldCoordinate = new WorldCoordinate((int)request.X, (int)request.Y);
+        var worldCoordinate = new WorldCoordinate((long)request.X, (long)request.Y);
 
         var commandResult = await playerViewInterface.SetCaster(worldCoordinate);
 
@@ -27,7 +27,7 @@ public class PlayerController : ControllerBase
     [HttpPost("move-caster")]
     public async Task<CommandResult> MoveCaster([FromBody] CanvasClickRequest request)
     {
-        var worldCoordinate = new WorldCoordinate((int)request.X, (int)request.Y);
+        var worldCoordinate = new WorldCoordinate((long)request.X, (long)request.Y);
 
         var commandResult = await playerViewInterface.MoveCaster(worldCoordinate);
 
@@ -37,7 +37,7 @@ public class PlayerController : ControllerBase
     [HttpPost("point-at")]
     public async Task<CommandResult> PointAt([FromBody] CanvasClickRequest request)
     {
-        var worldCoordinate = new WorldCoordinate((int)request.X, (int)request.Y);
+        var worldCoordinate = new WorldCoordinate((long)request.X, (long)request.Y);
 
         var commandResult = await playerViewInterface.SetPointingDirection(worldCoordinate);
 
@@ -47,7 +47,7 @@ public class PlayerController : ControllerBase
     [HttpPost("indicate")]
     public async Task<CommandResult> Indicate([FromBody] CanvasClickRequest request)
     {
-        var worldCoordinate = new WorldCoordinate((int)request.X, (int)request.Y);
+        var worldCoordinate = new WorldCoordinate((long)request.X, (long)request.Y);
 
         var commandResult = await playerViewInterface.SetIndicateTarget(worldCoordinate);
 

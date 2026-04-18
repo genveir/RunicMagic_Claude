@@ -10,7 +10,7 @@ namespace RunicMagic.Tests;
 
 public class WorldRenderingServiceTests
 {
-    private static Entity MakeEntity(string label, int x, int y, int width, int height,
+    private static Entity MakeEntity(string label, long x, long y, long width, long height,
         bool hasAgency = false, LifeCapability? life = null) =>
         new(EntityId.New(), EntityType.Object, label)
         {

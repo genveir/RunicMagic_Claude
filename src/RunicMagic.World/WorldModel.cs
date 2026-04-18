@@ -28,7 +28,7 @@ public class WorldModel
         return entities;
     }
 
-    public IReadOnlyList<Entity> GetEntitiesAtPoint(int x, int y)
+    public IReadOnlyList<Entity> GetEntitiesAtPoint(long x, long y)
     {
         var entities = _entities.Values.Where(e => Bounds(e).Contains(x, y)).ToList();
         return entities;

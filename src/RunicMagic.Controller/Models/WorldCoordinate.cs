@@ -1,4 +1,4 @@
 ﻿namespace RunicMagic.Controller.Models
 {
-    public readonly record struct WorldCoordinate(int X, int Y);
+    public readonly record struct WorldCoordinate(long X, long Y);
 }

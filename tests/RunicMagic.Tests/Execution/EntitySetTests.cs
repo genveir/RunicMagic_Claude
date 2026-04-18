@@ -9,7 +9,7 @@ public class EntitySetTests
     [Fact]
     public void DrawPower_DistributesWithCeilingRounding()
     {
-        var drawn = new List<int>();
+        var drawn = new List<long>();
         var entity1 = TestFixtures.MakeEntity();
         var entity2 = TestFixtures.MakeEntity();
         var entity3 = TestFixtures.MakeEntity();
@@ -28,7 +28,7 @@ public class EntitySetTests
     [Fact]
     public void DrawPower_SkipsEntitiesWithoutReservoir()
     {
-        var drawn = new List<int>();
+        var drawn = new List<long>();
         var withReservoir = TestFixtures.MakeEntity();
         var withoutReservoir = TestFixtures.MakeEntity();
         withReservoir.Reservoir = amount => { drawn.Add(amount); return new ReservoirDraw(amount, false); };
@@ -60,7 +60,7 @@ public class EntitySetTests
     [Fact]
     public void DrawPower_EvenAmount_DistributesExactly()
     {
-        var drawn = new List<int>();
+        var drawn = new List<long>();
         var entity1 = TestFixtures.MakeEntity();
         var entity2 = TestFixtures.MakeEntity();
         entity1.Reservoir = amount => { drawn.Add(amount); return new ReservoirDraw(amount, false); };

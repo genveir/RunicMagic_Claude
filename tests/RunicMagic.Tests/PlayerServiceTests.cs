@@ -21,7 +21,7 @@ public class PlayerServiceTests
         return (service, world);
     }
 
-    private static Entity MakeAgencyEntity(int x, int y, string label = "agent") =>
+    private static Entity MakeAgencyEntity(long x, long y, string label = "agent") =>
         new(EntityId.New(), EntityType.Object, label)
         {
             X = x,

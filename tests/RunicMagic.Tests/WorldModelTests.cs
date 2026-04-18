@@ -6,7 +6,7 @@ namespace RunicMagic.Tests;
 
 public class WorldModelTests
 {
-    private static Entity MakeEntity(int x, int y, int width, int height) =>
+    private static Entity MakeEntity(long x, long y, long width, long height) =>
         new(EntityId.New(), EntityType.Object, "test") { X = x, Y = y, Width = width, Height = height };
 
     // ── GetEntitiesInArea ─────────────────────────────────────────────────────

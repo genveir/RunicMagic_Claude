@@ -49,7 +49,7 @@ public class SpellExecutorTests
     [Fact]
     public void Execute_DrawsEvaluationCostFromCasterBeforeExecution()
     {
-        var drawn = new List<int>();
+        var drawn = new List<long>();
         var world = new WorldModel();
 
         var casterEntity = TestFixtures.MakeEntity();
@@ -78,8 +78,8 @@ public class SpellExecutorTests
     [Fact]
     public void Execute_EvaluationCost_DrawnFromExecutorFirst_ThenCaster()
     {
-        var executorDrawn = new List<int>();
-        var casterDrawn = new List<int>();
+        var executorDrawn = new List<long>();
+        var casterDrawn = new List<long>();
         var world = new WorldModel();
 
         var executorEntity = TestFixtures.MakeEntity();
@@ -106,7 +106,7 @@ public class SpellExecutorTests
     [Fact]
     public void Execute_RuneCountBelowFive_DrawsZeroEvaluationCost()
     {
-        var drawn = new List<int>();
+        var drawn = new List<long>();
         var world = new WorldModel();
 
         var casterEntity = TestFixtures.MakeEntity();

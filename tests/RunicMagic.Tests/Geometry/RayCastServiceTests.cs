@@ -7,7 +7,7 @@ namespace RunicMagic.Tests.Geometry;
 
 public class RayCastServiceTests
 {
-    private static Entity MakeEntity(int x, int y, int width = 100, int height = 100, bool isTranslucent = false)
+    private static Entity MakeEntity(long x, long y, long width = 100, long height = 100, bool isTranslucent = false)
     {
         return new Entity(EntityId.New(), EntityType.Object, "test")
         {

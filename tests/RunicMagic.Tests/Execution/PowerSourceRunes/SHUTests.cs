@@ -113,7 +113,7 @@ public class SHUTests
         drawOrder.Should().Equal("source", "executor", "caster");
     }
 
-    private class DrawingStatement(int amount) : IStatement
+    private class DrawingStatement(long amount) : IStatement
     {
         public void Execute(SpellContext context)
         {

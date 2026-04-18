@@ -2,9 +2,9 @@ namespace RunicMagic.World.Geometry;
 
 public class RayCastService(WorldModel world)
 {
-    private const int MaxRangeMillimetres = 3000;
+    private const long MaxRangeMillimetres = 3000;
 
-    public RayCastResult Cast(EntityId sourceId, int originX, int originY, Direction direction, bool skipTranslucent = true)
+    public RayCastResult Cast(EntityId sourceId, long originX, long originY, Direction direction, bool skipTranslucent = true)
     {
         var closestT = double.MaxValue;
         Entity? closestEntity = null;
@@ -26,8 +26,8 @@ public class RayCastService(WorldModel world)
         }
 
         var range = closestT == double.MaxValue ? MaxRangeMillimetres : closestT;
-        var endX = (int)Math.Round(originX + direction.X * range);
-        var endY = (int)Math.Round(originY + direction.Y * range);
+        var endX = (long)Math.Round(originX + direction.X * range);
+        var endY = (long)Math.Round(originY + direction.Y * range);
         return new RayCastResult(closestEntity, endX, endY);
     }
 }

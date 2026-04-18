@@ -43,7 +43,7 @@ public class WorldLoader(string connectionString)
         });
     }
 
-    private record EntityRow(Guid Id, int EntityTypeId, string Label, int X, int Y, int Width, int Height, bool HasAgency, int Weight, bool IsTranslucent);
-    private record LifeRow(Guid EntityId, int MaxHitPoints, int CurrentHitPoints);
-    private record ChargeRow(Guid EntityId, int MaxCharge, int CurrentCharge);
+    private record EntityRow(Guid Id, long EntityTypeId, string Label, long X, long Y, long Width, long Height, bool HasAgency, long Weight, bool IsTranslucent);
+    private record LifeRow(Guid EntityId, long MaxHitPoints, long CurrentHitPoints);
+    private record ChargeRow(Guid EntityId, long MaxCharge, long CurrentCharge);
 }

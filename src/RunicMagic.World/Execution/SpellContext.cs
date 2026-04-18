@@ -27,7 +27,7 @@ public class SpellContext
         _sourceStack.Pop();
     }
 
-    public int DrawPower(int amount)
+    public long DrawPower(long amount)
     {
         var remaining = amount;
         var sources = _sourceStack.Concat([Executor, Caster]);

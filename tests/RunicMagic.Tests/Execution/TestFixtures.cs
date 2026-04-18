@@ -6,7 +6,7 @@ namespace RunicMagic.Tests.Execution;
 
 internal static class TestFixtures
 {
-    internal static Entity MakeEntity(int x = 0, int y = 0, int weight = 0)
+    internal static Entity MakeEntity(long x = 0, long y = 0, long weight = 0)
     {
         var entity = new Entity(new EntityId(Guid.NewGuid()), EntityType.Object, "test");
         entity.X = x;
@@ -49,9 +49,9 @@ internal class FixedEntitySet : IEntitySet
 
 internal class FixedNumber : INumber
 {
-    private readonly int _value;
+    private readonly long _value;
 
-    internal FixedNumber(int value)
+    internal FixedNumber(long value)
     {
         _value = value;
     }
@@ -66,7 +66,7 @@ internal class FixedLocation : ILocation
 {
     private readonly Location _location;
 
-    internal FixedLocation(int x, int y)
+    internal FixedLocation(long x, long y)
     {
         _location = new Location(x, y);
     }
