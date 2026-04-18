@@ -6,9 +6,10 @@ public class RayCastService(WorldModel world)
 {
     private const int MaxRangeMillimetres = 3000;
 
-    public (int X, int Y) Cast(EntityId sourceId, int originX, int originY, Direction direction)
+    public RayCastResult Cast(EntityId sourceId, int originX, int originY, Direction direction)
     {
         var closestT = double.MaxValue;
+        Entity? closestEntity = null;
 
         foreach (var entity in world.GetAll())
         {
@@ -19,13 +20,16 @@ public class RayCastService(WorldModel world)
             if (bounds.IntersectsRay(originX, originY, direction.X, direction.Y, out var t))
             {
                 if (t < closestT)
+                {
                     closestT = t;
+                    closestEntity = entity;
+                }
             }
         }
 
         var range = closestT == double.MaxValue ? MaxRangeMillimetres : closestT;
         var endX = (int)Math.Round(originX + direction.X * range);
         var endY = (int)Math.Round(originY + direction.Y * range);
-        return (endX, endY);
+        return new RayCastResult(closestEntity, endX, endY);
     }
 }

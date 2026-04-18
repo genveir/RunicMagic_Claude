@@ -67,6 +67,7 @@ namespace RunicMagic.Controller.RuneParsing
             entitySetRuneParsers["A"] = new AParser(); // me, caster
             entitySetRuneParsers["OH"] = new OHParser(); // this, executor
             entitySetRuneParsers["LA"] = new LAParser(); // context of
+            entitySetRuneParsers["DAN"] = new DANParser(); // pointing at
         }
 
         private static void FillNumberRuneParsers()

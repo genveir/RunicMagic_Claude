@@ -7,8 +7,6 @@ Next bugfix number: BUG-3
 
 | Key | Title | Description | Blocked By |
 |-----|-------|-------------|------------|
-| RMC-52 | DAN(pointing at) rune | Implement the DAN(pointing at) rune in the parser and rune system. DAN casts a ray from the caster in their `PointingDirection`, applying a translucency capability check (windows are translucent, walls and doors are not), and returns a singleton Set containing the first non-translucent entity hit. | RMC-49 RMC-51 RMC-53 |
-| RMC-47 | 🚩 Mini-milestone — point at an entity and push it | With the previous milestone world seeded, the player clicks an entity to aim at it and casts `ZU VUN DAN FOTIR FOTIR FOTIR HET`. The aimed-at entity is pushed 2 744 mm away from the caster. | RMC-51 RMC-52 RMC-46 |
 | RMC-15 | Design power sourcing implementation | The sourcing rules (explicit > executor-scope > caster-scope > local-scope, with preference ordering) are complex enough to deserve their own design and implementation ticket. | |
 | RMC-16 | Design inscribed spells on objects | Spells inscribed on objects have different executor/caster semantics. Define how the world model represents inscribed spells, how they are activated, and how the evaluator handles the executor being an object rather than a creature. | |
 | RMC-40 | GWYAH rune — invoke inscriptions on a Set | Implement the GWYAH(invoke) rune: takes a Set, activates all inscriptions found on entities in that Set, and returns a Statement. The entity the inscription is on becomes the executor; the caster of the invoking spell becomes the caster of the activated inscription. | RMC-16 |
@@ -20,6 +18,7 @@ Next bugfix number: BUG-3
 
 | Key | Title | Description | Blocked By |
 |-----|-------|-------------|------------|
+| BUG-3 | Terminal scrolling does not take resizable height into account | When the terminal height is reduced, the scrollback buffer does not adjust and the most recent lines and current input are out of frame | |
 | RMC-37 | Kill creatures when they run out of life | At any point during spell execution, living entities may run out of hitpoints. In this case the game should register that they're dead and remove their living and agency properties | |
 | RMC-38 | Register entity destruction | It should be possible to destroy entities. When this happens, the game should register that the entity is destroyed | |
 | RMC-39 | Stop spell execution on caster or executor death or destruction | When the caster or executor of a spell cease to be in an active state the spell should stop executing | RMC-37 RMC-38 |
@@ -49,3 +48,5 @@ Next bugfix number: BUG-3
 | RMC-46 | Move caster position in-game |
 | RMC-51 | UI point-to-aim interaction |
 | RMC-53 | Add translucency capability to entity model and database |
+| RMC-52 | DAN(pointing at) rune |
+| RMC-47 | 🚩 Mini-milestone — point at an entity and push it |

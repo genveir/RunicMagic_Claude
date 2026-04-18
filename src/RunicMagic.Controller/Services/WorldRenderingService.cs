@@ -15,7 +15,10 @@ public class WorldRenderingService(WorldModel world, RayCastService rayCast)
         {
             (int X, int Y)? pointingEnd = null;
             if (entity.PointingDirection.HasValue)
-                pointingEnd = rayCast.Cast(entity.Id, entity.X, entity.Y, entity.PointingDirection.Value);
+            {
+                var castResult = rayCast.Cast(entity.Id, entity.X, entity.Y, entity.PointingDirection.Value);
+                pointingEnd = (castResult.X, castResult.Y);
+            }
 
             var mapped = EntityRenderingMapper.ToRenderingModel(entity, entity.Id == casterEntityId, pointingEnd);
             renderingModels.Add(mapped);
