@@ -74,43 +74,27 @@ internal class PlayerService(
 
     public Task<CommandResult> MoveCaster(WorldCoordinate worldCoordinate)
     {
-        if (casterId == null)
-        {
-            SendText("No caster selected.");
-            return Task.FromResult(FlushPendingOutputs());
-        }
+        var (caster, error) = CheckForCaster(checkForDeath: true);
+        if (error != null) return Task.FromResult(error);
+        if (caster == null) throw new InvalidOperationException("Unexpected null caster after check.");
 
-        var casterEntity = world.Find(casterId.Value);
-        if (casterEntity == null)
-        {
-            SendText("Caster not found in world.");
-            return Task.FromResult(FlushPendingOutputs());
-        }
-
-        teleport.Teleport(casterEntity, worldCoordinate.X, worldCoordinate.Y);
+        teleport.Teleport(caster, worldCoordinate.X, worldCoordinate.Y);
         SendText($"Caster moved to ({worldCoordinate.X}, {worldCoordinate.Y}).");
+
         return Task.FromResult(FlushPendingOutputs());
     }
 
     public Task<CommandResult> SetPointingDirection(WorldCoordinate worldCoordinate)
     {
-        if (casterId == null)
-        {
-            SendText("No caster selected.");
-            return Task.FromResult(FlushPendingOutputs());
-        }
+        var (caster, error) = CheckForCaster(checkForDeath: true);
+        if (error != null) return Task.FromResult(error);
+        if (caster == null) throw new InvalidOperationException("Unexpected null caster after check.");
 
-        var casterEntity = world.Find(casterId.Value);
-        if (casterEntity == null)
-        {
-            SendText("Caster not found in world.");
-            return Task.FromResult(FlushPendingOutputs());
-        }
-
-        var from = new Location(casterEntity.X, casterEntity.Y);
+        var from = new Location(caster.X, caster.Y);
         var to = new Location(worldCoordinate.X, worldCoordinate.Y);
-        casterEntity.PointingDirection = Direction.FromPoints(from, to);
+        caster.PointingDirection = Direction.FromPoints(from, to);
         SendText("Pointing direction set.");
+
         return Task.FromResult(FlushPendingOutputs());
     }
 
@@ -122,6 +106,37 @@ internal class PlayerService(
     public void SendWorldEntities()
     {
         _pendingEntities.AddRange(worldRendering.GetAllRenderingModels(casterId));
+    }
+
+    private (Entity? caster, CommandResult? error) CheckForCaster(bool checkForDeath)
+    {
+        (Entity?, CommandResult?) result = (null, null);
+
+        if (casterId == null)
+        {
+            SendText("No caster selected.");
+            result = (null, FlushPendingOutputs());
+        }
+        else
+        {
+            var caster = world.Find(casterId.Value);
+            if (caster == null)
+            {
+                SendText("Caster not found in world.");
+                result = (null, FlushPendingOutputs());
+            }
+            else if (checkForDeath && caster.Life == null)
+            {
+                SendText("[dead caster] >");
+                result = (null, FlushPendingOutputs());
+            }
+            else
+            {
+                result = (caster, null);
+            }
+        }
+
+        return result;
     }
 
     private CommandResult FlushPendingOutputs()

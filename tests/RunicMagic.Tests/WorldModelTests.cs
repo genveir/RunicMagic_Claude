@@ -1,4 +1,5 @@
 using RunicMagic.World;
+using RunicMagic.World.Geometry;
 using Xunit;
 
 namespace RunicMagic.Tests;

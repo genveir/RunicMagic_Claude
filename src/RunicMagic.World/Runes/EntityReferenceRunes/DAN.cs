@@ -1,4 +1,5 @@
 using RunicMagic.World.Execution;
+using RunicMagic.World.Geometry;
 using RunicMagic.World.Runes.RuneTypes;
 
 namespace RunicMagic.World.Runes.EntityReferenceRunes

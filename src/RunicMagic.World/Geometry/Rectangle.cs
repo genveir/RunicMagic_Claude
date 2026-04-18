@@ -1,4 +1,4 @@
-namespace RunicMagic.World;
+namespace RunicMagic.World.Geometry;
 
 // X and Y are the center of the rectangle. Width and Height are the full extents.
 public readonly record struct Rectangle(int X, int Y, int Width, int Height)
@@ -34,21 +34,21 @@ public readonly record struct Rectangle(int X, int Y, int Width, int Height)
     public bool IntersectsRay(double ox, double oy, double dx, double dy, out double t)
     {
         t = 0;
-        double left   = X - Width  / 2.0;
-        double right  = X + Width  / 2.0;
+        double left = X - Width / 2.0;
+        double right = X + Width / 2.0;
         double bottom = Y - Height / 2.0;
-        double top    = Y + Height / 2.0;
+        double top = Y + Height / 2.0;
 
         double tEnter = double.NegativeInfinity;
-        double tExit  = double.PositiveInfinity;
+        double tExit = double.PositiveInfinity;
 
         if (dx != 0)
         {
-            var tx0 = (left  - ox) / dx;
+            var tx0 = (left - ox) / dx;
             var tx1 = (right - ox) / dx;
             if (tx0 > tx1) (tx0, tx1) = (tx1, tx0);
             tEnter = Math.Max(tEnter, tx0);
-            tExit  = Math.Min(tExit,  tx1);
+            tExit = Math.Min(tExit, tx1);
         }
         else if (ox < left || ox > right)
         {
@@ -58,10 +58,10 @@ public readonly record struct Rectangle(int X, int Y, int Width, int Height)
         if (dy != 0)
         {
             var ty0 = (bottom - oy) / dy;
-            var ty1 = (top    - oy) / dy;
+            var ty1 = (top - oy) / dy;
             if (ty0 > ty1) (ty0, ty1) = (ty1, ty0);
             tEnter = Math.Max(tEnter, ty0);
-            tExit  = Math.Min(tExit,  ty1);
+            tExit = Math.Min(tExit, ty1);
         }
         else if (oy < bottom || oy > top)
         {

@@ -3,6 +3,7 @@ using RunicMagic.Controller.Models;
 using RunicMagic.Controller.Services;
 using RunicMagic.World;
 using RunicMagic.World.Capabilities;
+using RunicMagic.World.Geometry;
 using Xunit;
 
 namespace RunicMagic.Tests;
@@ -72,7 +73,10 @@ public class WorldRenderingServiceTests
         var world = new WorldModel();
         var pointing = new Entity(EntityId.New(), EntityType.Object, "archer")
         {
-            X = 0, Y = 0, Width = 100, Height = 100,
+            X = 0,
+            Y = 0,
+            Width = 100,
+            Height = 100,
             PointingDirection = new RunicMagic.World.Geometry.Direction(1, 0),
         };
         world.Add(pointing);

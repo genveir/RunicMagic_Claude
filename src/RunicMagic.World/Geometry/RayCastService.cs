@@ -1,6 +1,4 @@
-using RunicMagic.World.Geometry;
-
-namespace RunicMagic.World;
+namespace RunicMagic.World.Geometry;
 
 public class RayCastService(WorldModel world)
 {

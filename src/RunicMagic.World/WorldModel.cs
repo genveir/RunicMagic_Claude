@@ -1,3 +1,5 @@
+using RunicMagic.World.Geometry;
+
 namespace RunicMagic.World;
 
 public class WorldModel

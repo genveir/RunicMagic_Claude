@@ -29,6 +29,7 @@ public class PlayerServiceTests
             Width = 100,
             Height = 100,
             HasAgency = true,
+            Life = new LifeCapability(maxHitPoints: 10, currentHitPoints: 10),
         };
 
     [Fact]
@@ -187,6 +188,7 @@ public class PlayerServiceTests
     {
         var (service, world) = MakeService();
         var entity = MakeAgencyEntity(x: 0, y: 0);
+        entity.Life = null;
         world.Add(entity);
         await service.SetCaster(new WorldCoordinate(0, 0));
 

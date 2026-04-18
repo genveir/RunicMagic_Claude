@@ -3,7 +3,7 @@ using RunicMagic.World;
 using RunicMagic.World.Geometry;
 using Xunit;
 
-namespace RunicMagic.Tests;
+namespace RunicMagic.Tests.Geometry;
 
 public class RayCastServiceTests
 {
@@ -88,7 +88,7 @@ public class RayCastServiceTests
         var world = new WorldModel();
         var source = MakeEntity(x: 0, y: 0);
         var near = MakeEntity(x: 500, y: 0);
-        var far  = MakeEntity(x: 1000, y: 0);
+        var far = MakeEntity(x: 1000, y: 0);
         world.Add(source);
         world.Add(near);
         world.Add(far);
@@ -105,7 +105,7 @@ public class RayCastServiceTests
     {
         var world = new WorldModel();
         var source = MakeEntity(x: 0, y: 0);
-        var ice  = MakeEntity(x: 300, y: 0, isTranslucent: true);
+        var ice = MakeEntity(x: 300, y: 0, isTranslucent: true);
         var wall = MakeEntity(x: 700, y: 0);
         world.Add(source);
         world.Add(ice);
