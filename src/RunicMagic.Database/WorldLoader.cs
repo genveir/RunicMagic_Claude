@@ -10,7 +10,7 @@ public class WorldLoader(string connectionString)
         await using var conn = new SqlConnection(connectionString);
 
         var entityRows = (await conn.QueryAsync<EntityRow>(
-            "select Id, EntityTypeId, Label, X, Y, Width, Height, HasAgency, Weight from Entities")).AsList();
+            "select Id, EntityTypeId, Label, X, Y, Width, Height, HasAgency, Weight, IsTranslucent from Entities")).AsList();
 
         var lifeRows = (await conn.QueryAsync<LifeRow>(
             "select EntityId, MaxHitPoints, CurrentHitPoints from EntityLife"))
@@ -35,6 +35,7 @@ public class WorldLoader(string connectionString)
                 Height: row.Height,
                 HasAgency: row.HasAgency,
                 Weight: row.Weight,
+                IsTranslucent: row.IsTranslucent,
                 MaxHitPoints: life?.MaxHitPoints,
                 CurrentHitPoints: life?.CurrentHitPoints,
                 MaxCharge: charge?.MaxCharge,
@@ -42,7 +43,7 @@ public class WorldLoader(string connectionString)
         });
     }
 
-    private record EntityRow(Guid Id, int EntityTypeId, string Label, int X, int Y, int Width, int Height, bool HasAgency, int Weight);
+    private record EntityRow(Guid Id, int EntityTypeId, string Label, int X, int Y, int Width, int Height, bool HasAgency, int Weight, bool IsTranslucent);
     private record LifeRow(Guid EntityId, int MaxHitPoints, int CurrentHitPoints);
     private record ChargeRow(Guid EntityId, int MaxCharge, int CurrentCharge);
 }

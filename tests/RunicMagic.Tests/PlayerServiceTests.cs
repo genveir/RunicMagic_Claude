@@ -4,6 +4,7 @@ using RunicMagic.Controller.Services;
 using RunicMagic.World;
 using RunicMagic.World.Capabilities;
 using RunicMagic.World.Execution;
+using RunicMagic.World.Geometry;
 using Xunit;
 
 namespace RunicMagic.Tests;
@@ -13,7 +14,7 @@ public class PlayerServiceTests
     private static (PlayerService service, WorldModel world) MakeService()
     {
         var world = new WorldModel();
-        var worldRendering = new WorldRenderingService(world);
+        var worldRendering = new WorldRenderingService(world, new RayCastService(world));
         var spellCasting = new SpellCastingService(world, new SpellExecutor(world));
         var teleport = new TeleportEntityService();
         var service = new PlayerService(world, worldRendering, spellCasting, teleport);
@@ -121,6 +122,44 @@ public class PlayerServiceTests
         var result = await service.RegisterInput("ZU VUN LA FOTIR FOTIR FOTIR HET");
 
         result.Text.Should().Contain(l => l.Contains("No caster selected"));
+    }
+
+    [Fact]
+    public async Task SetPointingDirection_NoCasterSelected_ReturnsNoCasterSelectedMessage()
+    {
+        var (service, _) = MakeService();
+
+        var result = await service.SetPointingDirection(new WorldCoordinate(500, 0));
+
+        result.Text.Should().ContainSingle().Which.Should().Contain("No caster selected");
+    }
+
+    [Fact]
+    public async Task SetPointingDirection_WithCasterSelected_SetsPointingDirection()
+    {
+        var (service, world) = MakeService();
+        var entity = MakeAgencyEntity(x: 0, y: 0);
+        world.Add(entity);
+        await service.SetCaster(new WorldCoordinate(0, 0));
+
+        await service.SetPointingDirection(new WorldCoordinate(1000, 0));
+
+        entity.PointingDirection.Should().NotBeNull();
+        entity.PointingDirection!.Value.X.Should().BeApproximately(1.0, precision: 0.001);
+        entity.PointingDirection!.Value.Y.Should().BeApproximately(0.0, precision: 0.001);
+    }
+
+    [Fact]
+    public async Task SetPointingDirection_WithCasterSelected_ReturnsConfirmationMessage()
+    {
+        var (service, world) = MakeService();
+        var entity = MakeAgencyEntity(x: 0, y: 0);
+        world.Add(entity);
+        await service.SetCaster(new WorldCoordinate(0, 0));
+
+        var result = await service.SetPointingDirection(new WorldCoordinate(1000, 0));
+
+        result.Text.Should().ContainSingle().Which.Should().Contain("Pointing direction set");
     }
 
     [Fact]

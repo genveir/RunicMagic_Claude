@@ -137,8 +137,9 @@ async function sendCommand(cmd) {
 const SVG_NS = 'http://www.w3.org/2000/svg';
 const svg    = document.getElementById('world-canvas');
 
-const FLAGS_HAS_LIFE   = 1;
-const FLAGS_HAS_AGENCY = 2;
+const FLAGS_HAS_LIFE      = 1;
+const FLAGS_HAS_AGENCY    = 2;
+const FLAGS_IS_TRANSLUCENT = 4;
 
 function entityClass(entity) {
     let cls;
@@ -146,7 +147,8 @@ function entityClass(entity) {
     else if (entity.flags & FLAGS_HAS_LIFE)                                    cls = 'entity entity-life';
     else if (entity.flags & FLAGS_HAS_AGENCY)                                  cls = 'entity entity-agency';
     else                                                                        cls = 'entity entity-object';
-    if (entity.isCaster) cls += ' entity-caster';
+    if (entity.isCaster)                        cls += ' entity-caster';
+    if (entity.flags & FLAGS_IS_TRANSLUCENT)    cls += ' entity-translucent';
     return cls;
 }
 
@@ -199,6 +201,30 @@ function updateCanvas(entities) {
         });
         label.textContent = e.label;
         g.appendChild(label);
+
+        if (e.pointingEndX != null) {
+            const sx = e.x,          sy = -e.y;
+            const ex = e.pointingEndX, ey = -e.pointingEndY;
+
+            g.appendChild(svgEl('line', {
+                x1: sx, y1: sy, x2: ex, y2: ey,
+                class: 'entity-direction',
+            }));
+
+            const dx = ex - sx, dy = ey - sy;
+            const len = Math.sqrt(dx * dx + dy * dy);
+            if (len > 0) {
+                const ux = dx / len, uy = dy / len;
+                const px = -uy,      py = ux;
+                const cLen = 250;
+                g.appendChild(svgEl('path', {
+                    d: `M ${ex - ux * cLen + px * cLen * 0.5},${ey - uy * cLen + py * cLen * 0.5}` +
+                       ` L ${ex},${ey}` +
+                       ` L ${ex - ux * cLen - px * cLen * 0.5},${ey - uy * cLen - py * cLen * 0.5}`,
+                    class: 'entity-direction',
+                }));
+            }
+        }
 
         svg.appendChild(g);
     }

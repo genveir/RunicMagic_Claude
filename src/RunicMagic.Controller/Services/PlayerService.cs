@@ -1,6 +1,8 @@
 using RunicMagic.Controller.Abstractions;
 using RunicMagic.Controller.Models;
 using RunicMagic.World;
+using RunicMagic.World.Execution;
+using RunicMagic.World.Geometry;
 
 namespace RunicMagic.Controller.Services;
 
@@ -87,6 +89,28 @@ internal class PlayerService(
 
         teleport.Teleport(casterEntity, worldCoordinate.X, worldCoordinate.Y);
         SendText($"Caster moved to ({worldCoordinate.X}, {worldCoordinate.Y}).");
+        return Task.FromResult(FlushPendingOutputs());
+    }
+
+    public Task<CommandResult> SetPointingDirection(WorldCoordinate worldCoordinate)
+    {
+        if (casterId == null)
+        {
+            SendText("No caster selected.");
+            return Task.FromResult(FlushPendingOutputs());
+        }
+
+        var casterEntity = world.Find(casterId.Value);
+        if (casterEntity == null)
+        {
+            SendText("Caster not found in world.");
+            return Task.FromResult(FlushPendingOutputs());
+        }
+
+        var from = new Location(casterEntity.X, casterEntity.Y);
+        var to = new Location(worldCoordinate.X, worldCoordinate.Y);
+        casterEntity.PointingDirection = Direction.FromPoints(from, to);
+        SendText("Pointing direction set.");
         return Task.FromResult(FlushPendingOutputs());
     }
 

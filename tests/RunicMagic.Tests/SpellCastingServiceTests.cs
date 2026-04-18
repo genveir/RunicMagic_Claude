@@ -14,13 +14,21 @@ public class SpellCastingServiceTests
         return new SpellCastingService(world, new SpellExecutor(world));
     }
 
+    private static Entity AddCaster(WorldModel world)
+    {
+        var caster = TestFixtures.MakeEntity(x: 0, y: 0, weight: 1);
+        world.Add(caster);
+        return caster;
+    }
+
     [Fact]
     public void Cast_EmptyInput_ReturnsRanOutOfTokensMessage()
     {
         var world = new WorldModel();
+        var caster = AddCaster(world);
         var service = MakeService(world);
 
-        var lines = service.Cast("", casterId: null);
+        var lines = service.Cast("", casterId: caster.Id);
 
         lines.Should().ContainSingle().Which.Should().Contain("ran out of runes");
     }
@@ -29,9 +37,10 @@ public class SpellCastingServiceTests
     public void Cast_UnrecognisedRune_ReturnsUnexpectedTokenMessage()
     {
         var world = new WorldModel();
+        var caster = AddCaster(world);
         var service = MakeService(world);
 
-        var lines = service.Cast("NOTARUNE", casterId: null);
+        var lines = service.Cast("NOTARUNE", casterId: caster.Id);
 
         lines.Should().ContainSingle().Which.Should().Contain("NOTARUNE");
     }
@@ -40,10 +49,11 @@ public class SpellCastingServiceTests
     public void Cast_IncompleteSpell_ReturnsRanOutOfTokensMessage()
     {
         var world = new WorldModel();
+        var caster = AddCaster(world);
         var service = MakeService(world);
 
         // ZU VUN A — missing Number argument for VUN
-        var lines = service.Cast("ZU VUN A", casterId: null);
+        var lines = service.Cast("ZU VUN A", casterId: caster.Id);
 
         lines.Should().ContainSingle().Which.Should().Contain("ran out of runes");
     }

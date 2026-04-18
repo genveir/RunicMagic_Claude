@@ -10,5 +10,7 @@ public interface IPlayerViewInterface
 
     Task<CommandResult> MoveCaster(WorldCoordinate worldCoordinate);
 
+    Task<CommandResult> SetPointingDirection(WorldCoordinate worldCoordinate);
+
     string Prompt { get; }
 }

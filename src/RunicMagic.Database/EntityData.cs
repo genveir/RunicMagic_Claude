@@ -10,6 +10,7 @@ public record EntityData(
     int Height,
     bool HasAgency,
     int Weight,
+    bool IsTranslucent = false,
     int? MaxHitPoints = null,
     int? CurrentHitPoints = null,
     int? MaxCharge = null,

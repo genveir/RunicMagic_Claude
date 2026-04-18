@@ -25,6 +25,7 @@ public class EntityFactory(WorldModel world, ILogger<EntityFactory> logger)
             Width = data.Width,
             Height = data.Height,
             HasAgency = data.HasAgency,
+            IsTranslucent = data.IsTranslucent,
             Weight = data.Weight,
         };
 

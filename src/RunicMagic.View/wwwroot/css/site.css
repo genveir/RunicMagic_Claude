@@ -95,6 +95,18 @@ body {
     fill-opacity: 0.7;
 }
 
+.entity-translucent {
+    stroke: #5bb8e8;
+    fill: #5bb8e8;
+}
+
+.entity-direction {
+    stroke: #ffd700;
+    stroke-width: 2;
+    fill: none;
+    vector-effect: non-scaling-stroke;
+}
+
 .entity-label {
     fill: #111;
     font-family: monospace;

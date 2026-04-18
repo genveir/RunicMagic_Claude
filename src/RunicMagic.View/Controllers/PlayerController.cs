@@ -39,8 +39,9 @@ public class PlayerController : ControllerBase
     {
         var worldCoordinate = new WorldCoordinate((int)request.X, (int)request.Y);
 
-        var text = $"Point At: received ({worldCoordinate.X}, {worldCoordinate.Y})";
-        return new CommandResult([text], [], ">");
+        var commandResult = await playerViewInterface.SetPointingDirection(worldCoordinate);
+
+        return commandResult;
     }
 }
 

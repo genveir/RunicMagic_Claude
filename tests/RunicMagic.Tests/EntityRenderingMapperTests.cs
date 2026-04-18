@@ -85,7 +85,25 @@ public class EntityRenderingMapperTests
         model.IsCaster.Should().BeFalse();
     }
 
-[Fact]
+    [Fact]
+    public void Entity_WithPointingEnd_IncludesEndpointCoordinates()
+    {
+        var model = EntityRenderingMapper.ToRenderingModel(MakeEntity(), isCaster: false, pointingEnd: (100, 200));
+
+        model.PointingEndX.Should().Be(100);
+        model.PointingEndY.Should().Be(200);
+    }
+
+    [Fact]
+    public void Entity_WithoutPointingEnd_HasNullEndpoint()
+    {
+        var model = EntityRenderingMapper.ToRenderingModel(MakeEntity(), isCaster: false, pointingEnd: null);
+
+        model.PointingEndX.Should().BeNull();
+        model.PointingEndY.Should().BeNull();
+    }
+
+    [Fact]
     public void Entity_WithLifeAndAgency_HasBothFlags()
     {
         var model = EntityRenderingMapper.ToRenderingModel(
@@ -93,5 +111,24 @@ public class EntityRenderingMapperTests
 
         model.Flags.Should().HaveFlag(EntityRenderingFlags.HasLife);
         model.Flags.Should().HaveFlag(EntityRenderingFlags.HasAgency);
+    }
+
+    [Fact]
+    public void Entity_WhenTranslucent_HasTranslucentFlag()
+    {
+        var entity = MakeEntity();
+        entity.IsTranslucent = true;
+
+        var model = EntityRenderingMapper.ToRenderingModel(entity, isCaster: false);
+
+        model.Flags.Should().HaveFlag(EntityRenderingFlags.IsTranslucent);
+    }
+
+    [Fact]
+    public void Entity_WhenNotTranslucent_DoesNotHaveTranslucentFlag()
+    {
+        var model = EntityRenderingMapper.ToRenderingModel(MakeEntity(), isCaster: false);
+
+        model.Flags.Should().NotHaveFlag(EntityRenderingFlags.IsTranslucent);
     }
 }

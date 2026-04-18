@@ -7,8 +7,6 @@ Next bugfix number: BUG-3
 
 | Key | Title | Description | Blocked By |
 |-----|-------|-------------|------------|
-| RMC-51 | UI point-to-aim interaction | Add a UI mode where the next canvas click sets the caster's pointing direction. Draw a line from the caster to the cursor as visual feedback. On click, compute the direction and report it to PlayerService, which writes it to the caster entity's `PointingDirection`. | RMC-49 RMC-50 |
-| RMC-53 | Add translucency capability to entity model and database | Add a persistent `Translucency` capability to the world model and database. Windows are translucent; walls, doors, and other solid entities are not. | |
 | RMC-52 | DAN(pointing at) rune | Implement the DAN(pointing at) rune in the parser and rune system. DAN casts a ray from the caster in their `PointingDirection`, applying a translucency capability check (windows are translucent, walls and doors are not), and returns a singleton Set containing the first non-translucent entity hit. | RMC-49 RMC-51 RMC-53 |
 | RMC-47 | 🚩 Mini-milestone — point at an entity and push it | With the previous milestone world seeded, the player clicks an entity to aim at it and casts `ZU VUN DAN FOTIR FOTIR FOTIR HET`. The aimed-at entity is pushed 2 744 mm away from the caster. | RMC-51 RMC-52 RMC-46 |
 | RMC-15 | Design power sourcing implementation | The sourcing rules (explicit > executor-scope > caster-scope > local-scope, with preference ordering) are complex enough to deserve their own design and implementation ticket. | |
@@ -49,3 +47,5 @@ Next bugfix number: BUG-3
 | RMC-56 | PlayerService knows which entity is the caster |
 | RMC-50 | UI knows which entity is the caster |
 | RMC-46 | Move caster position in-game |
+| RMC-51 | UI point-to-aim interaction |
+| RMC-53 | Add translucency capability to entity model and database |
