@@ -1,11 +1,37 @@
 namespace RunicMagic.World.Execution;
 
-public record SpellContext(EntitySet Caster, EntitySet Executor, WorldModel World, SpellResult Result)
+public class SpellContext
 {
+    private readonly Stack<EntitySet> _sourceStack = new();
+
+    public SpellContext(EntitySet caster, EntitySet executor, WorldModel world, SpellResult result)
+    {
+        Caster = caster;
+        Executor = executor;
+        World = world;
+        Result = result;
+    }
+
+    public EntitySet Caster { get; }
+    public EntitySet Executor { get; }
+    public WorldModel World { get; }
+    public SpellResult Result { get; }
+
+    public void PushPowerSource(EntitySet source)
+    {
+        _sourceStack.Push(source);
+    }
+
+    public void PopPowerSource()
+    {
+        _sourceStack.Pop();
+    }
+
     public int DrawPower(int amount)
     {
         var remaining = amount;
-        foreach (var source in new[] { Executor, Caster })
+        var sources = _sourceStack.Concat([Executor, Caster]);
+        foreach (var source in sources)
         {
             if (remaining == 0)
             {

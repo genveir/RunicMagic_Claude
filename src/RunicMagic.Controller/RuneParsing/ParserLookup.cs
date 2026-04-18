@@ -4,6 +4,7 @@ using RunicMagic.Controller.RuneParsing.EntitySetRunes;
 using RunicMagic.Controller.RuneParsing.ExecutionRunes;
 using RunicMagic.Controller.RuneParsing.LocationRunes;
 using RunicMagic.Controller.RuneParsing.NumberRunes;
+using RunicMagic.Controller.RuneParsing.PowerSourceRunes;
 using RunicMagic.World.Runes.RuneTypes;
 
 namespace RunicMagic.Controller.RuneParsing
@@ -61,6 +62,7 @@ namespace RunicMagic.Controller.RuneParsing
         {
             statementRuneParsers["VUN"] = new VUNParser(); // push
             statementRuneParsers["VAR"] = new VARParser(); // pull
+            statementRuneParsers["SHU"] = new SHUParser(); // with power source
         }
 
         private static void FillEntitySetRuneParsers()
