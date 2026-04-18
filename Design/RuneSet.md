@@ -17,8 +17,9 @@ Nothing can consume ExecutableStatement — ZU must appear first in the token st
 | Rune | Meaning | Signature |
 |------|---------|-----------|
 | `VUN` | push | (Set, Number, Location = PAR(A)) → Statement |
+| `VAR` | pull | (Set, Number, Location = PAR(A)) → Statement |
 
-Moves every entity in the Set away from the given Location by the given Number of millimetres.
+VUN moves every entity in the Set away from the given Location by the given Number of millimetres. VAR moves every entity towards it.
 
 Direction is determined per entity as the unit vector from Location to the entity's centre. The default origin is the caster's position.
 
@@ -57,7 +58,9 @@ They are identical for spoken spells and diverge for inscribed spells (where the
 
 Both are used as targeting references and, in the power sourcing context (RMC-15), as reservoir references.
 
-`KAL` and `DAN` are conscious-action references set by the player via UI before casting. `KAL` is the entity the caster is deliberately touching; `DAN` is the entity the caster is pointing at, resolved by ray-casting from the caster through the aimed direction and returning the first non-translucent entity hit. Both return an empty Set if no target is active.
+`KAL` and `DAN` are conscious-action references set by the player via UI before casting. 
+`KAL` is the entity the caster is deliberately indicating.
+`DAN` is the entity the caster is pointing at.
 
 ## Location
 

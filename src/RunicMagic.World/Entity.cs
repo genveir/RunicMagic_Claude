@@ -22,4 +22,5 @@ public class Entity(EntityId id, EntityType type, string label)
     public Func<Entity[]>? Scope { get; set; }
     public Func<int, ReservoirDraw>? Reservoir { get; set; }
     public Direction? PointingDirection { get; set; }
+    public IndicateTarget? IndicateTarget { get; set; }
 }

@@ -17,7 +17,7 @@ public class PlayerServiceTests
         var worldRendering = new WorldRenderingService(world, new RayCastService(world));
         var spellCasting = new SpellCastingService(world, new SpellExecutor(world));
         var teleport = new TeleportEntityService();
-        var service = new PlayerService(world, worldRendering, spellCasting, teleport);
+        var service = new PlayerService(world, worldRendering, spellCasting, teleport, new RayCastService(world));
         return (service, world);
     }
 

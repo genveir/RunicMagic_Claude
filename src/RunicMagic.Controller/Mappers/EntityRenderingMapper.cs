@@ -5,7 +5,7 @@ namespace RunicMagic.Controller.Mappers;
 
 public static class EntityRenderingMapper
 {
-    public static EntityRenderingModel ToRenderingModel(Entity entity, bool isCaster, (int X, int Y)? pointingEnd = null)
+    public static EntityRenderingModel ToRenderingModel(Entity entity, bool isCaster, (int X, int Y)? pointingEnd = null, bool isIndicateTarget = false, (int X, int Y)? indicateEnd = null)
     {
         var flags = EntityRenderingFlags.None;
         if (entity.Life != null) flags |= EntityRenderingFlags.HasLife;
@@ -21,6 +21,9 @@ public static class EntityRenderingMapper
             Flags: flags,
             IsCaster: isCaster,
             PointingEndX: pointingEnd?.X,
-            PointingEndY: pointingEnd?.Y);
+            PointingEndY: pointingEnd?.Y,
+            IsIndicateTarget: isIndicateTarget,
+            IndicateEndX: indicateEnd?.X,
+            IndicateEndY: indicateEnd?.Y);
     }
 }

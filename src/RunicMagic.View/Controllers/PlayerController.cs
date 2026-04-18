@@ -43,6 +43,16 @@ public class PlayerController : ControllerBase
 
         return commandResult;
     }
+
+    [HttpPost("indicate")]
+    public async Task<CommandResult> Indicate([FromBody] CanvasClickRequest request)
+    {
+        var worldCoordinate = new WorldCoordinate((int)request.X, (int)request.Y);
+
+        var commandResult = await playerViewInterface.SetIndicateTarget(worldCoordinate);
+
+        return commandResult;
+    }
 }
 
 public record CanvasClickRequest(float X, float Y);

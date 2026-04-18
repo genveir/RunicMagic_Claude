@@ -149,6 +149,7 @@ function entityClass(entity) {
     else                                                                        cls = 'entity entity-object';
     if (entity.isCaster)                        cls += ' entity-caster';
     if (entity.flags & FLAGS_IS_TRANSLUCENT)    cls += ' entity-translucent';
+    if (entity.isIndicateTarget)                cls += ' entity-indicate-target';
     return cls;
 }
 
@@ -202,6 +203,30 @@ function updateCanvas(entities) {
         label.textContent = e.label;
         g.appendChild(label);
 
+        if (e.indicateEndX != null) {
+            const sx = e.x,           sy = -e.y;
+            const ex = e.indicateEndX, ey = -e.indicateEndY;
+
+            g.appendChild(svgEl('line', {
+                x1: sx, y1: sy, x2: ex, y2: ey,
+                class: 'entity-indicate',
+            }));
+
+            const dx = ex - sx, dy = ey - sy;
+            const len = Math.sqrt(dx * dx + dy * dy);
+            if (len > 0) {
+                const ux = dx / len, uy = dy / len;
+                const px = -uy,      py = ux;
+                const cLen = 150;
+                g.appendChild(svgEl('path', {
+                    d: `M ${ex - ux * cLen + px * cLen * 0.5},${ey - uy * cLen + py * cLen * 0.5}` +
+                       ` L ${ex},${ey}` +
+                       ` L ${ex - ux * cLen - px * cLen * 0.5},${ey - uy * cLen - py * cLen * 0.5}`,
+                    class: 'entity-indicate',
+                }));
+            }
+        }
+
         if (e.pointingEndX != null) {
             const sx = e.x,          sy = -e.y;
             const ex = e.pointingEndX, ey = -e.pointingEndY;
@@ -239,6 +264,7 @@ const modeButtons = {
     'pick-caster': document.getElementById('btn-pick-caster'),
     'move-caster': document.getElementById('btn-move-caster'),
     'point-at':    document.getElementById('btn-point-at'),
+    'indicate':    document.getElementById('btn-indicate'),
 };
 
 function setMode(mode) {

@@ -22,7 +22,6 @@ Next bugfix number: BUG-3
 | RMC-37 | Kill creatures when they run out of life | At any point during spell execution, living entities may run out of hitpoints. In this case the game should register that they're dead and remove their living and agency properties | |
 | RMC-38 | Register entity destruction | It should be possible to destroy entities. When this happens, the game should register that the entity is destroyed | |
 | RMC-39 | Stop spell execution on caster or executor death or destruction | When the caster or executor of a spell cease to be in an active state the spell should stop executing | RMC-37 RMC-38 |
-| RMC-42 | KAL rune and touching mechanic | Implement the KAL(touching) rune, which returns a singleton Set containing the entity the caster is consciously touching. Requires a UI affordance to set the active touch target. Distinct from the automatic scope-of touching used by LA — this is a deliberate player action. | |
 | RMC-14 | Design channeling and persistent effects | Written runes stay active while power is channeled. Define what "channeling" means mechanically — what keeps a spell alive, how it is terminated, and how the executor tracks ongoing effects. | |
 | RMC-7 | Identify missing runes | There are no runes that manipulate entity sets, or effects other than pushing. Audit the full rune set for gaps needed to write meaningful spells. | |
 | RMC-48 | Formalize movement with collision | VUN currently teleports entities to their destination. Replace this with movement through space: the entity travels along the push vector and stops when it hits an entity (a wall, door, etc.) rather than passing through it. | |
@@ -50,3 +49,4 @@ Next bugfix number: BUG-3
 | RMC-53 | Add translucency capability to entity model and database |
 | RMC-52 | DAN(pointing at) rune |
 | RMC-47 | 🚩 Mini-milestone — point at an entity and push it |
+| RMC-42 | KAL rune and touching mechanic | 

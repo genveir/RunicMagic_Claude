@@ -60,6 +60,7 @@ namespace RunicMagic.Controller.RuneParsing
         private static void FillStatementRuneParsers()
         {
             statementRuneParsers["VUN"] = new VUNParser(); // push
+            statementRuneParsers["VAR"] = new VARParser(); // pull
         }
 
         private static void FillEntitySetRuneParsers()
@@ -68,6 +69,7 @@ namespace RunicMagic.Controller.RuneParsing
             entitySetRuneParsers["OH"] = new OHParser(); // this, executor
             entitySetRuneParsers["LA"] = new LAParser(); // context of
             entitySetRuneParsers["DAN"] = new DANParser(); // pointing at
+            entitySetRuneParsers["KAL"] = new KALParser(); // indicating
         }
 
         private static void FillNumberRuneParsers()
@@ -78,8 +80,8 @@ namespace RunicMagic.Controller.RuneParsing
 
         private static void FillLocationRuneParsers()
         {
-            locationRuneParsers["PAR"] = new PARParser(); // location of
-            locationRuneParsers["GER"] = new GERParser(); // centering
+            locationRuneParsers["PAR"] = new PARParser(); // centroid of
+            locationRuneParsers["GER"] = new GERParser(); // weighted centroid of
         }
     }
 }

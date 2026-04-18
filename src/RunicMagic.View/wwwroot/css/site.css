@@ -100,6 +100,19 @@ body {
     fill: #5bb8e8;
 }
 
+.entity-indicate-target {
+    stroke: #ff8c00;
+    stroke-width: 2;
+    vector-effect: non-scaling-stroke;
+}
+
+.entity-indicate {
+    stroke: #ff8c00;
+    stroke-width: 2;
+    fill: none;
+    vector-effect: non-scaling-stroke;
+}
+
 .entity-direction {
     stroke: #ffd700;
     stroke-width: 2;

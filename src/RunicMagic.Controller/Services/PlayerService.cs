@@ -10,7 +10,8 @@ internal class PlayerService(
         WorldModel world,
         WorldRenderingService worldRendering,
         SpellCastingService spellCasting,
-        TeleportEntityService teleport) : IPlayerViewInterface, IPlayerOutputSink
+        TeleportEntityService teleport,
+        RayCastService rayCast) : IPlayerViewInterface, IPlayerOutputSink
 {
     private EntityId? casterId = null;
 
@@ -95,6 +96,51 @@ internal class PlayerService(
         caster.PointingDirection = Direction.FromPoints(from, to);
         SendText("Pointing direction set.");
 
+        return Task.FromResult(FlushPendingOutputs());
+    }
+
+    public Task<CommandResult> SetIndicateTarget(WorldCoordinate worldCoordinate)
+    {
+        var (caster, error) = CheckForCaster(checkForDeath: true);
+        if (error != null) return Task.FromResult(error);
+        if (caster == null) throw new InvalidOperationException("Unexpected null caster after check.");
+
+        var entities = world.GetEntitiesAtPoint(worldCoordinate.X, worldCoordinate.Y);
+        if (entities.Count == 0)
+        {
+            SendText("Nothing to indicate at that position.");
+            return Task.FromResult(FlushPendingOutputs());
+        }
+
+        if (entities.Any(e => e.Id == caster.Id))
+        {
+            caster.IndicateTarget = new IndicateTarget(caster.Id, Direction: null);
+            SendText("Indicating self.");
+            return Task.FromResult(FlushPendingOutputs());
+        }
+
+        var from = new Location(caster.X, caster.Y);
+        var to = new Location(worldCoordinate.X, worldCoordinate.Y);
+        var direction = Direction.FromPoints(from, to);
+        var castResult = rayCast.Cast(caster.Id, caster.X, caster.Y, direction, skipTranslucent: false);
+
+        if (castResult.HitEntity == null || entities.All(e => e.Id != castResult.HitEntity.Id))
+        {
+            SendText("Cannot reach that — something is in the way.");
+            return Task.FromResult(FlushPendingOutputs());
+        }
+
+        var dx = castResult.X - caster.X;
+        var dy = castResult.Y - caster.Y;
+        var distance = Math.Sqrt(dx * dx + dy * dy);
+        if (distance > 1000)
+        {
+            SendText($"{castResult.HitEntity.Label} is out of reach.");
+            return Task.FromResult(FlushPendingOutputs());
+        }
+
+        caster.IndicateTarget = new IndicateTarget(castResult.HitEntity.Id, direction);
+        SendText($"Indicating {castResult.HitEntity.Label}.");
         return Task.FromResult(FlushPendingOutputs());
     }
 
