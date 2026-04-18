@@ -156,12 +156,13 @@ public class EntityFactoryTests
     // ── Creature scope ────────────────────────────────────────────────────────
 
     [Fact]
-    public void Creature_Scope_ReturnsTouchingEntities()
+    public void Creature_Scope_ReturnsEntityWithin500mm()
     {
         var world = new WorldModel();
-        var caster = Factory(world).Create(CreatureData(maxHp: 100, currentHp: 100) with { X = 0, Y = 0 });
+        // Caster centre at (0,0); nearby bbox x:[495,505],y:[-5,5] → nearest point (495,0) → gap=495 < 500
+        var caster = Factory(world).Create(CreatureData(maxHp: 100, currentHp: 100) with { X = 0, Y = 0, Width = 10, Height = 10 });
         var nearby = Factory(world).Create(new EntityData(Guid.NewGuid(), (long)EntityType.Object, "nearby",
-            X: 10, Y: 0, Width: 10, Height: 10, HasAgency: false, Weight: 0));
+            X: 500, Y: 0, Width: 10, Height: 10, HasAgency: false, Weight: 0));
         world.Add(caster);
         world.Add(nearby);
 
@@ -171,12 +172,13 @@ public class EntityFactoryTests
     }
 
     [Fact]
-    public void Creature_Scope_DoesNotReturnDistantEntities()
+    public void Creature_Scope_DoesNotReturnEntityBeyond500mm()
     {
         var world = new WorldModel();
-        var caster = Factory(world).Create(CreatureData(maxHp: 100, currentHp: 100) with { X = 0, Y = 0 });
+        // Caster centre at (0,0); distant bbox x:[1005,1015],y:[-5,5] → nearest point (1005,0) → gap=1005 > 500
+        var caster = Factory(world).Create(CreatureData(maxHp: 100, currentHp: 100) with { X = 0, Y = 0, Width = 10, Height = 10 });
         var distant = Factory(world).Create(new EntityData(Guid.NewGuid(), (long)EntityType.Object, "distant",
-            X: 500, Y: 500, Width: 10, Height: 10, HasAgency: false, Weight: 0));
+            X: 1010, Y: 0, Width: 10, Height: 10, HasAgency: false, Weight: 0));
         world.Add(caster);
         world.Add(distant);
 
@@ -196,6 +198,5 @@ public class EntityFactoryTests
             X: 0, Y: 0, Width: 5, Height: 5, HasAgency: false, Weight: 0));
 
         entity.Reservoir.Should().BeNull();
-        entity.Scope.Should().BeNull();
     }
 }

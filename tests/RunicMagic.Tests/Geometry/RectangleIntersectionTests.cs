@@ -71,3 +71,61 @@ public class RectangleIntersectionTests
         t.Should().BePositive();
     }
 }
+
+public class RectangleIsWithinDistanceFromPointTests
+{
+    // Rectangle centred at (0, 0), 100x100 → spans x:[-50,50], y:[-50,50]
+    private static readonly Rectangle Box = new(X: 0, Y: 0, Width: 100, Height: 100);
+
+    [Fact]
+    public void PointInsideRectangle_IsWithinAnyPositiveDistance()
+    {
+        var result = Box.IsWithinDistanceFromPoint(px: 0, py: 0, maxDistance: 1);
+
+        result.Should().BeTrue();
+    }
+
+    [Fact]
+    public void PointOnEdge_IsWithinZeroDistance()
+    {
+        var result = Box.IsWithinDistanceFromPoint(px: 50, py: 0, maxDistance: 0);
+
+        result.Should().BeTrue();
+    }
+
+    [Fact]
+    public void PointExactlyAtMaxDistance_IsWithin()
+    {
+        // Point at (550, 0), box right edge at x=50 → gap = 500
+        var result = Box.IsWithinDistanceFromPoint(px: 550, py: 0, maxDistance: 500);
+
+        result.Should().BeTrue();
+    }
+
+    [Fact]
+    public void PointOneUnitBeyondMaxDistance_IsNotWithin()
+    {
+        // Point at (551, 0), box right edge at x=50 → gap = 501
+        var result = Box.IsWithinDistanceFromPoint(px: 551, py: 0, maxDistance: 500);
+
+        result.Should().BeFalse();
+    }
+
+    [Fact]
+    public void PointDiagonallyBeyondCorner_DistanceIsEuclidean()
+    {
+        // Corner at (50, 50); point at (50 + 400, 50 + 300) → dx=400, dy=300 → distance=500
+        var result = Box.IsWithinDistanceFromPoint(px: 450, py: 350, maxDistance: 500);
+
+        result.Should().BeTrue();
+    }
+
+    [Fact]
+    public void PointDiagonallyBeyondCorner_JustOutside_IsNotWithin()
+    {
+        // Corner at (50, 50); point at (50 + 400, 50 + 300) → distance=500; add 1 to x → distance > 500
+        var result = Box.IsWithinDistanceFromPoint(px: 451, py: 350, maxDistance: 500);
+
+        result.Should().BeFalse();
+    }
+}

@@ -105,6 +105,65 @@ public class WorldModelTests
         Assert.DoesNotContain(other, result);
     }
 
+    // ── GetEntitiesWithinDistance ─────────────────────────────────────────────
+
+    [Fact]
+    public void GetEntitiesWithinDistance_ReturnsEntityWithinThreshold()
+    {
+        var world = new WorldModel();
+        // Source centre at (0,0); target bbox x:[495,505], y:[-5,5] → nearest point (495,0) → gap=495
+        var source = MakeEntity(x: 0, y: 0, width: 10, height: 10);
+        var target = MakeEntity(x: 500, y: 0, width: 10, height: 10);
+        world.Add(source);
+        world.Add(target);
+
+        var result = world.GetEntitiesWithinDistance(source, distance: 500);
+
+        Assert.Contains(target, result);
+    }
+
+    [Fact]
+    public void GetEntitiesWithinDistance_DoesNotReturnEntityBeyondThreshold()
+    {
+        var world = new WorldModel();
+        // Source centre at (0,0); target bbox x:[496,506], y:[-5,5] → nearest point (496,0) → gap=496 < 500 — shift further
+        // target at (1010,0) width=10 → bbox x:[1005,1015] → gap=1005 > 500
+        var source = MakeEntity(x: 0, y: 0, width: 10, height: 10);
+        var target = MakeEntity(x: 1010, y: 0, width: 10, height: 10);
+        world.Add(source);
+        world.Add(target);
+
+        var result = world.GetEntitiesWithinDistance(source, distance: 500);
+
+        Assert.DoesNotContain(target, result);
+    }
+
+    [Fact]
+    public void GetEntitiesWithinDistance_DoesNotReturnSelf()
+    {
+        var world = new WorldModel();
+        var source = MakeEntity(x: 0, y: 0, width: 10, height: 10);
+        world.Add(source);
+
+        var result = world.GetEntitiesWithinDistance(source, distance: 500);
+
+        Assert.DoesNotContain(source, result);
+    }
+
+    [Fact]
+    public void GetEntitiesWithinDistance_ReturnsOverlappingEntity()
+    {
+        var world = new WorldModel();
+        var source = MakeEntity(x: 0, y: 0, width: 20, height: 20);
+        var other = MakeEntity(x: 5, y: 5, width: 20, height: 20);
+        world.Add(source);
+        world.Add(other);
+
+        var result = world.GetEntitiesWithinDistance(source, distance: 500);
+
+        Assert.Contains(other, result);
+    }
+
     // ── GetContainedEntities ──────────────────────────────────────────────────
 
     [Fact]

@@ -40,6 +40,14 @@ public class WorldModel
         return entities;
     }
 
+    public IReadOnlyList<Entity> GetEntitiesWithinDistance(Entity source, long distance)
+    {
+        var entities = _entities.Values
+            .Where(e => e.Id != source.Id && Bounds(e).IsWithinDistanceFromPoint(source.X, source.Y, distance))
+            .ToList();
+        return entities;
+    }
+
     public IReadOnlyList<Entity> GetTouchingEntities(Entity source)
     {
         var entities = _entities.Values.Where(e => e.Id != source.Id && Bounds(source).Touches(Bounds(e))).ToList();

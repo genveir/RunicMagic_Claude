@@ -41,10 +41,12 @@ public class EntityFactory(WorldModel world, ILogger<EntityFactory> logger)
 
     private void WireDelegates(Entity entity)
     {
+        entity.Scope = () => [.. world.GetEntitiesWithinDistance(entity, 500)];
+
         switch (entity.Type)
         {
             case EntityType.Creature:
-                entity.Scope = () => [.. world.GetTouchingEntities(entity)];
+
                 entity.Reservoir = amount =>
                 {
                     if (entity.Life is null)

@@ -17,6 +17,24 @@ public class EntitySet
         }
     }
 
+    public EntitySet GetScope()
+    {
+        var seen = new HashSet<EntityId>();
+        var scopeEntities = new List<Entity>();
+        foreach (var entity in _entities)
+        {
+            var scope = entity.Scope?.Invoke() ?? [];
+            foreach (var member in scope)
+            {
+                if (seen.Add(member.Id))
+                {
+                    scopeEntities.Add(member);
+                }
+            }
+        }
+        return new EntitySet(scopeEntities);
+    }
+
     public long DrawPower(long amount, SpellResult result)
     {
         if (amount == 0)

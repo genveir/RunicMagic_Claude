@@ -2,12 +2,11 @@
 
 ## To Do — Milestone 2
 
-Next ticket number: RMC-58
+Next ticket number: RMC-60
 Next bugfix number: BUG-3
 
 | Key | Title | Description | Blocked By |
 |-----|-------|-------------|------------|
-| RMC-15 | Design power sourcing implementation | The sourcing rules (explicit > executor-scope > caster-scope > local-scope, with preference ordering) are complex enough to deserve their own design and implementation ticket. | RMC-57 |
 | RMC-16 | Design inscribed spells on objects | Spells inscribed on objects have different executor/caster semantics. Define how the world model represents inscribed spells, how they are activated, and how the evaluator handles the executor being an object rather than a creature. | |
 | RMC-40 | GWYAH rune — invoke inscriptions on a Set | Implement the GWYAH(invoke) rune: takes a Set, activates all inscriptions found on entities in that Set, and returns a Statement. The entity the inscription is on becomes the executor; the caster of the invoking spell becomes the caster of the activated inscription. | RMC-16 |
 | RMC-58 | Add inscription to the rock | Add an inscription to the rock in the demo room. The inscription should be designed to open the door when activated. | RMC-16 |
@@ -24,11 +23,11 @@ Next bugfix number: BUG-3
 | RMC-14 | Design channeling and persistent effects | Written runes stay active while power is channeled. Define what "channeling" means mechanically — what keeps a spell alive, how it is terminated, and how the executor tracks ongoing effects. | |
 | RMC-7 | Identify missing runes | There are no runes that manipulate entity sets, or effects other than pushing. Audit the full rune set for gaps needed to write meaningful spells. | |
 | RMC-48 | Formalize movement with collision | VUN currently teleports entities to their destination. Replace this with movement through space: the entity travels along the push vector and stops when it hits an entity (a wall, door, etc.) rather than passing through it. | |
+| RMC-59 | Expansion selectors cost power scaled by selected entities' max power | Selectors that expand the selection (e.g. runes that broaden a Set to include more entities) should drain power from the spell's source proportional to the maximum power of the entities they select. | |
 
 ## In Progress
 | Key | Title | Description | Remarks |
 |-----|-------|-------------|---------|
-| RMC-43 | Seed the milestone world | Build the seeded world for the Milestone 2 scenario: a room entity containing walls, windows (translucent), a door, and a rock. | RMC-16 |
 
 ## Ready For Review
 
@@ -52,3 +51,5 @@ Next bugfix number: BUG-3
 | RMC-42 | KAL rune and touching mechanic | 
 | BUG-3 | Terminal scrolling does not take resizable height into account |
 | RMC-57 | SHU rune — explicit power source |
+| RMC-43 | Seed the milestone world |
+| RMC-15 | Design power sourcing implementation |

@@ -75,6 +75,26 @@ public readonly record struct Rectangle(long X, long Y, long Width, long Height)
         return true;
     }
 
+    // True when the nearest point on this rectangle to (px, py) is within maxDistance.
+    // Points inside the rectangle have distance 0 and always satisfy the check.
+    public bool IsWithinDistanceFromPoint(long px, long py, long maxDistance)
+    {
+        var left = X - Width / 2;
+        var right = X + Width / 2;
+        var bottom = Y - Height / 2;
+        var top = Y + Height / 2;
+
+        var clampedX = Math.Clamp(px, left, right);
+        var clampedY = Math.Clamp(py, bottom, top);
+
+        var dx = px - clampedX;
+        var dy = py - clampedY;
+
+        var distanceSquared = dx * dx + dy * dy;
+        var result = distanceSquared <= maxDistance * maxDistance;
+        return result;
+    }
+
     // Overlap or shared edge — used for the "touch" spatial relationship.
     public bool Touches(Rectangle other)
     {

@@ -30,7 +30,7 @@ public class SpellContext
     public long DrawPower(long amount)
     {
         var remaining = amount;
-        var sources = _sourceStack.Concat([Executor, Caster]);
+        var sources = _sourceStack.Concat([Executor.GetScope(), Executor, Caster.GetScope(), Caster]);
         foreach (var source in sources)
         {
             if (remaining == 0)
