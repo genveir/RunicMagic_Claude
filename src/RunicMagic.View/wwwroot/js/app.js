@@ -185,8 +185,13 @@ function updateCanvas(entities) {
         maxY = Math.max(maxY, -e.y + e.height / 2);
     }
     const pad = 100;
-    svg.setAttribute('viewBox',
-        `${minX - pad} ${minY - pad} ${maxX - minX + pad * 2} ${maxY - minY + pad * 2}`);
+    const vbWidth = maxX - minX + pad * 2;
+    const vbHeight = maxY - minY + pad * 2;
+    svg.setAttribute('viewBox', `${minX - pad} ${minY - pad} ${vbWidth} ${vbHeight}`);
+
+    const svgRect = svg.getBoundingClientRect();
+    const screenScale = Math.min(svgRect.width / vbWidth, svgRect.height / vbHeight);
+    const labelSize = 13 / screenScale;
 
     for (const e of entities) {
         const g = svgEl('g', {});
@@ -201,7 +206,7 @@ function updateCanvas(entities) {
             y:                   -e.y,
             'dominant-baseline': 'middle',
             'text-anchor':       'middle',
-            'font-size':         Math.max(e.height / 4, 12),
+            'font-size':         labelSize,
             class:               'entity-label',
         });
         label.textContent = e.label;

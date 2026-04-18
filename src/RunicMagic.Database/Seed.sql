@@ -1,0 +1,35 @@
+declare @caster    uniqueidentifier = newid();
+declare @manaStone uniqueidentifier = newid();
+
+insert into Entities (Id, EntityTypeId, Label, X, Y, Width, Height, HasAgency, Weight, IsTranslucent)
+values
+    -- caster (outside the room, above the top wall; X,Y are center)
+    (@caster,    1, 'Player',               1650,   -250, 900,  300,  1, 70000,    0),
+    -- mana stone (near top-right interior corner)
+    (@manaStone, 2, 'Mana Stone',           8125,    925, 250,  250,  0, 3000,     0),
+    -- top wall, split by door
+    (newid(),    3, 'Top Wall (Left)',       1600,    300, 3200, 600,  0, 10000000, 0),
+    (newid(),    3, 'Door',                 3800,    300, 1200, 100,  0, 30000,    0),
+    (newid(),    3, 'Top Wall (Right)',      6800,    300, 4800, 600,  0, 10000000, 0),
+    -- left wall, split by one window near the bottom
+    (newid(),    3, 'Left Wall (Upper)',      300,   4400, 600,  7600, 0, 10000000, 0),
+    (newid(),    3, 'Left Window',            300,   8600, 100,  800,  0, 5000,     1),
+    (newid(),    3, 'Left Wall (Lower)',      300,   9800, 600,  1600, 0, 10000000, 0),
+    -- right wall, split by two windows
+    (newid(),    3, 'Right Wall (Upper)',    8900,   2400, 600,  3600, 0, 10000000, 0),
+    (newid(),    3, 'Right Window (Upper)', 8900,   4600, 100,  800,  0, 5000,     1),
+    (newid(),    3, 'Right Wall (Middle)',   8900,   7000, 600,  4000, 0, 10000000, 0),
+    (newid(),    3, 'Right Window (Lower)', 8900,   9400, 100,  800,  0, 5000,     1),
+    (newid(),    3, 'Right Wall (Lower)',    8900,  10200, 600,  800,  0, 10000000, 0),
+    -- bottom wall
+    (newid(),    3, 'Bottom Wall',          4600,  10900, 9200, 600,  0, 10000000, 0),
+    -- rock (center of room, to be inscribed)
+    (newid(),    3, 'Rock',                 4600,   5600, 700,  700,  0, 200000,   0);
+
+insert into EntityLife (EntityId, MaxHitPoints, CurrentHitPoints)
+values
+    (@caster, 1000, 1000);
+
+insert into EntityCharge (EntityId, MaxCharge, CurrentCharge)
+values
+    (@manaStone, 10000, 10000);

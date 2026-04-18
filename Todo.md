@@ -10,7 +10,7 @@ Next bugfix number: BUG-3
 | RMC-15 | Design power sourcing implementation | The sourcing rules (explicit > executor-scope > caster-scope > local-scope, with preference ordering) are complex enough to deserve their own design and implementation ticket. | RMC-57 |
 | RMC-16 | Design inscribed spells on objects | Spells inscribed on objects have different executor/caster semantics. Define how the world model represents inscribed spells, how they are activated, and how the evaluator handles the executor being an object rather than a creature. | |
 | RMC-40 | GWYAH rune — invoke inscriptions on a Set | Implement the GWYAH(invoke) rune: takes a Set, activates all inscriptions found on entities in that Set, and returns a Statement. The entity the inscription is on becomes the executor; the caster of the invoking spell becomes the caster of the activated inscription. | RMC-16 |
-| RMC-43 | Seed the milestone world | Build the seeded world for the Milestone 2 scenario: a room entity containing walls, windows (translucent), a door, and a rock with an inscription. The caster's starting position is randomised so they may or may not have line of sight to the rock through a window. | RMC-16 |
+| RMC-58 | Add inscription to the rock | Add an inscription to the rock in the demo room. The inscription should be designed to open the door when activated. | RMC-16 |
 | RMC-44 | Design the inscription spell | Determine what the rock's inscription says. The spell must open the door when activated via GWYAH. Work out which runes are needed (filtering a Set to the door, the open/close effect, etc.) and raise any missing-rune tickets that fall out of the design. | RMC-16 RMC-40 |
 | RMC-45 | 🏁 Milestone 2 — trigger an inscription through a window | A room contains walls, windows, a door, and a rock with an inscription. The player clicks the rock to aim, casts `ZU GWYAH DAN`, and the inscription on the rock opens the door if the caster has line of sight to the rock. | RMC-15 RMC-16 RMC-37 RMC-38 RMC-39 RMC-40 RMC-51 RMC-52 RMC-43 RMC-44 |
 
@@ -28,6 +28,7 @@ Next bugfix number: BUG-3
 ## In Progress
 | Key | Title | Description | Remarks |
 |-----|-------|-------------|---------|
+| RMC-43 | Seed the milestone world | Build the seeded world for the Milestone 2 scenario: a room entity containing walls, windows (translucent), a door, and a rock. | RMC-16 |
 
 ## Ready For Review
 
