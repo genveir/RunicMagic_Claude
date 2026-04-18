@@ -33,7 +33,7 @@ public class EntityRenderingMapperTests
             Height = 35,
         };
 
-        var model = EntityRenderingMapper.ToRenderingModel(entity);
+        var model = EntityRenderingMapper.ToRenderingModel(entity, isCaster: false);
 
         model.X.Should().Be(5);
         model.Y.Should().Be(15);
@@ -45,7 +45,7 @@ public class EntityRenderingMapperTests
     [Fact]
     public void Object_WithNoCapabilities_HasNoFlags()
     {
-        var model = EntityRenderingMapper.ToRenderingModel(MakeEntity());
+        var model = EntityRenderingMapper.ToRenderingModel(MakeEntity(), isCaster: false);
 
         model.Flags.Should().Be(EntityRenderingFlags.None);
     }
@@ -54,7 +54,7 @@ public class EntityRenderingMapperTests
     public void Entity_WithLife_HasLifeFlag()
     {
         var model = EntityRenderingMapper.ToRenderingModel(
-            MakeEntity(life: new LifeCapability(100, 100)));
+            MakeEntity(life: new LifeCapability(100, 100)), isCaster: false);
 
         model.Flags.Should().HaveFlag(EntityRenderingFlags.HasLife);
         model.Flags.Should().NotHaveFlag(EntityRenderingFlags.HasAgency);
@@ -63,17 +63,33 @@ public class EntityRenderingMapperTests
     [Fact]
     public void Entity_WithAgency_HasAgencyFlag()
     {
-        var model = EntityRenderingMapper.ToRenderingModel(MakeEntity(hasAgency: true));
+        var model = EntityRenderingMapper.ToRenderingModel(MakeEntity(hasAgency: true), isCaster: false);
 
         model.Flags.Should().HaveFlag(EntityRenderingFlags.HasAgency);
         model.Flags.Should().NotHaveFlag(EntityRenderingFlags.HasLife);
     }
 
     [Fact]
+    public void Entity_MarkedAsCaster_HasIsCasterTrue()
+    {
+        var model = EntityRenderingMapper.ToRenderingModel(MakeEntity(), isCaster: true);
+
+        model.IsCaster.Should().BeTrue();
+    }
+
+    [Fact]
+    public void Entity_NotMarkedAsCaster_HasIsCasterFalse()
+    {
+        var model = EntityRenderingMapper.ToRenderingModel(MakeEntity(), isCaster: false);
+
+        model.IsCaster.Should().BeFalse();
+    }
+
+[Fact]
     public void Entity_WithLifeAndAgency_HasBothFlags()
     {
         var model = EntityRenderingMapper.ToRenderingModel(
-            MakeEntity(hasAgency: true, life: new LifeCapability(100, 100)));
+            MakeEntity(hasAgency: true, life: new LifeCapability(100, 100)), isCaster: false);
 
         model.Flags.Should().HaveFlag(EntityRenderingFlags.HasLife);
         model.Flags.Should().HaveFlag(EntityRenderingFlags.HasAgency);

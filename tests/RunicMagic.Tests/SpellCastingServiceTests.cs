@@ -20,7 +20,7 @@ public class SpellCastingServiceTests
         var world = new WorldModel();
         var service = MakeService(world);
 
-        var lines = service.Cast("");
+        var lines = service.Cast("", casterId: null);
 
         lines.Should().ContainSingle().Which.Should().Contain("ran out of runes");
     }
@@ -31,7 +31,7 @@ public class SpellCastingServiceTests
         var world = new WorldModel();
         var service = MakeService(world);
 
-        var lines = service.Cast("NOTARUNE");
+        var lines = service.Cast("NOTARUNE", casterId: null);
 
         lines.Should().ContainSingle().Which.Should().Contain("NOTARUNE");
     }
@@ -43,20 +43,31 @@ public class SpellCastingServiceTests
         var service = MakeService(world);
 
         // ZU VUN A — missing Number argument for VUN
-        var lines = service.Cast("ZU VUN A");
+        var lines = service.Cast("ZU VUN A", casterId: null);
 
         lines.Should().ContainSingle().Which.Should().Contain("ran out of runes");
     }
 
     [Fact]
-    public void Cast_ValidSpell_NoCasterInWorld_ReturnsNoCasterMessage()
+    public void Cast_ValidSpell_NoCasterSelected_ReturnsNoCasterSelectedMessage()
     {
         var world = new WorldModel();
         var service = MakeService(world);
 
-        var lines = service.Cast("ZU VUN LA FOTIR FOTIR FOTIR HET");
+        var lines = service.Cast("ZU VUN LA FOTIR FOTIR FOTIR HET", casterId: null);
 
-        lines.Should().ContainSingle().Which.Should().Contain("No caster");
+        lines.Should().ContainSingle().Which.Should().Be("No caster selected.");
+    }
+
+    [Fact]
+    public void Cast_ValidSpell_CasterIdNotInWorld_ReturnsCasterNotFoundMessage()
+    {
+        var world = new WorldModel();
+        var service = MakeService(world);
+
+        var lines = service.Cast("ZU VUN LA FOTIR FOTIR FOTIR HET", casterId: EntityId.New());
+
+        lines.Should().ContainSingle().Which.Should().Be("Caster not found in world.");
     }
 
     [Fact]
@@ -77,7 +88,7 @@ public class SpellCastingServiceTests
 
         var service = MakeService(world);
 
-        var lines = service.Cast("ZU VUN LA FOTIR FOTIR FOTIR HET");
+        var lines = service.Cast("ZU VUN LA FOTIR FOTIR FOTIR HET", casterId: casterEntity.Id);
 
         lines.Should().Contain(l => l.Contains("target") && l.Contains("pushed"));
     }
@@ -100,7 +111,7 @@ public class SpellCastingServiceTests
 
         var service = MakeService(world);
 
-        var lines = service.Cast("ZU VUN LA FOTIR FOTIR FOTIR HET");
+        var lines = service.Cast("ZU VUN LA FOTIR FOTIR FOTIR HET", casterId: casterEntity.Id);
 
         lines.Should().Contain(l => l.Contains("Caster") && l.Contains("lost") && l.Contains("power"));
     }

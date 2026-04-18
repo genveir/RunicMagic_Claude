@@ -6,7 +6,7 @@ namespace RunicMagic.Controller.Services;
 
 internal class SpellCastingService(WorldModel world, SpellExecutor spellExecutor)
 {
-    public IReadOnlyList<string> Cast(string input)
+    public IReadOnlyList<string> Cast(string input, EntityId? casterId)
     {
         var responseLines = new List<string>();
         var (runeCount, parseResult) = SpellParser.Parse(input);
@@ -17,10 +17,16 @@ internal class SpellCastingService(WorldModel world, SpellExecutor spellExecutor
             return responseLines;
         }
 
-        var casterEntity = world.GetAll().FirstOrDefault(e => e.Label == "Caster");
+        if (casterId == null)
+        {
+            responseLines.Add("No caster selected.");
+            return responseLines;
+        }
+
+        var casterEntity = world.Find(casterId.Value);
         if (casterEntity == null)
         {
-            responseLines.Add("No caster found in world.");
+            responseLines.Add("Caster not found in world.");
             return responseLines;
         }
 

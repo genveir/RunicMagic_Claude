@@ -12,6 +12,13 @@ public readonly record struct Rectangle(int X, int Y, int Width, int Height)
         return result;
     }
 
+    public bool Contains(int x, int y)
+    {
+        var result = X - Width / 2 <= x && x <= X + Width / 2 &&
+            Y - Height / 2 <= y && y <= Y + Height / 2;
+        return result;
+    }
+
     public bool IntersectsWith(Rectangle other)
     {
         var result = X - Width / 2 < other.X + other.Width / 2 &&

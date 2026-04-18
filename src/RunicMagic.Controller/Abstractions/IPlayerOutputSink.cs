@@ -4,6 +4,6 @@ namespace RunicMagic.Controller.Abstractions;
 // Call these during RegisterInput processing to accumulate output for the current command.
 public interface IPlayerOutputSink
 {
-    Task SendText(string text);
-    Task SendWorldEntities();
+    void SendText(string text);
+    void SendWorldEntities();
 }

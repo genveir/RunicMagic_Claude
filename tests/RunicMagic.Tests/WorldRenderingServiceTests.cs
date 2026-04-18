@@ -27,7 +27,7 @@ public class WorldRenderingServiceTests
         var world = new WorldModel();
         var service = new WorldRenderingService(world);
 
-        var result = service.GetAllRenderingModels();
+        var result = service.GetAllRenderingModels(casterEntityId: null);
 
         result.Should().BeEmpty();
     }
@@ -41,7 +41,7 @@ public class WorldRenderingServiceTests
             hasAgency: true, life: new LifeCapability(100, 100)));
         var service = new WorldRenderingService(world);
 
-        var result = service.GetAllRenderingModels();
+        var result = service.GetAllRenderingModels(casterEntityId: null);
 
         result.Should().HaveCount(2);
         result.Should().Contain(m => m.Label == "rock" && m.Flags == EntityRenderingFlags.None);
@@ -51,14 +51,30 @@ public class WorldRenderingServiceTests
     }
 
     [Fact]
+    public void GetAllRenderingModels_MarksEntityWithIsCasterFlag_WhenIdMatches()
+    {
+        var world = new WorldModel();
+        var caster = MakeEntity("caster", x: 0, y: 0, width: 10, height: 10, hasAgency: true);
+        var other = MakeEntity("other", x: 50, y: 50, width: 10, height: 10);
+        world.Add(caster);
+        world.Add(other);
+        var service = new WorldRenderingService(world);
+
+        var result = service.GetAllRenderingModels(casterEntityId: caster.Id);
+
+        result.Should().Contain(m => m.Label == "caster" && m.IsCaster);
+        result.Should().Contain(m => m.Label == "other" && !m.IsCaster);
+    }
+
+    [Fact]
     public void GetAllRenderingModels_ReflectsCurrentWorldState()
     {
         var world = new WorldModel();
         var service = new WorldRenderingService(world);
 
-        var before = service.GetAllRenderingModels();
+        var before = service.GetAllRenderingModels(casterEntityId: null);
         world.Add(MakeEntity("added", x: 0, y: 0, width: 5, height: 5));
-        var after = service.GetAllRenderingModels();
+        var after = service.GetAllRenderingModels(casterEntityId: null);
 
         before.Should().BeEmpty();
         after.Should().HaveCount(1);

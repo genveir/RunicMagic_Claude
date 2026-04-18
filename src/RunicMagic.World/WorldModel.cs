@@ -26,6 +26,12 @@ public class WorldModel
         return entities;
     }
 
+    public IReadOnlyList<Entity> GetEntitiesAtPoint(int x, int y)
+    {
+        var entities = _entities.Values.Where(e => Bounds(e).Contains(x, y)).ToList();
+        return entities;
+    }
+
     public IReadOnlyList<Entity> GetEntitiesInArea(Rectangle area)
     {
         var entities = _entities.Values.Where(e => Bounds(e).IntersectsWith(area)).ToList();

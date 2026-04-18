@@ -140,11 +140,14 @@ const svg    = document.getElementById('world-canvas');
 const FLAGS_HAS_LIFE   = 1;
 const FLAGS_HAS_AGENCY = 2;
 
-function entityClass(flags) {
-    if ((flags & FLAGS_HAS_LIFE) && (flags & FLAGS_HAS_AGENCY)) return 'entity entity-creature';
-    if  (flags & FLAGS_HAS_LIFE)                                 return 'entity entity-life';
-    if  (flags & FLAGS_HAS_AGENCY)                               return 'entity entity-agency';
-    return 'entity entity-object';
+function entityClass(entity) {
+    let cls;
+    if ((entity.flags & FLAGS_HAS_LIFE) && (entity.flags & FLAGS_HAS_AGENCY)) cls = 'entity entity-creature';
+    else if (entity.flags & FLAGS_HAS_LIFE)                                    cls = 'entity entity-life';
+    else if (entity.flags & FLAGS_HAS_AGENCY)                                  cls = 'entity entity-agency';
+    else                                                                        cls = 'entity entity-object';
+    if (entity.isCaster) cls += ' entity-caster';
+    return cls;
 }
 
 function svgEl(tag, attrs) {
@@ -183,7 +186,7 @@ function updateCanvas(entities) {
 
         g.appendChild(svgEl('rect', {
             x: e.x - e.width / 2, y: -e.y - e.height / 2, width: e.width, height: e.height,
-            class: entityClass(e.flags),
+            class: entityClass(e),
         }));
 
         const label = svgEl('text', {
@@ -199,6 +202,59 @@ function updateCanvas(entities) {
 
         svg.appendChild(g);
     }
+}
+
+
+// ── Mode toggle ───────────────────────────────────────────────────────────────
+
+let currentMode = null;
+
+const modeButtons = {
+    'pick-caster': document.getElementById('btn-pick-caster'),
+    'point-at':    document.getElementById('btn-point-at'),
+};
+
+function setMode(mode) {
+    currentMode = mode;
+    for (const [key, btn] of Object.entries(modeButtons)) {
+        btn.classList.toggle('active', key === mode);
+    }
+}
+
+for (const [mode, btn] of Object.entries(modeButtons)) {
+    btn.addEventListener('click', () => {
+        setMode(currentMode === mode ? null : mode);
+    });
+}
+
+svg.addEventListener('click', async e => {
+    if (!currentMode) return;
+
+    const pt = svg.createSVGPoint();
+    pt.x = e.clientX;
+    pt.y = e.clientY;
+    const svgPt = pt.matrixTransform(svg.getScreenCTM().inverse());
+
+    const mode = currentMode;
+    setMode(null);
+
+    const result = await sendModeClick(mode, svgPt.x, -svgPt.y);
+
+    term.write('\r\n');
+    for (const line of result.text) {
+        if (line) term.writeln(line);
+    }
+    updateCanvas(result.entities);
+    writePrompt();
+});
+
+async function sendModeClick(mode, x, y) {
+    const response = await fetch(`/${mode}`, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ x, y }),
+    });
+    return response.json();
 }
 
 

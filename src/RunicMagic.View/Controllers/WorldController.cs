@@ -11,7 +11,7 @@ public class WorldController(WorldRenderingService worldRendering) : ControllerB
     [HttpGet]
     public IReadOnlyList<EntityRenderingModel> Get()
     {
-        var models = worldRendering.GetAllRenderingModels();
+        var models = worldRendering.GetAllRenderingModels(casterEntityId: null);
         return models;
     }
 }
