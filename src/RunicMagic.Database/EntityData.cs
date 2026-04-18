@@ -14,4 +14,5 @@ public record EntityData(
     long? MaxHitPoints = null,
     long? CurrentHitPoints = null,
     long? MaxCharge = null,
-    long? CurrentCharge = null);
+    long? CurrentCharge = null,
+    string[]? InscriptionTexts = null);

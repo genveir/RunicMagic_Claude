@@ -125,4 +125,69 @@ public class SpellContextTests
 
         casterCalled.Should().BeFalse();
     }
+
+    // ── ForkWithNewExecutor ───────────────────────────────────────────────────
+
+    [Fact]
+    public void ForkWithNewExecutor_ForkedContextHasNewExecutor()
+    {
+        var original = TestFixtures.MakeContext();
+        var newExecutorEntity = TestFixtures.MakeEntity();
+        var newExecutor = new EntitySet([newExecutorEntity]);
+
+        var forked = original.ForkWithNewExecutor(newExecutor);
+
+        forked.Executor.Should().BeSameAs(newExecutor);
+    }
+
+    [Fact]
+    public void ForkWithNewExecutor_CasterIsPreserved()
+    {
+        var casterEntity = TestFixtures.MakeEntity();
+        var caster = new EntitySet([casterEntity]);
+        var original = TestFixtures.MakeContext(caster: caster);
+
+        var forked = original.ForkWithNewExecutor(new EntitySet([]));
+
+        forked.Caster.Should().BeSameAs(caster);
+    }
+
+    [Fact]
+    public void ForkWithNewExecutor_WorldIsShared()
+    {
+        var world = new WorldModel();
+        var original = TestFixtures.MakeContext(world: world);
+
+        var forked = original.ForkWithNewExecutor(new EntitySet([]));
+
+        forked.World.Should().BeSameAs(world);
+    }
+
+    [Fact]
+    public void ForkWithNewExecutor_ResultIsShared()
+    {
+        var result = new SpellResult();
+        var original = TestFixtures.MakeContext(result: result);
+
+        var forked = original.ForkWithNewExecutor(new EntitySet([]));
+
+        forked.Result.Should().BeSameAs(result);
+    }
+
+    [Fact]
+    public void ForkWithNewExecutor_PowerSourceStackIsCopied()
+    {
+        var pushedEntity = TestFixtures.MakeEntity();
+        var pushed = false;
+        pushedEntity.Reservoir = amount => { pushed = true; return new ReservoirDraw(amount, false); };
+        var pushedSet = new EntitySet([pushedEntity]);
+
+        var original = TestFixtures.MakeContext();
+        original.PushPowerSource(pushedSet);
+
+        var forked = original.ForkWithNewExecutor(new EntitySet([]));
+        forked.DrawPower(10);
+
+        pushed.Should().BeTrue();
+    }
 }

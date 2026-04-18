@@ -1,6 +1,7 @@
 using RunicMagic.World.Capabilities;
 using RunicMagic.World.Execution;
 using RunicMagic.World.Geometry;
+using RunicMagic.World.Runes.RuneTypes;
 
 namespace RunicMagic.World;
 
@@ -23,4 +24,5 @@ public class Entity(EntityId id, EntityType type, string label)
     public Func<long, ReservoirDraw>? Reservoir { get; set; }
     public Direction? PointingDirection { get; set; }
     public IndicateTarget? IndicateTarget { get; set; }
+    public IStatement[] ParsedInscriptions { get; set; } = [];
 }

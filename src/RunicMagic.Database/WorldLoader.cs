@@ -20,10 +20,16 @@ public class WorldLoader(string connectionString)
             "select EntityId, MaxCharge, CurrentCharge from EntityCharge"))
             .ToDictionary(r => r.EntityId);
 
+        var inscriptionGroups = (await conn.QueryAsync<InscriptionRow>(
+            "select EntityId, SpellText from Inscription"))
+            .GroupBy(r => r.EntityId)
+            .ToDictionary(g => g.Key, g => g.Select(r => r.SpellText).ToArray());
+
         return entityRows.Select(row =>
         {
             lifeRows.TryGetValue(row.Id, out var life);
             chargeRows.TryGetValue(row.Id, out var charge);
+            inscriptionGroups.TryGetValue(row.Id, out var inscriptions);
 
             return new EntityData(
                 Id: row.Id,
@@ -39,11 +45,13 @@ public class WorldLoader(string connectionString)
                 MaxHitPoints: life?.MaxHitPoints,
                 CurrentHitPoints: life?.CurrentHitPoints,
                 MaxCharge: charge?.MaxCharge,
-                CurrentCharge: charge?.CurrentCharge);
+                CurrentCharge: charge?.CurrentCharge,
+                InscriptionTexts: inscriptions);
         });
     }
 
     private record EntityRow(Guid Id, long EntityTypeId, string Label, long X, long Y, long Width, long Height, bool HasAgency, long Weight, bool IsTranslucent);
     private record LifeRow(Guid EntityId, long MaxHitPoints, long CurrentHitPoints);
     private record ChargeRow(Guid EntityId, long MaxCharge, long CurrentCharge);
+    private record InscriptionRow(Guid EntityId, string SpellText);
 }

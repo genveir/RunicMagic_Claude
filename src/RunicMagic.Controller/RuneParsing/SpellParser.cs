@@ -12,5 +12,12 @@ namespace RunicMagic.Controller.RuneParsing
 
             return ((long)(tokenStream.Index + 1), result);
         }
+
+        public static IStatement? ParseAsStatement(string spellString)
+        {
+            var tokenStream = new TokenStream(spellString);
+            var result = RuneParsingDispatcher.ParseNextRune<IStatement>(tokenStream);
+            return result.Succeeded ? result.Value : null;
+        }
     }
 }

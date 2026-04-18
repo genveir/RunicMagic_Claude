@@ -27,6 +27,16 @@ public class SpellContext
         _sourceStack.Pop();
     }
 
+    public SpellContext ForkWithNewExecutor(EntitySet newExecutor)
+    {
+        var forked = new SpellContext(Caster, newExecutor, World, Result);
+        foreach (var source in _sourceStack.Reverse())
+        {
+            forked._sourceStack.Push(source);
+        }
+        return forked;
+    }
+
     public long DrawPower(long amount)
     {
         var remaining = amount;

@@ -1,8 +1,10 @@
 using Microsoft.Extensions.Logging;
+using RunicMagic.Controller.RuneParsing;
 using RunicMagic.Database;
 using RunicMagic.World;
 using RunicMagic.World.Capabilities;
 using RunicMagic.World.Execution;
+using RunicMagic.World.Runes.RuneTypes;
 
 namespace RunicMagic.Controller;
 
@@ -36,7 +38,27 @@ public class EntityFactory(WorldModel world, ILogger<EntityFactory> logger)
             entity.Charge = new ChargeCapability(data.MaxCharge.Value, data.CurrentCharge.Value);
 
         WireDelegates(entity);
+        ParseInscriptions(entity, data.InscriptionTexts);
         return entity;
+    }
+
+    private static void ParseInscriptions(Entity entity, string[]? inscriptionTexts)
+    {
+        if (inscriptionTexts is null || inscriptionTexts.Length == 0)
+        {
+            return;
+        }
+
+        var parsed = new List<IStatement>();
+        foreach (var text in inscriptionTexts)
+        {
+            var statement = SpellParser.ParseAsStatement(text);
+            if (statement is not null)
+            {
+                parsed.Add(statement);
+            }
+        }
+        entity.ParsedInscriptions = [.. parsed];
     }
 
     private void WireDelegates(Entity entity)

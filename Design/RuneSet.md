@@ -25,9 +25,9 @@ Nothing can consume ExecutableStatement — ZU must appear first in the token st
 |------|---------|-----------|
 | `SHU` | with power source | (Set, Statement) → Statement |
 
-SHU pushes an EntitySet onto the front of the power draw stack before executing a Statement, then pops it after. The default draw order (executor → caster) is extended at the front, not replaced — so a single `SHU X` produces the draw order X → executor → caster.
+SHU pushes an EntitySet onto the front of the power draw stack before executing a Statement, then pops it after. The default draw order (scope of executor → executor → scope of caster → caster) is extended at the front, not replaced — so a single `SHU X` produces the draw order X → scope of executor → executor → scope of caster → caster.
 
-SHU can be nested. Each SHU pushes onto whatever stack is current at the point of its execution, so the innermost push draws first. Example: `SHU A (SHU B <statement>)` produces draw order B → A → executor → caster for `<statement>`.
+SHU can be nested. Each SHU pushes onto whatever stack is current at the point of its execution, so the innermost push draws first. Example: `SHU A (SHU B <statement>)` produces draw order B → A → scope of executor → executor → scope of caster → caster for `<statement>`.
 
 VUN moves every entity in the Set away from the given Location by the given Number of millimetres. VAR moves every entity towards it.
 

@@ -6,6 +6,7 @@ using RunicMagic.World.Runes.EntitySetRunes;
 using RunicMagic.World.Runes.ExecutionRunes;
 using RunicMagic.World.Runes.LocationRunes;
 using RunicMagic.World.Runes.NumberRunes;
+using RunicMagic.World.Runes.RuneTypes;
 using Xunit;
 
 namespace RunicMagic.Tests.RuneParsing;
@@ -83,5 +84,40 @@ public class SpellParserTests
         var (_, result) = SpellParser.Parse("ZU VUN A");
 
         result.Succeeded.Should().BeFalse();
+    }
+
+    // ── ParseAsStatement ──────────────────────────────────────────────────────
+
+    [Fact]
+    public void ParseAsStatement_ValidStatement_ReturnsStatement()
+    {
+        var result = SpellParser.ParseAsStatement("VUN A HET");
+
+        result.Should().BeOfType<VUN>();
+    }
+
+    [Fact]
+    public void ParseAsStatement_InvalidRune_ReturnsNull()
+    {
+        var result = SpellParser.ParseAsStatement("NOTARUNE");
+
+        result.Should().BeNull();
+    }
+
+    [Fact]
+    public void ParseAsStatement_EmptyString_ReturnsNull()
+    {
+        var result = SpellParser.ParseAsStatement("");
+
+        result.Should().BeNull();
+    }
+
+    [Fact]
+    public void ParseAsStatement_ExecutionRune_ReturnsNull()
+    {
+        // ZU produces IExecutableStatement, not IStatement — should fail to parse as Statement
+        var result = SpellParser.ParseAsStatement("ZU VUN A HET");
+
+        result.Should().BeNull();
     }
 }

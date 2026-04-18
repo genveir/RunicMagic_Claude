@@ -4,6 +4,7 @@ using Moq;
 using RunicMagic.Controller;
 using RunicMagic.Database;
 using RunicMagic.World;
+using RunicMagic.World.Runes.EffectRunes;
 using Xunit;
 
 namespace RunicMagic.Tests;
@@ -198,5 +199,82 @@ public class EntityFactoryTests
             X: 0, Y: 0, Width: 5, Height: 5, HasAgency: false, Weight: 0));
 
         entity.Reservoir.Should().BeNull();
+    }
+
+    // ── Inscriptions ──────────────────────────────────────────────────────────
+
+    [Fact]
+    public void ParsedInscriptions_EmptyArray_WhenNoInscriptionTexts()
+    {
+        var world = new WorldModel();
+        var entity = Factory(world).Create(new EntityData(
+            Guid.NewGuid(), (long)EntityType.Object, "rock",
+            X: 0, Y: 0, Width: 5, Height: 5, HasAgency: false, Weight: 0));
+
+        entity.ParsedInscriptions.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void ParsedInscriptions_ContainsParsedStatement_WhenValidInscription()
+    {
+        var world = new WorldModel();
+        var entity = Factory(world).Create(new EntityData(
+            Guid.NewGuid(), (long)EntityType.Object, "rock",
+            X: 0, Y: 0, Width: 5, Height: 5, HasAgency: false, Weight: 0,
+            InscriptionTexts: ["VUN A HET"]));
+
+        entity.ParsedInscriptions.Should().HaveCount(1);
+        entity.ParsedInscriptions[0].Should().BeOfType<VUN>();
+    }
+
+    [Fact]
+    public void ParsedInscriptions_SilentlyDropsInvalidInscription()
+    {
+        var world = new WorldModel();
+        var entity = Factory(world).Create(new EntityData(
+            Guid.NewGuid(), (long)EntityType.Object, "rock",
+            X: 0, Y: 0, Width: 5, Height: 5, HasAgency: false, Weight: 0,
+            InscriptionTexts: ["NOTARUNE"]));
+
+        entity.ParsedInscriptions.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void ParsedInscriptions_SupportsMultipleInscriptions()
+    {
+        var world = new WorldModel();
+        var entity = Factory(world).Create(new EntityData(
+            Guid.NewGuid(), (long)EntityType.Object, "rock",
+            X: 0, Y: 0, Width: 5, Height: 5, HasAgency: false, Weight: 0,
+            InscriptionTexts: ["VUN A HET", "VAR A HET"]));
+
+        entity.ParsedInscriptions.Should().HaveCount(2);
+    }
+
+    [Fact]
+    public void ParsedInscriptions_SkipsInvalidAndKeepsValidInscriptions()
+    {
+        var world = new WorldModel();
+        var entity = Factory(world).Create(new EntityData(
+            Guid.NewGuid(), (long)EntityType.Object, "rock",
+            X: 0, Y: 0, Width: 5, Height: 5, HasAgency: false, Weight: 0,
+            InscriptionTexts: ["NOTARUNE", "VUN A HET"]));
+
+        entity.ParsedInscriptions.Should().HaveCount(1);
+        entity.ParsedInscriptions[0].Should().BeOfType<VUN>();
+    }
+
+    [Fact]
+    public void ParsedInscriptions_WorksOnCreature()
+    {
+        var world = new WorldModel();
+        var entity = Factory(world).Create(
+            CreatureData(maxHp: 100, currentHp: 100) with
+            {
+                InscriptionTexts = ["VUN A HET"]
+            });
+        world.Add(entity);
+
+        entity.ParsedInscriptions.Should().HaveCount(1);
     }
 }

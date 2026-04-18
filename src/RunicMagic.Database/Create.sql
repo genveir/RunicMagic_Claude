@@ -1,3 +1,9 @@
+drop table if exists EntityLife;
+drop table if exists EntityCharge;
+drop table if exists Inscription;
+drop table if exists Entities;
+drop table if exists EntityTypes;
+
 create table EntityTypes (
     Id   bigint       not null constraint PK_EntityTypes primary key,
     Name nvarchar(50) not null
@@ -33,4 +39,10 @@ create table EntityCharge (
                                             constraint FK_EntityCharge_Entities references Entities (Id),
     MaxCharge     bigint           not null,
     CurrentCharge bigint           not null
+);
+
+create table Inscription (
+    Id       bigint           not null constraint PK_Inscription primary key identity,
+    EntityId uniqueidentifier not null constraint FK_Inscription_Entities references Entities (Id),
+    SpellText nvarchar(max)   not null
 );

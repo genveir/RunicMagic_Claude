@@ -1,5 +1,12 @@
+delete from entitylife;
+delete from entitycharge;
+delete from inscription;
+delete from entities;
+delete from entitytypes;
+
 declare @caster    uniqueidentifier = newid();
 declare @manaStone uniqueidentifier = newid();
+declare @rock      uniqueidentifier = newid();
 
 insert into Entities (Id, EntityTypeId, Label, X, Y, Width, Height, HasAgency, Weight, IsTranslucent)
 values
@@ -24,7 +31,7 @@ values
     -- bottom wall
     (newid(),    3, 'Bottom Wall',          4600,  10900, 9200, 600,  0, 10000000, 0),
     -- rock (center of room, to be inscribed)
-    (newid(),    3, 'Rock',                 4600,   5600, 700,  700,  0, 200000,   0);
+    (@rock,      3, 'Rock',                 4600,   5600, 700,  700,  0, 200000,   0);
 
 insert into EntityLife (EntityId, MaxHitPoints, CurrentHitPoints)
 values
@@ -33,3 +40,7 @@ values
 insert into EntityCharge (EntityId, MaxCharge, CurrentCharge)
 values
     (@manaStone, 10000, 10000);
+
+insert into Inscription (EntityId, SpellText)
+values
+    (@rock, 'VUN A FOTIR HET PAR OH');

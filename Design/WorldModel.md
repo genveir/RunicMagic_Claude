@@ -34,6 +34,7 @@ Current entity data:
 | `Life` | Property | complex | `LifeCapability`: `MaxHitPoints` + `CurrentHitPoints`; null = not alive |
 | `Charge` | Property | complex | `ChargeCapability`: `MaxCharge` + `CurrentCharge`; null = uncharged |
 | `PointingDirection` | Transient | scalar | The direction the entity is consciously aiming; null = not pointing |
+| `ParsedInscriptions` | Transient | `IStatement[]` | Spells inscribed on this entity, pre-parsed at load time; empty = none |
 | `Scope` | Derived | delegate | Returns the set of entities reachable from this entity |
 | `Reservoir` | Derived | delegate | Draws power; closes over whichever property holds its state |
 
@@ -61,6 +62,7 @@ The implementation may use convenience classes (e.g. `Creature`) to stamp out en
 
 **Transient** (session-only):
 - `Direction? PointingDirection` — null = not pointing
+- `IStatement[] ParsedInscriptions` — spells inscribed on this entity; pre-parsed from the `Inscription` table at world load; empty = none. Any inscription whose rune text fails to parse is silently dropped. Any entity type can have inscriptions.
 
 **Derived** (wired at load, no persistence):
 - `Func<Entity[]>? Scope` — computed on call; closes over world state
