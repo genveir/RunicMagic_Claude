@@ -24,6 +24,16 @@ public class PlayerController : ControllerBase
         return commandResult;
     }
 
+    [HttpPost("move-caster")]
+    public async Task<CommandResult> MoveCaster([FromBody] CanvasClickRequest request)
+    {
+        var worldCoordinate = new WorldCoordinate((int)request.X, (int)request.Y);
+
+        var commandResult = await playerViewInterface.MoveCaster(worldCoordinate);
+
+        return commandResult;
+    }
+
     [HttpPost("point-at")]
     public async Task<CommandResult> PointAt([FromBody] CanvasClickRequest request)
     {

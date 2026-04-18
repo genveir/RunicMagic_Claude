@@ -14,7 +14,8 @@ public class PlayerServiceTests
         var world = new WorldModel();
         var worldRendering = new WorldRenderingService(world);
         var spellCasting = new SpellCastingService(world, new SpellExecutor(world));
-        var service = new PlayerService(world, worldRendering, spellCasting);
+        var teleport = new TeleportEntityService();
+        var service = new PlayerService(world, worldRendering, spellCasting, teleport);
         return (service, world);
     }
 
@@ -72,6 +73,43 @@ public class PlayerServiceTests
         var result = await service.SetCaster(new WorldCoordinate(0, 0));
 
         result.Text.Should().ContainSingle().Which.Should().Contain("Multiple entities");
+    }
+
+    [Fact]
+    public async Task MoveCaster_NoCasterSelected_ReturnsNoCasterSelectedMessage()
+    {
+        var (service, _) = MakeService();
+
+        var result = await service.MoveCaster(new WorldCoordinate(100, 100));
+
+        result.Text.Should().ContainSingle().Which.Should().Contain("No caster selected");
+    }
+
+    [Fact]
+    public async Task MoveCaster_WithCasterSelected_UpdatesEntityPosition()
+    {
+        var (service, world) = MakeService();
+        var entity = MakeAgencyEntity(x: 0, y: 0);
+        world.Add(entity);
+        await service.SetCaster(new WorldCoordinate(0, 0));
+
+        await service.MoveCaster(new WorldCoordinate(500, 300));
+
+        entity.X.Should().Be(500);
+        entity.Y.Should().Be(300);
+    }
+
+    [Fact]
+    public async Task MoveCaster_WithCasterSelected_ReturnsMoveConfirmationMessage()
+    {
+        var (service, world) = MakeService();
+        var entity = MakeAgencyEntity(x: 0, y: 0);
+        world.Add(entity);
+        await service.SetCaster(new WorldCoordinate(0, 0));
+
+        var result = await service.MoveCaster(new WorldCoordinate(500, 300));
+
+        result.Text.Should().ContainSingle().Which.Should().Contain("moved");
     }
 
     [Fact]

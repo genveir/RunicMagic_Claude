@@ -211,6 +211,7 @@ let currentMode = null;
 
 const modeButtons = {
     'pick-caster': document.getElementById('btn-pick-caster'),
+    'move-caster': document.getElementById('btn-move-caster'),
     'point-at':    document.getElementById('btn-point-at'),
 };
 
@@ -226,6 +227,12 @@ for (const [mode, btn] of Object.entries(modeButtons)) {
         setMode(currentMode === mode ? null : mode);
     });
 }
+
+document.addEventListener('contextmenu', e => {
+    if (!currentMode) return;
+    e.preventDefault();
+    setMode(null);
+});
 
 svg.addEventListener('click', async e => {
     if (!currentMode) return;

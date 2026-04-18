@@ -7,7 +7,8 @@ namespace RunicMagic.Controller.Services;
 internal class PlayerService(
         WorldModel world,
         WorldRenderingService worldRendering,
-        SpellCastingService spellCasting) : IPlayerViewInterface, IPlayerOutputSink
+        SpellCastingService spellCasting,
+        TeleportEntityService teleport) : IPlayerViewInterface, IPlayerOutputSink
 {
     private EntityId? casterId = null;
 
@@ -48,6 +49,26 @@ internal class PlayerService(
             SendText($"Caster set to entity {casterEntity.Label} at ({worldCoordinate.X}, {worldCoordinate.Y}).");
         }
 
+        return Task.FromResult(FlushPendingOutputs());
+    }
+
+    public Task<CommandResult> MoveCaster(WorldCoordinate worldCoordinate)
+    {
+        if (casterId == null)
+        {
+            SendText("No caster selected.");
+            return Task.FromResult(FlushPendingOutputs());
+        }
+
+        var casterEntity = world.Find(casterId.Value);
+        if (casterEntity == null)
+        {
+            SendText("Caster not found in world.");
+            return Task.FromResult(FlushPendingOutputs());
+        }
+
+        teleport.Teleport(casterEntity, worldCoordinate.X, worldCoordinate.Y);
+        SendText($"Caster moved to ({worldCoordinate.X}, {worldCoordinate.Y}).");
         return Task.FromResult(FlushPendingOutputs());
     }
 
