@@ -1,10 +1,10 @@
 using FluentAssertions;
 using RunicMagic.Controller.RuneParsing;
 using RunicMagic.Controller.RuneParsing.EffectRunes;
+using RunicMagic.World.Execution;
 using RunicMagic.World.Runes.EffectRunes;
 using RunicMagic.World.Runes.EntityReferenceRunes;
 using RunicMagic.World.Runes.LocationRunes;
-using RunicMagic.World.Execution;
 using RunicMagic.World.Runes.RuneTypes;
 using Xunit;
 
@@ -41,7 +41,7 @@ public class VUNParserTests
     }
 
     [Fact]
-    public void Parse_WithDefaultLocation_InjectsParA()
+    public void Parse_WithDefaultLocation_InjectsParOH()
     {
         var mockEntitySet = new MockEntitySet();
         var mockNumber = new MockNumber();
@@ -54,7 +54,7 @@ public class VUNParserTests
         var vun = result.Value.Should().BeOfType<VUN>().Subject;
         var par = vun.Origin.Should().BeOfType<PAR>().Subject;
         par.EntitySet.Should().BeOfType<EntitySetSelectionCostResolver>()
-            .Which.Inner.Should().BeOfType<A>();
+            .Which.Inner.Should().BeOfType<OH>();
     }
 
     [Fact]

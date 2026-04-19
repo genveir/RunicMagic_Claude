@@ -1,13 +1,12 @@
 using FluentAssertions;
 using RunicMagic.Controller.RuneParsing;
+using RunicMagic.World.Execution;
 using RunicMagic.World.Runes.EffectRunes;
 using RunicMagic.World.Runes.EntityReferenceRunes;
 using RunicMagic.World.Runes.EntitySetRunes;
 using RunicMagic.World.Runes.ExecutionRunes;
 using RunicMagic.World.Runes.LocationRunes;
 using RunicMagic.World.Runes.NumberRunes;
-using RunicMagic.World.Execution;
-using RunicMagic.World.Runes.RuneTypes;
 using Xunit;
 
 namespace RunicMagic.Tests.RuneParsing;
@@ -31,7 +30,7 @@ public class SpellParserTests
 
         var par = vun.Origin.Should().BeOfType<PAR>().Subject;
         par.EntitySet.Should().BeOfType<EntitySetSelectionCostResolver>()
-            .Which.Inner.Should().BeOfType<A>();
+            .Which.Inner.Should().BeOfType<OH>();
     }
 
     [Fact]
@@ -56,7 +55,7 @@ public class SpellParserTests
 
         var par = vun.Origin.Should().BeOfType<PAR>().Subject;
         par.EntitySet.Should().BeOfType<EntitySetSelectionCostResolver>()
-            .Which.Inner.Should().BeOfType<A>();
+            .Which.Inner.Should().BeOfType<OH>();
     }
 
     [Fact]

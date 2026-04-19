@@ -19,7 +19,7 @@ namespace RunicMagic.Controller.RuneParsing.EffectRunes
                 return ParsingResult<IStatement>.Fail(howFarResult.Error);
             }
 
-            var originResult = RuneParsingDispatcher.ParseNextRune<ILocation>(tokenStream, ["PAR", "A"]);
+            var originResult = RuneParsingDispatcher.ParseNextRune<ILocation>(tokenStream, ["PAR", "OH"]);
             if (!originResult.Succeeded)
             {
                 return ParsingResult<IStatement>.Fail(originResult.Error);
