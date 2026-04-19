@@ -77,8 +77,11 @@ Both are used as targeting references and, in the power sourcing context (RMC-15
 | Rune | Meaning | Signature |
 |------|---------|-----------|
 | `PAR` | location of | (Set) → Location |
+| `GER` | weighted centroid of | (Set) → Location |
 
-Resolves a Set to the centroid of its members' bounding rectangles.
+`PAR` resolves a Set to the unweighted centroid of its members' bounding rectangles.
+
+`GER` resolves a Set to the centroid weighted by each member's `Weight`. If all weights are zero, falls back to unweighted centroid.
 
 ## Numbers
 

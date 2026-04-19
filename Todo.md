@@ -23,7 +23,6 @@ Next bugfix number: BUG-4
 | RMC-14 | Design channeling and persistent effects | Written runes stay active while power is channeled. Define what "channeling" means mechanically — what keeps a spell alive, how it is terminated, and how the executor tracks ongoing effects. | |
 | RMC-7 | Identify missing runes | There are no runes that manipulate entity sets, or effects other than pushing. Audit the full rune set for gaps needed to write meaningful spells. | |
 | RMC-48 | Formalize movement with collision | VUN currently teleports entities to their destination. Replace this with movement through space: the entity travels along the push vector and stops when it hits an entity (a wall, door, etc.) rather than passing through it. | |
-| RMC-59 | Expansion selectors cost power scaled by selected entities' max power | Selectors that expand the selection (e.g. runes that broaden a Set to include more entities) should drain power from the spell's source proportional to the maximum power of the entities they select. | |
 
 ## In Progress
 | Key | Title | Description | Remarks |
@@ -33,6 +32,7 @@ Next bugfix number: BUG-4
 
 | Key | Title |
 |-----|-------|
+| RMC-59 | Expansion selectors cost power scaled by selected entities' max power |
 | RMC-40 | GWYAH rune — invoke inscriptions on a Set |
 
 ## Done

@@ -6,6 +6,7 @@ using RunicMagic.World.Runes.EntitySetRunes;
 using RunicMagic.World.Runes.ExecutionRunes;
 using RunicMagic.World.Runes.LocationRunes;
 using RunicMagic.World.Runes.NumberRunes;
+using RunicMagic.World.Execution;
 using RunicMagic.World.Runes.RuneTypes;
 using Xunit;
 
@@ -24,11 +25,13 @@ public class SpellParserTests
         var zu = result.Value.Should().BeOfType<ZU>().Subject;
         var vun = zu.Statement.Should().BeOfType<VUN>().Subject;
 
-        vun.ToMove.Should().BeOfType<A>();
+        vun.ToMove.Should().BeOfType<EntitySetSelectionCostResolver>()
+            .Which.Inner.Should().BeOfType<A>();
         vun.HowFar.Should().BeOfType<HET>();
 
         var par = vun.Origin.Should().BeOfType<PAR>().Subject;
-        par.EntitySet.Should().BeOfType<A>();
+        par.EntitySet.Should().BeOfType<EntitySetSelectionCostResolver>()
+            .Which.Inner.Should().BeOfType<A>();
     }
 
     [Fact]
@@ -42,7 +45,8 @@ public class SpellParserTests
         var zu = result.Value.Should().BeOfType<ZU>().Subject;
         var vun = zu.Statement.Should().BeOfType<VUN>().Subject;
 
-        var la = vun.ToMove.Should().BeOfType<LA>().Subject;
+        var la = vun.ToMove.Should().BeOfType<EntitySetSelectionCostResolver>()
+            .Which.Inner.Should().BeOfType<LA>().Subject;
         la.ToGetScopeOf.Should().BeOfType<OH>();
 
         var fotir1 = vun.HowFar.Should().BeOfType<FOTIR>().Subject;
@@ -51,7 +55,8 @@ public class SpellParserTests
         fotir3.Multiplicand.Should().BeOfType<HET>();
 
         var par = vun.Origin.Should().BeOfType<PAR>().Subject;
-        par.EntitySet.Should().BeOfType<A>();
+        par.EntitySet.Should().BeOfType<EntitySetSelectionCostResolver>()
+            .Which.Inner.Should().BeOfType<A>();
     }
 
     [Fact]

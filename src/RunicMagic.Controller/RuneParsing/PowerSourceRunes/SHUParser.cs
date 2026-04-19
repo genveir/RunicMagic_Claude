@@ -7,7 +7,7 @@ namespace RunicMagic.Controller.RuneParsing.PowerSourceRunes
     {
         public ParsingResult<IStatement> Parse(TokenStream tokenStream)
         {
-            var sourceResult = RuneParsingDispatcher.ParseNextRune<IEntitySet>(tokenStream);
+            var sourceResult = RuneParsingDispatcher.ParseNextTaxedEntitySet(tokenStream);
             if (!sourceResult.Succeeded)
             {
                 return ParsingResult<IStatement>.Fail(sourceResult.Error);

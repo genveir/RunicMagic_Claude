@@ -59,10 +59,12 @@ internal class SpellCastingService(WorldModel world, SpellExecutor spellExecutor
         return @event switch
         {
             EntityPushedEvent e => $"{e.Entity.Label} pushed {e.DistanceMm}mm.",
+            EntityPulledEvent e => $"{e.Entity.Label} pulled {e.DistanceMm}mm.",
             PowerDrawnEvent e => $"{e.Entity.Label} lost {e.Amount} power.",
             EntityDrainedEvent e => $"{e.Entity.Label} was drained.",
             EffectNotFiredEvent e => $"Effect '{e.Effect}' did not fire: {e.Reason}.",
             ExecutorDisintegratedEvent => "The executor disintegrated.",
+            SelectionCostNotMetEvent e => $"Selection failed: needed {e.Required} power, drew {e.Drawn}.",
             _ => @event.ToString()!
         };
     }

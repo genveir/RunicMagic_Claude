@@ -1,7 +1,32 @@
+using RunicMagic.World.Execution;
+using RunicMagic.World.Runes.RuneTypes;
+
 namespace RunicMagic.Controller.RuneParsing
 {
     internal static class RuneParsingDispatcher
     {
+        internal static ParsingResult<IEntitySet> ParseNextTaxedEntitySet(TokenStream tokenStream)
+        {
+            var result = ParseNextRune<IEntitySet>(tokenStream);
+            if (!result.Succeeded)
+            {
+                return result;
+            }
+            var taxed = new EntitySetSelectionCostResolver(result.Value);
+            return ParsingResult<IEntitySet>.Succeed(taxed);
+        }
+
+        internal static ParsingResult<IEntitySet> ParseNextTaxedEntitySet(TokenStream tokenStream, string[] defaultTokens)
+        {
+            var result = ParseNextRune<IEntitySet>(tokenStream, defaultTokens);
+            if (!result.Succeeded)
+            {
+                return result;
+            }
+            var taxed = new EntitySetSelectionCostResolver(result.Value);
+            return ParsingResult<IEntitySet>.Succeed(taxed);
+        }
+
         internal static ParsingResult<TRuneType> ParseNextRune<TRuneType>(TokenStream tokenStream)
         {
             var next = tokenStream.Next();

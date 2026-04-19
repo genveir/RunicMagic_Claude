@@ -34,9 +34,11 @@ Current entity data:
 | `Life` | Property | complex | `LifeCapability`: `MaxHitPoints` + `CurrentHitPoints`; null = not alive |
 | `Charge` | Property | complex | `ChargeCapability`: `MaxCharge` + `CurrentCharge`; null = uncharged |
 | `PointingDirection` | Transient | scalar | The direction the entity is consciously aiming; null = not pointing |
+| `IndicateTarget` | Transient | complex | The entity the caster is consciously indicating, with optional approach direction; null = not indicating |
 | `ParsedInscriptions` | Transient | `IStatement[]` | Spells inscribed on this entity, pre-parsed at load time; empty = none |
 | `Scope` | Derived | delegate | Returns the set of entities reachable from this entity |
-| `Reservoir` | Derived | delegate | Draws power; closes over whichever property holds its state |
+| `Reservoir` | Derived | delegate | Draws up to N power; closes over whichever property holds its state; null = no power |
+| `MaxReservoir` | Derived | delegate | Returns the entity's maximum power; null = no power (cost to select this entity is 0) |
 
 A complex property's null object is its own "absent" marker — no separate boolean needed. A boolean property uses `false` as its absent marker.
 
@@ -51,8 +53,9 @@ The implementation may use convenience classes (e.g. `Creature`) to stamp out en
 **Attributes** (always present):
 - `EntityId Id`
 - `string Label`
-- `int Weight`
-- Spatial bounds: `int X, Y, Width, Height`
+- `long Weight`
+- Position: `double X, Y` (via `Location`)
+- Dimensions: `long Width, Height`
 
 **Properties** (optional, persisted):
 - `bool HasAgency` — false = absent
@@ -62,11 +65,13 @@ The implementation may use convenience classes (e.g. `Creature`) to stamp out en
 
 **Transient** (session-only):
 - `Direction? PointingDirection` — null = not pointing
+- `IndicateTarget? IndicateTarget` — entity the caster consciously indicates, with optional approach direction; null = not indicating
 - `IStatement[] ParsedInscriptions` — spells inscribed on this entity; pre-parsed from the `Inscription` table at world load; empty = none. Any inscription whose rune text fails to parse is silently dropped. Any entity type can have inscriptions.
 
 **Derived** (wired at load, no persistence):
 - `Func<Entity[]>? Scope` — computed on call; closes over world state
-- `Func<int, ReservoirDraw>? Reservoir` — takes amount requested, returns draw result; closes over whichever property holds its state
+- `Func<long, ReservoirDraw>? Reservoir` — takes amount requested, returns draw result; closes over whichever property holds its state; null = no power
+- `Func<long>? MaxReservoir` — returns the entity's maximum power; null = no power
 
 ### Derived delegates
 
@@ -87,10 +92,12 @@ The world is loaded in full at startup into a `Dictionary<EntityId, Entity>`. Th
 
 ### Spatial queries
 
-`WorldModel` exposes three spatial queries, all implemented as linear scans:
+`WorldModel` exposes spatial queries, all implemented as linear scans:
 
-- `GetEntitiesInArea(Rectangle)` — entities whose bounds overlap the given area (strict intersection, excludes edge-adjacent)
-- `GetTouchingEntities(Entity)` — entities whose bounds overlap or share an edge with the given entity
-- `GetContainedEntities(Entity)` — entities whose bounds fit entirely within the given entity's bounds
+- `GetAll()` — all entities in the world
+- `Find(EntityId)` — single entity by identity; returns null if not found
+- `GetEntitiesAtPoint(Location)` — entities whose bounds contain the given point
+- `GetEntitiesWithinDistance(Entity, double)` — entities whose bounds are within the given distance of the source entity's position; excludes the source itself; used to compute scope
+- `GetContainedEntities(Entity)` — entities whose bounds fit entirely within the container's bounds; excludes the container itself
 
-`Rectangle` is a custom `readonly record struct` (integer millimetres) with no dependency on `System.Drawing`.
+`Rectangle` is a custom `readonly record struct` with no dependency on `System.Drawing`.
