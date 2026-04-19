@@ -16,8 +16,8 @@ Nothing can consume ExecutableStatement — ZU must appear first in the token st
 
 | Rune | Meaning | Signature |
 |------|---------|-----------|
-| `VUN` | push | (Set, Number, Location = PAR(A)) → Statement |
-| `VAR` | pull | (Set, Number, Location = PAR(A)) → Statement |
+| `VUN` | push | (Set, Number, Location = PAR(OH)) → Statement |
+| `VAR` | pull | (Set, Number, Location = PAR(OH)) → Statement |
 
 ## Power Sourcing
 
@@ -29,21 +29,16 @@ SHU pushes an EntitySet onto the front of the power draw stack before executing 
 
 SHU can be nested. Each SHU pushes onto whatever stack is current at the point of its execution, so the innermost push draws first. Example: `SHU A (SHU B <statement>)` produces draw order B → A → scope of executor → executor → scope of caster → caster for `<statement>`.
 
-VUN moves every entity in the Set away from the given Location by the given Number of millimetres. VAR moves every entity towards it.
-
-Direction is determined per entity as the unit vector from Location to the entity's centre. The default origin is the caster's position.
-
-Execution cost scales with distance × summed weight of entities pushed.
-
 ## Sets
 
 | Rune | Meaning | Signature |
 |------|---------|-----------|
 | `LA` | scope of | (Set = OH) → Set |
+| `HORO` | near | (Number, Location = PAR(OH)) → Set |
 
-Maps each member of the input Set to its scope (via the entity's scope delegate) and returns the union. 
+`LA` maps each member of the input Set to its scope (via the entity's scope delegate) and returns the union. Defaults to `OH`, so bare `LA` maps the executor's scope.
 
-Defaults to `OH`, so bare `LA` maps the executor's scope.
+`HORO` returns all entities in the world whose nearest bounding edge is within `Number` millimetres of `Location`. Defaults to the executor's position, so `HORO HET` selects everything within 1 mm of the executor.
 
 ## Invocation
 

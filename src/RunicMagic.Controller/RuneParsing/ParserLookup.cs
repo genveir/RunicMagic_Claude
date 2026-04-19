@@ -71,9 +71,10 @@ namespace RunicMagic.Controller.RuneParsing
         {
             entitySetRuneParsers["A"] = new AParser(); // me, caster
             entitySetRuneParsers["OH"] = new OHParser(); // this, executor
-            entitySetRuneParsers["LA"] = new LAParser(); // context of
+            entitySetRuneParsers["LA"] = new LAParser(); // scope of
             entitySetRuneParsers["DAN"] = new DANParser(); // pointing at
             entitySetRuneParsers["KAL"] = new KALParser(); // indicating
+            entitySetRuneParsers["HORO"] = new HOROParser(); // near
         }
 
         private static void FillNumberRuneParsers()

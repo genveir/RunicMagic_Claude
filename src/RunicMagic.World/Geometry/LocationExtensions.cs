@@ -1,5 +1,7 @@
 namespace RunicMagic.World.Geometry;
 
+using RunicMagic.World;
+
 public static class LocationExtensions
 {
     public static Location Translate(this Location origin, Direction direction, double distance)
@@ -16,6 +18,14 @@ public static class LocationExtensions
         var avgX = list.Average(l => l.X);
         var avgY = list.Average(l => l.Y);
         var result = new Location(avgX, avgY);
+        return result;
+    }
+
+    public static IEnumerable<Entity> WithinDistance(this IEnumerable<Entity> entities, Location origin, double distance)
+    {
+        var result = entities.Where(e =>
+            new Rectangle(e.Location, e.Width, e.Height, e.Angle)
+                .IsWithinDistanceFromPoint(origin, distance));
         return result;
     }
 

@@ -1,4 +1,5 @@
 using FluentAssertions;
+using RunicMagic.World;
 using RunicMagic.World.Geometry;
 using Xunit;
 
@@ -6,6 +7,53 @@ namespace RunicMagic.Tests.Geometry;
 
 public class LocationExtensionsTests
 {
+    private static Entity MakeEntity(long x, long y, long width = 100, long height = 100)
+    {
+        return new Entity(EntityId.New(), EntityType.Object, "test")
+        {
+            Location = new Location(x, y),
+            Width = width,
+            Height = height,
+        };
+    }
+
+    // ── WithinDistance ────────────────────────────────────────────────────────
+
+    [Fact]
+    public void WithinDistance_EntityWithinRadius_IsIncluded()
+    {
+        var entity = MakeEntity(x: 300, y: 0);
+
+        var result = new[] { entity }.WithinDistance(new Location(0, 0), distance: 500);
+
+        result.Should().ContainSingle().Which.Should().BeSameAs(entity);
+    }
+
+    [Fact]
+    public void WithinDistance_EntityOutsideRadius_IsExcluded()
+    {
+        var entity = MakeEntity(x: 1000, y: 0);
+
+        var result = new[] { entity }.WithinDistance(new Location(0, 0), distance: 500);
+
+        result.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void WithinDistance_MeasuresNearestEdgeNotCenter()
+    {
+        // Entity centre at (600, 0), width 100 → nearest edge at x=550, 550mm from origin
+        var entity = MakeEntity(x: 600, y: 0);
+
+        var within = new[] { entity }.WithinDistance(new Location(0, 0), distance: 550);
+        var outside = new[] { entity }.WithinDistance(new Location(0, 0), distance: 549);
+
+        within.Should().ContainSingle();
+        outside.Should().BeEmpty();
+    }
+
+    // ── Translate ─────────────────────────────────────────────────────────────
+
     [Fact]
     public void Translate_MovesPointInGivenDirection()
     {
