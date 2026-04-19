@@ -28,29 +28,17 @@ public class WorldModel
         return entities;
     }
 
-    public IReadOnlyList<Entity> GetEntitiesAtPoint(long x, long y)
+    public IReadOnlyList<Entity> GetEntitiesAtPoint(Location location)
     {
-        var entities = _entities.Values.Where(e => Bounds(e).Contains(x, y)).ToList();
+        var entities = _entities.Values.Where(e => Bounds(e).Contains(location)).ToList();
         return entities;
     }
 
-    public IReadOnlyList<Entity> GetEntitiesInArea(Rectangle area)
-    {
-        var entities = _entities.Values.Where(e => Bounds(e).IntersectsWith(area)).ToList();
-        return entities;
-    }
-
-    public IReadOnlyList<Entity> GetEntitiesWithinDistance(Entity source, long distance)
+    public IReadOnlyList<Entity> GetEntitiesWithinDistance(Entity source, double distance)
     {
         var entities = _entities.Values
-            .Where(e => e.Id != source.Id && Bounds(e).IsWithinDistanceFromPoint(source.X, source.Y, distance))
+            .Where(e => e.Id != source.Id && Bounds(e).IsWithinDistanceFromPoint(source.Location, distance))
             .ToList();
-        return entities;
-    }
-
-    public IReadOnlyList<Entity> GetTouchingEntities(Entity source)
-    {
-        var entities = _entities.Values.Where(e => e.Id != source.Id && Bounds(source).Touches(Bounds(e))).ToList();
         return entities;
     }
 
@@ -62,7 +50,7 @@ public class WorldModel
 
     private static Rectangle Bounds(Entity e)
     {
-        var bounds = new Rectangle(e.X, e.Y, e.Width, e.Height);
+        var bounds = new Rectangle(e.Location, e.Width, e.Height);
         return bounds;
     }
 }

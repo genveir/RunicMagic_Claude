@@ -14,8 +14,7 @@ public class WorldRenderingServiceTests
         bool hasAgency = false, LifeCapability? life = null) =>
         new(EntityId.New(), EntityType.Object, label)
         {
-            X = x,
-            Y = y,
+            Location = new Location(x, y),
             Width = width,
             Height = height,
             HasAgency = hasAgency,
@@ -73,8 +72,7 @@ public class WorldRenderingServiceTests
         var world = new WorldModel();
         var pointing = new Entity(EntityId.New(), EntityType.Object, "archer")
         {
-            X = 0,
-            Y = 0,
+            Location = new Location(0, 0),
             Width = 100,
             Height = 100,
             PointingDirection = new RunicMagic.World.Geometry.Direction(1, 0),

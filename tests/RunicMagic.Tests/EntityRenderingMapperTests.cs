@@ -3,6 +3,7 @@ using RunicMagic.Controller.Mappers;
 using RunicMagic.Controller.Models;
 using RunicMagic.World;
 using RunicMagic.World.Capabilities;
+using RunicMagic.World.Geometry;
 using Xunit;
 
 namespace RunicMagic.Tests;
@@ -13,8 +14,7 @@ public class EntityRenderingMapperTests
         LifeCapability? life = null, ChargeCapability? charge = null) =>
         new(EntityId.New(), type, "test")
         {
-            X = 10,
-            Y = 20,
+            Location = new Location(10, 20),
             Width = 30,
             Height = 40,
             HasAgency = hasAgency,
@@ -27,8 +27,7 @@ public class EntityRenderingMapperTests
     {
         var entity = new Entity(EntityId.New(), EntityType.Object, "rock")
         {
-            X = 5,
-            Y = 15,
+            Location = new Location(5, 15),
             Width = 25,
             Height = 35,
         };
@@ -88,7 +87,7 @@ public class EntityRenderingMapperTests
     [Fact]
     public void Entity_WithPointingEnd_IncludesEndpointCoordinates()
     {
-        var model = EntityRenderingMapper.ToRenderingModel(MakeEntity(), isCaster: false, pointingEnd: (100, 200));
+        var model = EntityRenderingMapper.ToRenderingModel(MakeEntity(), isCaster: false, pointingEnd: new WorldCoordinate(100, 200));
 
         model.PointingEndX.Should().Be(100);
         model.PointingEndY.Should().Be(200);

@@ -4,6 +4,7 @@ using RunicMagic.Database;
 using RunicMagic.World;
 using RunicMagic.World.Capabilities;
 using RunicMagic.World.Execution;
+using RunicMagic.World.Geometry;
 using RunicMagic.World.Runes.RuneTypes;
 
 namespace RunicMagic.Controller;
@@ -22,8 +23,7 @@ public class EntityFactory(WorldModel world, ILogger<EntityFactory> logger)
 
         var entity = new Entity(new EntityId(data.Id), type, data.Label)
         {
-            X = data.X,
-            Y = data.Y,
+            Location = new Location(data.X, data.Y),
             Width = data.Width,
             Height = data.Height,
             HasAgency = data.HasAgency,

@@ -2,11 +2,11 @@ delete from entitylife;
 delete from entitycharge;
 delete from inscription;
 delete from entities;
-delete from entitytypes;
 
-declare @caster    uniqueidentifier = newid();
-declare @manaStone uniqueidentifier = newid();
-declare @rock      uniqueidentifier = newid();
+declare @caster        uniqueidentifier = newid();
+declare @manaStone     uniqueidentifier = newid();
+declare @smallManaStone uniqueidentifier = newid();
+declare @rock          uniqueidentifier = newid();
 
 insert into Entities (Id, EntityTypeId, Label, X, Y, Width, Height, HasAgency, Weight, IsTranslucent)
 values
@@ -30,6 +30,8 @@ values
     (newid(),    3, 'Right Wall (Lower)',    8900,  10200, 600,  800,  0, 10000000, 0),
     -- bottom wall
     (newid(),    3, 'Bottom Wall',          4600,  10900, 9200, 600,  0, 10000000, 0),
+    -- small mana stone (next to the rock)
+    (@smallManaStone, 2, 'Small Mana Stone', 5000, 5600, 100, 100, 0, 500,    0),
     -- rock (center of room, to be inscribed)
     (@rock,      3, 'Rock',                 4600,   5600, 700,  700,  0, 200000,   0);
 
@@ -39,8 +41,9 @@ values
 
 insert into EntityCharge (EntityId, MaxCharge, CurrentCharge)
 values
-    (@manaStone, 10000, 10000);
+    (@manaStone, 10000, 10000),
+    (@smallManaStone, 100, 100);
 
 insert into Inscription (EntityId, SpellText)
 values
-    (@rock, 'VUN A FOTIR HET PAR OH');
+    (@rock, 'VUN A FOTIR FOTIR HET PAR OH');

@@ -1,8 +1,11 @@
 namespace RunicMagic.World.Geometry;
 
 // X and Y are the center of the rectangle. Width and Height are the full extents.
-public readonly record struct Rectangle(long X, long Y, long Width, long Height)
+public readonly record struct Rectangle(Location Location, double Width, double Height)
 {
+    private readonly double X = Location.X;
+    private readonly double Y = Location.Y;
+
     public bool Contains(Rectangle other)
     {
         var result = X - Width / 2 <= other.X - other.Width / 2 &&
@@ -12,8 +15,11 @@ public readonly record struct Rectangle(long X, long Y, long Width, long Height)
         return result;
     }
 
-    public bool Contains(long x, long y)
+    public bool Contains(Location location)
     {
+        var x = location.X;
+        var y = location.Y;
+
         var result = X - Width / 2 <= x && x <= X + Width / 2 &&
             Y - Height / 2 <= y && y <= Y + Height / 2;
         return result;
@@ -31,7 +37,7 @@ public readonly record struct Rectangle(long X, long Y, long Width, long Height)
     // Returns the entry t-parameter along the ray (origin + t*direction) where it first hits this
     // rectangle. Returns false if the ray misses, is parallel and outside, or the entry point is
     // behind the origin (t <= 0).
-    public bool IntersectsRay(double ox, double oy, double dx, double dy, out double t)
+    public bool IntersectsRay(Location origin, Direction direction, out double t)
     {
         t = 0;
         double left = X - Width / 2.0;
@@ -41,6 +47,11 @@ public readonly record struct Rectangle(long X, long Y, long Width, long Height)
 
         double tEnter = double.NegativeInfinity;
         double tExit = double.PositiveInfinity;
+
+        var ox = origin.X;
+        var oy = origin.Y;
+        var dx = direction.X;
+        var dy = direction.Y;
 
         if (dx != 0)
         {
@@ -77,8 +88,11 @@ public readonly record struct Rectangle(long X, long Y, long Width, long Height)
 
     // True when the nearest point on this rectangle to (px, py) is within maxDistance.
     // Points inside the rectangle have distance 0 and always satisfy the check.
-    public bool IsWithinDistanceFromPoint(long px, long py, long maxDistance)
+    public bool IsWithinDistanceFromPoint(Location toCheck, double maxDistance)
     {
+        var px = toCheck.X;
+        var py = toCheck.Y;
+
         var left = X - Width / 2;
         var right = X + Width / 2;
         var bottom = Y - Height / 2;
@@ -92,16 +106,6 @@ public readonly record struct Rectangle(long X, long Y, long Width, long Height)
 
         var distanceSquared = dx * dx + dy * dy;
         var result = distanceSquared <= maxDistance * maxDistance;
-        return result;
-    }
-
-    // Overlap or shared edge — used for the "touch" spatial relationship.
-    public bool Touches(Rectangle other)
-    {
-        var result = X - Width / 2 <= other.X + other.Width / 2 &&
-            other.X - other.Width / 2 <= X + Width / 2 &&
-            Y - Height / 2 <= other.Y + other.Height / 2 &&
-            other.Y - other.Height / 2 <= Y + Height / 2;
         return result;
     }
 }

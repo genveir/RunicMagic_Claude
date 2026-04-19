@@ -22,7 +22,7 @@ namespace RunicMagic.World.Runes.LocationRunes
                 return new Location(0, 0);
             }
             var result = entities
-                .Select(e => (new Location(e.X, e.Y), e.Weight))
+                .Select(e => (e.Location, e.Weight))
                 .WeightedCentroid();
             return result;
         }

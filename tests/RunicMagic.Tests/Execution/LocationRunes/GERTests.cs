@@ -1,5 +1,6 @@
 using FluentAssertions;
 using RunicMagic.World.Execution;
+using RunicMagic.World.Geometry;
 using RunicMagic.World.Runes.LocationRunes;
 using Xunit;
 

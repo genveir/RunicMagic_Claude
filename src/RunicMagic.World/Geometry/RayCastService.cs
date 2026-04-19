@@ -4,7 +4,7 @@ public class RayCastService(WorldModel world)
 {
     private const long MaxRangeMillimetres = 3000;
 
-    public RayCastResult Cast(EntityId sourceId, long originX, long originY, Direction direction, bool skipTranslucent = true)
+    public RayCastResult Cast(EntityId sourceId, Location origin, Direction direction, bool skipTranslucent = true)
     {
         var closestT = double.MaxValue;
         Entity? closestEntity = null;
@@ -14,8 +14,8 @@ public class RayCastService(WorldModel world)
             if (entity.Id == sourceId) continue;
             if (skipTranslucent && entity.IsTranslucent) continue;
 
-            var bounds = new Rectangle(entity.X, entity.Y, entity.Width, entity.Height);
-            if (bounds.IntersectsRay(originX, originY, direction.X, direction.Y, out var t))
+            var bounds = new Rectangle(entity.Location, entity.Width, entity.Height);
+            if (bounds.IntersectsRay(origin, direction, out var t))
             {
                 if (t < closestT)
                 {
@@ -26,8 +26,11 @@ public class RayCastService(WorldModel world)
         }
 
         var range = closestT == double.MaxValue ? MaxRangeMillimetres : closestT;
-        var endX = (long)Math.Round(originX + direction.X * range);
-        var endY = (long)Math.Round(originY + direction.Y * range);
-        return new RayCastResult(closestEntity, endX, endY);
+        var end = new Location
+        {
+            X = origin.X + direction.X * range,
+            Y = origin.Y + direction.Y * range
+        };
+        return new RayCastResult(closestEntity, end);
     }
 }

@@ -1,5 +1,3 @@
-using RunicMagic.World.Execution;
-
 namespace RunicMagic.World.Geometry;
 
 public readonly record struct Direction(double X, double Y)

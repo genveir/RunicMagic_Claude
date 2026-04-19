@@ -1,10 +1,11 @@
+using RunicMagic.World.Geometry;
+
 namespace RunicMagic.World;
 
 public class TeleportEntityService
 {
-    public void Teleport(Entity entity, long x, long y)
+    public void Teleport(Entity entity, Location location)
     {
-        entity.X = x;
-        entity.Y = y;
+        entity.Location = location;
     }
 }

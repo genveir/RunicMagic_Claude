@@ -24,7 +24,7 @@ namespace RunicMagic.World.Runes.EntityReferenceRunes
             }
 
             var rayCast = new RayCastService(context.World);
-            var castResult = rayCast.Cast(caster.Id, caster.X, caster.Y, caster.PointingDirection.Value);
+            var castResult = rayCast.Cast(caster.Id, caster.Location, caster.PointingDirection.Value);
 
             if (castResult.HitEntity == null)
             {

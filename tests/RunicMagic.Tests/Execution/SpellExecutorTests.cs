@@ -40,8 +40,8 @@ public class SpellExecutorTests
         var spellExecutor = new SpellExecutor(world);
         var result = spellExecutor.Execute(spell, runeCount: 10, caster, executor);
 
-        target.X.Should().Be(3744);
-        target.Y.Should().Be(0);
+        target.Location.X.Should().Be(3744);
+        target.Location.Y.Should().Be(0);
         result.Events.OfType<EntityPushedEvent>().Should().ContainSingle()
             .Which.Entity.Should().Be(target);
     }
@@ -165,7 +165,7 @@ public class SpellExecutorTests
         // Executor entity removed from world
         world.Find(executorEntity.Id).Should().BeNull();
         // Target not moved
-        target.X.Should().Be(1000);
+        target.Location.X.Should().Be(1000);
         // Event emitted
         result.Events.OfType<ExecutorDisintegratedEvent>().Should().ContainSingle();
     }

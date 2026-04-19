@@ -37,16 +37,14 @@ namespace RunicMagic.World.Runes.EntityReferenceRunes
             }
 
             var rayCast = new RayCastService(context.World);
-            var castResult = rayCast.Cast(caster.Id, caster.X, caster.Y, caster.IndicateTarget.Direction.Value, skipTranslucent: false);
+            var castResult = rayCast.Cast(caster.Id, caster.Location, caster.IndicateTarget.Direction.Value, skipTranslucent: false);
 
             if (castResult.HitEntity?.Id != caster.IndicateTarget.EntityId)
             {
                 return new EntitySet([]);
             }
 
-            var dx = castResult.X - caster.X;
-            var dy = castResult.Y - caster.Y;
-            var distance = Math.Sqrt(dx * dx + dy * dy);
+            var distance = castResult.LocationOfIntersect.GetDistanceTo(caster.Location);
             if (distance > 1000)
             {
                 return new EntitySet([]);

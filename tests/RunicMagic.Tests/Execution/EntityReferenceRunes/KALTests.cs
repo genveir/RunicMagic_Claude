@@ -15,8 +15,7 @@ public class KALTests
     {
         return new Entity(EntityId.New(), EntityType.Object, "test")
         {
-            X = x,
-            Y = y,
+            Location = new Location(x, y),
             Width = width,
             Height = height,
         };
@@ -86,8 +85,7 @@ public class KALTests
         var casterEntity = MakeEntity(x: 0, y: 0);
         var glass = new Entity(EntityId.New(), EntityType.Object, "glass")
         {
-            X = 300,
-            Y = 0,
+            Location = new Location(300, 0),
             Width = 100,
             Height = 100,
             IsTranslucent = true,

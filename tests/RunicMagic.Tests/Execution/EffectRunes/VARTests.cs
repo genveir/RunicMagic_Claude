@@ -20,8 +20,8 @@ public class VARTests
 
         var_.Execute(context);
 
-        entity.X.Should().Be(500);
-        entity.Y.Should().Be(0);
+        entity.Location.X.Should().Be(500);
+        entity.Location.Y.Should().Be(0);
     }
 
     [Fact]
@@ -37,7 +37,7 @@ public class VARTests
 
         var_.Execute(context);
 
-        var displaced = entity.X != 0 || entity.Y != 0;
+        var displaced = entity.Location.X != 0 || entity.Location.Y != 0;
         displaced.Should().BeTrue();
     }
 
@@ -104,10 +104,10 @@ public class VARTests
 
         var_.Execute(context);
 
-        entity1.X.Should().Be(800);
-        entity1.Y.Should().Be(0);
-        entity2.X.Should().Be(0);
-        entity2.Y.Should().Be(800);
+        entity1.Location.X.Should().Be(800);
+        entity1.Location.Y.Should().Be(0);
+        entity2.Location.X.Should().Be(0);
+        entity2.Location.Y.Should().Be(800);
     }
 
     [Fact]
@@ -132,7 +132,7 @@ public class VARTests
     public void Execute_InsufficientPower_DoesNotFireAndEmitsEvent()
     {
         var entity = TestFixtures.MakeEntity(x: 1000, y: 0, weight: 1000);
-        var originalX = entity.X;
+        var originalX = entity.Location.X;
 
         var casterEntity = TestFixtures.MakeEntity();
         casterEntity.Reservoir = amount => new ReservoirDraw(0, false);
@@ -148,7 +148,7 @@ public class VARTests
 
         var_.Execute(context);
 
-        entity.X.Should().Be(originalX);
+        entity.Location.X.Should().Be(originalX);
         result.Events.OfType<EffectNotFiredEvent>().Should().ContainSingle()
             .Which.Effect.Should().Be("VAR");
     }

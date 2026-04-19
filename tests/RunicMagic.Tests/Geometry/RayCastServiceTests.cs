@@ -11,8 +11,7 @@ public class RayCastServiceTests
     {
         return new Entity(EntityId.New(), EntityType.Object, "test")
         {
-            X = x,
-            Y = y,
+            Location = new Location(x, y),
             Width = width,
             Height = height,
             IsTranslucent = isTranslucent,
@@ -28,10 +27,10 @@ public class RayCastServiceTests
         var service = new RayCastService(world);
         var sourceId = EntityId.New();
 
-        var result = service.Cast(sourceId, originX: 0, originY: 0, Right);
+        var result = service.Cast(sourceId, new Location(0, 0), Right);
 
-        result.X.Should().Be(3000);
-        result.Y.Should().Be(0);
+        result.LocationOfIntersect.X.Should().Be(3000);
+        result.LocationOfIntersect.Y.Should().Be(0);
         result.HitEntity.Should().BeNull();
     }
 
@@ -45,9 +44,9 @@ public class RayCastServiceTests
 
         // If source were not skipped, the ray would start inside it and be rejected by
         // IntersectsRay, but it should be excluded by ID before geometry is checked.
-        var result = service.Cast(source.Id, originX: 0, originY: 0, Right);
+        var result = service.Cast(source.Id, new Location(0, 0), Right);
 
-        result.X.Should().Be(3000);
+        result.LocationOfIntersect.X.Should().Be(3000);
     }
 
     [Fact]
@@ -60,9 +59,9 @@ public class RayCastServiceTests
         world.Add(ice);
         var service = new RayCastService(world);
 
-        var result = service.Cast(source.Id, originX: 0, originY: 0, Right);
+        var result = service.Cast(source.Id, new Location(0, 0), Right);
 
-        result.X.Should().Be(3000);
+        result.LocationOfIntersect.X.Should().Be(3000);
         result.HitEntity.Should().BeNull();
     }
 
@@ -76,9 +75,9 @@ public class RayCastServiceTests
         world.Add(wall);
         var service = new RayCastService(world);
 
-        var result = service.Cast(source.Id, originX: 0, originY: 0, Right);
+        var result = service.Cast(source.Id, new Location(0, 0), Right);
 
-        result.X.Should().Be(450); // left edge of wall at x=500, width=100
+        result.LocationOfIntersect.X.Should().Be(450); // left edge of wall at x=500, width=100
         result.HitEntity.Should().BeSameAs(wall);
     }
 
@@ -94,9 +93,9 @@ public class RayCastServiceTests
         world.Add(far);
         var service = new RayCastService(world);
 
-        var result = service.Cast(source.Id, originX: 0, originY: 0, Right);
+        var result = service.Cast(source.Id, new Location(0, 0), Right);
 
-        result.X.Should().Be(450); // near wall entry, not far
+        result.LocationOfIntersect.X.Should().Be(450); // near wall entry, not far
         result.HitEntity.Should().BeSameAs(near);
     }
 
@@ -112,9 +111,9 @@ public class RayCastServiceTests
         world.Add(wall);
         var service = new RayCastService(world);
 
-        var result = service.Cast(source.Id, originX: 0, originY: 0, Right);
+        var result = service.Cast(source.Id, new Location(0, 0), Right);
 
-        result.X.Should().Be(650); // wall entry, ice skipped
+        result.LocationOfIntersect.X.Should().Be(650); // wall entry, ice skipped
         result.HitEntity.Should().BeSameAs(wall);
     }
 }

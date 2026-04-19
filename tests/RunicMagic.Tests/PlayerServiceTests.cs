@@ -24,8 +24,7 @@ public class PlayerServiceTests
     private static Entity MakeAgencyEntity(long x, long y, string label = "agent") =>
         new(EntityId.New(), EntityType.Object, label)
         {
-            X = x,
-            Y = y,
+            Location = new Location(x, y),
             Width = 100,
             Height = 100,
             HasAgency = true,
@@ -98,8 +97,8 @@ public class PlayerServiceTests
 
         await service.MoveCaster(new WorldCoordinate(500, 300));
 
-        entity.X.Should().Be(500);
-        entity.Y.Should().Be(300);
+        entity.Location.X.Should().Be(500);
+        entity.Location.Y.Should().Be(300);
     }
 
     [Fact]

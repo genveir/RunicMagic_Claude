@@ -21,7 +21,7 @@ namespace RunicMagic.World.Runes.LocationRunes
             {
                 return new Location(0, 0);
             }
-            var result = entities.Select(e => new Location(e.X, e.Y)).Centroid();
+            var result = entities.Select(e => e.Location).Centroid();
             return result;
         }
 

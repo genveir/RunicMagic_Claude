@@ -10,8 +10,7 @@ public class Entity(EntityId id, EntityType type, string label)
     public EntityId Id { get; } = id;
     public EntityType Type { get; } = type;
     public string Label { get; set; } = label;
-    public long X { get; set; }
-    public long Y { get; set; }
+    public Location Location { get; set; }
     public long Width { get; set; }
     public long Height { get; set; }
 

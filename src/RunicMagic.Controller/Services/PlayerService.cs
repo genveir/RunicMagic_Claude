@@ -51,7 +51,7 @@ internal class PlayerService(
 
     public Task<CommandResult> SetCaster(WorldCoordinate worldCoordinate)
     {
-        var entities = world.GetEntitiesAtPoint(worldCoordinate.X, worldCoordinate.Y)
+        var entities = world.GetEntitiesAtPoint(worldCoordinate.ToLocation())
             .Where(e => e.HasAgency)
             .ToList();
 
@@ -79,7 +79,7 @@ internal class PlayerService(
         if (error != null) return Task.FromResult(error);
         if (caster == null) throw new InvalidOperationException("Unexpected null caster after check.");
 
-        teleport.Teleport(caster, worldCoordinate.X, worldCoordinate.Y);
+        teleport.Teleport(caster, new Location(worldCoordinate.X, worldCoordinate.Y));
         SendText($"Caster moved to ({worldCoordinate.X}, {worldCoordinate.Y}).");
 
         return Task.FromResult(FlushPendingOutputs());
@@ -91,9 +91,8 @@ internal class PlayerService(
         if (error != null) return Task.FromResult(error);
         if (caster == null) throw new InvalidOperationException("Unexpected null caster after check.");
 
-        var from = new Location(caster.X, caster.Y);
         var to = new Location(worldCoordinate.X, worldCoordinate.Y);
-        caster.PointingDirection = Direction.FromPoints(from, to);
+        caster.PointingDirection = Direction.FromPoints(caster.Location, to);
         SendText("Pointing direction set.");
 
         return Task.FromResult(FlushPendingOutputs());
@@ -105,7 +104,7 @@ internal class PlayerService(
         if (error != null) return Task.FromResult(error);
         if (caster == null) throw new InvalidOperationException("Unexpected null caster after check.");
 
-        var entities = world.GetEntitiesAtPoint(worldCoordinate.X, worldCoordinate.Y);
+        var entities = world.GetEntitiesAtPoint(worldCoordinate.ToLocation());
         if (entities.Count == 0)
         {
             SendText("Nothing to indicate at that position.");
@@ -119,10 +118,9 @@ internal class PlayerService(
             return Task.FromResult(FlushPendingOutputs());
         }
 
-        var from = new Location(caster.X, caster.Y);
-        var to = new Location(worldCoordinate.X, worldCoordinate.Y);
-        var direction = Direction.FromPoints(from, to);
-        var castResult = rayCast.Cast(caster.Id, caster.X, caster.Y, direction, skipTranslucent: false);
+        var to = worldCoordinate.ToLocation();
+        var direction = Direction.FromPoints(caster.Location, to);
+        var castResult = rayCast.Cast(caster.Id, caster.Location, direction, skipTranslucent: false);
 
         if (castResult.HitEntity == null || entities.All(e => e.Id != castResult.HitEntity.Id))
         {
@@ -130,9 +128,7 @@ internal class PlayerService(
             return Task.FromResult(FlushPendingOutputs());
         }
 
-        var dx = castResult.X - caster.X;
-        var dy = castResult.Y - caster.Y;
-        var distance = Math.Sqrt(dx * dx + dy * dy);
+        var distance = castResult.LocationOfIntersect.GetDistanceTo(caster.Location);
         if (distance > 1000)
         {
             SendText($"{castResult.HitEntity.Label} is out of reach.");

@@ -39,11 +39,9 @@ namespace RunicMagic.World.Runes.EffectRunes
 
             foreach (var entity in toMove.Entities)
             {
-                var entityLocation = new Location(entity.X, entity.Y);
-                var direction = Direction.FromPoints(origin, entityLocation);
-                var destination = entityLocation.Translate(direction, distance);
-                entity.X = destination.X;
-                entity.Y = destination.Y;
+                var direction = Direction.FromPoints(origin, entity.Location);
+                var destination = entity.Location.Translate(direction, distance);
+                entity.Location = destination;
                 context.Result.Add(new EntityPushedEvent(entity, distance));
             }
         }

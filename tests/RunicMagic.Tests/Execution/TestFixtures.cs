@@ -1,5 +1,6 @@
 using RunicMagic.World;
 using RunicMagic.World.Execution;
+using RunicMagic.World.Geometry;
 using RunicMagic.World.Runes.RuneTypes;
 
 namespace RunicMagic.Tests.Execution;
@@ -9,8 +10,7 @@ internal static class TestFixtures
     internal static Entity MakeEntity(long x = 0, long y = 0, long weight = 0)
     {
         var entity = new Entity(new EntityId(Guid.NewGuid()), EntityType.Object, "test");
-        entity.X = x;
-        entity.Y = y;
+        entity.Location = new Location(x, y);
         entity.Width = 100;
         entity.Height = 100;
         entity.Weight = weight;

@@ -1,13 +1,11 @@
-using RunicMagic.World.Execution;
-
 namespace RunicMagic.World.Geometry;
 
 public static class LocationExtensions
 {
-    public static Location Translate(this Location origin, Direction direction, long distance)
+    public static Location Translate(this Location origin, Direction direction, double distance)
     {
-        var x = (long)Math.Round(origin.X + direction.X * distance);
-        var y = (long)Math.Round(origin.Y + direction.Y * distance);
+        var x = origin.X + direction.X * distance;
+        var y = origin.Y + direction.Y * distance;
         var result = new Location(x, y);
         return result;
     }
@@ -15,8 +13,8 @@ public static class LocationExtensions
     public static Location Centroid(this IEnumerable<Location> locations)
     {
         var list = locations.ToList();
-        var avgX = (long)Math.Round(list.Average(l => (double)l.X));
-        var avgY = (long)Math.Round(list.Average(l => (double)l.Y));
+        var avgX = list.Average(l => l.X);
+        var avgY = list.Average(l => l.Y);
         var result = new Location(avgX, avgY);
         return result;
     }
@@ -31,8 +29,8 @@ public static class LocationExtensions
             var result = list.Select(i => i.Location).Centroid();
             return result;
         }
-        var x = (long)Math.Round(list.Sum(i => (double)i.Location.X * i.Weight) / totalWeight);
-        var y = (long)Math.Round(list.Sum(i => (double)i.Location.Y * i.Weight) / totalWeight);
+        var x = list.Sum(i => i.Location.X * i.Weight) / totalWeight;
+        var y = list.Sum(i => i.Location.Y * i.Weight) / totalWeight;
         var weighted = new Location(x, y);
         return weighted;
     }

@@ -18,25 +18,25 @@ public class WorldRenderingService(WorldModel world, RayCastService rayCast)
         var renderingModels = new List<EntityRenderingModel>();
         foreach (var entity in entities)
         {
-            (long X, long Y)? pointingEnd = null;
+            WorldCoordinate? pointingEnd = null;
             if (entity.PointingDirection.HasValue)
             {
-                var castResult = rayCast.Cast(entity.Id, entity.X, entity.Y, entity.PointingDirection.Value);
-                pointingEnd = (castResult.X, castResult.Y);
+                var castResult = rayCast.Cast(entity.Id, entity.Location, entity.PointingDirection.Value);
+                pointingEnd = WorldCoordinate.FromLocation(castResult.LocationOfIntersect);
             }
 
-            (long X, long Y)? indicateEnd = null;
+            WorldCoordinate? indicateEnd = null;
             if (entity.IndicateTarget?.Direction != null)
             {
                 var direction = entity.IndicateTarget.Direction.Value;
-                var castResult = rayCast.Cast(entity.Id, entity.X, entity.Y, direction, skipTranslucent: false);
-                var dx = castResult.X - entity.X;
-                var dy = castResult.Y - entity.Y;
-                var dist = Math.Sqrt(dx * dx + dy * dy);
+                var castResult = rayCast.Cast(entity.Id, entity.Location, direction, skipTranslucent: false);
+                var dist = castResult.LocationOfIntersect.GetDistanceTo(entity.Location);
+
                 var capped = Math.Min(dist, 1000);
-                var endX = (long)Math.Round(entity.X + direction.X * capped);
-                var endY = (long)Math.Round(entity.Y + direction.Y * capped);
-                indicateEnd = (endX, endY);
+                var endX = (long)Math.Round(entity.Location.X + direction.X * capped);
+                var endY = (long)Math.Round(entity.Location.Y + direction.Y * capped);
+
+                indicateEnd = new WorldCoordinate(endX, endY);
             }
 
             var isIndicateTarget = entity.Id == indicateTargetId;
