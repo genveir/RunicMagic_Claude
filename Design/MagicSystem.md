@@ -73,11 +73,15 @@ Sets are always evaluated at the point of execution against current world state.
 
 ## Power Sourcing
 
-Power is drawn twice per spell: once upfront to cover the evaluation cost (step 4), and once per effect as it resolves during execution (step 5). Both draws use the same cascade and the same `Draw` interface — the sourcing mechanism does not distinguish between the two.
+Power is drawn in three distinct ways during a spell:
 
-The engine works through a cascade of power sources, calling `Draw(amount)` on each in turn and carrying forward any shortfall until the cost is met. A source returns however much it can actually provide — which may be less than asked. The engine never inspects a source's internals or queries its reserves; it just takes what it gets and moves on.
+1. **Evaluation cost** — paid upfront (step 4) before execution begins, based on rune count.
+2. **Selection cost** — paid each time a Set is consumed by a rune that consumes a Set but doesn't produce one (i.e. not by filters or selectors). Cost is `ceil(MaxPower / 1000)` per entity in the resolved Set, excluding the caster and executor, who are always free to select. If the full cost cannot be met, the Set resolves to empty.
+3. **Execution cost** — paid by each effect rune as it fires, scaled by the magnitude of the effect.
 
-What it means to be drained is entirely up to the entity. A mana crystal depletes its stored charge; a creature loses life. The engine has no special cases for any of this — it is all self-defined by the entity via its `IsReservoir` capability.
+All three draws use the same cascade. The engine works through a cascade of power sources, calling `Draw(amount)` on each in turn and carrying forward any shortfall until the cost is met. A source returns however much it can actually provide — which may be less than asked. The engine never inspects a source's internals or queries its reserves; it just takes what it gets and moves on.
+
+What it means to be drained is entirely up to the entity. A mana crystal depletes its stored charge; a creature loses life. The engine has no special cases for any of this — it is all self-defined by the entity via its `Reservoir` delegate.
 
 *(Cascade ordering and preference rules: RMC-15)*
 

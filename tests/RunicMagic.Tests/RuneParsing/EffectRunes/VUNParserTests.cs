@@ -4,6 +4,7 @@ using RunicMagic.Controller.RuneParsing.EffectRunes;
 using RunicMagic.World.Runes.EffectRunes;
 using RunicMagic.World.Runes.EntityReferenceRunes;
 using RunicMagic.World.Runes.LocationRunes;
+using RunicMagic.World.Execution;
 using RunicMagic.World.Runes.RuneTypes;
 using Xunit;
 
@@ -33,7 +34,8 @@ public class VUNParserTests
 
         result.Succeeded.Should().BeTrue();
         var vun = result.Value.Should().BeOfType<VUN>().Subject;
-        vun.ToMove.Should().BeSameAs(mockEntitySet);
+        vun.ToMove.Should().BeOfType<EntitySetSelectionCostResolver>()
+            .Which.Inner.Should().BeSameAs(mockEntitySet);
         vun.HowFar.Should().BeSameAs(mockNumber);
         vun.Origin.Should().BeSameAs(mockLocation);
     }
@@ -51,7 +53,8 @@ public class VUNParserTests
         result.Succeeded.Should().BeTrue();
         var vun = result.Value.Should().BeOfType<VUN>().Subject;
         var par = vun.Origin.Should().BeOfType<PAR>().Subject;
-        par.EntitySet.Should().BeOfType<A>();
+        par.EntitySet.Should().BeOfType<EntitySetSelectionCostResolver>()
+            .Which.Inner.Should().BeOfType<A>();
     }
 
     [Fact]

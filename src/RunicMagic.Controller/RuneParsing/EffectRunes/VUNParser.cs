@@ -7,7 +7,7 @@ namespace RunicMagic.Controller.RuneParsing.EffectRunes
     {
         public ParsingResult<IStatement> Parse(TokenStream tokenStream)
         {
-            var toMoveResult = RuneParsingDispatcher.ParseNextRune<IEntitySet>(tokenStream);
+            var toMoveResult = RuneParsingDispatcher.ParseNextTaxedEntitySet(tokenStream);
             if (!toMoveResult.Succeeded)
             {
                 return ParsingResult<IStatement>.Fail(toMoveResult.Error);

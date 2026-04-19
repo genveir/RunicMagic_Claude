@@ -70,6 +70,11 @@ public class EntityFactory(WorldModel world, ILogger<EntityFactory> logger)
         {
             case EntityType.Creature:
 
+                if (entity.Life is not null)
+                {
+                    entity.MaxReservoir = () => entity.Life.MaxHitPoints;
+                }
+
                 entity.Reservoir = amount =>
                 {
                     if (entity.Life is null)
@@ -84,6 +89,12 @@ public class EntityFactory(WorldModel world, ILogger<EntityFactory> logger)
                 break;
 
             case EntityType.ManaSource:
+
+                if (entity.Charge is not null)
+                {
+                    entity.MaxReservoir = () => entity.Charge.MaxCharge;
+                }
+
                 entity.Reservoir = amount =>
                 {
                     if (entity.Charge is null)

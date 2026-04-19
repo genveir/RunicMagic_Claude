@@ -2,6 +2,7 @@ using FluentAssertions;
 using RunicMagic.Controller.RuneParsing;
 using RunicMagic.Controller.RuneParsing.PowerSourceRunes;
 using RunicMagic.World.Runes.PowerSourceRunes;
+using RunicMagic.World.Execution;
 using RunicMagic.World.Runes.RuneTypes;
 using Xunit;
 
@@ -29,7 +30,8 @@ public class SHUParserTests
 
         result.Succeeded.Should().BeTrue();
         var shu = result.Value.Should().BeOfType<SHU>().Subject;
-        shu.Source.Should().BeSameAs(mockSource);
+        shu.Source.Should().BeOfType<EntitySetSelectionCostResolver>()
+            .Which.Inner.Should().BeSameAs(mockSource);
         shu.Statement.Should().BeSameAs(mockStatement);
     }
 

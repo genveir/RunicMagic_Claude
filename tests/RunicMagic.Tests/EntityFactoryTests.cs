@@ -188,6 +188,54 @@ public class EntityFactoryTests
         scope.Should().NotContain(distant);
     }
 
+    // ── MaxReservoir ──────────────────────────────────────────────────────────
+
+    [Fact]
+    public void Creature_MaxReservoir_ReturnsMaxHitPoints()
+    {
+        var world = new WorldModel();
+        var entity = Factory(world).Create(CreatureData(maxHp: 500, currentHp: 200));
+        world.Add(entity);
+
+        var max = entity.MaxReservoir!();
+
+        max.Should().Be(500);
+    }
+
+    [Fact]
+    public void Creature_MaxReservoir_IsNull_WhenNoLifeCapability()
+    {
+        var world = new WorldModel();
+        var entity = Factory(world).Create(new EntityData(
+            Guid.NewGuid(), (long)EntityType.Creature, "lifeless",
+            X: 0, Y: 0, Width: 10, Height: 10, HasAgency: false, Weight: 0));
+
+        entity.MaxReservoir.Should().BeNull();
+    }
+
+    [Fact]
+    public void ManaSource_MaxReservoir_ReturnsMaxCharge()
+    {
+        var world = new WorldModel();
+        var entity = Factory(world).Create(ManaSourceData(maxCharge: 800, currentCharge: 100));
+        world.Add(entity);
+
+        var max = entity.MaxReservoir!();
+
+        max.Should().Be(800);
+    }
+
+    [Fact]
+    public void ManaSource_MaxReservoir_IsNull_WhenNoChargeCapability()
+    {
+        var world = new WorldModel();
+        var entity = Factory(world).Create(new EntityData(
+            Guid.NewGuid(), (long)EntityType.ManaSource, "uncharged",
+            X: 0, Y: 0, Width: 10, Height: 10, HasAgency: false, Weight: 0));
+
+        entity.MaxReservoir.Should().BeNull();
+    }
+
     // ── Object ────────────────────────────────────────────────────────────────
 
     [Fact]
@@ -199,6 +247,17 @@ public class EntityFactoryTests
             X: 0, Y: 0, Width: 5, Height: 5, HasAgency: false, Weight: 0));
 
         entity.Reservoir.Should().BeNull();
+    }
+
+    [Fact]
+    public void Object_HasNoMaxReservoir()
+    {
+        var world = new WorldModel();
+        var entity = Factory(world).Create(new EntityData(
+            Guid.NewGuid(), (long)EntityType.Object, "rock",
+            X: 0, Y: 0, Width: 5, Height: 5, HasAgency: false, Weight: 0));
+
+        entity.MaxReservoir.Should().BeNull();
     }
 
     // ── Inscriptions ──────────────────────────────────────────────────────────

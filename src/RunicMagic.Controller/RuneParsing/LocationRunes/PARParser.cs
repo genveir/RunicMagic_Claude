@@ -7,7 +7,7 @@ namespace RunicMagic.Controller.RuneParsing.LocationRunes
     {
         public ParsingResult<ILocation> Parse(TokenStream tokenStream)
         {
-            var entitySetResult = RuneParsingDispatcher.ParseNextRune<IEntitySet>(tokenStream);
+            var entitySetResult = RuneParsingDispatcher.ParseNextTaxedEntitySet(tokenStream);
 
             if (!entitySetResult.Succeeded)
             {
