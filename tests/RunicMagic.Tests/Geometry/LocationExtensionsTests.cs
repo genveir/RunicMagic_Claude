@@ -18,17 +18,17 @@ public class LocationExtensionsTests
     }
 
     [Fact]
-    public void Translate_RoundsToNearestMillimetre()
+    public void Translate_ReturnsExactFloatingPointPosition()
     {
         var origin = new Location(0, 0);
-        // 45-degree diagonal: each component is 1/√2 ≈ 0.7071
         var diagonal = 1.0 / Math.Sqrt(2.0);
         var direction = new Direction(diagonal, diagonal);
 
         var result = origin.Translate(direction, 100);
 
-        // 100 * (1/√2) ≈ 70.71 → rounds to 71
-        result.Should().Be(new Location(71, 71));
+        // 100 * (1/√2) ≈ 70.711 — exact double result, no rounding
+        result.X.Should().BeApproximately(70.711, precision: 0.001);
+        result.Y.Should().BeApproximately(70.711, precision: 0.001);
     }
 
     [Fact]

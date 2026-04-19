@@ -24,7 +24,8 @@ create table Entities (
     Height        bigint           not null,
     HasAgency     bit              not null constraint DF_Entities_HasAgency default 0,
     Weight        bigint           not null,
-    IsTranslucent bit              not null constraint DF_Entities_IsTranslucent default 0
+    IsTranslucent bit              not null constraint DF_Entities_IsTranslucent default 0,
+    Angle         float            not null constraint DF_Entities_Angle default 0
 );
 
 create table EntityLife (

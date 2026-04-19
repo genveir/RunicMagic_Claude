@@ -11,6 +11,7 @@ public record EntityData(
     bool HasAgency,
     long Weight,
     bool IsTranslucent = false,
+    double Angle = 0,
     long? MaxHitPoints = null,
     long? CurrentHitPoints = null,
     long? MaxCharge = null,

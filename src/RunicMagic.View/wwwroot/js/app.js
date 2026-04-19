@@ -179,10 +179,14 @@ function updateCanvas(entities) {
 
     let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
     for (const e of entities) {
-        minX = Math.min(minX,  e.x - e.width  / 2);
-        minY = Math.min(minY, -e.y - e.height / 2);
-        maxX = Math.max(maxX,  e.x + e.width  / 2);
-        maxY = Math.max(maxY, -e.y + e.height / 2);
+        const hw = e.width / 2, hh = e.height / 2;
+        const cos = Math.abs(Math.cos(e.angle)), sin = Math.abs(Math.sin(e.angle));
+        const extX = hw * cos + hh * sin;
+        const extY = hw * sin + hh * cos;
+        minX = Math.min(minX,  e.x - extX);
+        minY = Math.min(minY, -e.y - extY);
+        maxX = Math.max(maxX,  e.x + extX);
+        maxY = Math.max(maxY, -e.y + extY);
     }
     const pad = 100;
     const vbWidth = maxX - minX + pad * 2;
@@ -194,11 +198,13 @@ function updateCanvas(entities) {
     const labelSize = 13 / screenScale;
 
     for (const e of entities) {
-        const g = svgEl('g', {});
+        const g = svgEl('g', e.isCaster ? { class: 'caster-group' } : {});
 
+        const angleDeg = e.angle * 180 / Math.PI;
         g.appendChild(svgEl('rect', {
             x: e.x - e.width / 2, y: -e.y - e.height / 2, width: e.width, height: e.height,
             class: entityClass(e),
+            transform: `rotate(${angleDeg}, ${e.x}, ${-e.y})`,
         }));
 
         const label = svgEl('text', {

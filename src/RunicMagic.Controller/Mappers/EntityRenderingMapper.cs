@@ -13,10 +13,11 @@ public static class EntityRenderingMapper
         if (entity.IsTranslucent) flags |= EntityRenderingFlags.IsTranslucent;
 
         return new EntityRenderingModel(
-            X: (long)entity.Location.X,
-            Y: (long)entity.Location.Y,
+            X: entity.Location.X,
+            Y: entity.Location.Y,
             Width: entity.Width,
             Height: entity.Height,
+            Angle: entity.Angle,
             Label: entity.Label,
             Flags: flags,
             IsCaster: isCaster,

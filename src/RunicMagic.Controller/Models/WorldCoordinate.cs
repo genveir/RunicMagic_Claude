@@ -2,11 +2,18 @@
 
 namespace RunicMagic.Controller.Models
 {
-    public readonly record struct WorldCoordinate(long X, long Y)
+    public readonly record struct WorldCoordinate(double X, double Y)
     {
-        public Location ToLocation() => new Location(X, Y);
+        public Location ToLocation()
+        {
+            var location = new Location(X, Y);
+            return location;
+        }
 
-        public static WorldCoordinate FromLocation(Location location) =>
-            new WorldCoordinate((long)Math.Round(location.X), (long)Math.Round(location.Y));
+        public static WorldCoordinate FromLocation(Location location)
+        {
+            var coordinate = new WorldCoordinate(location.X, location.Y);
+            return coordinate;
+        }
     }
 }

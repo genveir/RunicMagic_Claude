@@ -33,8 +33,8 @@ public class WorldRenderingService(WorldModel world, RayCastService rayCast)
                 var dist = castResult.LocationOfIntersect.GetDistanceTo(entity.Location);
 
                 var capped = Math.Min(dist, 1000);
-                var endX = (long)Math.Round(entity.Location.X + direction.X * capped);
-                var endY = (long)Math.Round(entity.Location.Y + direction.Y * capped);
+                var endX = entity.Location.X + direction.X * capped;
+                var endY = entity.Location.Y + direction.Y * capped;
 
                 indicateEnd = new WorldCoordinate(endX, endY);
             }

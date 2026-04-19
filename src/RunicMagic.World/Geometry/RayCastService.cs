@@ -14,7 +14,7 @@ public class RayCastService(WorldModel world)
             if (entity.Id == sourceId) continue;
             if (skipTranslucent && entity.IsTranslucent) continue;
 
-            var bounds = new Rectangle(entity.Location, entity.Width, entity.Height);
+            var bounds = new Rectangle(entity.Location, entity.Width, entity.Height, entity.Angle);
             if (bounds.IntersectsRay(origin, direction, out var t))
             {
                 if (t < closestT)

@@ -13,6 +13,7 @@ public class Entity(EntityId id, EntityType type, string label)
     public Location Location { get; set; }
     public long Width { get; set; }
     public long Height { get; set; }
+    public double Angle { get; set; }
 
     public LifeCapability? Life { get; set; }
     public ChargeCapability? Charge { get; set; }

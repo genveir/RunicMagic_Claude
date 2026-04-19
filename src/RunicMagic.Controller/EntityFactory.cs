@@ -24,6 +24,7 @@ public class EntityFactory(WorldModel world, ILogger<EntityFactory> logger)
         var entity = new Entity(new EntityId(data.Id), type, data.Label)
         {
             Location = new Location(data.X, data.Y),
+            Angle = data.Angle,
             Width = data.Width,
             Height = data.Height,
             HasAgency = data.HasAgency,

@@ -50,7 +50,7 @@ public class WorldModel
 
     private static Rectangle Bounds(Entity e)
     {
-        var bounds = new Rectangle(e.Location, e.Width, e.Height);
+        var bounds = new Rectangle(e.Location, e.Width, e.Height, e.Angle);
         return bounds;
     }
 }
