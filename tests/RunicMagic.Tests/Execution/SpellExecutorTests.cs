@@ -28,17 +28,17 @@ public class SpellExecutorTests
         var caster = new EntitySet([casterEntity]);
         var executor = new EntitySet([casterEntity]);
 
-        // ZU VUN LA OH FOTIR FOTIR FOTIR HET [PAR A default] — 10 runes
+        // ZU VUN LA OH IR HOT IR HOT HOT [PAR OH default] — 11 runes
         var spell = new ZU(
             new VUN(
                 toMove: new LA(new OH()),
-                howFar: new FOTIR(new FOTIR(new FOTIR(new HET()))),
+                howFar: new IR(new HOT(), new IR(new HOT(), new HOT())),
                 origin: new PAR(new A())
             )
         );
 
         var spellExecutor = new SpellExecutor(world);
-        var result = spellExecutor.Execute(spell, runeCount: 10, caster, executor);
+        var result = spellExecutor.Execute(spell, runeCount: 11, caster, executor);
 
         target.Location.X.Should().Be(3744);
         target.Location.Y.Should().Be(0);

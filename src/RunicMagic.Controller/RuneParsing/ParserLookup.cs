@@ -1,4 +1,5 @@
-﻿using RunicMagic.Controller.RuneParsing.EffectRunes;
+﻿using RunicMagic.Controller.RuneParsing.ArithmeticRunes;
+using RunicMagic.Controller.RuneParsing.EffectRunes;
 using RunicMagic.Controller.RuneParsing.EntityReferenceRunes;
 using RunicMagic.Controller.RuneParsing.EntitySetRunes;
 using RunicMagic.Controller.RuneParsing.ExecutionRunes;
@@ -79,8 +80,23 @@ namespace RunicMagic.Controller.RuneParsing
 
         private static void FillNumberRuneParsers()
         {
+            numberRuneParsers["JON"] = new JONParser(); // zero
             numberRuneParsers["HET"] = new HETParser(); // one
-            numberRuneParsers["FOTIR"] = new FOTIRParser(); // times fourteen
+            numberRuneParsers["DET"] = new DETParser(); // two
+            numberRuneParsers["TET"] = new TETParser(); // three
+            numberRuneParsers["FET"] = new FETParser(); // five
+            numberRuneParsers["SET"] = new SETParser(); // seven
+            numberRuneParsers["HOT"] = new HOTParser(); // 14^1
+            numberRuneParsers["DOT"] = new DOTParser(); // 14^2
+            numberRuneParsers["TOT"] = new TOTParser(); // 14^3
+            numberRuneParsers["FOT"] = new FOTParser(); // 14^5
+            numberRuneParsers["SOT"] = new SOTParser(); // 14^7
+            numberRuneParsers["IR"] = new IRParser(); // multiply
+            numberRuneParsers["MO"] = new MOParser(); // add
+            numberRuneParsers["UIT"] = new UITParser(); // modulo
+            numberRuneParsers["EID"] = new EIDParser(); // integer divide
+            numberRuneParsers["DEID"] = new DEIDParser(); // halve
+            numberRuneParsers["MOST"] = new MOSTParser(); // one and a half
         }
 
         private static void FillLocationRuneParsers()

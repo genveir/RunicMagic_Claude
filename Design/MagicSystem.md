@@ -64,7 +64,7 @@ Sets can be derived several ways:
 
 - **Entity references** — `A(me)` and `OH(this)` produce singleton Sets.
 - **Scope expansion** — `LA(scope of)` maps a Set to the union of its members' scopes, where each entity's scope is defined by its `HasScope` capability (a cave's scope is its contents, a person's scope is what they are touching).
-- **Spatial construction** — future runes may build Sets from spatial predicates.
+- **Spatial construction** — `HORO(near)` builds a Set from a spatial predicate: all entities within a given distance of a Location.
 - **Set operations** — union, intersection, difference, and property filters are natural future rune primitives.
 
 Sets are always evaluated at the point of execution against current world state. A Set referenced twice in a spell may yield different results if the world changed between the two evaluations.

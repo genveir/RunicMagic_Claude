@@ -80,20 +80,34 @@ Both are used as targeting references and, in the power sourcing context (RMC-15
 
 ## Numbers
 
+### Literals
+
+| Rune | Value |
+|------|-------|
+| `JON` | 0 |
+| `HET` | 1 |
+| `DET` | 2 |
+| `TET` | 3 |
+| `FET` | 5 |
+| `SET` | 7 |
+| `HOT` | 14¹ = 14 |
+| `DOT` | 14² = 196 |
+| `TOT` | 14³ = 2 744 |
+| `FOT` | 14⁵ = 537 824 |
+| `SOT` | 14⁷ = 105 413 504 |
+
+All literals have signature `() → Number`. The base literals (`JON` through `SET`) are the primes up to 7, plus zero. The power literals (`HOT` through `SOT`) are 14 raised to those same prime exponents.
+
+### Arithmetic
+
 | Rune | Meaning | Signature |
 |------|---------|-----------|
-| `HET` | one | () → Number |
-| `FOTIR` | times fourteen | (Number) → Number |
-
-Numbers are expressed as powers of 14. Representative values:
-
-| Expression | Value |
-|------------|-------|
-| `HET` | 1 |
-| `FOTIR HET` | 14 |
-| `FOTIR FOTIR HET` | 196 |
-| `FOTIR FOTIR FOTIR HET` | 2 744 |
-| `FOTIR FOTIR FOTIR FOTIR HET` | 38 416 |
+| `IR` | multiply | (Number A, Number B) → Number |
+| `MO` | add | (Number A, Number B) → Number |
+| `UIT` | modulo | (Number A, Number B) → Number |
+| `EID` | integer divide | (Number A, Number B) → Number |
+| `DEID` | halve | (Number A) → Number |
+| `MOST` | one and a half | (Number A) → Number |
 
 ---
 
@@ -102,7 +116,7 @@ Numbers are expressed as powers of 14. Representative values:
 ### Milestone spell — push everything touching the caster
 
 ```
-ZU VUN LA FOTIR FOTIR FOTIR HET
+ZU VUN LA TOT
 ```
 
 Pushes all entities in the caster's local scope 2 744 mm (~2.7 m) away from the caster.
@@ -115,31 +129,23 @@ ZU
 └── VUN
     ├── LA
     │   └── [default] OH
-    ├── FOTIR
-    │   └── FOTIR
-    │       └── FOTIR
-    │           └── HET
+    ├── TOT
     └── [default] PAR
-        └── A
+        └── [default] OH
 ```
 
 **Node by node:**
 
 | Expression | Type | Value |
 |------------|------|-------|
-| `HET` | Number | 1 |
-| `FOTIR HET` | Number | 14 |
-| `FOTIR FOTIR HET` | Number | 196 |
-| `FOTIR FOTIR FOTIR HET` | Number | 2 744 |
+| `TOT` | Number | 2 744 |
 | `OH` | Set | singleton set containing the executor |
 | `LA OH` | Set | scope of the executor (default argument `OH` consumed implicitly) |
-| `A` | Set | singleton set containing the caster |
-| `PAR A` | Location | centroid of the caster's bounding rectangle |
-| `VUN LA  FOTIR FOTIR FOTIR HET  PAR A` | Statement | move each entity in the Set 2 744 mm away from the caster's centre |
+| `PAR OH` | Location | centroid of the executor's bounding rectangle (default argument `OH` consumed implicitly) |
+| `VUN LA TOT PAR OH` | Statement | move each entity in the Set 2 744 mm away from the executor's centre |
 | `ZU VUN …` | ExecutableStatement | execute the Statement |
 
-Both `LA` and `PAR A` use their declared defaults — neither `OH` nor `A` appears in the
-token stream.
+Both `LA` and `PAR` use their declared defaults — neither `OH` appears in the token stream.
 
 `LA` could be replaced with `LA OH` (explicit) or `LA A` (caster's scope) and the result
 would be identical for this spell, since the caster is also the executor.
@@ -147,7 +153,7 @@ would be identical for this spell, since the caster is also the executor.
 ### Mini-milestone spell — push whatever you're pointing at
 
 ```
-ZU VUN DAN FOTIR FOTIR FOTIR HET
+ZU VUN DAN TOT
 ```
 
 Pushes the aimed-at entity 2 744 mm away from the caster. Identical in structure to the Milestone 1 spell with `DAN` substituted for `LA` — targeting a single conscious-action reference rather than the full executor scope.

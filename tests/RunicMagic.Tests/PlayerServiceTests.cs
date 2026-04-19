@@ -3,7 +3,6 @@ using RunicMagic.Controller.Models;
 using RunicMagic.Controller.Services;
 using RunicMagic.World;
 using RunicMagic.World.Capabilities;
-using RunicMagic.World.Execution;
 using RunicMagic.World.Geometry;
 using Xunit;
 
@@ -119,7 +118,7 @@ public class PlayerServiceTests
     {
         var (service, _) = MakeService();
 
-        var result = await service.RegisterInput("ZU VUN LA FOTIR FOTIR FOTIR HET");
+        var result = await service.RegisterInput("ZU VUN LA IR HOT IR HOT HOT");
 
         result.Text.Should().Contain(l => l.Contains("No caster selected"));
     }

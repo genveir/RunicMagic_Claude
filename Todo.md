@@ -2,13 +2,12 @@
 
 ## To Do — Milestone 2
 
-Next ticket number: RMC-61
+Next ticket number: RMC-63
 Next bugfix number: BUG-4
 
 | Key | Title | Description | Blocked By |
 |-----|-------|-------------|------------|
 
-| RMC-58 | Add inscription to the rock | Add an inscription to the rock in the demo room. The inscription should be designed to open the door when activated. | |
 | RMC-44 | Design the inscription spell | Determine what the rock's inscription says. The spell must open the door when activated via GWYAH. Work out which runes are needed (filtering a Set to the door, the open/close effect, etc.) and raise any missing-rune tickets that fall out of the design. | RMC-40 |
 | RMC-45 | 🏁 Milestone 2 — trigger an inscription through a window | A room contains walls, windows, a door, and a rock with an inscription. The player clicks the rock to aim, casts `ZU GWYAH DAN`, and the inscription on the rock opens the door if the caster has line of sight to the rock. | RMC-15 RMC-37 RMC-38 RMC-39 RMC-40 RMC-51 RMC-52 RMC-43 RMC-44 |
 
@@ -32,8 +31,6 @@ Next bugfix number: BUG-4
 
 | Key | Title |
 |-----|-------|
-| RMC-59 | Expansion selectors cost power scaled by selected entities' max power |
-| RMC-40 | GWYAH rune — invoke inscriptions on a Set |
 
 ## Done
 
@@ -55,3 +52,8 @@ Next bugfix number: BUG-4
 | RMC-43 | Seed the milestone world |
 | RMC-15 | Design power sourcing implementation |
 | RMC-16 | Design inscribed spells on objects |
+| RMC-58 | Add inscription to the rock |
+| RMC-59 | Expansion selectors cost power scaled by selected entities' max power |
+| RMC-40 | GWYAH rune — invoke inscriptions on a Set |
+| RMC-61 | HORO rune — spatial selector for nearby entities |
+| RMC-62 | Work on the number system |

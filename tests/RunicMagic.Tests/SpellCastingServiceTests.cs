@@ -64,7 +64,7 @@ public class SpellCastingServiceTests
         var world = new WorldModel();
         var service = MakeService(world);
 
-        var lines = service.Cast("ZU VUN LA FOTIR FOTIR FOTIR HET", casterId: null);
+        var lines = service.Cast("ZU VUN LA IR HOT IR HOT HOT", casterId: null);
 
         lines.Should().ContainSingle().Which.Should().Be("No caster selected.");
     }
@@ -75,7 +75,7 @@ public class SpellCastingServiceTests
         var world = new WorldModel();
         var service = MakeService(world);
 
-        var lines = service.Cast("ZU VUN LA FOTIR FOTIR FOTIR HET", casterId: EntityId.New());
+        var lines = service.Cast("ZU VUN LA IR HOT IR HOT HOT", casterId: EntityId.New());
 
         lines.Should().ContainSingle().Which.Should().Be("Caster not found in world.");
     }
@@ -98,7 +98,7 @@ public class SpellCastingServiceTests
 
         var service = MakeService(world);
 
-        var lines = service.Cast("ZU VUN LA FOTIR FOTIR FOTIR HET", casterId: casterEntity.Id);
+        var lines = service.Cast("ZU VUN LA IR HOT IR HOT HOT", casterId: casterEntity.Id);
 
         lines.Should().Contain(l => l.Contains("target") && l.Contains("pushed"));
     }
@@ -121,7 +121,7 @@ public class SpellCastingServiceTests
 
         var service = MakeService(world);
 
-        var lines = service.Cast("ZU VUN LA FOTIR FOTIR FOTIR HET", casterId: casterEntity.Id);
+        var lines = service.Cast("ZU VUN LA IR HOT IR HOT HOT", casterId: casterEntity.Id);
 
         lines.Should().Contain(l => l.Contains("Caster") && l.Contains("lost") && l.Contains("power"));
     }

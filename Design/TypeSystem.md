@@ -15,8 +15,7 @@ There is no singleton subtype; a Set with one member is still just a Set.
 
 ### Number
 A non-negative integer.
-Arithmetic is intentionally omitted for now — the available range (1, 14, 196, 2744, …)
-is sufficient to scale effects from trivial to lethal.
+Literals cover the primes up to 7 (plus zero) and powers of 14 at those same prime exponents, giving a sparse but wide range. Arithmetic runes (IR, MO, UIT, EID, DEID, MOST) allow any value to be composed from these building blocks.
 
 ### Location
 A point in 2D space.

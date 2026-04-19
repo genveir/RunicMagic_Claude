@@ -36,9 +36,9 @@ public class SpellParserTests
     [Fact]
     public void Parse_MilestoneSpell_ProducesCorrectTree()
     {
-        var (count, result) = SpellParser.Parse("ZU VUN LA FOTIR FOTIR FOTIR HET");
+        var (count, result) = SpellParser.Parse("ZU VUN LA IR HOT IR HOT HOT");
 
-        count.Should().Be(10);
+        count.Should().Be(11);
         result.Succeeded.Should().BeTrue();
 
         var zu = result.Value.Should().BeOfType<ZU>().Subject;
@@ -48,10 +48,11 @@ public class SpellParserTests
             .Which.Inner.Should().BeOfType<LA>().Subject;
         la.ToGetScopeOf.Should().BeOfType<OH>();
 
-        var fotir1 = vun.HowFar.Should().BeOfType<FOTIR>().Subject;
-        var fotir2 = fotir1.Multiplicand.Should().BeOfType<FOTIR>().Subject;
-        var fotir3 = fotir2.Multiplicand.Should().BeOfType<FOTIR>().Subject;
-        fotir3.Multiplicand.Should().BeOfType<HET>();
+        var ir1 = vun.HowFar.Should().BeOfType<IR>().Subject;
+        ir1.A.Should().BeOfType<HOT>();
+        var ir2 = ir1.B.Should().BeOfType<IR>().Subject;
+        ir2.A.Should().BeOfType<HOT>();
+        ir2.B.Should().BeOfType<HOT>();
 
         var par = vun.Origin.Should().BeOfType<PAR>().Subject;
         par.EntitySet.Should().BeOfType<EntitySetSelectionCostResolver>()
