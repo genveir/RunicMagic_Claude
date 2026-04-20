@@ -42,7 +42,11 @@ namespace RunicMagic.World.Runes.EffectRunes
                 var direction = Direction.FromPoints(origin, entity.Location);
                 var destination = entity.Location.Translate(direction, distance);
                 entity.Location = destination;
-                context.Result.Add(new EntityPushedEvent(entity, distance));
+
+                if (distance > 0)
+                {
+                    context.Result.Add(new EntityPushedEvent(entity, distance));
+                }
             }
         }
 

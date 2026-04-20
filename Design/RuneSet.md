@@ -35,10 +35,19 @@ SHU can be nested. Each SHU pushes onto whatever stack is current at the point o
 |------|---------|-----------|
 | `LA` | scope of | (Set = OH) → Set |
 | `HORO` | near | (Number, Location = PAR(OH)) → Set |
+| `ZYIL` | weight range filter | (Set, Number lower, Number upper) → Set |
+| `ZYHE` | lightest | (Set) → Set |
+| `ZYSE` | heaviest | (Set) → Set |
 
 `LA` maps each member of the input Set to its scope (via the entity's scope delegate) and returns the union. Defaults to `OH`, so bare `LA` maps the executor's scope.
 
 `HORO` returns all entities in the world whose nearest bounding edge is within `Number` millimetres of `Location`. Defaults to the executor's position, so `HORO HET` selects everything within 1 mm of the executor.
+
+`ZYIL` filters a Set to entities whose weight in grams is strictly greater than `lower` and strictly less than `upper` (both bounds exclusive).
+
+`ZYHE` returns all entities in the Set tied for minimum weight. If multiple entities share the lowest weight, all are returned.
+
+`ZYSE` returns all entities in the Set tied for maximum weight. If multiple entities share the highest weight, all are returned.
 
 ## Invocation
 

@@ -46,4 +46,4 @@ values
 
 insert into Inscription (EntityId, SpellText)
 values
-    (@rock, 'VUN A DOT PAR OH');
+    (@rock, 'ZU VUN ZYIL HORO IR TET TOT IR MO FET FET TOT IR MO FET SET TOT TOT');

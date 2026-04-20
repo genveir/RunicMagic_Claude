@@ -3,6 +3,7 @@ using RunicMagic.Controller.RuneParsing.EffectRunes;
 using RunicMagic.Controller.RuneParsing.EntityReferenceRunes;
 using RunicMagic.Controller.RuneParsing.EntitySetRunes;
 using RunicMagic.Controller.RuneParsing.ExecutionRunes;
+using RunicMagic.Controller.RuneParsing.FilterRunes;
 using RunicMagic.Controller.RuneParsing.InvocationRunes;
 using RunicMagic.Controller.RuneParsing.LocationRunes;
 using RunicMagic.Controller.RuneParsing.NumberRunes;
@@ -76,6 +77,9 @@ namespace RunicMagic.Controller.RuneParsing
             entitySetRuneParsers["DAN"] = new DANParser(); // pointing at
             entitySetRuneParsers["KAL"] = new KALParser(); // indicating
             entitySetRuneParsers["HORO"] = new HOROParser(); // near
+            entitySetRuneParsers["ZYIL"] = new ZYILParser(); // weight range filter
+            entitySetRuneParsers["ZYHE"] = new ZYHEParser(); // lightest
+            entitySetRuneParsers["ZYSE"] = new ZYSEParser(); // heaviest
         }
 
         private static void FillNumberRuneParsers()

@@ -7,8 +7,6 @@ Next bugfix number: BUG-4
 
 | Key | Title | Description | Blocked By |
 |-----|-------|-------------|------------|
-
-| RMC-63 | ZYIL rune — weight range filter and weight singletons | `(IEntitySet, INumber lower, INumber upper) → IEntitySet` for the range filter. Also build heaviest and lightest singletons `(IEntitySet) → IEntitySet` in the same ticket. Ties return all tied entities. Names for singletons TBD. | |
 | RMC-64 | FUIL rune — power range filter and power singletons | `(IEntitySet, INumber lower, INumber upper) → IEntitySet` for the range filter. Also build most-powerful and least-powerful singletons `(IEntitySet) → IEntitySet` in the same ticket. Ties return all tied entities. Names for singletons TBD. | |
 | RMC-66 | CJIR and CJAR runes — rotate clockwise and counterclockwise | `(IEntitySet target, INumber angle, ILocation origin = PAR target) → IStatement`. CJIR rotates clockwise, CJAR counterclockwise, otherwise identical. Angle is in a 2744-degree circle (base-14 degrees; TOT = full circle). Default origin is the centroid of the rotating entity set itself — the parser substitutes the first argument's expression as the default for the third, so bare `CJIR A HET` rotates the caster one degree around its own centre. Cost is proportional to mass × arc distance; specifics to be determined during implementation. | |
 | RMC-65 | FUORJ rune — fill | `(IEntitySet from, IEntitySet to, INumber amount) → IStatement`. Transfers up to `amount` power from entities in `from` to entities in `to`. Overcharge (recipient receiving more than its maximum) is a special concern that needs to be addressed in the design. | |
@@ -65,3 +63,4 @@ Next bugfix number: BUG-4
 | RMC-61 | HORO rune — spatial selector for nearby entities |
 | RMC-62 | Work on the number system |
 | RMC-70 | Tax peak selection breadth during set resolution |
+| RMC-63 | ZYIL rune — weight range filter and weight singletons |
