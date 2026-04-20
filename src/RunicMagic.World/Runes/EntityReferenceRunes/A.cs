@@ -11,6 +11,7 @@ namespace RunicMagic.World.Runes.EntityReferenceRunes
         public EntitySet Resolve(SpellContext context)
         {
             var result = context.Caster;
+            context.EntityResolutionCount?.UnionWith(result.Entities.Select(e => e.Id));
             return result;
         }
 

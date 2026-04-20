@@ -101,4 +101,36 @@ public class DANTests
 
         result.Entities.Should().BeEmpty();
     }
+
+    [Fact]
+    public void Resolve_WindowOpen_EntityHit_AddsEntityIdToResolutionCount()
+    {
+        var world = new WorldModel();
+        var casterEntity = MakeEntity(x: 0, y: 0);
+        casterEntity.PointingDirection = Right;
+        var target = MakeEntity(x: 500, y: 0);
+        world.Add(casterEntity);
+        world.Add(target);
+        var context = TestFixtures.MakeContext(caster: new EntitySet([casterEntity]), world: world);
+        context.OpenResolutionWindow();
+
+        new DAN().Resolve(context);
+
+        context.EntityResolutionCount.Should().Contain(target.Id);
+    }
+
+    [Fact]
+    public void Resolve_WindowOpen_NoEntityHit_ResolutionCountEmpty()
+    {
+        var world = new WorldModel();
+        var casterEntity = MakeEntity(x: 0, y: 0);
+        casterEntity.PointingDirection = Right;
+        world.Add(casterEntity);
+        var context = TestFixtures.MakeContext(caster: new EntitySet([casterEntity]), world: world);
+        context.OpenResolutionWindow();
+
+        new DAN().Resolve(context);
+
+        context.EntityResolutionCount.Should().BeEmpty();
+    }
 }

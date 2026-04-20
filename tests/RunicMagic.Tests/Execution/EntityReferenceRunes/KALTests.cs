@@ -158,4 +158,32 @@ public class KALTests
 
         result.Entities.Should().BeEmpty();
     }
+
+    [Fact]
+    public void Resolve_WindowOpen_TargetResolved_AddsTargetIdToResolutionCount()
+    {
+        var world = new WorldModel();
+        var casterEntity = MakeEntity(x: 0, y: 0);
+        var target = MakeEntity(x: 500, y: 0);
+        casterEntity.IndicateTarget = new IndicateTarget(target.Id, Right);
+        world.Add(casterEntity);
+        world.Add(target);
+        var context = TestFixtures.MakeContext(caster: new EntitySet([casterEntity]), world: world);
+        context.OpenResolutionWindow();
+
+        new KAL().Resolve(context);
+
+        context.EntityResolutionCount.Should().Contain(target.Id);
+    }
+
+    [Fact]
+    public void Resolve_WindowOpen_TargetNotResolved_ResolutionCountEmpty()
+    {
+        var context = TestFixtures.MakeContext();
+        context.OpenResolutionWindow();
+
+        new KAL().Resolve(context);
+
+        context.EntityResolutionCount.Should().BeEmpty();
+    }
 }

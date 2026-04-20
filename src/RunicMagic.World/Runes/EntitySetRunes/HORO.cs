@@ -24,6 +24,7 @@ namespace RunicMagic.World.Runes.EntitySetRunes
                 .WithinDistance(origin, (double)radius.Value)
                 .ToList();
             var result = new EntitySet(entities);
+            context.EntityResolutionCount?.UnionWith(result.Entities.Select(e => e.Id));
             return result;
         }
 

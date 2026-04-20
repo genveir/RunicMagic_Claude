@@ -33,6 +33,7 @@ namespace RunicMagic.World.Runes.EntityReferenceRunes
             if (caster.IndicateTarget.Direction == null)
             {
                 var selfResult = new EntitySet([target]);
+                context.EntityResolutionCount?.Add(target.Id);
                 return selfResult;
             }
 
@@ -51,6 +52,7 @@ namespace RunicMagic.World.Runes.EntityReferenceRunes
             }
 
             var result = new EntitySet([target]);
+            context.EntityResolutionCount?.Add(target.Id);
             return result;
         }
 

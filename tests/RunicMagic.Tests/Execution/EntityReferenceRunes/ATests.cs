@@ -18,4 +18,27 @@ public class ATests
 
         result.Should().BeSameAs(caster);
     }
+
+    [Fact]
+    public void Resolve_WindowOpen_AddsCasterIdToResolutionCount()
+    {
+        var casterEntity = TestFixtures.MakeEntity();
+        var context = TestFixtures.MakeContext(caster: new EntitySet([casterEntity]));
+        context.OpenResolutionWindow();
+
+        new A().Resolve(context);
+
+        context.EntityResolutionCount.Should().Contain(casterEntity.Id);
+    }
+
+    [Fact]
+    public void Resolve_WindowNull_DoesNotThrow()
+    {
+        var casterEntity = TestFixtures.MakeEntity();
+        var context = TestFixtures.MakeContext(caster: new EntitySet([casterEntity]));
+
+        var act = () => new A().Resolve(context);
+
+        act.Should().NotThrow();
+    }
 }

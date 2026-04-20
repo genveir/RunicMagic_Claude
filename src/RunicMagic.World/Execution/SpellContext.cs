@@ -27,6 +27,18 @@ public class SpellContext
         _sourceStack.Pop();
     }
 
+    public HashSet<EntityId>? EntityResolutionCount { get; private set; }
+
+    public void OpenResolutionWindow()
+    {
+        EntityResolutionCount = new HashSet<EntityId>();
+    }
+
+    public void CloseResolutionWindow()
+    {
+        EntityResolutionCount = null;
+    }
+
     public SpellContext ForkWithNewExecutor(EntitySet newExecutor)
     {
         var forked = new SpellContext(Caster, newExecutor, World, Result);
@@ -34,6 +46,9 @@ public class SpellContext
         {
             forked._sourceStack.Push(source);
         }
+        forked.EntityResolutionCount = EntityResolutionCount != null
+            ? new HashSet<EntityId>(EntityResolutionCount)
+            : null;
         return forked;
     }
 

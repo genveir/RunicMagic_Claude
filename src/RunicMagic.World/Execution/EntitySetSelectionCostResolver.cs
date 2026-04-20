@@ -13,8 +13,33 @@ namespace RunicMagic.World.Execution
 
         public EntitySet Resolve(SpellContext context)
         {
+            context.OpenResolutionWindow();
             var resolved = Inner.Resolve(context);
 
+            var cost = CalulateCost(context, resolved);
+
+            context.CloseResolutionWindow();
+
+            var drawn = context.DrawPower(cost);
+            if (drawn < cost)
+            {
+                context.Result.Add(new SelectionCostNotMetEvent(Required: cost, Drawn: drawn));
+                return new EntitySet([]);
+            }
+
+            return resolved;
+        }
+
+        private long CalulateCost(SpellContext context, EntitySet resolved)
+        {
+            var finalSetCost = CalculateFinalSetCost(context, resolved);
+            var breadthCost = CalculateBreadthCost(context);
+
+            return finalSetCost + breadthCost;
+        }
+
+        private long CalculateFinalSetCost(SpellContext context, EntitySet resolved)
+        {
             EntityId[] exemptIds = context.Caster.Entities
                 .Concat(context.Executor.Entities)
                 .Select(e => e.Id)
@@ -31,14 +56,13 @@ namespace RunicMagic.World.Execution
                 cost += (maxPower + 999) / 1000;
             }
 
-            var drawn = context.DrawPower(cost);
-            if (drawn < cost)
-            {
-                context.Result.Add(new SelectionCostNotMetEvent(Required: cost, Drawn: drawn));
-                return new EntitySet([]);
-            }
+            return cost;
+        }
 
-            return resolved;
+        private long CalculateBreadthCost(SpellContext context)
+        {
+            var breadthCount = context.EntityResolutionCount?.Count ?? 0;
+            return breadthCount / 10;
         }
     }
 }

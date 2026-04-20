@@ -43,6 +43,7 @@ internal class FixedEntitySet : IEntitySet
 
     public EntitySet Resolve(SpellContext context)
     {
+        context.EntityResolutionCount?.UnionWith(_resolved.Entities.Select(e => e.Id));
         return _resolved;
     }
 }

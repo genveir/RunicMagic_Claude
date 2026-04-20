@@ -76,7 +76,11 @@ Sets are always evaluated at the point of execution against current world state.
 Power is drawn in three distinct ways during a spell:
 
 1. **Evaluation cost** — paid upfront (step 4) before execution begins, based on rune count.
-2. **Selection cost** — paid each time a Set is consumed by a rune that consumes a Set but doesn't produce one (i.e. not by filters or selectors). Cost is `ceil(MaxPower / 1000)` per entity in the resolved Set, excluding the caster and executor, who are always free to select. If the full cost cannot be met, the Set resolves to empty.
+2. **Selection cost** — paid each time a Set is consumed by a rune that consumes a Set but doesn't produce one (i.e. not by filters or selectors). Two components are charged together:
+   - **Entity cost**: `ceil(MaxPower / 1000)` per entity in the resolved Set, excluding the caster and executor, who are always free to select.
+   - **Breadth cost**: `floor(N / 10)` where N is the total number of distinct entities touched by any leaf selector (for example HORO, LA) during resolution of that Set, regardless of how many survive filtering. A precise spell that targets exactly what it needs pays less than one that sweeps broadly and filters back down.
+
+   If the full combined cost cannot be met, the Set resolves to empty.
 3. **Execution cost** — paid by each effect rune as it fires, scaled by the magnitude of the effect.
 
 All three draws use the same cascade. The engine works through a cascade of power sources, calling `Draw(amount)` on each in turn and carrying forward any shortfall until the cost is met. A source returns however much it can actually provide — which may be less than asked. The engine never inspects a source's internals or queries its reserves; it just takes what it gets and moves on.

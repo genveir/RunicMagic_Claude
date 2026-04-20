@@ -32,6 +32,7 @@ namespace RunicMagic.World.Runes.EntityReferenceRunes
             }
 
             var result = new EntitySet([castResult.HitEntity]);
+            context.EntityResolutionCount?.Add(castResult.HitEntity.Id);
             return result;
         }
 

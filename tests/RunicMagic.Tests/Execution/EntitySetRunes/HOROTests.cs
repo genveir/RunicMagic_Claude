@@ -123,6 +123,38 @@ public class HOROTests
     }
 
     [Fact]
+    public void Resolve_WindowOpen_AddsResolvedEntityIdsToResolutionCount()
+    {
+        var world = new WorldModel();
+        var near = MakeEntity(x: 200, y: 0);
+        var far = MakeEntity(x: 2000, y: 0);
+        world.Add(near);
+        world.Add(far);
+
+        var horo = new HORO(howFar: new FixedNumber(500), origin: new FixedLocation(0, 0));
+        var context = TestFixtures.MakeContext(world: world);
+        context.OpenResolutionWindow();
+
+        horo.Resolve(context);
+
+        context.EntityResolutionCount.Should().Contain(near.Id);
+        context.EntityResolutionCount.Should().NotContain(far.Id);
+    }
+
+    [Fact]
+    public void Resolve_WindowNull_DoesNotThrow()
+    {
+        var world = new WorldModel();
+        world.Add(MakeEntity(x: 200, y: 0));
+        var horo = new HORO(howFar: new FixedNumber(500), origin: new FixedLocation(0, 0));
+        var context = TestFixtures.MakeContext(world: world);
+
+        var act = () => horo.Resolve(context);
+
+        act.Should().NotThrow();
+    }
+
+    [Fact]
     public void Resolve_LargeEntityBridgesRadius_IsIncluded()
     {
         var world = new WorldModel();

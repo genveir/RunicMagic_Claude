@@ -209,4 +209,85 @@ public class EntitySetSelectionCostResolverTests
         drawn.Should().ContainSingle().Which.Should().Be(1);
         result.Entities.Should().HaveCount(2);
     }
+
+    [Fact]
+    public void Resolve_BreadthCost_FewerThan10EntitiesSwept_NoBreadthCharge()
+    {
+        var drawn = new List<long>();
+        var casterEntity = TestFixtures.MakeEntity();
+        casterEntity.Reservoir = amount => { drawn.Add(amount); return new ReservoirDraw(amount, false); };
+
+        var targets = Enumerable.Range(0, 9).Select(_ => TestFixtures.MakeEntity()).ToArray();
+        var context = MakeContext(casterEntity);
+        var resolver = new EntitySetSelectionCostResolver(new FixedEntitySet(targets));
+
+        resolver.Resolve(context);
+
+        drawn.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void Resolve_BreadthCost_Exactly10EntitiesSwept_ChargesOne()
+    {
+        var drawn = new List<long>();
+        var casterEntity = TestFixtures.MakeEntity();
+        casterEntity.Reservoir = amount => { drawn.Add(amount); return new ReservoirDraw(amount, false); };
+
+        var targets = Enumerable.Range(0, 10).Select(_ => TestFixtures.MakeEntity()).ToArray();
+        var context = MakeContext(casterEntity);
+        var resolver = new EntitySetSelectionCostResolver(new FixedEntitySet(targets));
+
+        resolver.Resolve(context);
+
+        drawn.Should().ContainSingle().Which.Should().Be(1);
+    }
+
+    [Fact]
+    public void Resolve_BreadthCost_AddedToEntitySelectionCost()
+    {
+        var drawn = new List<long>();
+        var casterEntity = TestFixtures.MakeEntity();
+        casterEntity.Reservoir = amount => { drawn.Add(amount); return new ReservoirDraw(amount, false); };
+
+        var targets = Enumerable.Range(0, 10).Select(_ => MakeEntityWithMaxPower(1000)).ToArray();
+        var context = MakeContext(casterEntity);
+        var resolver = new EntitySetSelectionCostResolver(new FixedEntitySet(targets));
+
+        resolver.Resolve(context);
+
+        // Entity cost: 10 * ceil(1000/1000) = 10; breadth cost: floor(10/10) = 1; total = 11
+        drawn.Should().ContainSingle().Which.Should().Be(11);
+    }
+
+    [Fact]
+    public void Resolve_BreadthCost_WindowClosedAfterResolve()
+    {
+        var casterEntity = TestFixtures.MakeEntity();
+        casterEntity.Reservoir = amount => new ReservoirDraw(amount, false);
+        var context = MakeContext(casterEntity);
+        var resolver = new EntitySetSelectionCostResolver(new FixedEntitySet(TestFixtures.MakeEntity()));
+
+        resolver.Resolve(context);
+
+        context.EntityResolutionCount.Should().BeNull();
+    }
+
+    [Fact]
+    public void Resolve_BreadthCost_AppliedEvenWhenFinalSetIsEmpty()
+    {
+        var drawn = new List<long>();
+        var casterEntity = TestFixtures.MakeEntity();
+        casterEntity.Reservoir = amount => { drawn.Add(amount); return new ReservoirDraw(amount, false); };
+
+        // 10 entities swept, but insufficient power to pay — still charges breadth upfront alongside entity cost
+        var casterWithLimitedPower = MakeCasterWithPower(0);
+        var targets = Enumerable.Range(0, 10).Select(_ => TestFixtures.MakeEntity()).ToArray();
+        var context = MakeContext(casterWithLimitedPower);
+        var resolver = new EntitySetSelectionCostResolver(new FixedEntitySet(targets));
+
+        var result = resolver.Resolve(context);
+
+        result.Entities.Should().BeEmpty();
+        context.EntityResolutionCount.Should().BeNull();
+    }
 }

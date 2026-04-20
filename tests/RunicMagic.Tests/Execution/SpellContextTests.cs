@@ -175,6 +175,31 @@ public class SpellContextTests
     }
 
     [Fact]
+    public void ForkWithNewExecutor_EntityResolutionCountNull_ForkedIsAlsoNull()
+    {
+        var original = TestFixtures.MakeContext();
+
+        var forked = original.ForkWithNewExecutor(new EntitySet([]));
+
+        forked.EntityResolutionCount.Should().BeNull();
+    }
+
+    [Fact]
+    public void ForkWithNewExecutor_EntityResolutionCountOpen_ForkedReceivesCopy()
+    {
+        var original = TestFixtures.MakeContext();
+        original.OpenResolutionWindow();
+        var entityId = EntityId.New();
+        original.EntityResolutionCount!.Add(entityId);
+
+        var forked = original.ForkWithNewExecutor(new EntitySet([]));
+
+        forked.EntityResolutionCount.Should().NotBeNull();
+        forked.EntityResolutionCount.Should().Contain(entityId);
+        forked.EntityResolutionCount.Should().NotBeSameAs(original.EntityResolutionCount);
+    }
+
+    [Fact]
     public void ForkWithNewExecutor_PowerSourceStackIsCopied()
     {
         var pushedEntity = TestFixtures.MakeEntity();

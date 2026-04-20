@@ -18,4 +18,27 @@ public class OHTests
 
         result.Should().BeSameAs(executor);
     }
+
+    [Fact]
+    public void Resolve_WindowOpen_AddsExecutorIdToResolutionCount()
+    {
+        var executorEntity = TestFixtures.MakeEntity();
+        var context = TestFixtures.MakeContext(executor: new EntitySet([executorEntity]));
+        context.OpenResolutionWindow();
+
+        new OH().Resolve(context);
+
+        context.EntityResolutionCount.Should().Contain(executorEntity.Id);
+    }
+
+    [Fact]
+    public void Resolve_WindowNull_DoesNotThrow()
+    {
+        var executorEntity = TestFixtures.MakeEntity();
+        var context = TestFixtures.MakeContext(executor: new EntitySet([executorEntity]));
+
+        var act = () => new OH().Resolve(context);
+
+        act.Should().NotThrow();
+    }
 }
