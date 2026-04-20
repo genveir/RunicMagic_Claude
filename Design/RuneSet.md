@@ -44,6 +44,7 @@ SHU can be nested. Each SHU pushes onto whatever stack is current at the point o
 | `HORIL` | distance range filter | (Set, Number lower, Number upper, Location = PAR(OH)) → Set |
 | `HORHE` | closest | (Set, Location = PAR(OH)) → Set |
 | `HORSE` | farthest | (Set, Location = PAR(OH)) → Set |
+| `DRYAL` | is alive | (Set) → Set |
 
 `LA` maps each member of the input Set to its scope (via the entity's scope delegate) and returns the union. Defaults to `OH`, so bare `LA` maps the executor's scope.
 
@@ -66,6 +67,8 @@ SHU can be nested. Each SHU pushes onto whatever stack is current at the point o
 `HORHE` returns all entities in the Set tied for minimum distance from `Location`. Defaults to the executor's position.
 
 `HORSE` returns all entities in the Set tied for maximum distance from `Location`. Defaults to the executor's position.
+
+`DRYAL` filters a Set to entities that have a life capability and currently have more than 0 hit points.
 
 ## Invocation
 

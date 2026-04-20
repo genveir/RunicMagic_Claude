@@ -86,6 +86,7 @@ namespace RunicMagic.Controller.RuneParsing
             entitySetRuneParsers["HORIL"] = new HORILParser(); // distance range filter
             entitySetRuneParsers["HORHE"] = new HORHEParser(); // closest
             entitySetRuneParsers["HORSE"] = new HORSEParser(); // farthest
+            entitySetRuneParsers["DRYAL"] = new DRYALParser(); // is alive
         }
 
         private static void FillNumberRuneParsers()

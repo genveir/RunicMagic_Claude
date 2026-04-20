@@ -30,8 +30,6 @@ The rune string is parsed into an expression tree. Each rune consumes its argume
 
 Example: `ZU(execute) HET(one)` — `ZU` expects a `Statement`, but `HET` returns a `Number`. Only `ZU` is evaluated; the rest is ignored.
 
-*(Parser design: RMC-12)*
-
 ### 3. Calculate Evaluation Cost
 
 The evaluation cost is the total rune count — including all defaults filled in automatically — divided by 5, rounded down. This cost is paid before execution begins.
@@ -49,8 +47,6 @@ The expression tree is evaluated against the world state. Effects are applied as
 Each effect-producing rune is responsible for defining its own execution cost. A fireball with radius 1 and a fireball with radius 1000 are the same spell structurally, and cost the same to evaluate; but the execution cost scales with the effect, so magnitude has real consequence.
 
 All Sets are resolved at the time of their execution. If a previous part of a spell has altered state, that altered state is carried forward. Runes being executed always only see the state as it is when they're executed.
-
-*(Evaluator design: RMC-28)*
 
 ---
 
@@ -87,8 +83,6 @@ All three draws use the same cascade. The engine works through a cascade of powe
 
 What it means to be drained is entirely up to the entity. A mana crystal depletes its stored charge; a creature loses life. The engine has no special cases for any of this — it is all self-defined by the entity via its `Reservoir` delegate.
 
-*(Cascade ordering and preference rules: RMC-15)*
-
 ## Failure
 
 If the spell is structurally invalid at a point in the expression tree, evaluation stops there. Any portion of the spell that was valid and evaluated before the failure still takes effect, and its cost is still paid.
@@ -96,8 +90,6 @@ If the spell is structurally invalid at a point in the expression tree, evaluati
 If the evaluation cost cannot be met in full, the executor disintegrates.
 
 The system makes no attempt to pre-validate whether a spell can be afforded before drawing begins. There are no guardrails — power is drawn, effects fire, and consequences follow. A spell that cannot be completed will still drain every source it can reach before failing.
-
-*(Full failure mode design: RMC-13)*
 
 ---
 
