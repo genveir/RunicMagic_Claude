@@ -109,6 +109,8 @@ All literals have signature `() → Number`. The base literals (`JON` through `S
 | `DEID` | halve | (Number A) → Number |
 | `MOST` | one and a half | (Number A) → Number |
 
+All arithmetic truncates toward zero. There are no fractional numbers in the system — every intermediate and final result is an integer.
+
 ---
 
 ## Canonical Spell Patterns

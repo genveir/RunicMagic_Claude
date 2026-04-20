@@ -16,7 +16,7 @@
 
 ## Architecture
 
-- The solution follows a hub-and-spokes model. `Controller` is the hub and the only assembly that communicates between other assemblies. Spoke assemblies (`World`, `Database`, `Magic`, etc.) must not reference each other. If two spokes need to share a concept, it either lives in `Controller` or is intentionally represented differently in each spoke (e.g. `EntityData` uses `long TypeId` rather than `EntityType` to avoid `Database` depending on `World`).
+- The solution follows a hub-and-spokes model. `Controller` is the hub and the only assembly that communicates between other assemblies. Spoke assemblies (`World`, `Database`, etc.) must not reference each other. If two spokes need to share a concept, it either lives in `Controller` or is intentionally represented differently in each spoke (e.g. `EntityData` uses `long TypeId` rather than `EntityType` to avoid `Database` depending on `World`).
 
 ## General
 
