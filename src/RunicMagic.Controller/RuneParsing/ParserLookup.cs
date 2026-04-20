@@ -80,6 +80,9 @@ namespace RunicMagic.Controller.RuneParsing
             entitySetRuneParsers["ZYIL"] = new ZYILParser(); // weight range filter
             entitySetRuneParsers["ZYHE"] = new ZYHEParser(); // lightest
             entitySetRuneParsers["ZYSE"] = new ZYSEParser(); // heaviest
+            entitySetRuneParsers["FUIL"] = new FUILParser(); // power range filter
+            entitySetRuneParsers["FUHE"] = new FUHEParser(); // least powerful
+            entitySetRuneParsers["FUSE"] = new FUSEParser(); // most powerful
         }
 
         private static void FillNumberRuneParsers()

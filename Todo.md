@@ -18,7 +18,6 @@ Next bugfix number: BUG-4
 | Key | Title | Description | Blocked By |
 |-----|-------|-------------|------------|
 | RMC-67 | Set operation runes — union, intersection, difference | Three runes, one ticket. All have signature `(IEntitySet, IEntitySet) → IEntitySet`. Union returns all entities in either set; intersection returns only entities in both; difference returns entities in the first set not in the second. Names TBD. | |
-| RMC-69 | Proximity selectors — closest, farthest, distance range | Three selectors relative to a location. Closest and farthest are singletons `(IEntitySet, ILocation = PAR OH) → IEntitySet`; ties return all tied entities. Distance range is `(IEntitySet, INumber lower, INumber upper, ILocation = PAR OH) → IEntitySet`. Names TBD. | |
 | RMC-68 | Is-alive filter rune | `(IEntitySet) → IEntitySet`. Filters to entities that have a life capability and are currently alive (CurrentHitPoints > 0). Name TBD. | |
 | RMC-60 | Design small items | Define the world model for small items — portable objects a creature can carry (e.g. a mana gem in the caster's pocket). Covers how items are represented, how carrying/inventory works, and how items interact with spells and power sourcing. | |
 | RMC-37 | Kill creatures when they run out of life | At any point during spell execution, living entities may run out of hitpoints. In this case the game should register that they're dead and remove their living and agency properties | |
@@ -64,3 +63,4 @@ Next bugfix number: BUG-4
 | RMC-62 | Work on the number system |
 | RMC-70 | Tax peak selection breadth during set resolution |
 | RMC-63 | ZYIL rune — weight range filter and weight singletons |
+| RMC-64 | FUIL rune — power range filter and power singletons |

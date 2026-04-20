@@ -73,6 +73,7 @@ public class EntityFactory(WorldModel world, ILogger<EntityFactory> logger)
                 if (entity.Life is not null)
                 {
                     entity.MaxReservoir = () => entity.Life.MaxHitPoints;
+                    entity.CurrentReservoir = () => entity.Life.CurrentHitPoints;
                 }
 
                 entity.Reservoir = amount =>
@@ -93,6 +94,7 @@ public class EntityFactory(WorldModel world, ILogger<EntityFactory> logger)
                 if (entity.Charge is not null)
                 {
                     entity.MaxReservoir = () => entity.Charge.MaxCharge;
+                    entity.CurrentReservoir = () => entity.Charge.CurrentCharge;
                 }
 
                 entity.Reservoir = amount =>

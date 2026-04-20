@@ -23,6 +23,7 @@ public class Entity(EntityId id, EntityType type, string label)
     public Func<Entity[]>? Scope { get; set; }
     public Func<long, ReservoirDraw>? Reservoir { get; set; }
     public Func<long>? MaxReservoir { get; set; }
+    public Func<long>? CurrentReservoir { get; set; }
     public Direction? PointingDirection { get; set; }
     public IndicateTarget? IndicateTarget { get; set; }
     public IStatement[] ParsedInscriptions { get; set; } = [];
