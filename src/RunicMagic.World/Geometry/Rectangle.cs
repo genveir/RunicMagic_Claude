@@ -169,9 +169,9 @@ public readonly record struct Rectangle(Location Location, double Width, double 
         return true;
     }
 
-    // True when the nearest point on this rectangle to (px, py) is within maxDistance.
-    // Points inside the rectangle have distance 0 and always satisfy the check.
-    public bool IsWithinDistanceFromPoint(Location toCheck, double maxDistance)
+    // Returns the distance from the nearest point on this rectangle to the given location.
+    // Points inside the rectangle have distance 0.
+    public double GetDistanceFromPoint(Location toCheck)
     {
         var (px, py) = ToLocalFrame(toCheck.X, toCheck.Y);
 
@@ -186,8 +186,16 @@ public readonly record struct Rectangle(Location Location, double Width, double 
         var dx = px - clampedX;
         var dy = py - clampedY;
 
-        var distanceSquared = dx * dx + dy * dy;
-        var result = distanceSquared <= maxDistance * maxDistance;
+        var result = Math.Sqrt(dx * dx + dy * dy);
+        return result;
+    }
+
+    // True when the nearest point on this rectangle to the given location is within maxDistance.
+    // Points inside the rectangle have distance 0 and always satisfy the check.
+    public bool IsWithinDistanceFromPoint(Location toCheck, double maxDistance)
+    {
+        var distance = GetDistanceFromPoint(toCheck);
+        var result = distance <= maxDistance;
         return result;
     }
 }

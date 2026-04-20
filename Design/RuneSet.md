@@ -41,6 +41,9 @@ SHU can be nested. Each SHU pushes onto whatever stack is current at the point o
 | `FUIL` | power range filter | (Set, Number lower, Number upper) → Set |
 | `FUHE` | least powerful | (Set) → Set |
 | `FUSE` | most powerful | (Set) → Set |
+| `HORIL` | distance range filter | (Set, Number lower, Number upper, Location = PAR(OH)) → Set |
+| `HORHE` | closest | (Set, Location = PAR(OH)) → Set |
+| `HORSE` | farthest | (Set, Location = PAR(OH)) → Set |
 
 `LA` maps each member of the input Set to its scope (via the entity's scope delegate) and returns the union. Defaults to `OH`, so bare `LA` maps the executor's scope.
 
@@ -57,6 +60,12 @@ SHU can be nested. Each SHU pushes onto whatever stack is current at the point o
 `FUHE` returns all entities in the Set tied for minimum current power. Entities with no power reservoir are treated as having 0 current power.
 
 `FUSE` returns all entities in the Set tied for maximum current power. Entities with no power reservoir are treated as having 0 current power.
+
+`HORIL` filters a Set to entities whose distance from `Location` is strictly greater than `lower` and strictly less than `upper` (both bounds exclusive). Distance is measured from the nearest bounding edge; entities containing the origin have distance 0. Defaults to the executor's position.
+
+`HORHE` returns all entities in the Set tied for minimum distance from `Location`. Defaults to the executor's position.
+
+`HORSE` returns all entities in the Set tied for maximum distance from `Location`. Defaults to the executor's position.
 
 ## Invocation
 

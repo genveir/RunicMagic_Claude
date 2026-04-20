@@ -83,6 +83,9 @@ namespace RunicMagic.Controller.RuneParsing
             entitySetRuneParsers["FUIL"] = new FUILParser(); // power range filter
             entitySetRuneParsers["FUHE"] = new FUHEParser(); // least powerful
             entitySetRuneParsers["FUSE"] = new FUSEParser(); // most powerful
+            entitySetRuneParsers["HORIL"] = new HORILParser(); // distance range filter
+            entitySetRuneParsers["HORHE"] = new HORHEParser(); // closest
+            entitySetRuneParsers["HORSE"] = new HORSEParser(); // farthest
         }
 
         private static void FillNumberRuneParsers()

@@ -21,6 +21,13 @@ public static class LocationExtensions
         return result;
     }
 
+    public static double GetDistance(this Entity entity, Location origin)
+    {
+        var result = new Rectangle(entity.Location, entity.Width, entity.Height, entity.Angle)
+            .GetDistanceFromPoint(origin);
+        return result;
+    }
+
     public static IEnumerable<Entity> WithinDistance(this IEnumerable<Entity> entities, Location origin, double distance)
     {
         var result = entities.Where(e =>
