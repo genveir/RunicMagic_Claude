@@ -126,6 +126,37 @@ public class SpellContextTests
         casterCalled.Should().BeFalse();
     }
 
+    // ── Nested resolution windows ─────────────────────────────────────────────
+
+    [Fact]
+    public void NestedWindows_InnerCloseDoesNotDestroyOuterWindow()
+    {
+        // HORO with default PAR(OH): HOROParser injects EntitySetSelectionCostResolver(OH)
+        // as the PAR argument. Resolving it opens and closes an inner window while the outer
+        // window (opened by the outer EntitySetSelectionCostResolver, as VUN would) is active.
+        // The outer window must survive the inner close so HORO's results are tracked.
+        var context = TestFixtures.MakeContext();
+
+        context.OpenResolutionWindow();
+        var outerWindow = context.EntityResolutionCount;
+
+        // Inner window: simulates PAR(EntitySetSelectionCostResolver(OH)) resolving
+        context.OpenResolutionWindow();
+        context.CloseResolutionWindow();
+
+        // Outer window must still be the active window
+        context.EntityResolutionCount.Should().NotBeNull();
+        context.EntityResolutionCount.Should().BeSameAs(outerWindow);
+
+        // Entities added after the inner close (as HORO would) go into the outer window
+        var entityId = EntityId.New();
+        context.EntityResolutionCount!.Add(entityId);
+        context.EntityResolutionCount.Should().Contain(entityId);
+
+        context.CloseResolutionWindow();
+        context.EntityResolutionCount.Should().BeNull();
+    }
+
     // ── ForkWithNewExecutor ───────────────────────────────────────────────────
 
     [Fact]

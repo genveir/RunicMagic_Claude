@@ -27,16 +27,19 @@ public class SpellContext
         _sourceStack.Pop();
     }
 
-    public HashSet<EntityId>? EntityResolutionCount { get; private set; }
+    private readonly Stack<HashSet<EntityId>> _resolutionStack = new();
+
+    public HashSet<EntityId>? EntityResolutionCount =>
+        _resolutionStack.TryPeek(out var top) ? top : null;
 
     public void OpenResolutionWindow()
     {
-        EntityResolutionCount = new HashSet<EntityId>();
+        _resolutionStack.Push(new HashSet<EntityId>());
     }
 
     public void CloseResolutionWindow()
     {
-        EntityResolutionCount = null;
+        _resolutionStack.Pop();
     }
 
     public SpellContext ForkWithNewExecutor(EntitySet newExecutor)
@@ -46,9 +49,10 @@ public class SpellContext
         {
             forked._sourceStack.Push(source);
         }
-        forked.EntityResolutionCount = EntityResolutionCount != null
-            ? new HashSet<EntityId>(EntityResolutionCount)
-            : null;
+        foreach (var set in _resolutionStack.Reverse())
+        {
+            forked._resolutionStack.Push(new HashSet<EntityId>(set));
+        }
         return forked;
     }
 
