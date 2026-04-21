@@ -2,7 +2,7 @@
 
 ## To Do — Milestone 2
 
-Next ticket number: RMC-71
+Next ticket number: RMC-72
 Next bugfix number: BUG-4
 
 | Key | Title | Description | Blocked By |
@@ -16,7 +16,6 @@ Next bugfix number: BUG-4
 
 | Key | Title | Description | Blocked By |
 |-----|-------|-------------|------------|
-| RMC-67 | Set operation runes — union, intersection, difference | Three runes, one ticket. All have signature `(IEntitySet, IEntitySet) → IEntitySet`. Union returns all entities in either set; intersection returns only entities in both; difference returns entities in the first set not in the second. Names TBD. | |
 | RMC-60 | Design small items | Define the world model for small items — portable objects a creature can carry (e.g. a mana gem in the caster's pocket). Covers how items are represented, how carrying/inventory works, and how items interact with spells and power sourcing. | |
 | RMC-37 | Kill creatures when they run out of life | At any point during spell execution, living entities may run out of hitpoints. In this case the game should register that they're dead and remove their living and agency properties | |
 | RMC-38 | Register entity destruction | It should be possible to destroy entities. When this happens, the game should register that the entity is destroyed | |
@@ -28,6 +27,8 @@ Next bugfix number: BUG-4
 ## In Progress
 | Key | Title | Description | Remarks |
 |-----|-------|-------------|---------|
+| RMC-71 | PA rune — intersection of scopes | `(IEntitySet = OH) → IEntitySet`. Sibling to LA. Where LA returns the union of all members' scopes, PA returns only entities that appear in every member's scope. Defaults to OH. | |
+| RMC-67 | Set operation runes — union, intersection, difference | Three runes, one ticket. All have signature `(IEntitySet, IEntitySet) → IEntitySet`. Union returns all entities in either set; intersection returns only entities in both; difference returns entities in the first set not in the second. Names TBD. | |
 
 ## Ready For Review
 

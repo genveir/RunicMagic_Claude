@@ -8,6 +8,7 @@ using RunicMagic.Controller.RuneParsing.InvocationRunes;
 using RunicMagic.Controller.RuneParsing.LocationRunes;
 using RunicMagic.Controller.RuneParsing.NumberRunes;
 using RunicMagic.Controller.RuneParsing.PowerSourceRunes;
+using RunicMagic.Controller.RuneParsing.SetOperationRunes;
 using RunicMagic.World.Runes.RuneTypes;
 
 namespace RunicMagic.Controller.RuneParsing
@@ -25,6 +26,7 @@ namespace RunicMagic.Controller.RuneParsing
             FillExecutableStatementRuneParsers();
             FillStatementRuneParsers();
             FillEntitySetRuneParsers();
+            FillSetOperationRuneParsers();
             FillNumberRuneParsers();
             FillLocationRuneParsers();
         }
@@ -74,6 +76,7 @@ namespace RunicMagic.Controller.RuneParsing
             entitySetRuneParsers["A"] = new AParser(); // me, caster
             entitySetRuneParsers["OH"] = new OHParser(); // this, executor
             entitySetRuneParsers["LA"] = new LAParser(); // scope of
+            entitySetRuneParsers["PA"] = new PAParser(); // intersection of scopes
             entitySetRuneParsers["DAN"] = new DANParser(); // pointing at
             entitySetRuneParsers["KAL"] = new KALParser(); // indicating
             entitySetRuneParsers["HORO"] = new HOROParser(); // near
@@ -87,6 +90,13 @@ namespace RunicMagic.Controller.RuneParsing
             entitySetRuneParsers["HORHE"] = new HORHEParser(); // closest
             entitySetRuneParsers["HORSE"] = new HORSEParser(); // farthest
             entitySetRuneParsers["DRYAL"] = new DRYALParser(); // is alive
+        }
+
+        private static void FillSetOperationRuneParsers()
+        {
+            entitySetRuneParsers["AN"] = new ANParser(); // union
+            entitySetRuneParsers["DU"] = new DUParser(); // intersection
+            entitySetRuneParsers["RAL"] = new RALParser(); // difference
         }
 
         private static void FillNumberRuneParsers()

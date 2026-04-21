@@ -34,6 +34,7 @@ SHU can be nested. Each SHU pushes onto whatever stack is current at the point o
 | Rune | Meaning | Signature |
 |------|---------|-----------|
 | `LA` | scope of | (Set = OH) → Set |
+| `PA` | intersection of scopes | (Set = OH) → Set |
 | `HORO` | near | (Number, Location = PAR(OH)) → Set |
 | `ZYIL` | weight range filter | (Set, Number lower, Number upper) → Set |
 | `ZYHE` | lightest | (Set) → Set |
@@ -45,8 +46,13 @@ SHU can be nested. Each SHU pushes onto whatever stack is current at the point o
 | `HORHE` | closest | (Set, Location = PAR(OH)) → Set |
 | `HORSE` | farthest | (Set, Location = PAR(OH)) → Set |
 | `DRYAL` | is alive | (Set) → Set |
+| `AN` | union | (Set, Set) → Set |
+| `DU` | intersection | (Set, Set) → Set |
+| `RAL` | difference | (Set, Set) → Set |
 
 `LA` maps each member of the input Set to its scope (via the entity's scope delegate) and returns the union. Defaults to `OH`, so bare `LA` maps the executor's scope.
+
+`PA` maps each member of the input Set to its scope and returns the intersection — only entities that appear in every member's scope. An entity with no scope contributes an empty set, making the whole result empty. Defaults to `OH`.
 
 `HORO` returns all entities in the world whose nearest bounding edge is within `Number` millimetres of `Location`. Defaults to the executor's position, so `HORO HET` selects everything within 1 mm of the executor.
 
@@ -69,6 +75,12 @@ SHU can be nested. Each SHU pushes onto whatever stack is current at the point o
 `HORSE` returns all entities in the Set tied for maximum distance from `Location`. Defaults to the executor's position.
 
 `DRYAL` filters a Set to entities that have a life capability and currently have more than 0 hit points.
+
+`AN` returns all entities that appear in either input Set. Duplicates are collapsed — an entity in both sets appears once.
+
+`DU` returns only entities that appear in both input Sets.
+
+`RAL` returns entities from the first Set that do not appear in the second Set. Order follows the first Set.
 
 ## Invocation
 
