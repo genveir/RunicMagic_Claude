@@ -66,6 +66,7 @@ internal class SpellCastingService(WorldModel world, SpellExecutor spellExecutor
             ExecutorDisintegratedEvent => "The executor disintegrated.",
             SelectionCostNotMetEvent e => $"Selection failed: needed {e.Required} power, drew {e.Drawn}.",
             InscriptionReadEvent e => $"{e.Entity.Label}: {e.Text}",
+            DebugOutputEvent e => e.Text,
             _ => @event.ToString()!
         };
     }

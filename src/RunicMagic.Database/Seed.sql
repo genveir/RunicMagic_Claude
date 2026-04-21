@@ -33,7 +33,9 @@ values
     -- small mana stone (next to the rock)
     (@smallManaStone, 2, 'Small Mana Stone', 5000, 5600, 100, 100, 0, 500,    0, 0),
     -- rock (center of room, to be inscribed)
-    (@rock,      3, 'Rock',                 4600,   5600, 700,  700,  0, 200000,   0, 35 * PI() / 180);
+    (@rock,      3, 'Rock',                 4600,   5600, 700,  700,  0, 200000,   0, 35 * PI() / 180),
+
+    (newid(),    3, 'Rotated Test Wall',    12000, 6000, 600,  5000, 0, 3000000,   0, 70 * PI() / 180);
 
 insert into EntityLife (EntityId, MaxHitPoints, CurrentHitPoints)
 values

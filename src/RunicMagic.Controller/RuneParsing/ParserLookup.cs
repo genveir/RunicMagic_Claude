@@ -1,4 +1,5 @@
 ﻿using RunicMagic.Controller.RuneParsing.ArithmeticRunes;
+using RunicMagic.Controller.RuneParsing.DebugRunes;
 using RunicMagic.Controller.RuneParsing.EffectRunes;
 using RunicMagic.Controller.RuneParsing.EntityReferenceRunes;
 using RunicMagic.Controller.RuneParsing.EntitySetRunes;
@@ -65,6 +66,7 @@ namespace RunicMagic.Controller.RuneParsing
 
         private static void FillStatementRuneParsers()
         {
+            statementRuneParsers["DETAILS"] = new DETAILSParser(); // debug info
             statementRuneParsers["VUN"] = new VUNParser(); // push
             statementRuneParsers["VAR"] = new VARParser(); // pull
             statementRuneParsers["CJIR"] = new CJIRParser(); // rotate clockwise
@@ -76,6 +78,7 @@ namespace RunicMagic.Controller.RuneParsing
 
         private static void FillEntitySetRuneParsers()
         {
+            entitySetRuneParsers["GA"] = new GAParser(); // global context
             entitySetRuneParsers["A"] = new AParser(); // me, caster
             entitySetRuneParsers["OH"] = new OHParser(); // this, executor
             entitySetRuneParsers["LA"] = new LAParser(); // scope of

@@ -216,7 +216,7 @@ function updateCanvas(entities) {
         g.appendChild(svgEl('rect', {
             x: e.x - e.width / 2, y: -e.y - e.height / 2, width: e.width, height: e.height,
             class: entityClass(e),
-            transform: `rotate(${angleDeg}, ${e.x}, ${-e.y})`,
+            transform: `rotate(${-angleDeg}, ${e.x}, ${-e.y})`,
         }));
 
         const label = svgEl('text', {
