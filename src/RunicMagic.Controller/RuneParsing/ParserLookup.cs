@@ -67,6 +67,8 @@ namespace RunicMagic.Controller.RuneParsing
         {
             statementRuneParsers["VUN"] = new VUNParser(); // push
             statementRuneParsers["VAR"] = new VARParser(); // pull
+            statementRuneParsers["CJIR"] = new CJIRParser(); // rotate clockwise
+            statementRuneParsers["CJAR"] = new CJARParser(); // rotate counterclockwise
             statementRuneParsers["SHU"] = new SHUParser(); // with power source
             statementRuneParsers["GWYAH"] = new GWYAHParser(); // invoke
             statementRuneParsers["CRIYR"] = new CRIYRParser(); // read inscription

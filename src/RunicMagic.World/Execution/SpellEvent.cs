@@ -10,3 +10,4 @@ public record EffectNotFiredEvent(string Effect, string Reason) : SpellEvent;
 public record ExecutorDisintegratedEvent : SpellEvent;
 public record SelectionCostNotMetEvent(long Required, long Drawn) : SpellEvent;
 public record InscriptionReadEvent(Entity Entity, string Text) : SpellEvent;
+public record EntityRotatedEvent(Entity Entity, long AngleDegrees) : SpellEvent;
