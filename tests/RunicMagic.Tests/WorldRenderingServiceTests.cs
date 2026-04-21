@@ -12,7 +12,7 @@ public class WorldRenderingServiceTests
 {
     private static Entity MakeEntity(string label, long x, long y, long width, long height,
         bool hasAgency = false, LifeCapability? life = null) =>
-        new(EntityId.New(), EntityType.Object, label)
+        new(EntityId.New(), label)
         {
             Location = new Location(x, y),
             Width = width,
@@ -70,7 +70,7 @@ public class WorldRenderingServiceTests
     public void GetAllRenderingModels_EntityWithPointingDirection_IncludesResolvedEndpoint()
     {
         var world = new WorldModel();
-        var pointing = new Entity(EntityId.New(), EntityType.Object, "archer")
+        var pointing = new Entity(EntityId.New(), "archer")
         {
             Location = new Location(0, 0),
             Width = 100,

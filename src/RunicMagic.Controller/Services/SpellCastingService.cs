@@ -65,6 +65,7 @@ internal class SpellCastingService(WorldModel world, SpellExecutor spellExecutor
             EffectNotFiredEvent e => $"Effect '{e.Effect}' did not fire: {e.Reason}.",
             ExecutorDisintegratedEvent => "The executor disintegrated.",
             SelectionCostNotMetEvent e => $"Selection failed: needed {e.Required} power, drew {e.Drawn}.",
+            InscriptionReadEvent e => $"{e.Entity.Label}: {e.Text}",
             _ => @event.ToString()!
         };
     }

@@ -7,7 +7,7 @@ namespace RunicMagic.Tests;
 public class WorldModelTests
 {
     private static Entity MakeEntity(long x, long y, long width, long height) =>
-        new(EntityId.New(), EntityType.Object, "test") { Location = new Location(x, y), Width = width, Height = height };
+        new(EntityId.New(), "test") { Location = new Location(x, y), Width = width, Height = height };
 
     // ── GetEntitiesWithinDistance ─────────────────────────────────────────────
 

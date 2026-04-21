@@ -9,7 +9,7 @@ public class RayCastServiceTests
 {
     private static Entity MakeEntity(long x, long y, long width = 100, long height = 100, bool isTranslucent = false)
     {
-        return new Entity(EntityId.New(), EntityType.Object, "test")
+        return new Entity(EntityId.New(), "test")
         {
             Location = new Location(x, y),
             Width = width,

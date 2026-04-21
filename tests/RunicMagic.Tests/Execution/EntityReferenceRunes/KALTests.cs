@@ -13,7 +13,7 @@ public class KALTests
 
     private static Entity MakeEntity(long x, long y, long width = 100, long height = 100)
     {
-        return new Entity(EntityId.New(), EntityType.Object, "test")
+        return new Entity(EntityId.New(), "test")
         {
             Location = new Location(x, y),
             Width = width,
@@ -83,7 +83,7 @@ public class KALTests
     {
         var world = new WorldModel();
         var casterEntity = MakeEntity(x: 0, y: 0);
-        var glass = new Entity(EntityId.New(), EntityType.Object, "glass")
+        var glass = new Entity(EntityId.New(), "glass")
         {
             Location = new Location(300, 0),
             Width = 100,

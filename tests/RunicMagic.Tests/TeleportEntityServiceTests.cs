@@ -10,7 +10,7 @@ public class TeleportEntityServiceTests
     [Fact]
     public void Teleport_UpdatesEntityPosition()
     {
-        var entity = new Entity(EntityId.New(), EntityType.Object, "test") { Location = new Location(0, 0) };
+        var entity = new Entity(EntityId.New(), "test") { Location = new Location(0, 0) };
         var service = new TeleportEntityService();
 
         service.Teleport(entity, new Location(400, 300));

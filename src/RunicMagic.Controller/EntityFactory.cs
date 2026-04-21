@@ -21,7 +21,7 @@ public class EntityFactory(WorldModel world, ILogger<EntityFactory> logger)
             _ => throw new ArgumentException($"Unknown entity type ID: {data.TypeId}")
         };
 
-        var entity = new Entity(new EntityId(data.Id), type, data.Label)
+        var entity = new Entity(new EntityId(data.Id), data.Label)
         {
             Location = new Location(data.X, data.Y),
             Angle = data.Angle,
@@ -38,7 +38,7 @@ public class EntityFactory(WorldModel world, ILogger<EntityFactory> logger)
         if (data.MaxCharge.HasValue && data.CurrentCharge.HasValue)
             entity.Charge = new ChargeCapability(data.MaxCharge.Value, data.CurrentCharge.Value);
 
-        WireDelegates(entity);
+        WireDelegates(type, entity);
         ParseInscriptions(entity, data.InscriptionTexts);
         return entity;
     }
@@ -60,13 +60,14 @@ public class EntityFactory(WorldModel world, ILogger<EntityFactory> logger)
             }
         }
         entity.ParsedInscriptions = [.. parsed];
+        entity.RawInscriptions = inscriptionTexts;
     }
 
-    private void WireDelegates(Entity entity)
+    private void WireDelegates(EntityType type, Entity entity)
     {
         entity.Scope = () => [.. world.GetEntitiesWithinDistance(entity, 500)];
 
-        switch (entity.Type)
+        switch (type)
         {
             case EntityType.Creature:
 

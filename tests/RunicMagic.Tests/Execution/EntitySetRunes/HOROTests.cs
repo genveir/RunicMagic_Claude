@@ -1,6 +1,5 @@
 using FluentAssertions;
 using RunicMagic.World;
-using RunicMagic.World.Execution;
 using RunicMagic.World.Geometry;
 using RunicMagic.World.Runes.EntitySetRunes;
 using Xunit;
@@ -11,7 +10,7 @@ public class HOROTests
 {
     private static Entity MakeEntity(long x, long y, long width = 100, long height = 100)
     {
-        return new Entity(EntityId.New(), EntityType.Object, "test")
+        return new Entity(EntityId.New(), "test")
         {
             Location = new Location(x, y),
             Width = width,

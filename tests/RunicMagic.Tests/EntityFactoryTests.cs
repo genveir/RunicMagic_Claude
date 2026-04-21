@@ -336,4 +336,54 @@ public class EntityFactoryTests
 
         entity.ParsedInscriptions.Should().HaveCount(1);
     }
+
+    // ── RawInscriptions ───────────────────────────────────────────────────────
+
+    [Fact]
+    public void RawInscriptions_EmptyArray_WhenNoInscriptionTexts()
+    {
+        var world = new WorldModel();
+        var entity = Factory(world).Create(new EntityData(
+            Guid.NewGuid(), (long)EntityType.Object, "rock",
+            X: 0, Y: 0, Width: 5, Height: 5, HasAgency: false, Weight: 0));
+
+        entity.RawInscriptions.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void RawInscriptions_ContainsOriginalText_WhenValidInscription()
+    {
+        var world = new WorldModel();
+        var entity = Factory(world).Create(new EntityData(
+            Guid.NewGuid(), (long)EntityType.Object, "rock",
+            X: 0, Y: 0, Width: 5, Height: 5, HasAgency: false, Weight: 0,
+            InscriptionTexts: ["VUN A HET"]));
+
+        entity.RawInscriptions.Should().Equal("VUN A HET");
+    }
+
+    [Fact]
+    public void RawInscriptions_ContainsOriginalText_WhenInvalidInscription()
+    {
+        var world = new WorldModel();
+        var entity = Factory(world).Create(new EntityData(
+            Guid.NewGuid(), (long)EntityType.Object, "rock",
+            X: 0, Y: 0, Width: 5, Height: 5, HasAgency: false, Weight: 0,
+            InscriptionTexts: ["NOTARUNE"]));
+
+        entity.RawInscriptions.Should().Equal("NOTARUNE");
+    }
+
+    [Fact]
+    public void RawInscriptions_ContainsAllTexts_WhenMixedValidAndInvalid()
+    {
+        var world = new WorldModel();
+        var entity = Factory(world).Create(new EntityData(
+            Guid.NewGuid(), (long)EntityType.Object, "rock",
+            X: 0, Y: 0, Width: 5, Height: 5, HasAgency: false, Weight: 0,
+            InscriptionTexts: ["NOTARUNE", "VUN A HET"]));
+
+        entity.RawInscriptions.Should().Equal("NOTARUNE", "VUN A HET");
+        entity.ParsedInscriptions.Should().HaveCount(1);
+    }
 }

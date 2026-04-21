@@ -12,7 +12,7 @@ public class EntityRenderingMapperTests
 {
     private static Entity MakeEntity(EntityType type = EntityType.Object, bool hasAgency = false,
         LifeCapability? life = null, ChargeCapability? charge = null) =>
-        new(EntityId.New(), type, "test")
+        new(EntityId.New(), "test")
         {
             Location = new Location(10, 20),
             Width = 30,
@@ -25,7 +25,7 @@ public class EntityRenderingMapperTests
     [Fact]
     public void Maps_LocationAndLabel()
     {
-        var entity = new Entity(EntityId.New(), EntityType.Object, "rock")
+        var entity = new Entity(EntityId.New(), "rock")
         {
             Location = new Location(5, 15),
             Width = 25,

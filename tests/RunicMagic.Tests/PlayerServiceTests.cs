@@ -21,7 +21,7 @@ public class PlayerServiceTests
     }
 
     private static Entity MakeAgencyEntity(long x, long y, string label = "agent") =>
-        new(EntityId.New(), EntityType.Object, label)
+        new(EntityId.New(), label)
         {
             Location = new Location(x, y),
             Width = 100,

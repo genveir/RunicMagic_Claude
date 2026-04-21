@@ -9,7 +9,7 @@ internal static class TestFixtures
 {
     internal static Entity MakeEntity(long x = 0, long y = 0, long weight = 0)
     {
-        var entity = new Entity(new EntityId(Guid.NewGuid()), EntityType.Object, "test");
+        var entity = new Entity(new EntityId(Guid.NewGuid()), "test");
         entity.Location = new Location(x, y);
         entity.Width = 100;
         entity.Height = 100;
