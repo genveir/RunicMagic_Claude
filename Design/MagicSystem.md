@@ -90,7 +90,19 @@ If the spell is structurally invalid at a point in the expression tree, evaluati
 
 If the evaluation cost cannot be met in full, the executor disintegrates.
 
-The system makes no attempt to pre-validate whether a spell can be afforded before drawing begins. There are no guardrails — power is drawn, effects fire, and consequences follow. A spell that cannot be completed will still drain every source it can reach before failing.
+The system makes no attempt to pre-validate whether a spell can be afforded before drawing begins. A spell that cannot be completed will still drain every source it can reach before failing.
+
+---
+
+## Skill and Precision
+
+The cost model consistently rewards mastery. There are no guardrails, no safety nets, and no bonuses for intent — only the structure of the spell and the state of the world matter.
+
+- **Evaluation cost** rewards compact spell construction. A caster who finds a 9-rune representation of a number pays less than one who writes the same value in 21 runes using naive base-14 arithmetic. The engine taxes the number of nodes it must instantiate, not the magnitude of the result.
+- **Breadth cost** rewards precise targeting. A spell that selects exactly what it needs pays less than one that sweeps broadly and filters back down. The engine counts every entity touched during Set resolution, not just those that survive.
+- **Failure** punishes overreach without mercy. The engine makes no attempt to pre-validate whether a spell can be afforded. Power is drawn, effects fire, and consequences follow — a spell that cannot be completed will still drain every source it can reach before failing.
+
+A novice and an expert can write the same effect. The expert's version costs less, leaves more in reserve, and is harder to exhaust against. That gap is entirely a function of how well the caster understands the system.
 
 ---
 
