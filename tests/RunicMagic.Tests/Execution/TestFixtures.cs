@@ -63,6 +63,27 @@ internal class FixedNumber : INumber
     }
 }
 
+internal class FixedPointEntitySet : IEntitySet
+{
+    private readonly Location _location;
+
+    internal FixedPointEntitySet(long x, long y)
+    {
+        _location = new Location(x, y);
+    }
+
+    public EntitySet Resolve(SpellContext context)
+    {
+        var entity = new Entity(EntityId.New(), "origin")
+        {
+            Location = _location,
+            Width = 1,
+            Height = 1,
+        };
+        return new EntitySet([entity]);
+    }
+}
+
 internal class FixedLocation : ILocation
 {
     private readonly Location _location;

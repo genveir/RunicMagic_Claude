@@ -1,6 +1,5 @@
 using FluentAssertions;
 using RunicMagic.World;
-using RunicMagic.World.Geometry;
 using RunicMagic.World.Runes.EntitySetRunes;
 using Xunit;
 
@@ -8,99 +7,25 @@ namespace RunicMagic.Tests.Execution.EntitySetRunes;
 
 public class HOROTests
 {
-    private static Entity MakeEntity(long x, long y, long width = 100, long height = 100)
+    // Origin: 100x100 at (0,0) → bounds [-50,50] on both axes.
+    // near:   100x100 at (200,0) → left edge 150, gap to origin right edge 50  = 100
+    // far:    100x100 at (500,0) → left edge 450, gap to origin right edge 50  = 400
+    private static readonly Entity Origin = TestFixtures.MakeEntity(x: 0, y: 0);
+
+    private static WorldModel WorldWith(params Entity[] entities)
     {
-        return new Entity(EntityId.New(), "test")
-        {
-            Location = new Location(x, y),
-            Width = width,
-            Height = height,
-        };
+        var world = new WorldModel();
+        foreach (var e in entities)
+            world.Add(e);
+        return world;
     }
 
     [Fact]
     public void Resolve_EntityWithinRadius_IsReturned()
     {
-        var world = new WorldModel();
-        var entity = MakeEntity(x: 500, y: 0);
-        world.Add(entity);
-
-        var horo = new HORO(
-            howFar: new FixedNumber(600),
-            origin: new FixedLocation(0, 0));
-        var context = TestFixtures.MakeContext(world: world);
-
-        var result = horo.Resolve(context);
-
-        result.Entities.Should().ContainSingle().Which.Should().BeSameAs(entity);
-    }
-
-    [Fact]
-    public void Resolve_EntityOutsideRadius_IsNotReturned()
-    {
-        var world = new WorldModel();
-        var entity = MakeEntity(x: 1000, y: 0);
-        world.Add(entity);
-
-        var horo = new HORO(
-            howFar: new FixedNumber(400),
-            origin: new FixedLocation(0, 0));
-        var context = TestFixtures.MakeContext(world: world);
-
-        var result = horo.Resolve(context);
-
-        result.Entities.Should().BeEmpty();
-    }
-
-    [Fact]
-    public void Resolve_EntityAtExactBoundary_IsReturned()
-    {
-        var world = new WorldModel();
-        // Entity centre at (550, 0), width 100 → nearest edge at x=500
-        var entity = MakeEntity(x: 550, y: 0);
-        world.Add(entity);
-
-        var horo = new HORO(
-            howFar: new FixedNumber(500),
-            origin: new FixedLocation(0, 0));
-        var context = TestFixtures.MakeContext(world: world);
-
-        var result = horo.Resolve(context);
-
-        result.Entities.Should().ContainSingle().Which.Should().BeSameAs(entity);
-    }
-
-    [Fact]
-    public void Resolve_UsesOriginFromLocation()
-    {
-        var world = new WorldModel();
-        // Entity 200mm from origin at (1000, 0), so nearest edge at (950, 0) → 50mm from origin
-        var entity = MakeEntity(x: 1000, y: 0);
-        world.Add(entity);
-
-        var horo = new HORO(
-            howFar: new FixedNumber(100),
-            origin: new FixedLocation(900, 0));
-        var context = TestFixtures.MakeContext(world: world);
-
-        var result = horo.Resolve(context);
-
-        result.Entities.Should().ContainSingle().Which.Should().BeSameAs(entity);
-    }
-
-    [Fact]
-    public void Resolve_MultipleEntities_ReturnsOnlyThoseWithinRadius()
-    {
-        var world = new WorldModel();
-        var near = MakeEntity(x: 200, y: 0);
-        var far = MakeEntity(x: 2000, y: 0);
-        world.Add(near);
-        world.Add(far);
-
-        var horo = new HORO(
-            howFar: new FixedNumber(500),
-            origin: new FixedLocation(0, 0));
-        var context = TestFixtures.MakeContext(world: world);
+        var near = TestFixtures.MakeEntity(x: 200, y: 0);
+        var horo = new HORO(howFar: new FixedNumber(200), origin: new FixedEntitySet(Origin));
+        var context = TestFixtures.MakeContext(world: WorldWith(near));
 
         var result = horo.Resolve(context);
 
@@ -108,13 +33,11 @@ public class HOROTests
     }
 
     [Fact]
-    public void Resolve_NoEntitiesInWorld_ReturnsEmptySet()
+    public void Resolve_EntityBeyondRadius_IsNotReturned()
     {
-        var world = new WorldModel();
-        var horo = new HORO(
-            howFar: new FixedNumber(1000),
-            origin: new FixedLocation(0, 0));
-        var context = TestFixtures.MakeContext(world: world);
+        var far = TestFixtures.MakeEntity(x: 500, y: 0);
+        var horo = new HORO(howFar: new FixedNumber(200), origin: new FixedEntitySet(Origin));
+        var context = TestFixtures.MakeContext(world: WorldWith(far));
 
         var result = horo.Resolve(context);
 
@@ -122,52 +45,93 @@ public class HOROTests
     }
 
     [Fact]
-    public void Resolve_WindowOpen_AddsResolvedEntityIdsToResolutionCount()
+    public void Resolve_EntityExactlyAtRadius_IsReturned()
     {
-        var world = new WorldModel();
-        var near = MakeEntity(x: 200, y: 0);
-        var far = MakeEntity(x: 2000, y: 0);
-        world.Add(near);
-        world.Add(far);
+        var near = TestFixtures.MakeEntity(x: 200, y: 0);
+        var horo = new HORO(howFar: new FixedNumber(100), origin: new FixedEntitySet(Origin));
+        var context = TestFixtures.MakeContext(world: WorldWith(near));
 
-        var horo = new HORO(howFar: new FixedNumber(500), origin: new FixedLocation(0, 0));
-        var context = TestFixtures.MakeContext(world: world);
+        var result = horo.Resolve(context);
+
+        result.Entities.Should().ContainSingle().Which.Should().BeSameAs(near);
+    }
+
+    [Fact]
+    public void Resolve_EntityOneUnitBeyondRadius_IsNotReturned()
+    {
+        var near = TestFixtures.MakeEntity(x: 200, y: 0);
+        var horo = new HORO(howFar: new FixedNumber(99), origin: new FixedEntitySet(Origin));
+        var context = TestFixtures.MakeContext(world: WorldWith(near));
+
+        var result = horo.Resolve(context);
+
+        result.Entities.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void Resolve_MultipleEntities_ReturnsOnlyThoseWithinRadius()
+    {
+        var near = TestFixtures.MakeEntity(x: 200, y: 0);
+        var far = TestFixtures.MakeEntity(x: 500, y: 0);
+        var horo = new HORO(howFar: new FixedNumber(200), origin: new FixedEntitySet(Origin));
+        var context = TestFixtures.MakeContext(world: WorldWith(near, far));
+
+        var result = horo.Resolve(context);
+
+        result.Entities.Should().ContainSingle().Which.Should().BeSameAs(near);
+    }
+
+    [Fact]
+    public void Resolve_EmptyOriginSet_ReturnsNoEntities()
+    {
+        var near = TestFixtures.MakeEntity(x: 200, y: 0);
+        var horo = new HORO(howFar: new FixedNumber(1000), origin: new FixedEntitySet());
+        var context = TestFixtures.MakeContext(world: WorldWith(near));
+
+        var result = horo.Resolve(context);
+
+        result.Entities.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void Resolve_EmptyWorld_ReturnsEmpty()
+    {
+        var horo = new HORO(howFar: new FixedNumber(1000), origin: new FixedEntitySet(Origin));
+        var context = TestFixtures.MakeContext(world: new WorldModel());
+
+        var result = horo.Resolve(context);
+
+        result.Entities.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void Resolve_WindowOpen_TracksResultEntities()
+    {
+        var near = TestFixtures.MakeEntity(x: 200, y: 0);
+        var horo = new HORO(howFar: new FixedNumber(200), origin: new FixedEntitySet(Origin));
+        var context = TestFixtures.MakeContext(world: WorldWith(near));
         context.OpenResolutionWindow();
 
         horo.Resolve(context);
 
         context.EntityResolutionCount.Should().Contain(near.Id);
-        context.EntityResolutionCount.Should().NotContain(far.Id);
     }
 
     [Fact]
-    public void Resolve_WindowNull_DoesNotThrow()
+    public void Resolve_MultipleOrigins_EntityInRangeOfEachOriginOnly_IsReturned()
     {
-        var world = new WorldModel();
-        world.Add(MakeEntity(x: 200, y: 0));
-        var horo = new HORO(howFar: new FixedNumber(500), origin: new FixedLocation(0, 0));
-        var context = TestFixtures.MakeContext(world: world);
-
-        var act = () => horo.Resolve(context);
-
-        act.Should().NotThrow();
-    }
-
-    [Fact]
-    public void Resolve_LargeEntityBridgesRadius_IsIncluded()
-    {
-        var world = new WorldModel();
-        // Entity centre at (2000, 0), width 4000 → nearest edge at x=0, distance 0 from origin
-        var largeEntity = MakeEntity(x: 2000, y: 0, width: 4000, height: 100);
-        world.Add(largeEntity);
-
-        var horo = new HORO(
-            howFar: new FixedNumber(1),
-            origin: new FixedLocation(0, 0));
-        var context = TestFixtures.MakeContext(world: world);
+        // O1 at (0,0), O2 at (1000,0). nearA is within radius of O1 only (dist=100, gap to O2=700).
+        // nearB is within radius of O2 only (dist=100, gap to O1=700). Both qualify via their nearest origin.
+        var originO2 = TestFixtures.MakeEntity(x: 1000, y: 0);
+        var nearA = TestFixtures.MakeEntity(x: 200, y: 0);
+        var nearB = TestFixtures.MakeEntity(x: 800, y: 0);
+        var horo = new HORO(howFar: new FixedNumber(200), origin: new FixedEntitySet(Origin, originO2));
+        var context = TestFixtures.MakeContext(world: WorldWith(nearA, nearB));
 
         var result = horo.Resolve(context);
 
-        result.Entities.Should().ContainSingle().Which.Should().BeSameAs(largeEntity);
+        result.Entities.Should().HaveCount(2);
+        result.Entities.Should().Contain(nearA);
+        result.Entities.Should().Contain(nearB);
     }
 }

@@ -36,6 +36,17 @@ public static class LocationExtensions
         return result;
     }
 
+    public static double GetDistanceFromSet(this Entity entity, IReadOnlyList<Rectangle> originRects)
+    {
+        if (originRects.Count == 0)
+        {
+            return double.PositiveInfinity;
+        }
+        var entityBounds = new Rectangle(entity.Location, entity.Width, entity.Height, entity.Angle);
+        var minDistance = originRects.Min(r => entityBounds.GetDistanceFromRectangle(r));
+        return minDistance;
+    }
+
     // Falls back to unweighted centroid when total weight is zero.
     public static Location WeightedCentroid(this IEnumerable<(Location Location, long Weight)> items)
     {

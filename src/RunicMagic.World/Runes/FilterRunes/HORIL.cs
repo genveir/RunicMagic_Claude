@@ -9,9 +9,9 @@ namespace RunicMagic.World.Runes.FilterRunes
         public IEntitySet Source { get; }
         public INumber Lower { get; }
         public INumber Upper { get; }
-        public ILocation Origin { get; }
+        public IEntitySet Origin { get; }
 
-        public HORIL(IEntitySet source, INumber lower, INumber upper, ILocation origin)
+        public HORIL(IEntitySet source, INumber lower, INumber upper, IEntitySet origin)
         {
             Source = source;
             Lower = lower;
@@ -24,16 +24,23 @@ namespace RunicMagic.World.Runes.FilterRunes
             var source = Source.Resolve(context);
             var lower = Lower.Evaluate(context);
             var upper = Upper.Evaluate(context);
-            var origin = Origin.Evaluate(context);
+            var originSet = Origin.Resolve(context);
+            var originRects = originSet.Entities.Select(e => Bounds(e)).ToList();
             var filtered = source.Entities
                 .Where(e =>
                 {
-                    var distance = e.GetDistance(origin);
+                    var distance = e.GetDistanceFromSet(originRects);
                     return distance > (double)lower.Value && distance < (double)upper.Value;
                 })
                 .ToList();
             var result = new EntitySet(filtered);
             return result;
+        }
+
+        private static Rectangle Bounds(Entity e)
+        {
+            var bounds = new Rectangle(e.Location, e.Width, e.Height, e.Angle);
+            return bounds;
         }
 
         public override string ToString()

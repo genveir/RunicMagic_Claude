@@ -7,9 +7,9 @@ namespace RunicMagic.World.Runes.FilterRunes
     public class HORHE : IEntitySet
     {
         public IEntitySet Source { get; }
-        public ILocation Origin { get; }
+        public IEntitySet Origin { get; }
 
-        public HORHE(IEntitySet source, ILocation origin)
+        public HORHE(IEntitySet source, IEntitySet origin)
         {
             Source = source;
             Origin = origin;
@@ -22,13 +22,20 @@ namespace RunicMagic.World.Runes.FilterRunes
             {
                 return new EntitySet([]);
             }
-            var origin = Origin.Evaluate(context);
-            var minDistance = source.Entities.Min(e => e.GetDistance(origin));
+            var originSet = Origin.Resolve(context);
+            var originRects = originSet.Entities.Select(e => Bounds(e)).ToList();
+            var minDistance = source.Entities.Min(e => e.GetDistanceFromSet(originRects));
             var closest = source.Entities
-                .Where(e => e.GetDistance(origin) == minDistance)
+                .Where(e => e.GetDistanceFromSet(originRects) == minDistance)
                 .ToList();
             var result = new EntitySet(closest);
             return result;
+        }
+
+        private static Rectangle Bounds(Entity e)
+        {
+            var bounds = new Rectangle(e.Location, e.Width, e.Height, e.Angle);
+            return bounds;
         }
 
         public override string ToString()

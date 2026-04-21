@@ -3,63 +3,6 @@ namespace RunicMagic.World.Geometry;
 // X and Y are the center of the rectangle. Width and Height are the full extents.
 public readonly record struct Rectangle(Location Location, double Width, double Height, double Angle)
 {
-    // Translates a world-space point into this rectangle's local frame (centred at origin, unrotated).
-    private (double X, double Y) ToLocalFrame(double worldX, double worldY)
-    {
-        var dx = worldX - Location.X;
-        var dy = worldY - Location.Y;
-        var cos = Math.Cos(Angle);
-        var sin = Math.Sin(Angle);
-        var localX = dx * cos + dy * sin;
-        var localY = -dx * sin + dy * cos;
-        return (localX, localY);
-    }
-
-    // Returns a new rectangle with its centre rotated around world origin by the given angle
-    // and its own orientation incremented by the same amount.
-    public Rectangle Rotate(double angle)
-    {
-        var cos = Math.Cos(angle);
-        var sin = Math.Sin(angle);
-        var newX = Location.X * cos - Location.Y * sin;
-        var newY = Location.X * sin + Location.Y * cos;
-        return new Rectangle(new Location(newX, newY), Width, Height, Angle + angle);
-    }
-
-    // Returns the 4 corners of this rectangle in world space.
-    private (double X, double Y)[] Corners()
-    {
-        var hw = Width / 2;
-        var hh = Height / 2;
-        var cos = Math.Cos(Angle);
-        var sin = Math.Sin(Angle);
-        var cx = Location.X;
-        var cy = Location.Y;
-        return [
-            (cx + hw * cos - hh * sin, cy + hw * sin + hh * cos),
-            (cx - hw * cos - hh * sin, cy - hw * sin + hh * cos),
-            (cx + hw * cos + hh * sin, cy + hw * sin - hh * cos),
-            (cx - hw * cos + hh * sin, cy - hw * sin - hh * cos),
-        ];
-    }
-
-    public bool Contains(Rectangle other)
-    {
-        var relative = other with { Location = new Location(other.Location.X - Location.X, other.Location.Y - Location.Y) };
-        var local = relative.Rotate(-Angle);
-        var halfW = Width / 2;
-        var halfH = Height / 2;
-        var result = local.Corners().All(c => Math.Abs(c.X) <= halfW && Math.Abs(c.Y) <= halfH);
-        return result;
-    }
-
-    public bool Contains(Location location)
-    {
-        var (lx, ly) = ToLocalFrame(location.X, location.Y);
-        var result = Math.Abs(lx) <= Width / 2 && Math.Abs(ly) <= Height / 2;
-        return result;
-    }
-
     public bool IntersectsWith(Rectangle other)
     {
         // Broad-phase: (Width + Height) / 2 is a conservative circumradius (always >= true circumradius).
@@ -92,27 +35,20 @@ public readonly record struct Rectangle(Location Location, double Width, double 
         return false;
     }
 
-    private static double Cross(
-        (double X, double Y) lineStart,
-        (double X, double Y) lineEnd,
-        (double X, double Y) point)
+    public bool Contains(Rectangle other)
     {
-        var result = (lineEnd.X - lineStart.X) * (point.Y - lineStart.Y)
-                   - (lineEnd.Y - lineStart.Y) * (point.X - lineStart.X);
+        var relative = other with { Location = new Location(other.Location.X - Location.X, other.Location.Y - Location.Y) };
+        var local = relative.RotateAroundWorldOrigin(-Angle);
+        var halfW = Width / 2;
+        var halfH = Height / 2;
+        var result = local.Corners().All(c => Math.Abs(c.X) <= halfW && Math.Abs(c.Y) <= halfH);
         return result;
     }
 
-    // Returns true only for proper crossings; collinear/touching segments return false.
-    private static bool SegmentsIntersect(
-        (double X, double Y) a, (double X, double Y) b,
-        (double X, double Y) c, (double X, double Y) d)
+    public bool Contains(Location location)
     {
-        var d1 = Cross(c, d, a);
-        var d2 = Cross(c, d, b);
-        var d3 = Cross(a, b, c);
-        var d4 = Cross(a, b, d);
-        var result = (d1 > 0 && d2 < 0 || d1 < 0 && d2 > 0) &&
-                     (d3 > 0 && d4 < 0 || d3 < 0 && d4 > 0);
+        var (lx, ly) = ToLocalFrame(location.X, location.Y);
+        var result = Math.Abs(lx) <= Width / 2 && Math.Abs(ly) <= Height / 2;
         return result;
     }
 
@@ -196,6 +132,143 @@ public readonly record struct Rectangle(Location Location, double Width, double 
     {
         var distance = GetDistanceFromPoint(toCheck);
         var result = distance <= maxDistance;
+        return result;
+    }
+
+    // Returns the minimum distance between the surfaces of this rectangle and another.
+    // Overlapping or touching rectangles have distance 0.
+    public double GetDistanceFromRectangle(Rectangle other)
+    {
+        if (IntersectsWith(other))
+        {
+            return 0;
+        }
+
+        var cornersA = Corners();
+        var cornersB = other.Corners();
+        var minDistance = double.MaxValue;
+
+        for (var i = 0; i < 4; i++)
+        {
+            for (var j = 0; j < 4; j++)
+            {
+                var d = PointToSegmentDistance(cornersA[i], cornersB[j], cornersB[(j + 1) % 4]);
+                if (d < minDistance) minDistance = d;
+            }
+        }
+
+        for (var i = 0; i < 4; i++)
+        {
+            for (var j = 0; j < 4; j++)
+            {
+                var d = PointToSegmentDistance(cornersB[i], cornersA[j], cornersA[(j + 1) % 4]);
+                if (d < minDistance) minDistance = d;
+            }
+        }
+
+        return minDistance;
+    }
+
+    // True when the minimum surface-to-surface distance between this rectangle and another is within maxDistance.
+    public bool IsWithinDistanceFromRectangle(Rectangle other, double maxDistance)
+    {
+        var distance = GetDistanceFromRectangle(other);
+        var result = distance <= maxDistance;
+        return result;
+    }
+
+    // Returns a new rectangle with its centre rotated around world origin by the given angle
+    // and its own orientation incremented by the same amount.
+    private Rectangle RotateAroundWorldOrigin(double angle)
+    {
+        var cos = Math.Cos(angle);
+        var sin = Math.Sin(angle);
+        var newX = Location.X * cos - Location.Y * sin;
+        var newY = Location.X * sin + Location.Y * cos;
+        return new Rectangle(new Location(newX, newY), Width, Height, Angle + angle);
+    }
+
+    // Translates a world-space point into this rectangle's local frame (centred at origin, unrotated).
+    private (double X, double Y) ToLocalFrame(double worldX, double worldY)
+    {
+        var dx = worldX - Location.X;
+        var dy = worldY - Location.Y;
+        var cos = Math.Cos(Angle);
+        var sin = Math.Sin(Angle);
+        var localX = dx * cos + dy * sin;
+        var localY = -dx * sin + dy * cos;
+        return (localX, localY);
+    }
+
+    // Returns the 4 corners of this rectangle in world space.
+    private (double X, double Y)[] Corners()
+    {
+        var hw = Width / 2;
+        var hh = Height / 2;
+        var cos = Math.Cos(Angle);
+        var sin = Math.Sin(Angle);
+        var cx = Location.X;
+        var cy = Location.Y;
+        return [
+            (cx + hw * cos - hh * sin, cy + hw * sin + hh * cos),
+            (cx - hw * cos - hh * sin, cy - hw * sin + hh * cos),
+            (cx + hw * cos + hh * sin, cy + hw * sin - hh * cos),
+            (cx - hw * cos + hh * sin, cy - hw * sin - hh * cos),
+        ];
+    }
+
+    private static double Cross(
+        (double X, double Y) lineStart,
+        (double X, double Y) lineEnd,
+        (double X, double Y) point)
+    {
+        var result = (lineEnd.X - lineStart.X) * (point.Y - lineStart.Y)
+                   - (lineEnd.Y - lineStart.Y) * (point.X - lineStart.X);
+        return result;
+    }
+
+    // Returns true only for proper crossings; collinear/touching segments return false.
+    private static bool SegmentsIntersect(
+        (double X, double Y) a, (double X, double Y) b,
+        (double X, double Y) c, (double X, double Y) d)
+    {
+        var d1 = Cross(c, d, a);
+        var d2 = Cross(c, d, b);
+        var d3 = Cross(a, b, c);
+        var d4 = Cross(a, b, d);
+        var result = (d1 > 0 && d2 < 0 || d1 < 0 && d2 > 0) &&
+                     (d3 > 0 && d4 < 0 || d3 < 0 && d4 > 0);
+        return result;
+    }
+
+    private static double PointToSegmentDistance(
+        (double X, double Y) point,
+        (double X, double Y) segStart,
+        (double X, double Y) segEnd)
+    {
+        var dx = segEnd.X - segStart.X;
+        var dy = segEnd.Y - segStart.Y;
+        var lenSq = dx * dx + dy * dy;
+
+        double nearestX;
+        double nearestY;
+
+        if (lenSq == 0)
+        {
+            nearestX = segStart.X;
+            nearestY = segStart.Y;
+        }
+        else
+        {
+            var t = ((point.X - segStart.X) * dx + (point.Y - segStart.Y) * dy) / lenSq;
+            t = Math.Clamp(t, 0, 1);
+            nearestX = segStart.X + t * dx;
+            nearestY = segStart.Y + t * dy;
+        }
+
+        var ex = point.X - nearestX;
+        var ey = point.Y - nearestY;
+        var result = Math.Sqrt(ex * ex + ey * ey);
         return result;
     }
 }

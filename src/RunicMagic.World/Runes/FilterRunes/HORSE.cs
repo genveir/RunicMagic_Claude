@@ -7,9 +7,9 @@ namespace RunicMagic.World.Runes.FilterRunes
     public class HORSE : IEntitySet
     {
         public IEntitySet Source { get; }
-        public ILocation Origin { get; }
+        public IEntitySet Origin { get; }
 
-        public HORSE(IEntitySet source, ILocation origin)
+        public HORSE(IEntitySet source, IEntitySet origin)
         {
             Source = source;
             Origin = origin;
@@ -22,13 +22,20 @@ namespace RunicMagic.World.Runes.FilterRunes
             {
                 return new EntitySet([]);
             }
-            var origin = Origin.Evaluate(context);
-            var maxDistance = source.Entities.Max(e => e.GetDistance(origin));
+            var originSet = Origin.Resolve(context);
+            var originRects = originSet.Entities.Select(e => Bounds(e)).ToList();
+            var maxDistance = source.Entities.Max(e => e.GetDistanceFromSet(originRects));
             var farthest = source.Entities
-                .Where(e => e.GetDistance(origin) == maxDistance)
+                .Where(e => e.GetDistanceFromSet(originRects) == maxDistance)
                 .ToList();
             var result = new EntitySet(farthest);
             return result;
+        }
+
+        private static Rectangle Bounds(Entity e)
+        {
+            var bounds = new Rectangle(e.Location, e.Width, e.Height, e.Angle);
+            return bounds;
         }
 
         public override string ToString()

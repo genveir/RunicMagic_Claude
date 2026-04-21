@@ -63,4 +63,9 @@ public class EntitySet
         }
         return totalDrawn;
     }
+
+    public override string ToString()
+    {
+        return $"EntitySet({string.Join(", ", _entities.Select(e => e.Label))})";
+    }
 }

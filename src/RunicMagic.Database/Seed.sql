@@ -11,7 +11,7 @@ declare @rock          uniqueidentifier = newid();
 insert into Entities (Id, EntityTypeId, Label, X, Y, Width, Height, HasAgency, Weight, IsTranslucent, Angle)
 values
     -- caster (outside the room, above the top wall; X,Y are center)
-    (@caster,    1, 'Player',               1650,   -250, 900,  300,  1, 70000,    0, 0),
+    (@caster,    1, 'Player',               12045,   4142, 900,  300,  1, 70000,    0, 0),
     -- mana stone (near top-right interior corner)
     (@manaStone, 2, 'Mana Stone',           8125,    925, 250,  250,  0, 3000,     0, 0),
     -- top wall, split by door
@@ -46,4 +46,4 @@ values
 
 insert into Inscription (EntityId, SpellText)
 values
-    (@rock, 'VUN ZYHE LA ZYSE LA ZYSE HORO MOST TOT FOT');
+    (@rock, 'VUN ZYHE LA ZYSE LA ZYSE HORO MOST TOT TOT');

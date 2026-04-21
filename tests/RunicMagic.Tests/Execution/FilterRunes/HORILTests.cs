@@ -7,38 +7,37 @@ namespace RunicMagic.Tests.Execution.FilterRunes;
 
 public class HORILTests
 {
-    private static Entity MakeEntity(long x, long y)
-    {
-        return TestFixtures.MakeEntity(x: x, y: y);
-    }
+    // Origin: 100x100 at (0,0) → bounds [-50,50] on both axes.
+    // near:   100x100 at (200,0)  → surface gap to origin = 100
+    // medium: 100x100 at (350,0)  → surface gap to origin = 250
+    // far:    100x100 at (500,0)  → surface gap to origin = 400
+    private static readonly Entity Origin = TestFixtures.MakeEntity(x: 0, y: 0);
 
     [Fact]
-    public void Resolve_EntityWithDistanceWithinRange_IsReturned()
+    public void Resolve_EntityWithDistanceInRange_IsReturned()
     {
-        // Entity centre at (500, 0), width 100 → nearest edge at x=450, distance 450 from origin
-        var entity = MakeEntity(x: 500, y: 0);
+        var near = TestFixtures.MakeEntity(x: 200, y: 0);
         var horil = new HORIL(
-            source: new FixedEntitySet(entity),
-            lower: new FixedNumber(100),
-            upper: new FixedNumber(1000),
-            origin: new FixedLocation(0, 0));
+            source: new FixedEntitySet(near),
+            lower: new FixedNumber(50),
+            upper: new FixedNumber(200),
+            origin: new FixedEntitySet(Origin));
         var context = TestFixtures.MakeContext();
 
         var result = horil.Resolve(context);
 
-        result.Entities.Should().ContainSingle().Which.Should().BeSameAs(entity);
+        result.Entities.Should().ContainSingle().Which.Should().BeSameAs(near);
     }
 
     [Fact]
     public void Resolve_EntityWithDistanceBelowLower_IsNotReturned()
     {
-        // Entity centre at (50, 0), width 100 → entity contains origin, distance 0
-        var entity = MakeEntity(x: 50, y: 0);
+        var near = TestFixtures.MakeEntity(x: 200, y: 0);
         var horil = new HORIL(
-            source: new FixedEntitySet(entity),
-            lower: new FixedNumber(100),
-            upper: new FixedNumber(1000),
-            origin: new FixedLocation(0, 0));
+            source: new FixedEntitySet(near),
+            lower: new FixedNumber(200),
+            upper: new FixedNumber(500),
+            origin: new FixedEntitySet(Origin));
         var context = TestFixtures.MakeContext();
 
         var result = horil.Resolve(context);
@@ -49,13 +48,12 @@ public class HORILTests
     [Fact]
     public void Resolve_EntityWithDistanceAboveUpper_IsNotReturned()
     {
-        // Entity centre at (2000, 0), width 100 → nearest edge at x=1950, distance 1950 from origin
-        var entity = MakeEntity(x: 2000, y: 0);
+        var far = TestFixtures.MakeEntity(x: 500, y: 0);
         var horil = new HORIL(
-            source: new FixedEntitySet(entity),
-            lower: new FixedNumber(100),
-            upper: new FixedNumber(1000),
-            origin: new FixedLocation(0, 0));
+            source: new FixedEntitySet(far),
+            lower: new FixedNumber(50),
+            upper: new FixedNumber(200),
+            origin: new FixedEntitySet(Origin));
         var context = TestFixtures.MakeContext();
 
         var result = horil.Resolve(context);
@@ -66,13 +64,12 @@ public class HORILTests
     [Fact]
     public void Resolve_EntityWithDistanceEqualToLower_IsNotReturned()
     {
-        // Entity centre at (150, 0), width 100 → nearest edge at x=100, distance exactly 100
-        var entity = MakeEntity(x: 150, y: 0);
+        var near = TestFixtures.MakeEntity(x: 200, y: 0);
         var horil = new HORIL(
-            source: new FixedEntitySet(entity),
+            source: new FixedEntitySet(near),
             lower: new FixedNumber(100),
-            upper: new FixedNumber(1000),
-            origin: new FixedLocation(0, 0));
+            upper: new FixedNumber(200),
+            origin: new FixedEntitySet(Origin));
         var context = TestFixtures.MakeContext();
 
         var result = horil.Resolve(context);
@@ -83,13 +80,12 @@ public class HORILTests
     [Fact]
     public void Resolve_EntityWithDistanceEqualToUpper_IsNotReturned()
     {
-        // Entity centre at (1050, 0), width 100 → nearest edge at x=1000, distance exactly 1000
-        var entity = MakeEntity(x: 1050, y: 0);
+        var near = TestFixtures.MakeEntity(x: 200, y: 0);
         var horil = new HORIL(
-            source: new FixedEntitySet(entity),
-            lower: new FixedNumber(100),
-            upper: new FixedNumber(1000),
-            origin: new FixedLocation(0, 0));
+            source: new FixedEntitySet(near),
+            lower: new FixedNumber(50),
+            upper: new FixedNumber(100),
+            origin: new FixedEntitySet(Origin));
         var context = TestFixtures.MakeContext();
 
         var result = horil.Resolve(context);
@@ -100,37 +96,21 @@ public class HORILTests
     [Fact]
     public void Resolve_MultipleEntities_ReturnsOnlyThoseInRange()
     {
-        // near: inside origin (distance 0), mid: nearest edge at 450, far: nearest edge at 1950
-        var near = MakeEntity(x: 50, y: 0);
-        var mid = MakeEntity(x: 500, y: 0);
-        var far = MakeEntity(x: 2000, y: 0);
+        var near = TestFixtures.MakeEntity(x: 200, y: 0);
+        var medium = TestFixtures.MakeEntity(x: 350, y: 0);
+        var far = TestFixtures.MakeEntity(x: 500, y: 0);
         var horil = new HORIL(
-            source: new FixedEntitySet(near, mid, far),
-            lower: new FixedNumber(100),
-            upper: new FixedNumber(1000),
-            origin: new FixedLocation(0, 0));
+            source: new FixedEntitySet(near, medium, far),
+            lower: new FixedNumber(50),
+            upper: new FixedNumber(300),
+            origin: new FixedEntitySet(Origin));
         var context = TestFixtures.MakeContext();
 
         var result = horil.Resolve(context);
 
-        result.Entities.Should().ContainSingle().Which.Should().BeSameAs(mid);
-    }
-
-    [Fact]
-    public void Resolve_UsesOriginFromLocation()
-    {
-        // Entity at (1000, 0); origin at (900, 0) → nearest edge at (950, 0), distance 50
-        var entity = MakeEntity(x: 1000, y: 0);
-        var horil = new HORIL(
-            source: new FixedEntitySet(entity),
-            lower: new FixedNumber(10),
-            upper: new FixedNumber(100),
-            origin: new FixedLocation(900, 0));
-        var context = TestFixtures.MakeContext();
-
-        var result = horil.Resolve(context);
-
-        result.Entities.Should().ContainSingle().Which.Should().BeSameAs(entity);
+        result.Entities.Should().HaveCount(2);
+        result.Entities.Should().Contain(near);
+        result.Entities.Should().Contain(medium);
     }
 
     [Fact]
@@ -138,13 +118,38 @@ public class HORILTests
     {
         var horil = new HORIL(
             source: new FixedEntitySet(),
-            lower: new FixedNumber(100),
-            upper: new FixedNumber(1000),
-            origin: new FixedLocation(0, 0));
+            lower: new FixedNumber(50),
+            upper: new FixedNumber(200),
+            origin: new FixedEntitySet(Origin));
         var context = TestFixtures.MakeContext();
 
         var result = horil.Resolve(context);
 
         result.Entities.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void Resolve_MultipleOrigins_EffectiveDistanceIsToNearestOriginEntity()
+    {
+        // O1 at (0,0), O2 at (800,0).
+        // entityA at (200,0): dist to O1=100, dist to O2=500 → effective dist=100 → in range (50,200)
+        // entityB at (600,0): dist to O1=500, dist to O2=100 → effective dist=100 → in range (50,200)
+        // entityC at (1200,0): dist to O1=1100, dist to O2=300 → effective dist=300 → out of range
+        var originO2 = TestFixtures.MakeEntity(x: 800, y: 0);
+        var entityA = TestFixtures.MakeEntity(x: 200, y: 0);
+        var entityB = TestFixtures.MakeEntity(x: 600, y: 0);
+        var entityC = TestFixtures.MakeEntity(x: 1200, y: 0);
+        var horil = new HORIL(
+            source: new FixedEntitySet(entityA, entityB, entityC),
+            lower: new FixedNumber(50),
+            upper: new FixedNumber(200),
+            origin: new FixedEntitySet(Origin, originO2));
+        var context = TestFixtures.MakeContext();
+
+        var result = horil.Resolve(context);
+
+        result.Entities.Should().HaveCount(2);
+        result.Entities.Should().Contain(entityA);
+        result.Entities.Should().Contain(entityB);
     }
 }

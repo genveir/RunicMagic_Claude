@@ -65,7 +65,7 @@ public class EntityFactory(WorldModel world, ILogger<EntityFactory> logger)
 
     private void WireDelegates(EntityType type, Entity entity)
     {
-        entity.Scope = () => [.. world.GetEntitiesWithinDistance(entity, 500)];
+        entity.Scope = () => GetEntitiesWithinDistance(entity, distance: 500);
 
         switch (type)
         {
@@ -114,5 +114,10 @@ public class EntityFactory(WorldModel world, ILogger<EntityFactory> logger)
             case EntityType.Object:
                 break;
         }
+    }
+
+    private Entity[] GetEntitiesWithinDistance(Entity entity, long distance)
+    {
+        return world.GetEntitiesWithinDistance(entity, distance).ToArray();
     }
 }

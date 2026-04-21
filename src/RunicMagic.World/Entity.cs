@@ -33,4 +33,9 @@ public class Entity(EntityId id, string label)
 
     public string[] RawInscriptions { get; set; } = [];
     public IStatement[] ParsedInscriptions { get; set; } = [];
+
+    public override string ToString()
+    {
+        return $"Entity {Label}";
+    }
 }

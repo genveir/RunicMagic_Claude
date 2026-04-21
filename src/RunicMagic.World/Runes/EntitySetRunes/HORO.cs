@@ -4,13 +4,13 @@ using RunicMagic.World.Runes.RuneTypes;
 
 namespace RunicMagic.World.Runes.EntitySetRunes
 {
-    // NEAR — all entities within howFar mm of origin (nearest bounding edge)
+    // NEAR — all entities within howFar mm of any entity in origin set (nearest bounding edge to nearest bounding edge)
     public class HORO : IEntitySet
     {
         public INumber HowFar { get; }
-        public ILocation Origin { get; }
+        public IEntitySet Origin { get; }
 
-        public HORO(INumber howFar, ILocation origin)
+        public HORO(INumber howFar, IEntitySet origin)
         {
             HowFar = howFar;
             Origin = origin;
@@ -19,13 +19,20 @@ namespace RunicMagic.World.Runes.EntitySetRunes
         public EntitySet Resolve(SpellContext context)
         {
             var radius = HowFar.Evaluate(context);
-            var origin = Origin.Evaluate(context);
+            var originSet = Origin.Resolve(context);
+            var originRects = originSet.Entities.Select(e => Bounds(e)).ToList();
             var entities = context.World.GetAll()
-                .WithinDistance(origin, (double)radius.Value)
+                .Where(e => e.GetDistanceFromSet(originRects) <= (double)radius.Value)
                 .ToList();
             var result = new EntitySet(entities);
             context.EntityResolutionCount?.UnionWith(result.Entities.Select(e => e.Id));
             return result;
+        }
+
+        private static Rectangle Bounds(Entity e)
+        {
+            var bounds = new Rectangle(e.Location, e.Width, e.Height, e.Angle);
+            return bounds;
         }
 
         public override string ToString()

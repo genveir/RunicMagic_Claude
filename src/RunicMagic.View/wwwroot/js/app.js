@@ -40,7 +40,7 @@ const clearInput = () =>
     ' '.repeat(input.length) +
     moveCursorLeft(input.length);
 
-term.onKey(({ key, domEvent }) => {
+function handleTerminalKey(key, domEvent) {
     switch (domEvent.key) {
         case 'Backspace': {
             const before = input.slice(0, input.length - cursorOffset);
@@ -101,6 +101,18 @@ term.onKey(({ key, domEvent }) => {
                 term.write(key + after + moveCursorLeft(cursorOffset));
             }
     }
+}
+
+term.onKey(({ key, domEvent }) => handleTerminalKey(key, domEvent));
+
+const REDIRECT_KEYS = new Set(['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Enter']);
+
+document.addEventListener('keydown', e => {
+    if (document.activeElement?.closest('#terminal-container')) return;
+    if (e.key.length !== 1 && !REDIRECT_KEYS.has(e.key)) return;
+    e.preventDefault();
+    term.focus();
+    handleTerminalKey(e.key, e);
 });
 
 async function submitInput() {

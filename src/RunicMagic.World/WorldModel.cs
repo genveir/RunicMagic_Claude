@@ -36,9 +36,10 @@ public class WorldModel
 
     public IReadOnlyList<Entity> GetEntitiesWithinDistance(Entity source, double distance)
     {
+        var sourceBounds = Bounds(source);
         var entities = _entities.Values
             .Where(e => e.Id != source.Id)
-            .WithinDistance(source.Location, distance)
+            .Where(e => Bounds(e).IsWithinDistanceFromRectangle(sourceBounds, distance))
             .ToList();
         return entities;
     }

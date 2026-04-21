@@ -35,16 +35,16 @@ SHU can be nested. Each SHU pushes onto whatever stack is current at the point o
 |------|---------|-----------|
 | `LA` | scope of | (Set = OH) → Set |
 | `PA` | intersection of scopes | (Set = OH) → Set |
-| `HORO` | near | (Number, Location = PAR(OH)) → Set |
+| `HORO` | near | (Number, Set = OH) → Set |
 | `ZYIL` | weight range filter | (Set, Number lower, Number upper) → Set |
 | `ZYHE` | lightest | (Set) → Set |
 | `ZYSE` | heaviest | (Set) → Set |
 | `FUIL` | power range filter | (Set, Number lower, Number upper) → Set |
 | `FUHE` | least powerful | (Set) → Set |
 | `FUSE` | most powerful | (Set) → Set |
-| `HORIL` | distance range filter | (Set, Number lower, Number upper, Location = PAR(OH)) → Set |
-| `HORHE` | closest | (Set, Location = PAR(OH)) → Set |
-| `HORSE` | farthest | (Set, Location = PAR(OH)) → Set |
+| `HORIL` | distance range filter | (Set, Number lower, Number upper, Set = OH) → Set |
+| `HORHE` | closest | (Set, Set = OH) → Set |
+| `HORSE` | farthest | (Set, Set = OH) → Set |
 | `DRYAL` | is alive | (Set) → Set |
 | `AN` | union | (Set, Set) → Set |
 | `DU` | intersection | (Set, Set) → Set |
@@ -54,7 +54,7 @@ SHU can be nested. Each SHU pushes onto whatever stack is current at the point o
 
 `PA` maps each member of the input Set to its scope and returns the intersection — only entities that appear in every member's scope. An entity with no scope contributes an empty set, making the whole result empty. Defaults to `OH`.
 
-`HORO` returns all entities in the world whose nearest bounding edge is within `Number` millimetres of `Location`. Defaults to the executor's position, so `HORO HET` selects everything within 1 mm of the executor.
+`HORO` returns all entities in the world within `Number` millimetres of any entity in the origin `Set`. Distance is measured bounding edge to bounding edge; overlapping entities have distance 0. Defaults to the executor, so `HORO HET` selects everything within 1 mm of the executor's bounding rectangle.
 
 `ZYIL` filters a Set to entities whose weight in grams is strictly greater than `lower` and strictly less than `upper` (both bounds exclusive).
 
@@ -68,11 +68,11 @@ SHU can be nested. Each SHU pushes onto whatever stack is current at the point o
 
 `FUSE` returns all entities in the Set tied for maximum current power. Entities with no power reservoir are treated as having 0 current power.
 
-`HORIL` filters a Set to entities whose distance from `Location` is strictly greater than `lower` and strictly less than `upper` (both bounds exclusive). Distance is measured from the nearest bounding edge; entities containing the origin have distance 0. Defaults to the executor's position.
+`HORIL` filters a Set to entities whose bounding edge to bounding edge distance from the origin `Set` is strictly greater than `lower` and strictly less than `upper` (both bounds exclusive). Distance is the minimum over all entities in the origin Set; overlapping entities have distance 0. Defaults to the executor.
 
-`HORHE` returns all entities in the Set tied for minimum distance from `Location`. Defaults to the executor's position.
+`HORHE` returns all entities in the Set tied for minimum bounding edge to bounding edge distance from the origin `Set`. Defaults to the executor.
 
-`HORSE` returns all entities in the Set tied for maximum distance from `Location`. Defaults to the executor's position.
+`HORSE` returns all entities in the Set tied for maximum bounding edge to bounding edge distance from the origin `Set`. Defaults to the executor.
 
 `DRYAL` filters a Set to entities that have a life capability and currently have more than 0 hit points.
 

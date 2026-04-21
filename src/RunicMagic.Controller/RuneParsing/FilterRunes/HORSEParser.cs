@@ -13,7 +13,7 @@ namespace RunicMagic.Controller.RuneParsing.FilterRunes
                 return ParsingResult<IEntitySet>.Fail(sourceResult.Error);
             }
 
-            var originResult = RuneParsingDispatcher.ParseNextRune<ILocation>(tokenStream, defaultTokens: ["PAR", "OH"]);
+            var originResult = RuneParsingDispatcher.ParseNextRune<IEntitySet>(tokenStream, defaultTokens: ["OH"]);
             if (!originResult.Succeeded)
             {
                 return ParsingResult<IEntitySet>.Fail(originResult.Error);

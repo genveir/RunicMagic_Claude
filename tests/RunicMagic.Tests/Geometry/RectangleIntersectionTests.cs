@@ -72,52 +72,6 @@ public class RectangleIntersectionTests
     }
 }
 
-public class RectangleRotateTests
-{
-    [Fact]
-    public void Rotate_ZeroAngle_ReturnsUnchangedRectangle()
-    {
-        var rect = new Rectangle(new Location(100, 0), Width: 40, Height: 20, Angle: 0);
-
-        var result = rect.Rotate(0);
-
-        result.Should().Be(rect);
-    }
-
-    [Fact]
-    public void Rotate_QuarterTurn_MovesLocationCorrectly()
-    {
-        // Centre at (100, 0), rotated 90°: new centre should be at (0, 100)
-        var rect = new Rectangle(new Location(100, 0), Width: 40, Height: 20, Angle: 0);
-
-        var result = rect.Rotate(Math.PI / 2);
-
-        result.Location.X.Should().BeApproximately(0, precision: 1e-10);
-        result.Location.Y.Should().BeApproximately(100, precision: 1e-10);
-    }
-
-    [Fact]
-    public void Rotate_IncrementsAngle()
-    {
-        var rect = new Rectangle(new Location(0, 0), Width: 40, Height: 20, Angle: Math.PI / 4);
-
-        var result = rect.Rotate(Math.PI / 4);
-
-        result.Angle.Should().BeApproximately(Math.PI / 2, precision: 1e-10);
-    }
-
-    [Fact]
-    public void Rotate_PreservesWidthAndHeight()
-    {
-        var rect = new Rectangle(new Location(50, 30), Width: 40, Height: 20, Angle: 0);
-
-        var result = rect.Rotate(1.23);
-
-        result.Width.Should().Be(40);
-        result.Height.Should().Be(20);
-    }
-}
-
 public class RectangleIntersectsWithTests
 {
     [Fact]
@@ -353,6 +307,101 @@ public class RectangleIsWithinDistanceFromPointTests
     {
         // Corner at (50, 50); point at (50 + 400, 50 + 300) → distance=500; add 1 to x → distance > 500
         var result = Box.IsWithinDistanceFromPoint(new Location(451, 350), maxDistance: 500);
+
+        result.Should().BeFalse();
+    }
+}
+
+public class RectangleGetDistanceFromRectangleTests
+{
+    [Fact]
+    public void OverlappingRects_ReturnsZero()
+    {
+        var a = new Rectangle(new Location(0, 0), Width: 100, Height: 100, Angle: 0);
+        var b = new Rectangle(new Location(50, 0), Width: 100, Height: 100, Angle: 0);
+
+        var result = a.GetDistanceFromRectangle(b);
+
+        result.Should().Be(0);
+    }
+
+    [Fact]
+    public void ContainedRect_ReturnsZero()
+    {
+        var outer = new Rectangle(new Location(0, 0), Width: 200, Height: 200, Angle: 0);
+        var inner = new Rectangle(new Location(0, 0), Width: 50, Height: 50, Angle: 0);
+
+        var result = outer.GetDistanceFromRectangle(inner);
+
+        result.Should().Be(0);
+    }
+
+    [Fact]
+    public void HorizontalGap_ReturnsGapWidth()
+    {
+        // A spans x:[-50,50]; B centred at (200,0) spans x:[150,250] → gap = 100
+        var a = new Rectangle(new Location(0, 0), Width: 100, Height: 100, Angle: 0);
+        var b = new Rectangle(new Location(200, 0), Width: 100, Height: 100, Angle: 0);
+
+        var result = a.GetDistanceFromRectangle(b);
+
+        result.Should().BeApproximately(100, precision: 0.001);
+    }
+
+    [Fact]
+    public void DiagonalGap_ReturnsEuclideanCornerToCorner()
+    {
+        // A corner at (50,50); B corner at (150,150) → distance = 100√2
+        var a = new Rectangle(new Location(0, 0), Width: 100, Height: 100, Angle: 0);
+        var b = new Rectangle(new Location(200, 200), Width: 100, Height: 100, Angle: 0);
+
+        var result = a.GetDistanceFromRectangle(b);
+
+        result.Should().BeApproximately(100 * Math.Sqrt(2), precision: 0.001);
+    }
+
+    [Fact]
+    public void RotatedRect_GapMeasuredFromSurface()
+    {
+        // A is 200x10 rotated 90°: spans x:[-5,5], y:[-100,100].
+        // B is 10x10 at (55,0): spans x:[50,60], y:[-5,5].
+        // Nearest surfaces: A right edge at x=5, B left edge at x=50 → gap = 45.
+        var a = new Rectangle(new Location(0, 0), Width: 200, Height: 10, Angle: Math.PI / 2);
+        var b = new Rectangle(new Location(55, 0), Width: 10, Height: 10, Angle: 0);
+
+        var result = a.GetDistanceFromRectangle(b);
+
+        result.Should().BeApproximately(45, precision: 0.001);
+    }
+
+    [Fact]
+    public void IsSymmetric()
+    {
+        var a = new Rectangle(new Location(0, 0), Width: 100, Height: 100, Angle: 0);
+        var b = new Rectangle(new Location(200, 0), Width: 100, Height: 100, Angle: 0);
+
+        a.GetDistanceFromRectangle(b).Should().BeApproximately(b.GetDistanceFromRectangle(a), precision: 0.001);
+    }
+}
+
+public class RectangleIsWithinDistanceFromRectangleTests
+{
+    // A spans x:[-50,50]; B centred at (200,0) spans x:[150,250] → gap = 100
+    private static readonly Rectangle A = new(new Location(0, 0), Width: 100, Height: 100, Angle: 0);
+    private static readonly Rectangle B = new(new Location(200, 0), Width: 100, Height: 100, Angle: 0);
+
+    [Fact]
+    public void ExactlyAtMaxDistance_ReturnsTrue()
+    {
+        var result = A.IsWithinDistanceFromRectangle(B, maxDistance: 100);
+
+        result.Should().BeTrue();
+    }
+
+    [Fact]
+    public void OneUnitBeyondMaxDistance_ReturnsFalse()
+    {
+        var result = A.IsWithinDistanceFromRectangle(B, maxDistance: 99);
 
         result.Should().BeFalse();
     }
