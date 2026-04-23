@@ -34,23 +34,7 @@ public class EntitySetSelectionCostResolverTests
     }
 
     [Fact]
-    public void Resolve_NoTaxableEntities_ReturnsSetWithoutDrawingPower()
-    {
-        var drawn = new List<long>();
-        var casterEntity = TestFixtures.MakeEntity();
-        casterEntity.Reservoir = amount => { drawn.Add(amount); return new ReservoirDraw(amount, false); };
-
-        var target = TestFixtures.MakeEntity();
-        var context = MakeContext(casterEntity);
-        var resolver = new EntitySetSelectionCostResolver(new FixedEntitySet(target));
-
-        resolver.Resolve(context);
-
-        drawn.Should().BeEmpty();
-    }
-
-    [Fact]
-    public void Resolve_CasterEntityInSet_IsNotTaxed()
+    public void Resolve_CasterEntityInSet_EntityCostIsExempt()
     {
         var drawn = new List<long>();
         var casterEntity = TestFixtures.MakeEntity();
@@ -62,12 +46,13 @@ public class EntitySetSelectionCostResolverTests
 
         var result = resolver.Resolve(context);
 
-        drawn.Should().BeEmpty();
+        // Entity cost for caster is exempt; only breadth cost of 1 is charged
+        drawn.Should().ContainSingle().Which.Should().Be(1);
         result.Entities.Should().ContainSingle().Which.Should().BeSameAs(casterEntity);
     }
 
     [Fact]
-    public void Resolve_ExecutorEntityInSet_IsNotTaxed()
+    public void Resolve_ExecutorEntityInSet_EntityCostIsExempt()
     {
         var drawn = new List<long>();
         var casterEntity = TestFixtures.MakeEntity();
@@ -81,12 +66,13 @@ public class EntitySetSelectionCostResolverTests
 
         var result = resolver.Resolve(context);
 
-        drawn.Should().BeEmpty();
+        // Entity cost for executor is exempt; only breadth cost of 1 is charged
+        drawn.Should().ContainSingle().Which.Should().Be(1);
         result.Entities.Should().ContainSingle().Which.Should().BeSameAs(executorEntity);
     }
 
     [Fact]
-    public void Resolve_SingleTaxableEntity_ExactThreshold_DrawsOne()
+    public void Resolve_SingleTaxableEntity_ExactThreshold_DrawsTwo()
     {
         var drawn = new List<long>();
         var casterEntity = TestFixtures.MakeEntity();
@@ -98,11 +84,12 @@ public class EntitySetSelectionCostResolverTests
 
         resolver.Resolve(context);
 
-        drawn.Should().ContainSingle().Which.Should().Be(1);
+        // Entity cost: ceil(1000/1000) = 1; breadth cost: 1 entity swept = 1; total = 2
+        drawn.Should().ContainSingle().Which.Should().Be(2);
     }
 
     [Fact]
-    public void Resolve_SingleTaxableEntity_SmallMaxPower_RoundsUpToOne()
+    public void Resolve_SingleTaxableEntity_SmallMaxPower_DrawsTwo()
     {
         var drawn = new List<long>();
         var casterEntity = TestFixtures.MakeEntity();
@@ -114,11 +101,12 @@ public class EntitySetSelectionCostResolverTests
 
         resolver.Resolve(context);
 
-        drawn.Should().ContainSingle().Which.Should().Be(1);
+        // Entity cost: ceil(1/1000) = 1; breadth cost: 1 entity swept = 1; total = 2
+        drawn.Should().ContainSingle().Which.Should().Be(2);
     }
 
     [Fact]
-    public void Resolve_SingleTaxableEntity_JustAboveThreshold_DrawsTwo()
+    public void Resolve_SingleTaxableEntity_JustAboveThreshold_DrawsThree()
     {
         var drawn = new List<long>();
         var casterEntity = TestFixtures.MakeEntity();
@@ -130,7 +118,8 @@ public class EntitySetSelectionCostResolverTests
 
         resolver.Resolve(context);
 
-        drawn.Should().ContainSingle().Which.Should().Be(2);
+        // Entity cost: ceil(1001/1000) = 2; breadth cost: 1 entity swept = 1; total = 3
+        drawn.Should().ContainSingle().Which.Should().Be(3);
     }
 
     [Fact]
@@ -147,7 +136,8 @@ public class EntitySetSelectionCostResolverTests
 
         resolver.Resolve(context);
 
-        drawn.Should().ContainSingle().Which.Should().Be(3);
+        // Entity costs: 1 + 2 = 3; breadth cost: 2 entities swept = 2; total = 5
+        drawn.Should().ContainSingle().Which.Should().Be(5);
     }
 
     [Fact]
@@ -188,8 +178,9 @@ public class EntitySetSelectionCostResolverTests
 
         resolver.Resolve(context);
 
+        // Entity cost: 1; breadth cost: 1; total required = 2
         spellResult.Events.OfType<SelectionCostNotMetEvent>().Should().ContainSingle()
-            .Which.Should().Match<SelectionCostNotMetEvent>(e => e.Required == 1 && e.Drawn == 0);
+            .Which.Should().Match<SelectionCostNotMetEvent>(e => e.Required == 2 && e.Drawn == 0);
     }
 
     [Fact]
@@ -206,28 +197,30 @@ public class EntitySetSelectionCostResolverTests
 
         var result = resolver.Resolve(context);
 
-        drawn.Should().ContainSingle().Which.Should().Be(1);
+        // Entity cost: target only = 1 (caster exempt); breadth cost: 2 entities swept = 2; total = 3
+        drawn.Should().ContainSingle().Which.Should().Be(3);
         result.Entities.Should().HaveCount(2);
     }
 
     [Fact]
-    public void Resolve_BreadthCost_FewerThan10EntitiesSwept_NoBreadthCharge()
+    public void Resolve_BreadthCost_EachEntitySweptCostsOne()
     {
         var drawn = new List<long>();
         var casterEntity = TestFixtures.MakeEntity();
         casterEntity.Reservoir = amount => { drawn.Add(amount); return new ReservoirDraw(amount, false); };
 
-        var targets = Enumerable.Range(0, 9).Select(_ => TestFixtures.MakeEntity()).ToArray();
+        var targets = Enumerable.Range(0, 3).Select(_ => TestFixtures.MakeEntity()).ToArray();
         var context = MakeContext(casterEntity);
         var resolver = new EntitySetSelectionCostResolver(new FixedEntitySet(targets));
 
         resolver.Resolve(context);
 
-        drawn.Should().BeEmpty();
+        // 3 entities swept, no entity cost (no MaxReservoir), breadth cost = 3
+        drawn.Should().ContainSingle().Which.Should().Be(3);
     }
 
     [Fact]
-    public void Resolve_BreadthCost_Exactly10EntitiesSwept_ChargesOne()
+    public void Resolve_BreadthCost_Exactly10EntitiesSwept_Charges10()
     {
         var drawn = new List<long>();
         var casterEntity = TestFixtures.MakeEntity();
@@ -239,7 +232,7 @@ public class EntitySetSelectionCostResolverTests
 
         resolver.Resolve(context);
 
-        drawn.Should().ContainSingle().Which.Should().Be(1);
+        drawn.Should().ContainSingle().Which.Should().Be(10);
     }
 
     [Fact]
@@ -255,8 +248,8 @@ public class EntitySetSelectionCostResolverTests
 
         resolver.Resolve(context);
 
-        // Entity cost: 10 * ceil(1000/1000) = 10; breadth cost: floor(10/10) = 1; total = 11
-        drawn.Should().ContainSingle().Which.Should().Be(11);
+        // Entity cost: 10 * ceil(1000/1000) = 10; breadth cost: 10 entities swept = 10; total = 20
+        drawn.Should().ContainSingle().Which.Should().Be(20);
     }
 
     [Fact]

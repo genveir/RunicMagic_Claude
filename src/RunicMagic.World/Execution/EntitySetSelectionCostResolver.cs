@@ -62,7 +62,8 @@ namespace RunicMagic.World.Execution
         private long CalculateBreadthCost(SpellContext context)
         {
             var breadthCount = context.EntityResolutionCount?.Count ?? 0;
-            return breadthCount / 10;
+
+            return breadthCount;
         }
     }
 }

@@ -71,8 +71,8 @@ public class SpellExecutorTests
         var spellExecutor = new SpellExecutor(world);
         spellExecutor.Execute(spell, runeCount: 10, caster, executor);
 
-        // evaluation cost = 10 / 5 = 2
-        drawn.Should().ContainSingle().Which.Should().Be(2);
+        // evaluation cost = 10 runes = 10
+        drawn.Should().ContainSingle().Which.Should().Be(10);
     }
 
     [Fact]
@@ -98,36 +98,9 @@ public class SpellExecutorTests
         var spellExecutor = new SpellExecutor(world);
         spellExecutor.Execute(spell, runeCount: 10, caster, executor);
 
-        // evaluation cost = 2; executor provides 1, caster covers remaining 1
-        executorDrawn.Should().ContainSingle().Which.Should().Be(2);
-        casterDrawn.Should().ContainSingle().Which.Should().Be(1);
-    }
-
-    [Fact]
-    public void Execute_RuneCountBelowFive_DrawsZeroEvaluationCost()
-    {
-        var drawn = new List<long>();
-        var world = new WorldModel();
-
-        var casterEntity = TestFixtures.MakeEntity();
-        casterEntity.Reservoir = amount => { drawn.Add(amount); return new ReservoirDraw(amount, false); };
-        world.Add(casterEntity);
-
-        var caster = new EntitySet([casterEntity]);
-        var executor = new EntitySet([casterEntity]);
-
-        var spell = new ZU(
-            new VUN(
-                toMove: new FixedEntitySet(),
-                howFar: new HET(),
-                origin: new FixedLocation(0, 0)
-            )
-        );
-
-        var spellExecutor = new SpellExecutor(world);
-        spellExecutor.Execute(spell, runeCount: 4, caster, executor);
-
-        drawn.Should().BeEmpty();
+        // evaluation cost = 10; executor provides 5 (amount/2), caster covers remaining 5
+        executorDrawn.Should().ContainSingle().Which.Should().Be(10);
+        casterDrawn.Should().ContainSingle().Which.Should().Be(5);
     }
 
     [Fact]

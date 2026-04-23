@@ -17,10 +17,9 @@ public class SpellExecutor
         var result = new SpellResult();
         var context = new SpellContext(caster, executor, _world, result);
 
-        var evaluationCost = runeCount / 5;
-        var evalDrawn = context.DrawPower(evaluationCost);
+        var evalDrawn = context.DrawPower(runeCount);
 
-        if (evalDrawn < evaluationCost)
+        if (evalDrawn < runeCount)
         {
             result.Add(new ExecutorDisintegratedEvent());
             foreach (var entity in executor.Entities)
