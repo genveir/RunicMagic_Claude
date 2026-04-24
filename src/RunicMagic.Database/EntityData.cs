@@ -16,4 +16,6 @@ public record EntityData(
     long? CurrentHitPoints = null,
     long? MaxCharge = null,
     long? CurrentCharge = null,
-    string[]? InscriptionTexts = null);
+    string[]? InscriptionTexts = null,
+    long MaxStructuralIntegrity = 1000,
+    long CurrentStructuralIntegrity = 1000);

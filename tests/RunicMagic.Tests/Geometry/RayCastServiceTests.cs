@@ -1,4 +1,5 @@
 using FluentAssertions;
+using RunicMagic.Tests.Builders;
 using RunicMagic.World;
 using RunicMagic.World.Geometry;
 using Xunit;
@@ -9,13 +10,9 @@ public class RayCastServiceTests
 {
     private static Entity MakeEntity(long x, long y, long width = 100, long height = 100, bool isTranslucent = false)
     {
-        return new Entity(EntityId.New(), "test")
-        {
-            Location = new Location(x, y),
-            Width = width,
-            Height = height,
-            IsTranslucent = isTranslucent,
-        };
+        var builder = new EntityBuilder().WithLocation(x, y).WithSize(width, height);
+        if (isTranslucent) builder.WithTranslucency();
+        return builder.Build();
     }
 
     private static readonly Direction Right = new(1, 0);

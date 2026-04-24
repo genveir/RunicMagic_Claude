@@ -1,6 +1,7 @@
 using FluentAssertions;
 using RunicMagic.Controller.Models;
 using RunicMagic.Controller.Services;
+using RunicMagic.Tests.Builders;
 using RunicMagic.World;
 using RunicMagic.World.Capabilities;
 using RunicMagic.World.Geometry;
@@ -11,15 +12,16 @@ namespace RunicMagic.Tests;
 public class WorldRenderingServiceTests
 {
     private static Entity MakeEntity(string label, long x, long y, long width, long height,
-        bool hasAgency = false, LifeCapability? life = null) =>
-        new(EntityId.New(), label)
-        {
-            Location = new Location(x, y),
-            Width = width,
-            Height = height,
-            HasAgency = hasAgency,
-            Life = life,
-        };
+        bool hasAgency = false, LifeCapability? life = null)
+    {
+        var builder = new EntityBuilder()
+            .WithLabel(label)
+            .WithLocation(x, y)
+            .WithSize(width, height);
+        if (hasAgency) builder.WithAgency();
+        if (life != null) builder.WithLife(life.MaxHitPoints, life.CurrentHitPoints);
+        return builder.Build();
+    }
 
     [Fact]
     public void GetAllRenderingModels_ReturnsEmptyList_WhenWorldIsEmpty()
@@ -70,13 +72,11 @@ public class WorldRenderingServiceTests
     public void GetAllRenderingModels_EntityWithPointingDirection_IncludesResolvedEndpoint()
     {
         var world = new WorldModel();
-        var pointing = new Entity(EntityId.New(), "archer")
-        {
-            Location = new Location(0, 0),
-            Width = 100,
-            Height = 100,
-            PointingDirection = new RunicMagic.World.Geometry.Direction(1, 0),
-        };
+        var pointing = new EntityBuilder()
+            .WithLabel("archer")
+            .WithLocation(0, 0)
+            .WithPointingDirection(new Direction(1, 0))
+            .Build();
         world.Add(pointing);
         var service = new WorldRenderingService(world, new RayCastService(world));
 

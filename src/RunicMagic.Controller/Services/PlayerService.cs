@@ -33,7 +33,7 @@ internal class PlayerService(
                 return "[dead caster] >";
             }
 
-            var prompt = $"({caster.Life.CurrentHitPoints}/{caster.Life.MaxHitPoints}) >";
+            var prompt = $"({caster.Life.CurrentHitPoints}/{caster.Life.MaxHitPoints}H) ({caster.StructuralIntegrity.CurrentIntegrity}/{caster.StructuralIntegrity.MaxIntegrity}I) >";
             return prompt;
         }
     }

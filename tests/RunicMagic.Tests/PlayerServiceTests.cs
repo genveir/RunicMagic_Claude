@@ -1,6 +1,7 @@
 using FluentAssertions;
 using RunicMagic.Controller.Models;
 using RunicMagic.Controller.Services;
+using RunicMagic.Tests.Builders;
 using RunicMagic.World;
 using RunicMagic.World.Capabilities;
 using RunicMagic.World.Geometry;
@@ -20,15 +21,15 @@ public class PlayerServiceTests
         return (service, world);
     }
 
-    private static Entity MakeAgencyEntity(long x, long y, string label = "agent") =>
-        new(EntityId.New(), label)
-        {
-            Location = new Location(x, y),
-            Width = 100,
-            Height = 100,
-            HasAgency = true,
-            Life = new LifeCapability(maxHitPoints: 10, currentHitPoints: 10),
-        };
+    private static Entity MakeAgencyEntity(long x, long y, string label = "agent")
+    {
+        return new EntityBuilder()
+            .WithLabel(label)
+            .WithLocation(x, y)
+            .WithAgency()
+            .WithLife(max: 10, current: 10)
+            .Build();
+    }
 
     [Fact]
     public async Task SetCaster_NoEntityAtPoint_ReturnsNoEntityMessage()
@@ -178,7 +179,7 @@ public class PlayerServiceTests
         world.Add(entity);
         await service.SetCaster(new WorldCoordinate(0, 0));
 
-        service.Prompt.Should().Be("(15/20) >");
+        service.Prompt.Should().Be("(15/20H) (1000/1000I) >");
     }
 
     [Fact]

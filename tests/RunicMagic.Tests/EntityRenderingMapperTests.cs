@@ -1,6 +1,7 @@
 using FluentAssertions;
 using RunicMagic.Controller.Mappers;
 using RunicMagic.Controller.Models;
+using RunicMagic.Tests.Builders;
 using RunicMagic.World;
 using RunicMagic.World.Capabilities;
 using RunicMagic.World.Geometry;
@@ -10,27 +11,23 @@ namespace RunicMagic.Tests;
 
 public class EntityRenderingMapperTests
 {
-    private static Entity MakeEntity(EntityType type = EntityType.Object, bool hasAgency = false,
-        LifeCapability? life = null, ChargeCapability? charge = null) =>
-        new(EntityId.New(), "test")
-        {
-            Location = new Location(10, 20),
-            Width = 30,
-            Height = 40,
-            HasAgency = hasAgency,
-            Life = life,
-            Charge = charge,
-        };
+    private static Entity MakeEntity(bool hasAgency = false, LifeCapability? life = null, ChargeCapability? charge = null)
+    {
+        var builder = new EntityBuilder().WithLocation(10, 20).WithSize(30, 40);
+        if (hasAgency) builder.WithAgency();
+        if (life != null) builder.WithLife(life.MaxHitPoints, life.CurrentHitPoints);
+        if (charge != null) builder.WithCharge(charge.MaxCharge, charge.CurrentCharge);
+        return builder.Build();
+    }
 
     [Fact]
     public void Maps_LocationAndLabel()
     {
-        var entity = new Entity(EntityId.New(), "rock")
-        {
-            Location = new Location(5, 15),
-            Width = 25,
-            Height = 35,
-        };
+        var entity = new EntityBuilder()
+            .WithLabel("rock")
+            .WithLocation(5, 15)
+            .WithSize(25, 35)
+            .Build();
 
         var model = EntityRenderingMapper.ToRenderingModel(entity, isCaster: false);
 
@@ -115,8 +112,7 @@ public class EntityRenderingMapperTests
     [Fact]
     public void Entity_WhenTranslucent_HasTranslucentFlag()
     {
-        var entity = MakeEntity();
-        entity.IsTranslucent = true;
+        var entity = new EntityBuilder().WithTranslucency().Build();
 
         var model = EntityRenderingMapper.ToRenderingModel(entity, isCaster: false);
 

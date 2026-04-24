@@ -1,13 +1,15 @@
+using RunicMagic.Tests.Builders;
 using RunicMagic.World;
-using RunicMagic.World.Geometry;
 using Xunit;
 
 namespace RunicMagic.Tests;
 
 public class WorldModelTests
 {
-    private static Entity MakeEntity(long x, long y, long width, long height) =>
-        new(EntityId.New(), "test") { Location = new Location(x, y), Width = width, Height = height };
+    private static Entity MakeEntity(long x, long y, long width, long height)
+    {
+        return new EntityBuilder().WithLocation(x, y).WithSize(width, height).Build();
+    }
 
     // ── GetEntitiesWithinDistance ─────────────────────────────────────────────
 

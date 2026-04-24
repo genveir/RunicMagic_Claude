@@ -21,16 +21,17 @@ public class EntityFactory(WorldModel world, ILogger<EntityFactory> logger)
             _ => throw new ArgumentException($"Unknown entity type ID: {data.TypeId}")
         };
 
-        var entity = new Entity(new EntityId(data.Id), data.Label)
-        {
-            Location = new Location(data.X, data.Y),
-            Angle = data.Angle,
-            Width = data.Width,
-            Height = data.Height,
-            HasAgency = data.HasAgency,
-            IsTranslucent = data.IsTranslucent,
-            Weight = data.Weight,
-        };
+        var entity = new Entity(
+            id: new EntityId(data.Id),
+            label: data.Label,
+            location: new Location(data.X, data.Y),
+            width: data.Width,
+            height: data.Height,
+            hasAgency: data.HasAgency,
+            weight: data.Weight,
+            isTranslucent: data.IsTranslucent,
+            angle: data.Angle,
+            structuralIntegrity: new StructuralIntegrityCapability(data.MaxStructuralIntegrity, data.CurrentStructuralIntegrity));
 
         if (data.MaxHitPoints.HasValue && data.CurrentHitPoints.HasValue)
             entity.Life = new LifeCapability(data.MaxHitPoints.Value, data.CurrentHitPoints.Value);

@@ -1,4 +1,5 @@
 using FluentAssertions;
+using RunicMagic.Tests.Builders;
 using RunicMagic.World;
 using RunicMagic.World.Geometry;
 using Xunit;
@@ -9,12 +10,7 @@ public class LocationExtensionsTests
 {
     private static Entity MakeEntity(long x, long y, long width = 100, long height = 100)
     {
-        return new Entity(EntityId.New(), "test")
-        {
-            Location = new Location(x, y),
-            Width = width,
-            Height = height,
-        };
+        return new EntityBuilder().WithLocation(x, y).WithSize(width, height).Build();
     }
 
     // ── WithinDistance ────────────────────────────────────────────────────────

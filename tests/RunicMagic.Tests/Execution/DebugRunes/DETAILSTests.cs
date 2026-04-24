@@ -1,4 +1,5 @@
 using FluentAssertions;
+using RunicMagic.Tests.Builders;
 using RunicMagic.World;
 using RunicMagic.World.Execution;
 using RunicMagic.World.Geometry;
@@ -13,12 +14,7 @@ public class DETAILSTests
 
     private static Entity MakeEntity(long x = 0, long y = 0, long width = 100, long height = 100, string label = "test")
     {
-        return new Entity(EntityId.New(), label)
-        {
-            Location = new Location(x, y),
-            Width = width,
-            Height = height,
-        };
+        return new EntityBuilder().WithLabel(label).WithLocation(x, y).WithSize(width, height).Build();
     }
 
     [Fact]

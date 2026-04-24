@@ -1,4 +1,5 @@
 using FluentAssertions;
+using RunicMagic.Tests.Builders;
 using RunicMagic.World;
 using RunicMagic.World.Execution;
 using RunicMagic.World.Geometry;
@@ -13,12 +14,7 @@ public class KALTests
 
     private static Entity MakeEntity(long x, long y, long width = 100, long height = 100)
     {
-        return new Entity(EntityId.New(), "test")
-        {
-            Location = new Location(x, y),
-            Width = width,
-            Height = height,
-        };
+        return new EntityBuilder().WithLocation(x, y).WithSize(width, height).Build();
     }
 
     [Fact]
@@ -83,13 +79,7 @@ public class KALTests
     {
         var world = new WorldModel();
         var casterEntity = MakeEntity(x: 0, y: 0);
-        var glass = new Entity(EntityId.New(), "glass")
-        {
-            Location = new Location(300, 0),
-            Width = 100,
-            Height = 100,
-            IsTranslucent = true,
-        };
+        var glass = new EntityBuilder().WithLabel("glass").WithLocation(300, 0).WithTranslucency().Build();
         var target = MakeEntity(x: 600, y: 0);
         casterEntity.IndicateTarget = new IndicateTarget(target.Id, Right);
         world.Add(casterEntity);

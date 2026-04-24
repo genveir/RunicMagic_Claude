@@ -5,11 +5,35 @@ using RunicMagic.World.Runes.RuneTypes;
 
 namespace RunicMagic.World;
 
-public class Entity(EntityId id, string label)
+public class Entity
 {
-    public EntityId Id { get; } = id;
+    public Entity(
+        EntityId id,
+        string label,
+        Location location,
+        long width,
+        long height,
+        bool hasAgency,
+        long weight,
+        bool isTranslucent,
+        double angle,
+        StructuralIntegrityCapability structuralIntegrity)
+    {
+        Id = id;
+        Label = label;
+        Location = location;
+        Width = width;
+        Height = height;
+        HasAgency = hasAgency;
+        Weight = weight;
+        IsTranslucent = isTranslucent;
+        Angle = angle;
+        StructuralIntegrity = structuralIntegrity;
+    }
 
-    public string Label { get; set; } = label;
+    public EntityId Id { get; }
+
+    public string Label { get; set; }
     public Location Location { get; set; }
     public long Width { get; set; }
     public long Height { get; set; }
@@ -23,6 +47,7 @@ public class Entity(EntityId id, string label)
 
     public LifeCapability? Life { get; set; }
     public ChargeCapability? Charge { get; set; }
+    public StructuralIntegrityCapability StructuralIntegrity { get; set; }
 
     public Func<long, ReservoirDraw>? Reservoir { get; set; }
     public Func<long>? MaxReservoir { get; set; }

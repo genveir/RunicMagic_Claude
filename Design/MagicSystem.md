@@ -32,9 +32,9 @@ Example: `ZU(execute) HET(one)` — `ZU` expects a `Statement`, but `HET` return
 
 ### 3. Calculate Evaluation Cost
 
-The evaluation cost is the total rune count — including all defaults filled in automatically — divided by 5, rounded down. This cost is paid before execution begins.
+The evaluation cost is 1 power per rune — including all defaults filled in automatically. This cost is paid before execution begins.
 
-Example: a spell that expands to 11 runes including defaults costs 2 power.
+Example: a spell that expands to 11 runes including defaults costs 11 power.
 
 ### 4. Source Evaluation Power
 
@@ -75,7 +75,7 @@ Power is drawn in three distinct ways during a spell:
 1. **Evaluation cost** — paid upfront (step 4) before execution begins, based on rune count.
 2. **Selection cost** — paid each time a Set is consumed by a rune that consumes a Set but doesn't produce one (i.e. not by filters or selectors). Two components are charged together:
    - **Entity cost**: `ceil(MaxPower / 1000)` per entity in the resolved Set, excluding the caster and executor, who are always free to select.
-   - **Breadth cost**: `floor(N / 10)` where N is the total number of distinct entities touched by any leaf selector (for example HORO, LA) during resolution of that Set, regardless of how many survive filtering. A precise spell that targets exactly what it needs pays less than one that sweeps broadly and filters back down.
+   - **Breadth cost**: 1 power per entity touched by any leaf selector (for example HORO, LA) during resolution of that Set, regardless of how many survive filtering. A precise spell that targets exactly what it needs pays less than one that sweeps broadly and filters back down.
 
    If the full combined cost cannot be met, the Set resolves to empty.
 3. **Execution cost** — paid by each effect rune as it fires, scaled by the magnitude of the effect.
@@ -94,7 +94,9 @@ The system makes no attempt to pre-validate whether a spell can be afforded befo
 
 ---
 
-## Skill and Precision
+## Design Principles — Skill and Precision
+
+These are core design principles that guide all cost-related decisions, not just a description of the current implementation.
 
 The cost model consistently rewards mastery. There are no guardrails, no safety nets, and no bonuses for intent — only the structure of the spell and the state of the world matter.
 

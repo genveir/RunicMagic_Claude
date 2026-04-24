@@ -1,3 +1,4 @@
+using RunicMagic.Tests.Builders;
 using RunicMagic.World;
 using RunicMagic.World.Execution;
 using RunicMagic.World.Geometry;
@@ -9,12 +10,10 @@ internal static class TestFixtures
 {
     internal static Entity MakeEntity(long x = 0, long y = 0, long weight = 0)
     {
-        var entity = new Entity(new EntityId(Guid.NewGuid()), "test");
-        entity.Location = new Location(x, y);
-        entity.Width = 100;
-        entity.Height = 100;
-        entity.Weight = weight;
-        return entity;
+        return new EntityBuilder()
+            .WithLocation(x, y)
+            .WithWeight(weight)
+            .Build();
     }
 
     internal static SpellContext MakeContext(
@@ -74,12 +73,10 @@ internal class FixedPointEntitySet : IEntitySet
 
     public EntitySet Resolve(SpellContext context)
     {
-        var entity = new Entity(EntityId.New(), "origin")
-        {
-            Location = _location,
-            Width = 1,
-            Height = 1,
-        };
+        var entity = new EntityBuilder()
+            .WithLocation(_location)
+            .WithSize(1, 1)
+            .Build();
         return new EntitySet([entity]);
     }
 }

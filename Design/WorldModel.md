@@ -33,6 +33,7 @@ Current entity data:
 | `IsTranslucent` | Property | boolean | `false` = opaque; used by ray-cast runes |
 | `Life` | Property | complex | `LifeCapability`: `MaxHitPoints` + `CurrentHitPoints`; null = not alive |
 | `Charge` | Property | complex | `ChargeCapability`: `MaxCharge` + `CurrentCharge`; null = uncharged |
+| `StructuralIntegrity` | Attribute | complex | `StructuralIntegrityCapability`: `MaxIntegrity` + `CurrentIntegrity`; always present. Damage to structural integrity also caps `Life.CurrentHitPoints` to the new `CurrentIntegrity` — the reverse does not apply. |
 | `PointingDirection` | Transient | scalar | The direction the entity is consciously aiming; null = not pointing |
 | `IndicateTarget` | Transient | complex | The entity the caster is consciously indicating, with optional approach direction; null = not indicating |
 | `ParsedInscriptions` | Transient | `IStatement[]` | Spells inscribed on this entity, pre-parsed at load time; empty = none |
@@ -62,6 +63,7 @@ The implementation may use convenience classes (e.g. `Creature`) to stamp out en
 - `bool IsTranslucent` — false = absent
 - `LifeCapability? Life` — null = absent; holds `MaxHitPoints` + `CurrentHitPoints`
 - `ChargeCapability? Charge` — null = absent; holds `MaxCharge` + `CurrentCharge`
+- `StructuralIntegrityCapability StructuralIntegrity` — always present; stored as columns on `Entities`; holds `MaxIntegrity` + `CurrentIntegrity`
 
 **Transient** (session-only):
 - `Direction? PointingDirection` — null = not pointing

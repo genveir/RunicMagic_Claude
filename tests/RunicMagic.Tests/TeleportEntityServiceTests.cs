@@ -1,4 +1,5 @@
 using FluentAssertions;
+using RunicMagic.Tests.Builders;
 using RunicMagic.World;
 using RunicMagic.World.Geometry;
 using Xunit;
@@ -10,7 +11,7 @@ public class TeleportEntityServiceTests
     [Fact]
     public void Teleport_UpdatesEntityPosition()
     {
-        var entity = new Entity(EntityId.New(), "test") { Location = new Location(0, 0) };
+        var entity = new EntityBuilder().WithLocation(0, 0).Build();
         var service = new TeleportEntityService();
 
         service.Teleport(entity, new Location(400, 300));

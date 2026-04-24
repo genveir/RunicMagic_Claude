@@ -1,5 +1,5 @@
 using FluentAssertions;
-using RunicMagic.World;
+using RunicMagic.Tests.Builders;
 using RunicMagic.World.Geometry;
 using Xunit;
 
@@ -10,7 +10,7 @@ public class EntityTests
     [Fact]
     public void PointingDirection_IsNullByDefault()
     {
-        var entity = new Entity(new EntityId(Guid.NewGuid()), "test");
+        var entity = new EntityBuilder().Build();
 
         entity.PointingDirection.Should().BeNull();
     }
@@ -18,7 +18,7 @@ public class EntityTests
     [Fact]
     public void PointingDirection_CanBeSet()
     {
-        var entity = new Entity(new EntityId(Guid.NewGuid()), "test");
+        var entity = new EntityBuilder().Build();
         var direction = new Direction(1.0, 0.0);
 
         entity.PointingDirection = direction;
@@ -29,7 +29,7 @@ public class EntityTests
     [Fact]
     public void PointingDirection_CanBeClearedBackToNull()
     {
-        var entity = new Entity(new EntityId(Guid.NewGuid()), "test");
+        var entity = new EntityBuilder().Build();
         entity.PointingDirection = new Direction(0.0, 1.0);
 
         entity.PointingDirection = null;
