@@ -2,7 +2,7 @@
 
 ## To Do — Milestone 2
 
-Next ticket number: RMC-74
+Next ticket number: RMC-75
 Next bugfix number: BUG-4
 
 | Key | Title | Description | Blocked By |
@@ -22,6 +22,7 @@ Next bugfix number: BUG-4
 | RMC-14 | Design channeling and persistent effects | Written runes stay active while power is channeled. Define what "channeling" means mechanically — what keeps a spell alive, how it is terminated, and how the executor tracks ongoing effects. | |
 | RMC-7 | Identify missing runes | There are no runes that manipulate entity sets, or effects other than pushing. Audit the full rune set for gaps needed to write meaningful spells. | |
 | RMC-48 | Formalize movement with collision | VUN currently teleports entities to their destination. Replace this with movement through space: the entity travels along the push vector and stops when it hits an entity (a wall, door, etc.) rather than passing through it. | |
+| RMC-74 | Cone selection rune | A spatial selector that selects all entities within a cone projected from an origin entity in its pointing direction. Parametrised by angle (half-width) and range. | |
 
 ## In Progress
 | Key | Title | Description | Remarks |
