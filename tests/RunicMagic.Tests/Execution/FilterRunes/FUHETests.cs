@@ -1,4 +1,5 @@
 using FluentAssertions;
+using RunicMagic.Tests.Builders;
 using RunicMagic.World;
 using RunicMagic.World.Runes.FilterRunes;
 using Xunit;
@@ -9,8 +10,9 @@ public class FUHETests
 {
     private static Entity MakeEntity(long currentPower)
     {
-        var entity = TestFixtures.MakeEntity();
-        entity.CurrentReservoir = () => currentPower;
+        var entity = new EntityBuilder()
+            .WithReservoir(current: () => currentPower)
+            .Build();
         return entity;
     }
 
@@ -59,7 +61,7 @@ public class FUHETests
     [Fact]
     public void Resolve_NullCurrentReservoir_TreatedAsZero()
     {
-        var noReservoir = TestFixtures.MakeEntity();
+        var noReservoir = new EntityBuilder().Build();
         var withPower = MakeEntity(currentPower: 500);
         var fuhe = new FUHE(source: new FixedEntitySet(noReservoir, withPower));
         var context = TestFixtures.MakeContext();

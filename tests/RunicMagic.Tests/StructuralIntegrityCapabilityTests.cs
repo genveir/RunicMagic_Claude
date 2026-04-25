@@ -26,10 +26,9 @@ public class DamageServiceTests
     public void Damage_ReducesCurrentIntegrity()
     {
         var entity = MakeEntity(maxIntegrity: 1000, currentIntegrity: 1000);
-        var service = new DamageService();
         var world = MakeWorldWithEntity(entity);
 
-        service.Damage(entity, 300, world);
+        DamageService.Damage(entity, 300, world);
 
         entity.StructuralIntegrity.CurrentIntegrity.Should().Be(700);
     }
@@ -38,10 +37,9 @@ public class DamageServiceTests
     public void Damage_ReturnsActualDamageDealt()
     {
         var entity = MakeEntity(maxIntegrity: 1000, currentIntegrity: 1000);
-        var service = new DamageService();
         var world = MakeWorldWithEntity(entity);
 
-        var dealt = service.Damage(entity, 400, world);
+        var dealt = DamageService.Damage(entity, 400, world);
 
         dealt.Should().Be(400);
     }
@@ -50,10 +48,9 @@ public class DamageServiceTests
     public void Damage_ClampsAtZero_WhenAmountExceedsCurrentIntegrity()
     {
         var entity = MakeEntity(maxIntegrity: 1000, currentIntegrity: 200);
-        var service = new DamageService();
         var world = MakeWorldWithEntity(entity);
 
-        var dealt = service.Damage(entity, 500, world);
+        var dealt = DamageService.Damage(entity, 500, world);
 
         dealt.Should().Be(200);
         entity.StructuralIntegrity.CurrentIntegrity.Should().Be(0);
@@ -63,10 +60,9 @@ public class DamageServiceTests
     public void Damage_CapsLife_WhenLifeExceedsNewCurrentIntegrity()
     {
         var entity = MakeEntity(maxIntegrity: 1000, currentIntegrity: 1000, maxHp: 1000, currentHp: 800);
-        var service = new DamageService();
         var world = MakeWorldWithEntity(entity);
 
-        service.Damage(entity, 300, world);
+        DamageService.Damage(entity, 300, world);
 
         entity.StructuralIntegrity.CurrentIntegrity.Should().Be(700);
         entity.Life!.CurrentHitPoints.Should().Be(700);
@@ -76,10 +72,9 @@ public class DamageServiceTests
     public void Damage_DoesNotTouchLife_WhenLifeIsBelowNewCurrentIntegrity()
     {
         var entity = MakeEntity(maxIntegrity: 1000, currentIntegrity: 1000, maxHp: 1000, currentHp: 400);
-        var service = new DamageService();
         var world = MakeWorldWithEntity(entity);
 
-        service.Damage(entity, 300, world);
+        DamageService.Damage(entity, 300, world);
 
         entity.StructuralIntegrity.CurrentIntegrity.Should().Be(700);
         entity.Life!.CurrentHitPoints.Should().Be(400);
@@ -89,10 +84,9 @@ public class DamageServiceTests
     public void Damage_WorksWithNoLife()
     {
         var entity = MakeEntity(maxIntegrity: 1000, currentIntegrity: 1000);
-        var service = new DamageService();
         var world = MakeWorldWithEntity(entity);
 
-        var act = () => service.Damage(entity, 500, world);
+        var act = () => DamageService.Damage(entity, 500, world);
 
         act.Should().NotThrow();
         entity.StructuralIntegrity.CurrentIntegrity.Should().Be(500);
@@ -102,10 +96,9 @@ public class DamageServiceTests
     public void Damage_CapsLifeToZero_WhenIntegrityReachesZero()
     {
         var entity = MakeEntity(maxIntegrity: 1000, currentIntegrity: 100, maxHp: 1000, currentHp: 600);
-        var service = new DamageService();
         var world = MakeWorldWithEntity(entity);
 
-        service.Damage(entity, 200, world);
+        DamageService.Damage(entity, 200, world);
 
         entity.StructuralIntegrity.CurrentIntegrity.Should().Be(0);
         entity.Life!.CurrentHitPoints.Should().Be(0);
@@ -115,10 +108,9 @@ public class DamageServiceTests
     public void Damage_RemovesEntityFromWorld_WhenIntegrityReachesZero()
     {
         var entity = MakeEntity(maxIntegrity: 1000, currentIntegrity: 100);
-        var service = new DamageService();
         var world = MakeWorldWithEntity(entity);
 
-        service.Damage(entity, 200, world);
+        DamageService.Damage(entity, 200, world);
 
         world.GetAll().Should().NotContain(entity);
     }

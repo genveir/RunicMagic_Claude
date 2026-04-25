@@ -19,9 +19,9 @@ namespace RunicMagic.World.Runes.FilterRunes
             {
                 return new EntitySet([]);
             }
-            var minPower = source.Entities.Min(e => e.CurrentReservoir?.Invoke() ?? 0L);
+            var minPower = source.Entities.Min(e => e.Reservoir?.Current() ?? 0L);
             var leastPowerful = source.Entities
-                .Where(e => (e.CurrentReservoir?.Invoke() ?? 0L) == minPower)
+                .Where(e => (e.Reservoir?.Current() ?? 0L) == minPower)
                 .ToList();
             var result = new EntitySet(leastPowerful);
             return result;

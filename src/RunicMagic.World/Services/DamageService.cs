@@ -1,8 +1,8 @@
 namespace RunicMagic.World.Services;
 
-public class DamageService
+internal static class DamageService
 {
-    public long Damage(Entity entity, long amount, WorldModel world)
+    public static long Damage(Entity entity, long amount, WorldModel world)
     {
         var actual = Math.Min(amount, entity.StructuralIntegrity.CurrentIntegrity);
         entity.StructuralIntegrity.CurrentIntegrity -= actual;

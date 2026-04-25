@@ -1,13 +1,13 @@
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
-using RunicMagic.Controller;
+using RunicMagic.Controller.EntityConstruction;
 using RunicMagic.Database;
 using RunicMagic.World;
 using RunicMagic.World.Runes.EffectRunes;
 using Xunit;
 
-namespace RunicMagic.Tests;
+namespace RunicMagic.Tests.EntityConstruction;
 
 public class EntityFactoryTests
 {
@@ -35,7 +35,7 @@ public class EntityFactoryTests
         MaxCharge: maxCharge,
         CurrentCharge: currentCharge);
 
-    // ── Creature reservoir ────────────────────────────────────────────────────
+    // ── Creature reservoir — Draw ─────────────────────────────────────────────
 
     [Fact]
     public void Creature_Reservoir_DrawsFromLife()
@@ -44,7 +44,7 @@ public class EntityFactoryTests
         var entity = Factory(world).Create(CreatureData(maxHp: 100, currentHp: 100));
         world.Add(entity);
 
-        var draw = entity.Reservoir!(50);
+        var draw = entity.Reservoir!.Draw(50);
 
         draw.Amount.Should().Be(50);
         draw.IsDrained.Should().BeFalse();
@@ -58,7 +58,7 @@ public class EntityFactoryTests
         var entity = Factory(world).Create(CreatureData(maxHp: 100, currentHp: 30));
         world.Add(entity);
 
-        var draw = entity.Reservoir!(50);
+        var draw = entity.Reservoir!.Draw(50);
 
         draw.Amount.Should().Be(30);
         draw.IsDrained.Should().BeTrue();
@@ -72,36 +72,108 @@ public class EntityFactoryTests
         var entity = Factory(world).Create(CreatureData(maxHp: 100, currentHp: 0));
         world.Add(entity);
 
-        var draw = entity.Reservoir!(50);
+        var draw = entity.Reservoir!.Draw(50);
 
         draw.Amount.Should().Be(0);
         draw.IsDrained.Should().BeFalse();
     }
 
+    // ── Creature reservoir — Current and Max ──────────────────────────────────
+
     [Fact]
-    public void Creature_Reservoir_DrawsZeroAndLogsWarning_WhenNoLifeCapability()
+    public void Creature_Reservoir_Current_ReturnsCurrentHp()
     {
         var world = new WorldModel();
-        var logger = new Mock<ILogger<EntityFactory>>();
-        var entity = new EntityFactory(world, logger.Object).Create(new EntityData(
-            Guid.NewGuid(), (long)EntityType.Creature, "lifeless creature",
-            X: 0, Y: 0, Width: 10, Height: 10, HasAgency: false, Weight: 0));
+        var entity = Factory(world).Create(CreatureData(maxHp: 100, currentHp: 60));
         world.Add(entity);
 
-        var draw = entity.Reservoir!(50);
+        var current = entity.Reservoir!.Current();
 
-        draw.Amount.Should().Be(0);
-        logger.Verify(
-            x => x.Log(
-                LogLevel.Warning,
-                It.IsAny<EventId>(),
-                It.IsAny<It.IsAnyType>(),
-                It.IsAny<Exception?>(),
-                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
-            Times.Once);
+        current.Should().Be(60);
     }
 
-    // ── ManaSource reservoir ──────────────────────────────────────────────────
+    [Fact]
+    public void Creature_Reservoir_Current_TracksHpChanges()
+    {
+        var world = new WorldModel();
+        var entity = Factory(world).Create(CreatureData(maxHp: 100, currentHp: 100));
+        world.Add(entity);
+
+        entity.Reservoir!.Draw(40);
+        var current = entity.Reservoir!.Current();
+
+        current.Should().Be(60);
+    }
+
+    [Fact]
+    public void Creature_MaxReservoir_ReturnsMaxHitPoints()
+    {
+        var world = new WorldModel();
+        var entity = Factory(world).Create(CreatureData(maxHp: 500, currentHp: 200));
+        world.Add(entity);
+
+        var max = entity.Reservoir!.Max();
+
+        max.Should().Be(500);
+    }
+
+    // ── Creature reservoir — Fill ─────────────────────────────────────────────
+
+    [Fact]
+    public void Creature_Reservoir_Fill_AddsToHp()
+    {
+        var world = new WorldModel();
+        var entity = Factory(world).Create(CreatureData(maxHp: 100, currentHp: 40));
+        world.Add(entity);
+
+        var fill = entity.Reservoir!.Fill(30);
+
+        fill.Amount.Should().Be(30);
+        fill.IsFull.Should().BeFalse();
+        entity.Life!.CurrentHitPoints.Should().Be(70);
+    }
+
+    [Fact]
+    public void Creature_Reservoir_Fill_CapsAtMaxHp()
+    {
+        var world = new WorldModel();
+        var entity = Factory(world).Create(CreatureData(maxHp: 100, currentHp: 80));
+        world.Add(entity);
+
+        var fill = entity.Reservoir!.Fill(50);
+
+        fill.Amount.Should().Be(20);
+        fill.IsFull.Should().BeTrue();
+        entity.Life!.CurrentHitPoints.Should().Be(100);
+    }
+
+    [Fact]
+    public void Creature_Reservoir_Fill_ReturnsZero_WhenAlreadyFull()
+    {
+        var world = new WorldModel();
+        var entity = Factory(world).Create(CreatureData(maxHp: 100, currentHp: 100));
+        world.Add(entity);
+
+        var fill = entity.Reservoir!.Fill(50);
+
+        fill.Amount.Should().Be(0);
+        fill.IsFull.Should().BeTrue();
+    }
+
+    // ── Creature — null checks ────────────────────────────────────────────────
+
+    [Fact]
+    public void Creature_Reservoir_IsNull_WhenNoLifeCapability()
+    {
+        var world = new WorldModel();
+        var entity = Factory(world).Create(new EntityData(
+            Guid.NewGuid(), (long)EntityType.Creature, "lifeless",
+            X: 0, Y: 0, Width: 10, Height: 10, HasAgency: false, Weight: 0));
+
+        entity.Reservoir.Should().BeNull();
+    }
+
+    // ── ManaSource reservoir — Draw ───────────────────────────────────────────
 
     [Fact]
     public void ManaSource_Reservoir_DrawsFromCharge()
@@ -110,7 +182,7 @@ public class EntityFactoryTests
         var entity = Factory(world).Create(ManaSourceData(maxCharge: 200, currentCharge: 200));
         world.Add(entity);
 
-        var draw = entity.Reservoir!(75);
+        var draw = entity.Reservoir!.Draw(75);
 
         draw.Amount.Should().Be(75);
         draw.IsDrained.Should().BeFalse();
@@ -124,34 +196,119 @@ public class EntityFactoryTests
         var entity = Factory(world).Create(ManaSourceData(maxCharge: 200, currentCharge: 40));
         world.Add(entity);
 
-        var draw = entity.Reservoir!(100);
+        var draw = entity.Reservoir!.Draw(100);
 
         draw.Amount.Should().Be(40);
         draw.IsDrained.Should().BeTrue();
         entity.Charge!.CurrentCharge.Should().Be(0);
     }
 
+    // ── ManaSource reservoir — Current and Max ────────────────────────────────
+
     [Fact]
-    public void ManaSource_Reservoir_DrawsZeroAndLogsWarning_WhenNoChargeCapability()
+    public void ManaSource_Reservoir_Current_ReturnsCurrentCharge()
     {
         var world = new WorldModel();
-        var logger = new Mock<ILogger<EntityFactory>>();
-        var entity = new EntityFactory(world, logger.Object).Create(new EntityData(
-            Guid.NewGuid(), (long)EntityType.ManaSource, "uncharged source",
-            X: 0, Y: 0, Width: 10, Height: 10, HasAgency: false, Weight: 0));
+        var entity = Factory(world).Create(ManaSourceData(maxCharge: 200, currentCharge: 120));
         world.Add(entity);
 
-        var draw = entity.Reservoir!(50);
+        var current = entity.Reservoir!.Current();
 
-        draw.Amount.Should().Be(0);
-        logger.Verify(
-            x => x.Log(
-                LogLevel.Warning,
-                It.IsAny<EventId>(),
-                It.IsAny<It.IsAnyType>(),
-                It.IsAny<Exception?>(),
-                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
-            Times.Once);
+        current.Should().Be(120);
+    }
+
+    [Fact]
+    public void ManaSource_Reservoir_Current_TracksChargeChanges()
+    {
+        var world = new WorldModel();
+        var entity = Factory(world).Create(ManaSourceData(maxCharge: 200, currentCharge: 200));
+        world.Add(entity);
+
+        entity.Reservoir!.Draw(50);
+        var current = entity.Reservoir!.Current();
+
+        current.Should().Be(150);
+    }
+
+    [Fact]
+    public void ManaSource_Reservoir_ReturnsMaxCharge()
+    {
+        var world = new WorldModel();
+        var entity = Factory(world).Create(ManaSourceData(maxCharge: 800, currentCharge: 100));
+        world.Add(entity);
+
+        var max = entity.Reservoir!.Max();
+
+        max.Should().Be(800);
+    }
+
+    // ── ManaSource reservoir — Fill ───────────────────────────────────────────
+
+    [Fact]
+    public void ManaSource_Reservoir_Fill_AddsToCharge()
+    {
+        var world = new WorldModel();
+        var entity = Factory(world).Create(ManaSourceData(maxCharge: 200, currentCharge: 50));
+        world.Add(entity);
+
+        var fill = entity.Reservoir!.Fill(80);
+
+        fill.Amount.Should().Be(80);
+        fill.IsFull.Should().BeFalse();
+        entity.Charge!.CurrentCharge.Should().Be(130);
+    }
+
+    [Fact]
+    public void ManaSource_Reservoir_Fill_CapsAtMaxCharge()
+    {
+        var world = new WorldModel();
+        var entity = Factory(world).Create(ManaSourceData(maxCharge: 200, currentCharge: 170));
+        world.Add(entity);
+
+        var fill = entity.Reservoir!.Fill(100);
+
+        fill.Amount.Should().Be(30);
+        fill.IsFull.Should().BeTrue();
+        entity.Charge!.CurrentCharge.Should().Be(200);
+    }
+
+    [Fact]
+    public void ManaSource_Reservoir_Fill_ReturnsZero_WhenAlreadyFull()
+    {
+        var world = new WorldModel();
+        var entity = Factory(world).Create(ManaSourceData(maxCharge: 200, currentCharge: 200));
+        world.Add(entity);
+
+        var fill = entity.Reservoir!.Fill(50);
+
+        fill.Amount.Should().Be(0);
+        fill.IsFull.Should().BeTrue();
+    }
+
+    // ── ManaSource — null checks ──────────────────────────────────────────────
+
+    [Fact]
+    public void ManaSource_Reservoir_IsNull_WhenNoChargeCapability()
+    {
+        var world = new WorldModel();
+        var entity = Factory(world).Create(new EntityData(
+            Guid.NewGuid(), (long)EntityType.ManaSource, "uncharged",
+            X: 0, Y: 0, Width: 10, Height: 5, HasAgency: false, Weight: 0));
+
+        entity.Reservoir.Should().BeNull();
+    }
+
+    // ── Object ────────────────────────────────────────────────────────────────
+
+    [Fact]
+    public void Object_HasNoReservoir()
+    {
+        var world = new WorldModel();
+        var entity = Factory(world).Create(new EntityData(
+            Guid.NewGuid(), (long)EntityType.Object, "rock",
+            X: 0, Y: 0, Width: 5, Height: 5, HasAgency: false, Weight: 0));
+
+        entity.Reservoir.Should().BeNull();
     }
 
     // ── Creature scope ────────────────────────────────────────────────────────
@@ -186,78 +343,6 @@ public class EntityFactoryTests
         var scope = caster.Scope!();
 
         scope.Should().NotContain(distant);
-    }
-
-    // ── MaxReservoir ──────────────────────────────────────────────────────────
-
-    [Fact]
-    public void Creature_MaxReservoir_ReturnsMaxHitPoints()
-    {
-        var world = new WorldModel();
-        var entity = Factory(world).Create(CreatureData(maxHp: 500, currentHp: 200));
-        world.Add(entity);
-
-        var max = entity.MaxReservoir!();
-
-        max.Should().Be(500);
-    }
-
-    [Fact]
-    public void Creature_MaxReservoir_IsNull_WhenNoLifeCapability()
-    {
-        var world = new WorldModel();
-        var entity = Factory(world).Create(new EntityData(
-            Guid.NewGuid(), (long)EntityType.Creature, "lifeless",
-            X: 0, Y: 0, Width: 10, Height: 10, HasAgency: false, Weight: 0));
-
-        entity.MaxReservoir.Should().BeNull();
-    }
-
-    [Fact]
-    public void ManaSource_MaxReservoir_ReturnsMaxCharge()
-    {
-        var world = new WorldModel();
-        var entity = Factory(world).Create(ManaSourceData(maxCharge: 800, currentCharge: 100));
-        world.Add(entity);
-
-        var max = entity.MaxReservoir!();
-
-        max.Should().Be(800);
-    }
-
-    [Fact]
-    public void ManaSource_MaxReservoir_IsNull_WhenNoChargeCapability()
-    {
-        var world = new WorldModel();
-        var entity = Factory(world).Create(new EntityData(
-            Guid.NewGuid(), (long)EntityType.ManaSource, "uncharged",
-            X: 0, Y: 0, Width: 10, Height: 10, HasAgency: false, Weight: 0));
-
-        entity.MaxReservoir.Should().BeNull();
-    }
-
-    // ── Object ────────────────────────────────────────────────────────────────
-
-    [Fact]
-    public void Object_HasNoReservoir()
-    {
-        var world = new WorldModel();
-        var entity = Factory(world).Create(new EntityData(
-            Guid.NewGuid(), (long)EntityType.Object, "rock",
-            X: 0, Y: 0, Width: 5, Height: 5, HasAgency: false, Weight: 0));
-
-        entity.Reservoir.Should().BeNull();
-    }
-
-    [Fact]
-    public void Object_HasNoMaxReservoir()
-    {
-        var world = new WorldModel();
-        var entity = Factory(world).Create(new EntityData(
-            Guid.NewGuid(), (long)EntityType.Object, "rock",
-            X: 0, Y: 0, Width: 5, Height: 5, HasAgency: false, Weight: 0));
-
-        entity.MaxReservoir.Should().BeNull();
     }
 
     // ── Inscriptions ──────────────────────────────────────────────────────────

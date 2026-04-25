@@ -1,5 +1,5 @@
 using FluentAssertions;
-using RunicMagic.World.Execution;
+using RunicMagic.Tests.Builders;
 using RunicMagic.World.Geometry;
 using RunicMagic.World.Runes.LocationRunes;
 using Xunit;
@@ -11,7 +11,7 @@ public class GERTests
     [Fact]
     public void Evaluate_SingleEntity_ReturnsEntityPosition()
     {
-        var entity = TestFixtures.MakeEntity(x: 300, y: 500, weight: 10);
+        var entity = new EntityBuilder().WithLocation(x: 300, y: 500).WithWeight(10).Build();
         var ger = new GER(new FixedEntitySet(entity));
         var context = TestFixtures.MakeContext();
 
@@ -23,8 +23,8 @@ public class GERTests
     [Fact]
     public void Evaluate_EqualWeights_ReturnsCentroid()
     {
-        var entity1 = TestFixtures.MakeEntity(x: 0, y: 0, weight: 5);
-        var entity2 = TestFixtures.MakeEntity(x: 100, y: 200, weight: 5);
+        var entity1 = new EntityBuilder().WithLocation(x: 0, y: 0).WithWeight(5).Build();
+        var entity2 = new EntityBuilder().WithLocation(x: 100, y: 200).WithWeight(5).Build();
         var ger = new GER(new FixedEntitySet(entity1, entity2));
         var context = TestFixtures.MakeContext();
 
@@ -36,8 +36,8 @@ public class GERTests
     [Fact]
     public void Evaluate_UnequalWeights_PullsTowardHeavierEntity()
     {
-        var light = TestFixtures.MakeEntity(x: 0, y: 0, weight: 1);
-        var heavy = TestFixtures.MakeEntity(x: 100, y: 0, weight: 3);
+        var light = new EntityBuilder().WithLocation(x: 0, y: 0).WithWeight(1).Build();
+        var heavy = new EntityBuilder().WithLocation(x: 100, y: 0).WithWeight(3).Build();
         var ger = new GER(new FixedEntitySet(light, heavy));
         var context = TestFixtures.MakeContext();
 
@@ -50,8 +50,8 @@ public class GERTests
     [Fact]
     public void Evaluate_AllZeroWeights_FallsBackToUnweightedCentroid()
     {
-        var entity1 = TestFixtures.MakeEntity(x: 0, y: 0, weight: 0);
-        var entity2 = TestFixtures.MakeEntity(x: 100, y: 0, weight: 0);
+        var entity1 = new EntityBuilder().WithLocation(x: 0, y: 0).WithWeight(0).Build();
+        var entity2 = new EntityBuilder().WithLocation(x: 100, y: 0).WithWeight(0).Build();
         var ger = new GER(new FixedEntitySet(entity1, entity2));
         var context = TestFixtures.MakeContext();
 

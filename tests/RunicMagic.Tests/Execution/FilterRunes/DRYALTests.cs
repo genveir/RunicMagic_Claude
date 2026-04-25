@@ -1,4 +1,5 @@
 using FluentAssertions;
+using RunicMagic.Tests.Builders;
 using RunicMagic.World.Capabilities;
 using RunicMagic.World.Runes.FilterRunes;
 using Xunit;
@@ -10,7 +11,7 @@ public class DRYALTests
     [Fact]
     public void Resolve_EntityWithLifeAndPositiveHitPoints_IsReturned()
     {
-        var entity = TestFixtures.MakeEntity();
+        var entity = new EntityBuilder().Build();
         entity.Life = new LifeCapability(maxHitPoints: 100, currentHitPoints: 50);
         var dryal = new DRYAL(source: new FixedEntitySet(entity));
         var context = TestFixtures.MakeContext();
@@ -23,7 +24,7 @@ public class DRYALTests
     [Fact]
     public void Resolve_EntityWithLifeAndZeroHitPoints_IsNotReturned()
     {
-        var entity = TestFixtures.MakeEntity();
+        var entity = new EntityBuilder().Build();
         entity.Life = new LifeCapability(maxHitPoints: 100, currentHitPoints: 0);
         var dryal = new DRYAL(source: new FixedEntitySet(entity));
         var context = TestFixtures.MakeContext();
@@ -36,7 +37,7 @@ public class DRYALTests
     [Fact]
     public void Resolve_EntityWithNoLifeCapability_IsNotReturned()
     {
-        var entity = TestFixtures.MakeEntity();
+        var entity = new EntityBuilder().Build();
         var dryal = new DRYAL(source: new FixedEntitySet(entity));
         var context = TestFixtures.MakeContext();
 
@@ -48,11 +49,9 @@ public class DRYALTests
     [Fact]
     public void Resolve_MixedEntities_ReturnsOnlyAlive()
     {
-        var alive = TestFixtures.MakeEntity();
-        alive.Life = new LifeCapability(maxHitPoints: 100, currentHitPoints: 10);
-        var dead = TestFixtures.MakeEntity();
-        dead.Life = new LifeCapability(maxHitPoints: 100, currentHitPoints: 0);
-        var inanimate = TestFixtures.MakeEntity();
+        var alive = new EntityBuilder().WithLife(max: 100, current: 10).Build();
+        var dead = new EntityBuilder().WithLife(max: 100, current: 0).Build();
+        var inanimate = new EntityBuilder().Build();
         var dryal = new DRYAL(source: new FixedEntitySet(alive, dead, inanimate));
         var context = TestFixtures.MakeContext();
 

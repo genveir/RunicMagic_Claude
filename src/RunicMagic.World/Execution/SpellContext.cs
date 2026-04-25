@@ -1,3 +1,5 @@
+using RunicMagic.World.Services;
+
 namespace RunicMagic.World.Execution;
 
 public class SpellContext
@@ -66,7 +68,7 @@ public class SpellContext
             {
                 break;
             }
-            remaining -= source.DrawPower(remaining, Result);
+            remaining -= PowerService.DrawPower(source, remaining, Result);
         }
         return amount - remaining;
     }

@@ -1,5 +1,5 @@
 using FluentAssertions;
-using RunicMagic.World;
+using RunicMagic.Tests.Builders;
 using RunicMagic.World.Execution;
 using RunicMagic.World.Runes.InvocationRunes;
 using Xunit;
@@ -13,7 +13,7 @@ public class CRIYRTests
     [Fact]
     public void Execute_EntityWithNoInscriptions_EmitsNoEvents()
     {
-        var target = TestFixtures.MakeEntity();
+        var target = new EntityBuilder().Build();
         var context = TestFixtures.MakeContext();
         var criyr = new CRIYR(target: new FixedEntitySet(target));
 
@@ -27,7 +27,7 @@ public class CRIYRTests
     [Fact]
     public void Execute_EntityWithOneInscription_EmitsOneEvent()
     {
-        var target = TestFixtures.MakeEntity();
+        var target = new EntityBuilder().Build();
         target.RawInscriptions = ["ZU VUN LA TOT"];
         var context = TestFixtures.MakeContext();
         var criyr = new CRIYR(target: new FixedEntitySet(target));
@@ -45,7 +45,7 @@ public class CRIYRTests
     [Fact]
     public void Execute_MultipleInscriptionsOnOneEntity_EmitsOneEventPerInscription()
     {
-        var target = TestFixtures.MakeEntity();
+        var target = new EntityBuilder().Build();
         target.RawInscriptions = ["ZU VUN LA TOT", "ZU GWYAH OH"];
         var context = TestFixtures.MakeContext();
         var criyr = new CRIYR(target: new FixedEntitySet(target));
@@ -63,10 +63,10 @@ public class CRIYRTests
     [Fact]
     public void Execute_MultipleEntities_EmitsEventsEntityFirst()
     {
-        var first = TestFixtures.MakeEntity();
+        var first = new EntityBuilder().Build();
         first.RawInscriptions = ["ZU VUN LA TOT", "ZU GWYAH OH"];
 
-        var second = TestFixtures.MakeEntity();
+        var second = new EntityBuilder().Build();
         second.RawInscriptions = ["ZU VAR DAN HET"];
 
         var context = TestFixtures.MakeContext();
@@ -89,10 +89,10 @@ public class CRIYRTests
     [Fact]
     public void Execute_SomeEntitiesHaveNoInscriptions_OnlyInscribedEntitiesEmitEvents()
     {
-        var withInscription = TestFixtures.MakeEntity();
+        var withInscription = new EntityBuilder().Build();
         withInscription.RawInscriptions = ["ZU VUN LA TOT"];
 
-        var withoutInscription = TestFixtures.MakeEntity();
+        var withoutInscription = new EntityBuilder().Build();
 
         var context = TestFixtures.MakeContext();
         var criyr = new CRIYR(target: new FixedEntitySet(withInscription, withoutInscription));

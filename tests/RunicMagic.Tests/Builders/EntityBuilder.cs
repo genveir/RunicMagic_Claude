@@ -22,9 +22,7 @@ namespace RunicMagic.Tests.Builders
         private LifeCapability? _life;
         private ChargeCapability? _charge;
         private Func<Entity[]>? _scope;
-        private Func<long, ReservoirDraw>? _reservoir;
-        private Func<long>? _maxReservoir;
-        private Func<long>? _currentReservoir;
+        private ReservoirCapability? _reservoir;
         private Direction? _pointingDirection;
         private IndicateTarget? _indicateTarget;
         private string[] _rawInscriptions = [];
@@ -105,27 +103,20 @@ namespace RunicMagic.Tests.Builders
             return this;
         }
 
+        public EntityBuilder WithReservoir(Func<long>? max = null, Func<long>? current = null, Func<long, ReservoirDraw>? draw = null, Func<long, ReservoirFill>? fill = null)
+        {
+            if (max == null) max = () => 1000;
+            if (current == null) current = () => 1000;
+            if (draw == null) draw = amount => new ReservoirDraw(amount, false);
+            if (fill == null) fill = amount => new ReservoirFill(amount, false);
+
+            _reservoir = new ReservoirCapability(max, current, draw, fill);
+            return this;
+        }
+
         public EntityBuilder WithScope(Func<Entity[]> scope)
         {
             _scope = scope;
-            return this;
-        }
-
-        public EntityBuilder WithReservoir(Func<long, ReservoirDraw> reservoir)
-        {
-            _reservoir = reservoir;
-            return this;
-        }
-
-        public EntityBuilder WithMaxReservoir(Func<long> maxReservoir)
-        {
-            _maxReservoir = maxReservoir;
-            return this;
-        }
-
-        public EntityBuilder WithCurrentReservoir(Func<long> currentReservoir)
-        {
-            _currentReservoir = currentReservoir;
             return this;
         }
 
@@ -166,8 +157,6 @@ namespace RunicMagic.Tests.Builders
                 Charge = _charge,
                 Scope = _scope,
                 Reservoir = _reservoir,
-                MaxReservoir = _maxReservoir,
-                CurrentReservoir = _currentReservoir,
                 PointingDirection = _pointingDirection,
                 IndicateTarget = _indicateTarget,
                 RawInscriptions = _rawInscriptions,

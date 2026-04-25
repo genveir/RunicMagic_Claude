@@ -10,8 +10,9 @@ public class FUSETests
 {
     private static Entity MakeEntity(long currentPower)
     {
-        var entity = new EntityBuilder().Build();
-        entity.CurrentReservoir = () => currentPower;
+        var entity = new EntityBuilder()
+            .WithReservoir(current: () => currentPower)
+            .Build();
         return entity;
     }
 

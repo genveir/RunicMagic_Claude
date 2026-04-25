@@ -1,4 +1,5 @@
 using FluentAssertions;
+using RunicMagic.Tests.Builders;
 using RunicMagic.World.Execution;
 using RunicMagic.World.Runes.EntityReferenceRunes;
 using Xunit;
@@ -10,7 +11,7 @@ public class ATests
     [Fact]
     public void Resolve_ReturnsCaster()
     {
-        var casterEntity = TestFixtures.MakeEntity();
+        var casterEntity = new EntityBuilder().Build();
         var caster = new EntitySet([casterEntity]);
         var context = TestFixtures.MakeContext(caster: caster);
 
@@ -22,7 +23,7 @@ public class ATests
     [Fact]
     public void Resolve_WindowOpen_AddsCasterIdToResolutionCount()
     {
-        var casterEntity = TestFixtures.MakeEntity();
+        var casterEntity = new EntityBuilder().Build();
         var context = TestFixtures.MakeContext(caster: new EntitySet([casterEntity]));
         context.OpenResolutionWindow();
 
@@ -34,7 +35,7 @@ public class ATests
     [Fact]
     public void Resolve_WindowNull_DoesNotThrow()
     {
-        var casterEntity = TestFixtures.MakeEntity();
+        var casterEntity = new EntityBuilder().Build();
         var context = TestFixtures.MakeContext(caster: new EntitySet([casterEntity]));
 
         var act = () => new A().Resolve(context);

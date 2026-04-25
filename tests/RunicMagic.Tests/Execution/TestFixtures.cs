@@ -8,14 +8,6 @@ namespace RunicMagic.Tests.Execution;
 
 internal static class TestFixtures
 {
-    internal static Entity MakeEntity(long x = 0, long y = 0, long weight = 0)
-    {
-        return new EntityBuilder()
-            .WithLocation(x, y)
-            .WithWeight(weight)
-            .Build();
-    }
-
     internal static SpellContext MakeContext(
         EntitySet? caster = null,
         EntitySet? executor = null,

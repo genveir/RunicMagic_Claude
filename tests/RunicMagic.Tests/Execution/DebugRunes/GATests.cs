@@ -1,5 +1,7 @@
 using FluentAssertions;
+using RunicMagic.Tests.Builders;
 using RunicMagic.World;
+using RunicMagic.World.Capabilities;
 using RunicMagic.World.Execution;
 using RunicMagic.World.Runes.DebugRunes;
 using Xunit;
@@ -12,8 +14,8 @@ public class GATests
     public void Resolve_ReturnsAllWorldEntities()
     {
         var world = new WorldModel();
-        var entity1 = TestFixtures.MakeEntity(x: 0, y: 0);
-        var entity2 = TestFixtures.MakeEntity(x: 100, y: 0);
+        var entity1 = new EntityBuilder().Build();
+        var entity2 = new EntityBuilder().WithLocation(x: 100, y: 0).Build();
         world.Add(entity1);
         world.Add(entity2);
         var context = TestFixtures.MakeContext(world: world);
@@ -27,7 +29,7 @@ public class GATests
     public void Resolve_WithNoResolutionWindow_DoesNotEmitDebugEvent()
     {
         var world = new WorldModel();
-        world.Add(TestFixtures.MakeEntity());
+        world.Add(new EntityBuilder().Build());
         var spellResult = new SpellResult();
         var context = TestFixtures.MakeContext(world: world, result: spellResult);
 
@@ -40,10 +42,11 @@ public class GATests
     public void Resolve_WithNoResolutionWindow_DoesNotDrawPower()
     {
         var drawn = new List<long>();
-        var casterEntity = TestFixtures.MakeEntity();
-        casterEntity.Reservoir = amount => { drawn.Add(amount); return new ReservoirDraw(amount, false); };
+        var casterEntity = new EntityBuilder()
+            .WithReservoir(draw: amount => { drawn.Add(amount); return new ReservoirDraw(amount, false); })
+            .Build();
         var world = new WorldModel();
-        world.Add(TestFixtures.MakeEntity());
+        world.Add(new EntityBuilder().Build());
         var context = TestFixtures.MakeContext(
             caster: new EntitySet([casterEntity]),
             world: world);
@@ -71,8 +74,9 @@ public class GATests
     public void Resolve_WithOpenResolutionWindow_DrawsOneBillionPower()
     {
         var drawn = new List<long>();
-        var casterEntity = TestFixtures.MakeEntity();
-        casterEntity.Reservoir = amount => { drawn.Add(amount); return new ReservoirDraw(amount, false); };
+        var casterEntity = new EntityBuilder()
+            .WithReservoir(draw: amount => { drawn.Add(amount); return new ReservoirDraw(amount, false); })
+            .Build();
         var world = new WorldModel();
         var context = TestFixtures.MakeContext(
             caster: new EntitySet([casterEntity]),
@@ -88,7 +92,7 @@ public class GATests
     public void Resolve_WithOpenResolutionWindow_StillReturnsAllWorldEntities()
     {
         var world = new WorldModel();
-        var entity = TestFixtures.MakeEntity();
+        var entity = new EntityBuilder().Build();
         world.Add(entity);
         var context = TestFixtures.MakeContext(world: world);
         context.OpenResolutionWindow();

@@ -1,4 +1,5 @@
 using FluentAssertions;
+using RunicMagic.Tests.Builders;
 using RunicMagic.World;
 using RunicMagic.World.Runes.FilterRunes;
 using Xunit;
@@ -9,8 +10,9 @@ public class FUILTests
 {
     private static Entity MakeEntity(long currentPower)
     {
-        var entity = TestFixtures.MakeEntity();
-        entity.CurrentReservoir = () => currentPower;
+        var entity = new EntityBuilder()
+            .WithReservoir(current: () => currentPower)
+            .Build();
         return entity;
     }
 
@@ -92,7 +94,7 @@ public class FUILTests
     [Fact]
     public void Resolve_EntityWithNullCurrentReservoir_TreatedAsZero()
     {
-        var entity = TestFixtures.MakeEntity();
+        var entity = new EntityBuilder().Build();
         var fuil = new FUIL(
             source: new FixedEntitySet(entity),
             lower: new FixedNumber(-1),

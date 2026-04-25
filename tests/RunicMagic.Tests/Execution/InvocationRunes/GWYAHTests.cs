@@ -1,5 +1,7 @@
 using FluentAssertions;
+using RunicMagic.Tests.Builders;
 using RunicMagic.World;
+using RunicMagic.World.Capabilities;
 using RunicMagic.World.Execution;
 using RunicMagic.World.Runes.InvocationRunes;
 using RunicMagic.World.Runes.RuneTypes;
@@ -20,7 +22,7 @@ public class GWYAHTests
     [Fact]
     public void Execute_EntityWithNoInscriptions_FiresNothing()
     {
-        var target = TestFixtures.MakeEntity();
+        var target = new EntityBuilder().Build();
         var context = TestFixtures.MakeContext();
         var gwyah = new GWYAH(target: new FixedEntitySet(target));
 
@@ -37,7 +39,7 @@ public class GWYAHTests
         Entity? capturedExecutor = null;
         var inscription = new CaptureExecutorStatement(e => capturedExecutor = e);
 
-        var target = TestFixtures.MakeEntity();
+        var target = new EntityBuilder().Build();
         target.ParsedInscriptions = [inscription];
 
         var context = TestFixtures.MakeContext();
@@ -54,10 +56,10 @@ public class GWYAHTests
         EntitySet? capturedCaster = null;
         var inscription = new CaptureCasterStatement(c => capturedCaster = c);
 
-        var casterEntity = TestFixtures.MakeEntity();
+        var casterEntity = new EntityBuilder().Build();
         var caster = new EntitySet([casterEntity]);
 
-        var target = TestFixtures.MakeEntity();
+        var target = new EntityBuilder().Build();
         target.ParsedInscriptions = [inscription];
 
         var context = TestFixtures.MakeContext(caster: caster, executor: caster);
@@ -74,7 +76,7 @@ public class GWYAHTests
     public void Execute_MultipleInscriptionsOnOneEntity_AllFiredInOrder()
     {
         var firedOrder = new List<int>();
-        var target = TestFixtures.MakeEntity();
+        var target = new EntityBuilder().Build();
         target.ParsedInscriptions =
         [
             new RecordOrderStatement(firedOrder, 1),
@@ -94,14 +96,14 @@ public class GWYAHTests
     {
         var firedOrder = new List<string>();
 
-        var first = TestFixtures.MakeEntity();
+        var first = new EntityBuilder().Build();
         first.ParsedInscriptions =
         [
             new RecordLabelStatement(firedOrder, "first-a"),
             new RecordLabelStatement(firedOrder, "first-b"),
         ];
 
-        var second = TestFixtures.MakeEntity();
+        var second = new EntityBuilder().Build();
         second.ParsedInscriptions =
         [
             new RecordLabelStatement(firedOrder, "second-a"),
@@ -120,15 +122,16 @@ public class GWYAHTests
     [Fact]
     public void Execute_PowerSourceStackTravelsIntoFork()
     {
-        var pushedEntity = TestFixtures.MakeEntity();
         var pushed = false;
-        pushedEntity.Reservoir = amount => { pushed = true; return new ReservoirDraw(amount, false); };
+        var pushedEntity = new EntityBuilder()
+            .WithReservoir(draw: amount => { pushed = true; return new ReservoirDraw(amount, false); })
+            .Build();
         var pushedSet = new EntitySet([pushedEntity]);
 
         long? drawnInsideInscription = null;
         var inscription = new DrawPowerStatement(10, drawn => drawnInsideInscription = drawn);
 
-        var target = TestFixtures.MakeEntity();
+        var target = new EntityBuilder().Build();
         target.ParsedInscriptions = [inscription];
 
         var context = TestFixtures.MakeContext();

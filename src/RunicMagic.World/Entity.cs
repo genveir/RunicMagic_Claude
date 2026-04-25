@@ -45,13 +45,10 @@ public class Entity
 
     public Func<Entity[]>? Scope { get; set; }
 
+    public ReservoirCapability? Reservoir { get; set; }
     public LifeCapability? Life { get; set; }
     public ChargeCapability? Charge { get; set; }
     public StructuralIntegrityCapability StructuralIntegrity { get; set; }
-
-    public Func<long, ReservoirDraw>? Reservoir { get; set; }
-    public Func<long>? MaxReservoir { get; set; }
-    public Func<long>? CurrentReservoir { get; set; }
 
     public Direction? PointingDirection { get; set; }
     public IndicateTarget? IndicateTarget { get; set; }

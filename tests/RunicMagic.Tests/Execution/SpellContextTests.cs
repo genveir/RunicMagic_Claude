@@ -1,5 +1,7 @@
 using FluentAssertions;
+using RunicMagic.Tests.Builders;
 using RunicMagic.World;
+using RunicMagic.World.Capabilities;
 using RunicMagic.World.Execution;
 using Xunit;
 
@@ -10,10 +12,11 @@ public class SpellContextTests
     [Fact]
     public void DrawPower_DrainsScopeOfExecutorFirst()
     {
-        var scopeEntity = TestFixtures.MakeEntity();
-        scopeEntity.Reservoir = amount => new ReservoirDraw(amount, false);
+        var scopeEntity = new EntityBuilder()
+            .WithReservoir(draw: amount => new ReservoirDraw(amount, false))
+            .Build();
 
-        var executorEntity = TestFixtures.MakeEntity();
+        var executorEntity = new EntityBuilder().Build();
         executorEntity.Scope = () => [scopeEntity];
         var executor = new EntitySet([executorEntity]);
 
@@ -28,8 +31,9 @@ public class SpellContextTests
     [Fact]
     public void DrawPower_FallsToExecutorWhenScopeEmpty()
     {
-        var executorEntity = TestFixtures.MakeEntity();
-        executorEntity.Reservoir = amount => new ReservoirDraw(amount, false);
+        var executorEntity = new EntityBuilder()
+            .WithReservoir(draw: amount => new ReservoirDraw(amount, false))
+            .Build();
         var executor = new EntitySet([executorEntity]);
 
         var context = TestFixtures.MakeContext(executor: executor);
@@ -43,14 +47,16 @@ public class SpellContextTests
     [Fact]
     public void DrawPower_FallsToScopeOfCasterWhenExecutorExhausted()
     {
-        var executorEntity = TestFixtures.MakeEntity();
-        executorEntity.Reservoir = amount => new ReservoirDraw(0, false);
+        var executorEntity = new EntityBuilder()
+            .WithReservoir(draw: amount => new ReservoirDraw(0, false))
+            .Build();
         var executor = new EntitySet([executorEntity]);
 
-        var scopeOfCasterEntity = TestFixtures.MakeEntity();
-        scopeOfCasterEntity.Reservoir = amount => new ReservoirDraw(amount, false);
+        var scopeOfCasterEntity = new EntityBuilder()
+            .WithReservoir(draw: amount => new ReservoirDraw(amount, false))
+            .Build();
 
-        var casterEntity = TestFixtures.MakeEntity();
+        var casterEntity = new EntityBuilder().Build();
         casterEntity.Scope = () => [scopeOfCasterEntity];
         var caster = new EntitySet([casterEntity]);
 
@@ -65,12 +71,14 @@ public class SpellContextTests
     [Fact]
     public void DrawPower_FallsToCasterLast()
     {
-        var executorEntity = TestFixtures.MakeEntity();
-        executorEntity.Reservoir = amount => new ReservoirDraw(0, false);
+        var executorEntity = new EntityBuilder()
+            .WithReservoir(draw: amount => new ReservoirDraw(0, false))
+            .Build();
         var executor = new EntitySet([executorEntity]);
 
-        var casterEntity = TestFixtures.MakeEntity();
-        casterEntity.Reservoir = amount => new ReservoirDraw(amount, false);
+        var casterEntity = new EntityBuilder()
+            .WithReservoir(draw: amount => new ReservoirDraw(amount, false))
+            .Build();
         var caster = new EntitySet([casterEntity]);
 
         var context = TestFixtures.MakeContext(caster: caster, executor: executor);
@@ -86,20 +94,28 @@ public class SpellContextTests
     {
         var drainOrder = new List<Entity>();
 
-        var scopeOfExecutorEntity = TestFixtures.MakeEntity();
-        scopeOfExecutorEntity.Reservoir = amount => { drainOrder.Add(scopeOfExecutorEntity); return new ReservoirDraw(0, false); };
+        Entity scopeOfExecutorEntity = null!;
+        scopeOfExecutorEntity = new EntityBuilder()
+            .WithReservoir(draw: amount => { drainOrder.Add(scopeOfExecutorEntity); return new ReservoirDraw(0, false); })
+            .Build();
 
-        var executorEntity = TestFixtures.MakeEntity();
+        Entity executorEntity = null!;
+        executorEntity = new EntityBuilder()
+            .WithReservoir(draw: amount => { drainOrder.Add(executorEntity); return new ReservoirDraw(0, false); })
+            .Build();
         executorEntity.Scope = () => [scopeOfExecutorEntity];
-        executorEntity.Reservoir = amount => { drainOrder.Add(executorEntity); return new ReservoirDraw(0, false); };
         var executor = new EntitySet([executorEntity]);
 
-        var scopeOfCasterEntity = TestFixtures.MakeEntity();
-        scopeOfCasterEntity.Reservoir = amount => { drainOrder.Add(scopeOfCasterEntity); return new ReservoirDraw(0, false); };
+        Entity scopeOfCasterEntity = null!;
+        scopeOfCasterEntity = new EntityBuilder()
+            .WithReservoir(draw: amount => { drainOrder.Add(scopeOfCasterEntity); return new ReservoirDraw(0, false); })
+            .Build();
 
-        var casterEntity = TestFixtures.MakeEntity();
+        Entity casterEntity = null!;
+        casterEntity = new EntityBuilder()
+            .WithReservoir(draw: amount => { drainOrder.Add(casterEntity); return new ReservoirDraw(amount, false); })
+            .Build();
         casterEntity.Scope = () => [scopeOfCasterEntity];
-        casterEntity.Reservoir = amount => { drainOrder.Add(casterEntity); return new ReservoirDraw(amount, false); };
         var caster = new EntitySet([casterEntity]);
 
         var context = TestFixtures.MakeContext(caster: caster, executor: executor);
@@ -111,13 +127,15 @@ public class SpellContextTests
     [Fact]
     public void DrawPower_StopsEarlyWhenSatisfied()
     {
-        var executorEntity = TestFixtures.MakeEntity();
-        executorEntity.Reservoir = amount => new ReservoirDraw(amount, false);
+        var executorEntity = new EntityBuilder()
+            .WithReservoir(draw: amount => new ReservoirDraw(amount, false))
+            .Build();
         var executor = new EntitySet([executorEntity]);
 
-        var casterEntity = TestFixtures.MakeEntity();
         var casterCalled = false;
-        casterEntity.Reservoir = amount => { casterCalled = true; return new ReservoirDraw(amount, false); };
+        var casterEntity = new EntityBuilder()
+            .WithReservoir(draw: amount => { casterCalled = true; return new ReservoirDraw(amount, false); })
+            .Build();
         var caster = new EntitySet([casterEntity]);
 
         var context = TestFixtures.MakeContext(caster: caster, executor: executor);
@@ -163,7 +181,7 @@ public class SpellContextTests
     public void ForkWithNewExecutor_ForkedContextHasNewExecutor()
     {
         var original = TestFixtures.MakeContext();
-        var newExecutorEntity = TestFixtures.MakeEntity();
+        var newExecutorEntity = new EntityBuilder().Build();
         var newExecutor = new EntitySet([newExecutorEntity]);
 
         var forked = original.ForkWithNewExecutor(newExecutor);
@@ -174,7 +192,7 @@ public class SpellContextTests
     [Fact]
     public void ForkWithNewExecutor_CasterIsPreserved()
     {
-        var casterEntity = TestFixtures.MakeEntity();
+        var casterEntity = new EntityBuilder().Build();
         var caster = new EntitySet([casterEntity]);
         var original = TestFixtures.MakeContext(caster: caster);
 
@@ -233,9 +251,10 @@ public class SpellContextTests
     [Fact]
     public void ForkWithNewExecutor_PowerSourceStackIsCopied()
     {
-        var pushedEntity = TestFixtures.MakeEntity();
         var pushed = false;
-        pushedEntity.Reservoir = amount => { pushed = true; return new ReservoirDraw(amount, false); };
+        var pushedEntity = new EntityBuilder()
+            .WithReservoir(draw: amount => { pushed = true; return new ReservoirDraw(amount, false); })
+            .Build();
         var pushedSet = new EntitySet([pushedEntity]);
 
         var original = TestFixtures.MakeContext();

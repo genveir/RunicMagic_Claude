@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using RunicMagic.Controller.Abstractions;
+using RunicMagic.Controller.EntityConstruction;
 using RunicMagic.Controller.Services;
 
 namespace RunicMagic.Controller

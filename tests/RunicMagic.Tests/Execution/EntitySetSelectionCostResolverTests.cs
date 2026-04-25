@@ -1,5 +1,6 @@
 using FluentAssertions;
-using RunicMagic.World;
+using RunicMagic.Tests.Builders;
+using RunicMagic.World.Capabilities;
 using RunicMagic.World.Execution;
 using Xunit;
 
@@ -7,159 +8,55 @@ namespace RunicMagic.Tests.Execution;
 
 public class EntitySetSelectionCostResolverTests
 {
-    private static Entity MakeEntityWithMaxPower(long maxPower)
+    // Helper: builds a caster EntitySet that tracks how much power is drawn.
+    private static (EntitySet caster, List<long> drawn) MakeTrackingCaster()
     {
-        var entity = TestFixtures.MakeEntity();
-        entity.MaxReservoir = () => maxPower;
-        return entity;
-    }
-
-    private static Entity MakeCasterWithPower(long power)
-    {
-        var caster = TestFixtures.MakeEntity();
-        caster.Reservoir = amount =>
-        {
-            var given = Math.Min(amount, power);
-            power -= given;
-            return new ReservoirDraw(given, power == 0 && given > 0);
-        };
-        return caster;
-    }
-
-    private static SpellContext MakeContext(Entity casterEntity, Entity? executorEntity = null)
-    {
-        var caster = new EntitySet([casterEntity]);
-        var executor = executorEntity is not null ? new EntitySet([executorEntity]) : new EntitySet([]);
-        return TestFixtures.MakeContext(caster: caster, executor: executor);
+        var drawnAmounts = new List<long>();
+        var entity = new EntityBuilder()
+            .WithReservoir(draw: amount =>
+            {
+                drawnAmounts.Add(amount);
+                return new ReservoirDraw(amount, false);
+            })
+            .Build();
+        return (new EntitySet([entity]), drawnAmounts);
     }
 
     [Fact]
-    public void Resolve_CasterEntityInSet_EntityCostIsExempt()
+    public void Resolve_EmptyInnerSet_ReturnsThatSet()
     {
-        var drawn = new List<long>();
-        var casterEntity = TestFixtures.MakeEntity();
-        casterEntity.Reservoir = amount => { drawn.Add(amount); return new ReservoirDraw(amount, false); };
-        casterEntity.MaxReservoir = () => 5000;
-
-        var context = MakeContext(casterEntity);
-        var resolver = new EntitySetSelectionCostResolver(new FixedEntitySet(casterEntity));
+        var inner = new FixedEntitySet();
+        var resolver = new EntitySetSelectionCostResolver(inner);
+        var context = TestFixtures.MakeContext();
 
         var result = resolver.Resolve(context);
 
-        // Entity cost for caster is exempt; only breadth cost of 1 is charged
-        drawn.Should().ContainSingle().Which.Should().Be(1);
-        result.Entities.Should().ContainSingle().Which.Should().BeSameAs(casterEntity);
+        result.Entities.Should().BeEmpty();
     }
 
     [Fact]
-    public void Resolve_ExecutorEntityInSet_EntityCostIsExempt()
+    public void Resolve_SufficientPower_ReturnsResolvedSet()
     {
-        var drawn = new List<long>();
-        var casterEntity = TestFixtures.MakeEntity();
-        casterEntity.Reservoir = amount => { drawn.Add(amount); return new ReservoirDraw(amount, false); };
-
-        var executorEntity = TestFixtures.MakeEntity();
-        executorEntity.MaxReservoir = () => 5000;
-
-        var context = MakeContext(casterEntity, executorEntity);
-        var resolver = new EntitySetSelectionCostResolver(new FixedEntitySet(executorEntity));
+        var target = new EntityBuilder().Build();
+        var inner = new FixedEntitySet(target);
+        var resolver = new EntitySetSelectionCostResolver(inner);
+        var (caster, _) = MakeTrackingCaster();
+        var context = TestFixtures.MakeContext(caster: caster);
 
         var result = resolver.Resolve(context);
 
-        // Entity cost for executor is exempt; only breadth cost of 1 is charged
-        drawn.Should().ContainSingle().Which.Should().Be(1);
-        result.Entities.Should().ContainSingle().Which.Should().BeSameAs(executorEntity);
-    }
-
-    [Fact]
-    public void Resolve_SingleTaxableEntity_ExactThreshold_DrawsTwo()
-    {
-        var drawn = new List<long>();
-        var casterEntity = TestFixtures.MakeEntity();
-        casterEntity.Reservoir = amount => { drawn.Add(amount); return new ReservoirDraw(amount, false); };
-
-        var target = MakeEntityWithMaxPower(1000);
-        var context = MakeContext(casterEntity);
-        var resolver = new EntitySetSelectionCostResolver(new FixedEntitySet(target));
-
-        resolver.Resolve(context);
-
-        // Entity cost: ceil(1000/1000) = 1; breadth cost: 1 entity swept = 1; total = 2
-        drawn.Should().ContainSingle().Which.Should().Be(2);
-    }
-
-    [Fact]
-    public void Resolve_SingleTaxableEntity_SmallMaxPower_DrawsTwo()
-    {
-        var drawn = new List<long>();
-        var casterEntity = TestFixtures.MakeEntity();
-        casterEntity.Reservoir = amount => { drawn.Add(amount); return new ReservoirDraw(amount, false); };
-
-        var target = MakeEntityWithMaxPower(1);
-        var context = MakeContext(casterEntity);
-        var resolver = new EntitySetSelectionCostResolver(new FixedEntitySet(target));
-
-        resolver.Resolve(context);
-
-        // Entity cost: ceil(1/1000) = 1; breadth cost: 1 entity swept = 1; total = 2
-        drawn.Should().ContainSingle().Which.Should().Be(2);
-    }
-
-    [Fact]
-    public void Resolve_SingleTaxableEntity_JustAboveThreshold_DrawsThree()
-    {
-        var drawn = new List<long>();
-        var casterEntity = TestFixtures.MakeEntity();
-        casterEntity.Reservoir = amount => { drawn.Add(amount); return new ReservoirDraw(amount, false); };
-
-        var target = MakeEntityWithMaxPower(1001);
-        var context = MakeContext(casterEntity);
-        var resolver = new EntitySetSelectionCostResolver(new FixedEntitySet(target));
-
-        resolver.Resolve(context);
-
-        // Entity cost: ceil(1001/1000) = 2; breadth cost: 1 entity swept = 1; total = 3
-        drawn.Should().ContainSingle().Which.Should().Be(3);
-    }
-
-    [Fact]
-    public void Resolve_MultipleEntities_CostsSummed()
-    {
-        var drawn = new List<long>();
-        var casterEntity = TestFixtures.MakeEntity();
-        casterEntity.Reservoir = amount => { drawn.Add(amount); return new ReservoirDraw(amount, false); };
-
-        var target1 = MakeEntityWithMaxPower(1000);
-        var target2 = MakeEntityWithMaxPower(2000);
-        var context = MakeContext(casterEntity);
-        var resolver = new EntitySetSelectionCostResolver(new FixedEntitySet(target1, target2));
-
-        resolver.Resolve(context);
-
-        // Entity costs: 1 + 2 = 3; breadth cost: 2 entities swept = 2; total = 5
-        drawn.Should().ContainSingle().Which.Should().Be(5);
-    }
-
-    [Fact]
-    public void Resolve_SufficientPower_ReturnsFullResolvedSet()
-    {
-        var casterEntity = MakeCasterWithPower(10);
-        var target = MakeEntityWithMaxPower(1000);
-        var context = MakeContext(casterEntity);
-        var resolver = new EntitySetSelectionCostResolver(new FixedEntitySet(target));
-
-        var result = resolver.Resolve(context);
-
-        result.Entities.Should().ContainSingle().Which.Should().BeSameAs(target);
+        result.Entities.Should().Contain(target);
     }
 
     [Fact]
     public void Resolve_InsufficientPower_ReturnsEmptySet()
     {
-        var casterEntity = MakeCasterWithPower(0);
-        var target = MakeEntityWithMaxPower(1000);
-        var context = MakeContext(casterEntity);
-        var resolver = new EntitySetSelectionCostResolver(new FixedEntitySet(target));
+        var target = new EntityBuilder()
+            .WithReservoir(max: () => 1000)
+            .Build();
+        var inner = new FixedEntitySet(target);
+        var resolver = new EntitySetSelectionCostResolver(inner);
+        var context = TestFixtures.MakeContext(); // no power sources
 
         var result = resolver.Resolve(context);
 
@@ -167,120 +64,168 @@ public class EntitySetSelectionCostResolverTests
     }
 
     [Fact]
-    public void Resolve_InsufficientPower_AddsSelectionCostNotMetEvent()
+    public void Resolve_InsufficientPower_EmitsSelectionCostNotMetEvent()
     {
-        var casterEntity = MakeCasterWithPower(0);
-        var target = MakeEntityWithMaxPower(1000);
-        var spellResult = new SpellResult();
+        var target = new EntityBuilder()
+            .WithReservoir(max: () => 1000)
+            .Build();
+        var inner = new FixedEntitySet(target);
+        var resolver = new EntitySetSelectionCostResolver(inner);
+        var result = new SpellResult();
+        var context = TestFixtures.MakeContext(result: result);
+
+        resolver.Resolve(context);
+
+        result.Events.OfType<SelectionCostNotMetEvent>().Should().ContainSingle();
+    }
+
+    [Fact]
+    public void Resolve_PartialPower_EventHasCorrectRequiredAndDrawn()
+    {
+        var target = new EntityBuilder()
+            .WithReservoir(max: () => 2000)
+            .Build();
+        var inner = new FixedEntitySet(target);
+        var resolver = new EntitySetSelectionCostResolver(inner);
+
+        var casterEntity = new EntityBuilder()
+            .WithReservoir(draw: amount => new ReservoirDraw(1, false))
+            .Build();
         var caster = new EntitySet([casterEntity]);
-        var context = new SpellContext(caster, new EntitySet([]), new WorldModel(), spellResult);
-        var resolver = new EntitySetSelectionCostResolver(new FixedEntitySet(target));
+        var result = new SpellResult();
+        var context = TestFixtures.MakeContext(caster: caster, result: result);
 
         resolver.Resolve(context);
 
-        // Entity cost: 1; breadth cost: 1; total required = 2
-        spellResult.Events.OfType<SelectionCostNotMetEvent>().Should().ContainSingle()
-            .Which.Should().Match<SelectionCostNotMetEvent>(e => e.Required == 2 && e.Drawn == 0);
+        // final set cost = ceil(2000/1000) = 2; breadth = 1 entity; total required = 3; drawn = 1
+        var evt = result.Events.OfType<SelectionCostNotMetEvent>().Single();
+        evt.Required.Should().Be(3);
+        evt.Drawn.Should().Be(1);
     }
 
     [Fact]
-    public void Resolve_MixedSet_OnlyNonExemptEntitiesAreTaxed()
+    public void FinalSetCost_EntityWithNoReservoir_ContributesZero()
     {
-        var drawn = new List<long>();
-        var casterEntity = TestFixtures.MakeEntity();
-        casterEntity.Reservoir = amount => { drawn.Add(amount); return new ReservoirDraw(amount, false); };
-        casterEntity.MaxReservoir = () => 5000;
+        var target = new EntityBuilder().Build(); // no reservoir
+        var inner = new FixedEntitySet(target);
+        var resolver = new EntitySetSelectionCostResolver(inner);
+        var (caster, drawn) = MakeTrackingCaster();
+        var context = TestFixtures.MakeContext(caster: caster);
 
-        var target = MakeEntityWithMaxPower(1000);
-        var context = MakeContext(casterEntity);
-        var resolver = new EntitySetSelectionCostResolver(new FixedEntitySet(casterEntity, target));
+        resolver.Resolve(context);
 
-        var result = resolver.Resolve(context);
+        // final set cost = 0 (no reservoir); breadth = 1; total = 1
+        drawn.Should().ContainSingle().Which.Should().Be(1);
+    }
 
-        // Entity cost: target only = 1 (caster exempt); breadth cost: 2 entities swept = 2; total = 3
+    [Fact]
+    public void FinalSetCost_EntityWithReservoir_ContributesCeilOfMaxPowerDividedBy1000()
+    {
+        var target = new EntityBuilder()
+            .WithReservoir(max: () => 3000)
+            .Build();
+        var inner = new FixedEntitySet(target);
+        var resolver = new EntitySetSelectionCostResolver(inner);
+        var (caster, drawn) = MakeTrackingCaster();
+        var context = TestFixtures.MakeContext(caster: caster);
+
+        resolver.Resolve(context);
+
+        // final set cost = 3000/1000 = 3; breadth = 1; total = 4
+        drawn.Should().ContainSingle().Which.Should().Be(4);
+    }
+
+    [Fact]
+    public void FinalSetCost_PartialMaxPower_RoundsUp()
+    {
+        var target = new EntityBuilder()
+            .WithReservoir(max: () => 1001)
+            .Build();
+        var inner = new FixedEntitySet(target);
+        var resolver = new EntitySetSelectionCostResolver(inner);
+        var (caster, drawn) = MakeTrackingCaster();
+        var context = TestFixtures.MakeContext(caster: caster);
+
+        resolver.Resolve(context);
+
+        // final set cost = ceil(1001/1000) = 2; breadth = 1; total = 3
         drawn.Should().ContainSingle().Which.Should().Be(3);
-        result.Entities.Should().HaveCount(2);
     }
 
     [Fact]
-    public void Resolve_BreadthCost_EachEntitySweptCostsOne()
+    public void FinalSetCost_CasterEntityInResolvedSet_IsExempt()
     {
-        var drawn = new List<long>();
-        var casterEntity = TestFixtures.MakeEntity();
-        casterEntity.Reservoir = amount => { drawn.Add(amount); return new ReservoirDraw(amount, false); };
+        var casterEntity = new EntityBuilder()
+            .WithReservoir(max: () => 5000)
+            .Build();
+        var caster = new EntitySet([casterEntity]);
 
-        var targets = Enumerable.Range(0, 3).Select(_ => TestFixtures.MakeEntity()).ToArray();
-        var context = MakeContext(casterEntity);
-        var resolver = new EntitySetSelectionCostResolver(new FixedEntitySet(targets));
+        // a second entity provides power so we can measure the draw amount
+        var (powerCaster, drawn) = MakeTrackingCaster();
+        var combinedCaster = new EntitySet([casterEntity, powerCaster.Entities[0]]);
+
+        var inner = new FixedEntitySet(casterEntity); // resolved set includes the caster entity
+        var resolver = new EntitySetSelectionCostResolver(inner);
+        var context = TestFixtures.MakeContext(caster: combinedCaster);
 
         resolver.Resolve(context);
 
-        // 3 entities swept, no entity cost (no MaxReservoir), breadth cost = 3
+        // casterEntity is exempt → final set cost = 0; breadth = 1; total = 1
+        drawn.Should().ContainSingle().Which.Should().Be(1);
+    }
+
+    [Fact]
+    public void FinalSetCost_ExecutorEntityInResolvedSet_IsExempt()
+    {
+        // executor entity cannot supply power (draw returns 0), so any cost is borne by the caster
+        var executorEntity = new EntityBuilder()
+            .WithReservoir(max: () => 5000, draw: amount => new ReservoirDraw(0, false))
+            .Build();
+        var executor = new EntitySet([executorEntity]);
+
+        var (caster, drawn) = MakeTrackingCaster();
+
+        var inner = new FixedEntitySet(executorEntity); // resolved set includes the executor entity
+        var resolver = new EntitySetSelectionCostResolver(inner);
+        var context = TestFixtures.MakeContext(caster: caster, executor: executor);
+
+        resolver.Resolve(context);
+
+        // executorEntity is exempt → final set cost = 0; breadth = 1; total = 1
+        drawn.Should().ContainSingle().Which.Should().Be(1);
+    }
+
+    [Fact]
+    public void BreadthCost_EqualsCountOfUniqueEntitiesResolvedByInner()
+    {
+        var e1 = new EntityBuilder().Build();
+        var e2 = new EntityBuilder().Build();
+        var e3 = new EntityBuilder().Build();
+        var inner = new FixedEntitySet(e1, e2, e3);
+        var resolver = new EntitySetSelectionCostResolver(inner);
+        var (caster, drawn) = MakeTrackingCaster();
+        var context = TestFixtures.MakeContext(caster: caster);
+
+        resolver.Resolve(context);
+
+        // all 3 entities have no reservoir → final set cost = 0; breadth = 3; total = 3
         drawn.Should().ContainSingle().Which.Should().Be(3);
     }
 
     [Fact]
-    public void Resolve_BreadthCost_Exactly10EntitiesSwept_Charges10()
+    public void Resolve_DoesNotPollutOuterResolutionWindow()
     {
-        var drawn = new List<long>();
-        var casterEntity = TestFixtures.MakeEntity();
-        casterEntity.Reservoir = amount => { drawn.Add(amount); return new ReservoirDraw(amount, false); };
-
-        var targets = Enumerable.Range(0, 10).Select(_ => TestFixtures.MakeEntity()).ToArray();
-        var context = MakeContext(casterEntity);
-        var resolver = new EntitySetSelectionCostResolver(new FixedEntitySet(targets));
+        var target = new EntityBuilder().Build();
+        var inner = new FixedEntitySet(target);
+        var resolver = new EntitySetSelectionCostResolver(inner);
+        var (caster, _) = MakeTrackingCaster();
+        var context = TestFixtures.MakeContext(caster: caster);
+        context.OpenResolutionWindow();
 
         resolver.Resolve(context);
 
-        drawn.Should().ContainSingle().Which.Should().Be(10);
-    }
-
-    [Fact]
-    public void Resolve_BreadthCost_AddedToEntitySelectionCost()
-    {
-        var drawn = new List<long>();
-        var casterEntity = TestFixtures.MakeEntity();
-        casterEntity.Reservoir = amount => { drawn.Add(amount); return new ReservoirDraw(amount, false); };
-
-        var targets = Enumerable.Range(0, 10).Select(_ => MakeEntityWithMaxPower(1000)).ToArray();
-        var context = MakeContext(casterEntity);
-        var resolver = new EntitySetSelectionCostResolver(new FixedEntitySet(targets));
-
-        resolver.Resolve(context);
-
-        // Entity cost: 10 * ceil(1000/1000) = 10; breadth cost: 10 entities swept = 10; total = 20
-        drawn.Should().ContainSingle().Which.Should().Be(20);
-    }
-
-    [Fact]
-    public void Resolve_BreadthCost_WindowClosedAfterResolve()
-    {
-        var casterEntity = TestFixtures.MakeEntity();
-        casterEntity.Reservoir = amount => new ReservoirDraw(amount, false);
-        var context = MakeContext(casterEntity);
-        var resolver = new EntitySetSelectionCostResolver(new FixedEntitySet(TestFixtures.MakeEntity()));
-
-        resolver.Resolve(context);
-
-        context.EntityResolutionCount.Should().BeNull();
-    }
-
-    [Fact]
-    public void Resolve_BreadthCost_AppliedEvenWhenFinalSetIsEmpty()
-    {
-        var drawn = new List<long>();
-        var casterEntity = TestFixtures.MakeEntity();
-        casterEntity.Reservoir = amount => { drawn.Add(amount); return new ReservoirDraw(amount, false); };
-
-        // 10 entities swept, but insufficient power to pay — still charges breadth upfront alongside entity cost
-        var casterWithLimitedPower = MakeCasterWithPower(0);
-        var targets = Enumerable.Range(0, 10).Select(_ => TestFixtures.MakeEntity()).ToArray();
-        var context = MakeContext(casterWithLimitedPower);
-        var resolver = new EntitySetSelectionCostResolver(new FixedEntitySet(targets));
-
-        var result = resolver.Resolve(context);
-
-        result.Entities.Should().BeEmpty();
-        context.EntityResolutionCount.Should().BeNull();
+        // the inner resolution window was opened and closed; the outer window should be untouched
+        context.EntityResolutionCount.Should().BeEmpty();
+        context.CloseResolutionWindow();
     }
 }

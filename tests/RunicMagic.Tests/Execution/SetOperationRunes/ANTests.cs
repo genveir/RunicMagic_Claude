@@ -1,4 +1,5 @@
 using FluentAssertions;
+using RunicMagic.Tests.Builders;
 using RunicMagic.World.Runes.SetOperationRunes;
 using Xunit;
 
@@ -9,8 +10,8 @@ public class ANTests
     [Fact]
     public void Resolve_ReturnsEntitiesFromBothSets()
     {
-        var left = TestFixtures.MakeEntity();
-        var right = TestFixtures.MakeEntity();
+        var left = new EntityBuilder().Build();
+        var right = new EntityBuilder().Build();
         var an = new AN(left: new FixedEntitySet(left), right: new FixedEntitySet(right));
         var context = TestFixtures.MakeContext();
 
@@ -22,7 +23,7 @@ public class ANTests
     [Fact]
     public void Resolve_EntityInBothSets_IsReturnedOnce()
     {
-        var shared = TestFixtures.MakeEntity();
+        var shared = new EntityBuilder().Build();
         var an = new AN(left: new FixedEntitySet(shared), right: new FixedEntitySet(shared));
         var context = TestFixtures.MakeContext();
 
@@ -34,7 +35,7 @@ public class ANTests
     [Fact]
     public void Resolve_LeftEmpty_ReturnsRight()
     {
-        var right = TestFixtures.MakeEntity();
+        var right = new EntityBuilder().Build();
         var an = new AN(left: new FixedEntitySet(), right: new FixedEntitySet(right));
         var context = TestFixtures.MakeContext();
 
@@ -46,7 +47,7 @@ public class ANTests
     [Fact]
     public void Resolve_RightEmpty_ReturnsLeft()
     {
-        var left = TestFixtures.MakeEntity();
+        var left = new EntityBuilder().Build();
         var an = new AN(left: new FixedEntitySet(left), right: new FixedEntitySet());
         var context = TestFixtures.MakeContext();
 
@@ -69,9 +70,9 @@ public class ANTests
     [Fact]
     public void Resolve_PreservesLeftOrderBeforeRight()
     {
-        var a = TestFixtures.MakeEntity();
-        var b = TestFixtures.MakeEntity();
-        var c = TestFixtures.MakeEntity();
+        var a = new EntityBuilder().Build();
+        var b = new EntityBuilder().Build();
+        var c = new EntityBuilder().Build();
         var an = new AN(left: new FixedEntitySet(a, b), right: new FixedEntitySet(c));
         var context = TestFixtures.MakeContext();
 

@@ -1,8 +1,8 @@
 using FluentAssertions;
 using RunicMagic.Controller.Services;
-using RunicMagic.Tests.Execution;
+using RunicMagic.Tests.Builders;
 using RunicMagic.World;
-using RunicMagic.World.Execution;
+using RunicMagic.World.Capabilities;
 using Xunit;
 
 namespace RunicMagic.Tests;
@@ -16,7 +16,7 @@ public class SpellCastingServiceTests
 
     private static Entity AddCaster(WorldModel world)
     {
-        var caster = TestFixtures.MakeEntity(x: 0, y: 0, weight: 1);
+        var caster = new EntityBuilder().WithLocation(x: 0, y: 0).WithWeight(1).Build();
         world.Add(caster);
         return caster;
     }
@@ -85,11 +85,14 @@ public class SpellCastingServiceTests
     {
         var world = new WorldModel();
 
-        var casterEntity = TestFixtures.MakeEntity(x: 0, y: 0, weight: 1);
+        var casterEntity = new EntityBuilder()
+            .WithLocation(x: 0, y: 0)
+            .WithWeight(1)
+            .WithReservoir(draw: amount => new ReservoirDraw(amount, false))
+            .Build();
         casterEntity.Label = "Caster";
-        casterEntity.Reservoir = amount => new ReservoirDraw(amount, false);
 
-        var target = TestFixtures.MakeEntity(x: 1000, y: 0, weight: 1);
+        var target = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(1).Build();
         target.Label = "target";
         casterEntity.Scope = () => [target];
 
@@ -108,11 +111,14 @@ public class SpellCastingServiceTests
     {
         var world = new WorldModel();
 
-        var casterEntity = TestFixtures.MakeEntity(x: 0, y: 0, weight: 1);
+        var casterEntity = new EntityBuilder()
+            .WithLocation(x: 0, y: 0)
+            .WithWeight(1)
+            .WithReservoir(draw: amount => new ReservoirDraw(amount, false))
+            .Build();
         casterEntity.Label = "Caster";
-        casterEntity.Reservoir = amount => new ReservoirDraw(amount, false);
 
-        var target = TestFixtures.MakeEntity(x: 1000, y: 0, weight: 1);
+        var target = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(1).Build();
         target.Label = "target";
         casterEntity.Scope = () => [target];
 

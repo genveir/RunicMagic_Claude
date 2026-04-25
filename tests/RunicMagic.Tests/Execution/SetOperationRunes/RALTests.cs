@@ -1,4 +1,5 @@
 using FluentAssertions;
+using RunicMagic.Tests.Builders;
 using RunicMagic.World.Runes.SetOperationRunes;
 using Xunit;
 
@@ -9,8 +10,8 @@ public class RALTests
     [Fact]
     public void Resolve_EntityOnlyInLeft_IsReturned()
     {
-        var leftOnly = TestFixtures.MakeEntity();
-        var rightOnly = TestFixtures.MakeEntity();
+        var leftOnly = new EntityBuilder().Build();
+        var rightOnly = new EntityBuilder().Build();
         var ral = new RAL(left: new FixedEntitySet(leftOnly), right: new FixedEntitySet(rightOnly));
         var context = TestFixtures.MakeContext();
 
@@ -22,7 +23,7 @@ public class RALTests
     [Fact]
     public void Resolve_EntityInBothSets_IsNotReturned()
     {
-        var shared = TestFixtures.MakeEntity();
+        var shared = new EntityBuilder().Build();
         var ral = new RAL(left: new FixedEntitySet(shared), right: new FixedEntitySet(shared));
         var context = TestFixtures.MakeContext();
 
@@ -34,7 +35,7 @@ public class RALTests
     [Fact]
     public void Resolve_EntityOnlyInRight_IsNotReturned()
     {
-        var rightOnly = TestFixtures.MakeEntity();
+        var rightOnly = new EntityBuilder().Build();
         var ral = new RAL(left: new FixedEntitySet(), right: new FixedEntitySet(rightOnly));
         var context = TestFixtures.MakeContext();
 
@@ -46,9 +47,9 @@ public class RALTests
     [Fact]
     public void Resolve_MixedOverlap_ReturnsOnlyLeftExclusive()
     {
-        var shared = TestFixtures.MakeEntity();
-        var leftOnly = TestFixtures.MakeEntity();
-        var rightOnly = TestFixtures.MakeEntity();
+        var shared = new EntityBuilder().Build();
+        var leftOnly = new EntityBuilder().Build();
+        var rightOnly = new EntityBuilder().Build();
         var ral = new RAL(
             left: new FixedEntitySet(shared, leftOnly),
             right: new FixedEntitySet(shared, rightOnly));
@@ -62,8 +63,8 @@ public class RALTests
     [Fact]
     public void Resolve_RightEmpty_ReturnsAllOfLeft()
     {
-        var a = TestFixtures.MakeEntity();
-        var b = TestFixtures.MakeEntity();
+        var a = new EntityBuilder().Build();
+        var b = new EntityBuilder().Build();
         var ral = new RAL(left: new FixedEntitySet(a, b), right: new FixedEntitySet());
         var context = TestFixtures.MakeContext();
 
@@ -75,7 +76,7 @@ public class RALTests
     [Fact]
     public void Resolve_LeftEmpty_ReturnsEmpty()
     {
-        var right = TestFixtures.MakeEntity();
+        var right = new EntityBuilder().Build();
         var ral = new RAL(left: new FixedEntitySet(), right: new FixedEntitySet(right));
         var context = TestFixtures.MakeContext();
 

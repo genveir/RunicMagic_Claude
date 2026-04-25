@@ -1,3 +1,4 @@
+using RunicMagic.Controller.EntityConstruction;
 using RunicMagic.Database;
 using RunicMagic.World;
 

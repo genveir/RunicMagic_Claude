@@ -7,7 +7,6 @@ Next bugfix number: BUG-4
 
 | Key | Title | Description | Blocked By |
 |-----|-------|-------------|------------|
-| RMC-65 | TIORJ rune — fill | `(IEntitySet from, IEntitySet to, INumber amount) → IStatement`. Transfers up to `amount` power from entities in `from` to entities in `to`. Overcharge (recipient receiving more than its maximum) is a special concern that needs to be addressed in the design. | |
 | RMC-44 | Design the inscription spell | Determine what the rock's inscription says. The spell must open the door when activated via GWYAH. Work out which runes are needed (filtering a Set to the door, the open/close effect, etc.) and raise any missing-rune tickets that fall out of the design. | RMC-40 |
 | RMC-45 | 🏁 Milestone 2 — trigger an inscription through a window | A room contains walls, windows, a door, and a rock with an inscription. The player clicks the rock to aim, casts `ZU GWYAH DAN`, and the inscription on the rock opens the door if the caster has line of sight to the rock. | RMC-15 RMC-37 RMC-38 RMC-39 RMC-40 RMC-51 RMC-52 RMC-43 RMC-44 |
 
@@ -27,6 +26,7 @@ Next bugfix number: BUG-4
 ## In Progress
 | Key | Title | Description | Remarks |
 |-----|-------|-------------|---------|
+| RMC-65 | TIORJ rune — fill | `(IEntitySet from, IEntitySet to, INumber amount) → IStatement`. Transfers up to `amount` power from entities in `from` to entities in `to`. Overcharge (recipient receiving more than its maximum) is a special concern that needs to be addressed in the design. | |
 
 ## Ready For Review
 

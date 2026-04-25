@@ -1,5 +1,7 @@
 using FluentAssertions;
+using RunicMagic.Tests.Builders;
 using RunicMagic.World;
+using RunicMagic.World.Capabilities;
 using RunicMagic.World.Execution;
 using RunicMagic.World.Runes.EffectRunes;
 using RunicMagic.World.Runes.EntityReferenceRunes;
@@ -18,9 +20,12 @@ public class SpellExecutorTests
     {
         var world = new WorldModel();
 
-        var casterEntity = TestFixtures.MakeEntity(x: 0, y: 0, weight: 1);
-        casterEntity.Reservoir = amount => new ReservoirDraw(amount, false);
-        var target = TestFixtures.MakeEntity(x: 1000, y: 0, weight: 1);
+        var casterEntity = new EntityBuilder()
+            .WithLocation(x: 0, y: 0)
+            .WithWeight(1)
+            .WithReservoir(draw: amount => new ReservoirDraw(amount, false))
+            .Build();
+        var target = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(1).Build();
         casterEntity.Scope = () => [target];
         world.Add(casterEntity);
         world.Add(target);
@@ -52,8 +57,9 @@ public class SpellExecutorTests
         var drawn = new List<long>();
         var world = new WorldModel();
 
-        var casterEntity = TestFixtures.MakeEntity();
-        casterEntity.Reservoir = amount => { drawn.Add(amount); return new ReservoirDraw(amount, false); };
+        var casterEntity = new EntityBuilder()
+            .WithReservoir(draw: amount => { drawn.Add(amount); return new ReservoirDraw(amount, false); })
+            .Build();
         world.Add(casterEntity);
 
         var caster = new EntitySet([casterEntity]);
@@ -82,12 +88,14 @@ public class SpellExecutorTests
         var casterDrawn = new List<long>();
         var world = new WorldModel();
 
-        var executorEntity = TestFixtures.MakeEntity();
-        executorEntity.Reservoir = amount => { executorDrawn.Add(amount); return new ReservoirDraw(amount / 2, false); };
+        var executorEntity = new EntityBuilder()
+            .WithReservoir(draw: amount => { executorDrawn.Add(amount); return new ReservoirDraw(amount / 2, false); })
+            .Build();
         world.Add(executorEntity);
 
-        var casterEntity = TestFixtures.MakeEntity();
-        casterEntity.Reservoir = amount => { casterDrawn.Add(amount); return new ReservoirDraw(amount, false); };
+        var casterEntity = new EntityBuilder()
+            .WithReservoir(draw: amount => { casterDrawn.Add(amount); return new ReservoirDraw(amount, false); })
+            .Build();
         world.Add(casterEntity);
 
         var caster = new EntitySet([casterEntity]);
@@ -108,16 +116,17 @@ public class SpellExecutorTests
     {
         var world = new WorldModel();
 
-        var executorEntity = TestFixtures.MakeEntity(x: 0, y: 0);
+        var executorEntity = new EntityBuilder().WithLocation(x: 0, y: 0).Build();
         world.Add(executorEntity);
 
-        var casterEntity = TestFixtures.MakeEntity();
         // Reservoir that can't pay anything
-        casterEntity.Reservoir = amount => new ReservoirDraw(0, false);
+        var casterEntity = new EntityBuilder()
+            .WithReservoir(draw: amount => new ReservoirDraw(0, false))
+            .Build();
         world.Add(casterEntity);
 
         // A target that should NOT be pushed if spell aborts
-        var target = TestFixtures.MakeEntity(x: 1000, y: 0, weight: 1);
+        var target = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(1).Build();
         executorEntity.Scope = () => [target];
         world.Add(target);
 

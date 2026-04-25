@@ -1,4 +1,6 @@
 using FluentAssertions;
+using RunicMagic.Tests.Builders;
+using RunicMagic.World.Capabilities;
 using RunicMagic.World.Execution;
 using RunicMagic.World.Runes.PowerSourceRunes;
 using RunicMagic.World.Runes.RuneTypes;
@@ -13,11 +15,13 @@ public class SHUTests
     {
         var drawOrder = new List<string>();
 
-        var sourceEntity = TestFixtures.MakeEntity();
-        sourceEntity.Reservoir = amount => { drawOrder.Add("source"); return new ReservoirDraw(amount, false); };
+        var sourceEntity = new EntityBuilder()
+            .WithReservoir(draw: amount => { drawOrder.Add("source"); return new ReservoirDraw(amount, false); })
+            .Build();
 
-        var executorEntity = TestFixtures.MakeEntity();
-        executorEntity.Reservoir = amount => { drawOrder.Add("executor"); return new ReservoirDraw(amount, false); };
+        var executorEntity = new EntityBuilder()
+            .WithReservoir(draw: amount => { drawOrder.Add("executor"); return new ReservoirDraw(amount, false); })
+            .Build();
         var executor = new EntitySet([executorEntity]);
 
         var context = TestFixtures.MakeContext(executor: executor);
@@ -36,11 +40,13 @@ public class SHUTests
     {
         var sourceDrawn = false;
 
-        var sourceEntity = TestFixtures.MakeEntity();
-        sourceEntity.Reservoir = amount => { sourceDrawn = true; return new ReservoirDraw(amount, false); };
+        var sourceEntity = new EntityBuilder()
+            .WithReservoir(draw: amount => { sourceDrawn = true; return new ReservoirDraw(amount, false); })
+            .Build();
 
-        var casterEntity = TestFixtures.MakeEntity();
-        casterEntity.Reservoir = amount => new ReservoirDraw(amount, false);
+        var casterEntity = new EntityBuilder()
+            .WithReservoir(draw: amount => new ReservoirDraw(amount, false))
+            .Build();
         var caster = new EntitySet([casterEntity]);
 
         var context = TestFixtures.MakeContext(caster: caster);
@@ -61,14 +67,17 @@ public class SHUTests
     {
         var drawOrder = new List<string>();
 
-        var outerEntity = TestFixtures.MakeEntity();
-        outerEntity.Reservoir = amount => { drawOrder.Add("outer"); return new ReservoirDraw(0, false); };
+        var outerEntity = new EntityBuilder()
+            .WithReservoir(draw: amount => { drawOrder.Add("outer"); return new ReservoirDraw(0, false); })
+            .Build();
 
-        var innerEntity = TestFixtures.MakeEntity();
-        innerEntity.Reservoir = amount => { drawOrder.Add("inner"); return new ReservoirDraw(0, false); };
+        var innerEntity = new EntityBuilder()
+            .WithReservoir(draw: amount => { drawOrder.Add("inner"); return new ReservoirDraw(0, false); })
+            .Build();
 
-        var casterEntity = TestFixtures.MakeEntity();
-        casterEntity.Reservoir = amount => { drawOrder.Add("caster"); return new ReservoirDraw(amount, false); };
+        var casterEntity = new EntityBuilder()
+            .WithReservoir(draw: amount => { drawOrder.Add("caster"); return new ReservoirDraw(amount, false); })
+            .Build();
         var caster = new EntitySet([casterEntity]);
 
         var context = TestFixtures.MakeContext(caster: caster);
@@ -91,15 +100,18 @@ public class SHUTests
     {
         var drawOrder = new List<string>();
 
-        var sourceEntity = TestFixtures.MakeEntity();
-        sourceEntity.Reservoir = amount => { drawOrder.Add("source"); return new ReservoirDraw(0, false); };
+        var sourceEntity = new EntityBuilder()
+            .WithReservoir(draw: amount => { drawOrder.Add("source"); return new ReservoirDraw(0, false); })
+            .Build();
 
-        var executorEntity = TestFixtures.MakeEntity();
-        executorEntity.Reservoir = amount => { drawOrder.Add("executor"); return new ReservoirDraw(0, false); };
+        var executorEntity = new EntityBuilder()
+            .WithReservoir(draw: amount => { drawOrder.Add("executor"); return new ReservoirDraw(0, false); })
+            .Build();
         var executor = new EntitySet([executorEntity]);
 
-        var casterEntity = TestFixtures.MakeEntity();
-        casterEntity.Reservoir = amount => { drawOrder.Add("caster"); return new ReservoirDraw(amount, false); };
+        var casterEntity = new EntityBuilder()
+            .WithReservoir(draw: amount => { drawOrder.Add("caster"); return new ReservoirDraw(amount, false); })
+            .Build();
         var caster = new EntitySet([casterEntity]);
 
         var context = TestFixtures.MakeContext(caster: caster, executor: executor);

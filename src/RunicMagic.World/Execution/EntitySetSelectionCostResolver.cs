@@ -52,7 +52,7 @@ namespace RunicMagic.World.Execution
                 {
                     continue;
                 }
-                var maxPower = entity.MaxReservoir?.Invoke() ?? 0L;
+                var maxPower = entity.Reservoir?.Max.Invoke() ?? 0L;
                 cost += (maxPower + 999) / 1000;
             }
 

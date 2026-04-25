@@ -1,4 +1,5 @@
 using FluentAssertions;
+using RunicMagic.Tests.Builders;
 using RunicMagic.World;
 using RunicMagic.World.Runes.EntitySetRunes;
 using Xunit;
@@ -10,7 +11,7 @@ public class HOROTests
     // Origin: 100x100 at (0,0) → bounds [-50,50] on both axes.
     // near:   100x100 at (200,0) → left edge 150, gap to origin right edge 50  = 100
     // far:    100x100 at (500,0) → left edge 450, gap to origin right edge 50  = 400
-    private static readonly Entity Origin = TestFixtures.MakeEntity(x: 0, y: 0);
+    private static readonly Entity Origin = new EntityBuilder().WithLocation(x: 0, y: 0).Build();
 
     private static WorldModel WorldWith(params Entity[] entities)
     {
@@ -23,7 +24,7 @@ public class HOROTests
     [Fact]
     public void Resolve_EntityWithinRadius_IsReturned()
     {
-        var near = TestFixtures.MakeEntity(x: 200, y: 0);
+        var near = new EntityBuilder().WithLocation(x: 200, y: 0).Build();
         var horo = new HORO(howFar: new FixedNumber(200), origin: new FixedEntitySet(Origin));
         var context = TestFixtures.MakeContext(world: WorldWith(near));
 
@@ -35,7 +36,7 @@ public class HOROTests
     [Fact]
     public void Resolve_EntityBeyondRadius_IsNotReturned()
     {
-        var far = TestFixtures.MakeEntity(x: 500, y: 0);
+        var far = new EntityBuilder().WithLocation(x: 500, y: 0).Build();
         var horo = new HORO(howFar: new FixedNumber(200), origin: new FixedEntitySet(Origin));
         var context = TestFixtures.MakeContext(world: WorldWith(far));
 
@@ -47,7 +48,7 @@ public class HOROTests
     [Fact]
     public void Resolve_EntityExactlyAtRadius_IsReturned()
     {
-        var near = TestFixtures.MakeEntity(x: 200, y: 0);
+        var near = new EntityBuilder().WithLocation(x: 200, y: 0).Build();
         var horo = new HORO(howFar: new FixedNumber(100), origin: new FixedEntitySet(Origin));
         var context = TestFixtures.MakeContext(world: WorldWith(near));
 
@@ -59,7 +60,7 @@ public class HOROTests
     [Fact]
     public void Resolve_EntityOneUnitBeyondRadius_IsNotReturned()
     {
-        var near = TestFixtures.MakeEntity(x: 200, y: 0);
+        var near = new EntityBuilder().WithLocation(x: 200, y: 0).Build();
         var horo = new HORO(howFar: new FixedNumber(99), origin: new FixedEntitySet(Origin));
         var context = TestFixtures.MakeContext(world: WorldWith(near));
 
@@ -71,8 +72,8 @@ public class HOROTests
     [Fact]
     public void Resolve_MultipleEntities_ReturnsOnlyThoseWithinRadius()
     {
-        var near = TestFixtures.MakeEntity(x: 200, y: 0);
-        var far = TestFixtures.MakeEntity(x: 500, y: 0);
+        var near = new EntityBuilder().WithLocation(x: 200, y: 0).Build();
+        var far = new EntityBuilder().WithLocation(x: 500, y: 0).Build();
         var horo = new HORO(howFar: new FixedNumber(200), origin: new FixedEntitySet(Origin));
         var context = TestFixtures.MakeContext(world: WorldWith(near, far));
 
@@ -84,7 +85,7 @@ public class HOROTests
     [Fact]
     public void Resolve_EmptyOriginSet_ReturnsNoEntities()
     {
-        var near = TestFixtures.MakeEntity(x: 200, y: 0);
+        var near = new EntityBuilder().WithLocation(x: 200, y: 0).Build();
         var horo = new HORO(howFar: new FixedNumber(1000), origin: new FixedEntitySet());
         var context = TestFixtures.MakeContext(world: WorldWith(near));
 
@@ -107,7 +108,7 @@ public class HOROTests
     [Fact]
     public void Resolve_WindowOpen_TracksResultEntities()
     {
-        var near = TestFixtures.MakeEntity(x: 200, y: 0);
+        var near = new EntityBuilder().WithLocation(x: 200, y: 0).Build();
         var horo = new HORO(howFar: new FixedNumber(200), origin: new FixedEntitySet(Origin));
         var context = TestFixtures.MakeContext(world: WorldWith(near));
         context.OpenResolutionWindow();
@@ -122,9 +123,9 @@ public class HOROTests
     {
         // O1 at (0,0), O2 at (1000,0). nearA is within radius of O1 only (dist=100, gap to O2=700).
         // nearB is within radius of O2 only (dist=100, gap to O1=700). Both qualify via their nearest origin.
-        var originO2 = TestFixtures.MakeEntity(x: 1000, y: 0);
-        var nearA = TestFixtures.MakeEntity(x: 200, y: 0);
-        var nearB = TestFixtures.MakeEntity(x: 800, y: 0);
+        var originO2 = new EntityBuilder().WithLocation(x: 1000, y: 0).Build();
+        var nearA = new EntityBuilder().WithLocation(x: 200, y: 0).Build();
+        var nearB = new EntityBuilder().WithLocation(x: 800, y: 0).Build();
         var horo = new HORO(howFar: new FixedNumber(200), origin: new FixedEntitySet(Origin, originO2));
         var context = TestFixtures.MakeContext(world: WorldWith(nearA, nearB));
 

@@ -1,5 +1,6 @@
 using FluentAssertions;
-using RunicMagic.World;
+using RunicMagic.Tests.Builders;
+using RunicMagic.World.Capabilities;
 using RunicMagic.World.Execution;
 using RunicMagic.World.Runes.EffectRunes;
 using Xunit;
@@ -15,7 +16,7 @@ public class CJARTests
     public void Execute_RotatesEntityCounterclockwise()
     {
         // Entity at (1000, 0). 90° CCW around (0, 0) with Y-down puts it at (0, -1000).
-        var entity = TestFixtures.MakeEntity(x: 1000, y: 0);
+        var entity = new EntityBuilder().WithLocation(x: 1000, y: 0).Build();
         var cjar = new CJAR(
             toRotate: new FixedEntitySet(entity),
             howMuch: new FixedNumber(QuarterTurn),
@@ -31,7 +32,7 @@ public class CJARTests
     [Fact]
     public void Execute_UpdatesEntityAngle()
     {
-        var entity = TestFixtures.MakeEntity(x: 1000, y: 0);
+        var entity = new EntityBuilder().WithLocation(x: 1000, y: 0).Build();
         var expectedAngle = -(QuarterTurn / 2744.0 * 2 * Math.PI);
         var cjar = new CJAR(
             toRotate: new FixedEntitySet(entity),
@@ -47,7 +48,7 @@ public class CJARTests
     [Fact]
     public void Execute_RotationAroundOwnCenter_LocationUnchanged()
     {
-        var entity = TestFixtures.MakeEntity(x: 500, y: 300);
+        var entity = new EntityBuilder().WithLocation(x: 500, y: 300).Build();
         var cjar = new CJAR(
             toRotate: new FixedEntitySet(entity),
             howMuch: new FixedNumber(QuarterTurn),
@@ -63,7 +64,7 @@ public class CJARTests
     [Fact]
     public void Execute_AddsEntityRotatedEvent()
     {
-        var entity = TestFixtures.MakeEntity(x: 1000, y: 0);
+        var entity = new EntityBuilder().WithLocation(x: 1000, y: 0).Build();
         var cjar = new CJAR(
             toRotate: new FixedEntitySet(entity),
             howMuch: new FixedNumber(QuarterTurn),
@@ -80,7 +81,7 @@ public class CJARTests
     [Fact]
     public void Execute_ZeroAngle_NoRotatedEvent()
     {
-        var entity = TestFixtures.MakeEntity(x: 1000, y: 0);
+        var entity = new EntityBuilder().WithLocation(x: 1000, y: 0).Build();
         var cjar = new CJAR(
             toRotate: new FixedEntitySet(entity),
             howMuch: new FixedNumber(0),
@@ -109,7 +110,7 @@ public class CJARTests
     [Fact]
     public void Execute_InsufficientPower_DoesNotRotate()
     {
-        var entity = TestFixtures.MakeEntity(x: 1000, y: 0);
+        var entity = new EntityBuilder().WithLocation(x: 1000, y: 0).Build();
         entity.Weight = 1_000_000;
         var originalX = entity.Location.X;
         var originalY = entity.Location.Y;
@@ -130,9 +131,11 @@ public class CJARTests
     [Fact]
     public void Execute_DrawsPower_WhenEntityHasWeight()
     {
-        var entity = TestFixtures.MakeEntity(x: 0, y: 0);
+        var entity = new EntityBuilder()
+            .WithLocation(x: 0, y: 0)
+            .WithReservoir(draw: amount => new ReservoirDraw(amount, false))
+            .Build();
         entity.Weight = 1_000_000;
-        entity.Reservoir = amount => new ReservoirDraw(amount, false);
         var executor = new EntitySet([entity]);
         var cjar = new CJAR(
             toRotate: new FixedEntitySet(entity),
@@ -150,15 +153,19 @@ public class CJARTests
     public void Execute_CostMatchesCJIR_ForSameInputs()
     {
         // Both runes should draw the same amount of power for the same entity and angle.
-        var entityA = TestFixtures.MakeEntity(x: 0, y: 0);
-        entityA.Weight = 1_000_000;
         long drawnByCJIR = 0;
-        entityA.Reservoir = amount => { drawnByCJIR = amount; return new ReservoirDraw(amount, false); };
+        var entityA = new EntityBuilder()
+            .WithLocation(x: 0, y: 0)
+            .WithReservoir(draw: amount => { drawnByCJIR = amount; return new ReservoirDraw(amount, false); })
+            .Build();
+        entityA.Weight = 1_000_000;
 
-        var entityB = TestFixtures.MakeEntity(x: 0, y: 0);
-        entityB.Weight = 1_000_000;
         long drawnByCJAR = 0;
-        entityB.Reservoir = amount => { drawnByCJAR = amount; return new ReservoirDraw(amount, false); };
+        var entityB = new EntityBuilder()
+            .WithLocation(x: 0, y: 0)
+            .WithReservoir(draw: amount => { drawnByCJAR = amount; return new ReservoirDraw(amount, false); })
+            .Build();
+        entityB.Weight = 1_000_000;
 
         var cjir = new CJIR(
             toRotate: new FixedEntitySet(entityA),

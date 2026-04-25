@@ -35,35 +35,6 @@ public class EntitySet
         return new EntitySet(scopeEntities);
     }
 
-    public long DrawPower(long amount, SpellResult result)
-    {
-        if (amount == 0)
-        {
-            return 0;
-        }
-        var sources = _entities.Where(e => e.Reservoir != null).ToList();
-        if (sources.Count == 0)
-        {
-            return 0;
-        }
-        var perEntity = (long)Math.Ceiling((double)amount / sources.Count);
-        var totalDrawn = 0L;
-        foreach (var entity in sources)
-        {
-            var draw = entity.Reservoir!(perEntity);
-            totalDrawn += draw.Amount;
-            if (draw.Amount > 0)
-            {
-                result.Add(new PowerDrawnEvent(entity, draw.Amount));
-            }
-            if (draw.IsDrained)
-            {
-                result.Add(new EntityDrainedEvent(entity));
-            }
-        }
-        return totalDrawn;
-    }
-
     public override string ToString()
     {
         return $"EntitySet({string.Join(", ", _entities.Select(e => e.Label))})";

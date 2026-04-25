@@ -1,4 +1,6 @@
 using FluentAssertions;
+using RunicMagic.Tests.Builders;
+using RunicMagic.World.Capabilities;
 using RunicMagic.World.Execution;
 using RunicMagic.World.Runes.EffectRunes;
 using Xunit;
@@ -10,7 +12,7 @@ public class VARTests
     [Fact]
     public void Execute_PullsEntityTowardsOrigin()
     {
-        var entity = TestFixtures.MakeEntity(x: 1000, y: 0, weight: 1);
+        var entity = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(1).Build();
         var var_ = new VAR(
             toMove: new FixedEntitySet(entity),
             howFar: new FixedNumber(500),
@@ -27,7 +29,7 @@ public class VARTests
     [Fact]
     public void Execute_NullVector_EntityStillMoves()
     {
-        var entity = TestFixtures.MakeEntity(x: 0, y: 0, weight: 1);
+        var entity = new EntityBuilder().WithLocation(x: 0, y: 0).WithWeight(1).Build();
         var var_ = new VAR(
             toMove: new FixedEntitySet(entity),
             howFar: new FixedNumber(100),
@@ -45,11 +47,12 @@ public class VARTests
     public void Execute_DrawsPowerFromCaster()
     {
         var drawn = new List<long>();
-        var casterEntity = TestFixtures.MakeEntity();
-        casterEntity.Reservoir = amount => { drawn.Add(amount); return new ReservoirDraw(amount, false); };
+        var casterEntity = new EntityBuilder()
+            .WithReservoir(draw: amount => { drawn.Add(amount); return new ReservoirDraw(amount, false); })
+            .Build();
         var caster = new EntitySet([casterEntity]);
 
-        var target = TestFixtures.MakeEntity(x: 1000, y: 0, weight: 1000);
+        var target = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(1000).Build();
         var var_ = new VAR(
             toMove: new FixedEntitySet(target),
             howFar: new FixedNumber(1000),
@@ -68,15 +71,17 @@ public class VARTests
         var executorDrawn = new List<long>();
         var casterDrawn = new List<long>();
 
-        var executorEntity = TestFixtures.MakeEntity();
-        executorEntity.Reservoir = amount => { executorDrawn.Add(amount); return new ReservoirDraw(amount / 2, false); };
+        var executorEntity = new EntityBuilder()
+            .WithReservoir(draw: amount => { executorDrawn.Add(amount); return new ReservoirDraw(amount / 2, false); })
+            .Build();
         var executor = new EntitySet([executorEntity]);
 
-        var casterEntity = TestFixtures.MakeEntity();
-        casterEntity.Reservoir = amount => { casterDrawn.Add(amount); return new ReservoirDraw(amount, false); };
+        var casterEntity = new EntityBuilder()
+            .WithReservoir(draw: amount => { casterDrawn.Add(amount); return new ReservoirDraw(amount, false); })
+            .Build();
         var caster = new EntitySet([casterEntity]);
 
-        var target = TestFixtures.MakeEntity(x: 1000, y: 0, weight: 1000);
+        var target = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(1000).Build();
         var var_ = new VAR(
             toMove: new FixedEntitySet(target),
             howFar: new FixedNumber(2000),
@@ -93,8 +98,8 @@ public class VARTests
     [Fact]
     public void Execute_MultipleEntities_AllMoveTowardsOrigin()
     {
-        var entity1 = TestFixtures.MakeEntity(x: 1000, y: 0, weight: 1);
-        var entity2 = TestFixtures.MakeEntity(x: 0, y: 1000, weight: 1);
+        var entity1 = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(1).Build();
+        var entity2 = new EntityBuilder().WithLocation(x: 0, y: 1000).WithWeight(1).Build();
         var var_ = new VAR(
             toMove: new FixedEntitySet(entity1, entity2),
             howFar: new FixedNumber(200),
@@ -113,8 +118,8 @@ public class VARTests
     [Fact]
     public void Execute_EmitsEntityPulledEvent_PerEntity()
     {
-        var entity1 = TestFixtures.MakeEntity(x: 1000, y: 0, weight: 1);
-        var entity2 = TestFixtures.MakeEntity(x: 0, y: 1000, weight: 1);
+        var entity1 = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(1).Build();
+        var entity2 = new EntityBuilder().WithLocation(x: 0, y: 1000).WithWeight(1).Build();
         var result = new SpellResult();
         var var_ = new VAR(
             toMove: new FixedEntitySet(entity1, entity2),
@@ -131,11 +136,12 @@ public class VARTests
     [Fact]
     public void Execute_InsufficientPower_DoesNotFireAndEmitsEvent()
     {
-        var entity = TestFixtures.MakeEntity(x: 1000, y: 0, weight: 1000);
+        var entity = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(1000).Build();
         var originalX = entity.Location.X;
 
-        var casterEntity = TestFixtures.MakeEntity();
-        casterEntity.Reservoir = amount => new ReservoirDraw(0, false);
+        var casterEntity = new EntityBuilder()
+            .WithReservoir(draw: amount => new ReservoirDraw(0, false))
+            .Build();
         var caster = new EntitySet([casterEntity]);
 
         var result = new SpellResult();
@@ -157,8 +163,9 @@ public class VARTests
     public void Execute_EmptySet_DrawsNoPower()
     {
         var drawn = new List<long>();
-        var casterEntity = TestFixtures.MakeEntity();
-        casterEntity.Reservoir = amount => { drawn.Add(amount); return new ReservoirDraw(amount, false); };
+        var casterEntity = new EntityBuilder()
+            .WithReservoir(draw: amount => { drawn.Add(amount); return new ReservoirDraw(amount, false); })
+            .Build();
         var caster = new EntitySet([casterEntity]);
 
         var var_ = new VAR(

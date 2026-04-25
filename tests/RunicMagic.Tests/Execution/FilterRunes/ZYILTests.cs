@@ -1,4 +1,5 @@
 using FluentAssertions;
+using RunicMagic.Tests.Builders;
 using RunicMagic.World.Runes.FilterRunes;
 using Xunit;
 
@@ -9,7 +10,7 @@ public class ZYILTests
     [Fact]
     public void Resolve_EntityWithWeightWithinRange_IsReturned()
     {
-        var entity = TestFixtures.MakeEntity(weight: 500);
+        var entity = new EntityBuilder().WithWeight(weight: 500).Build();
         var zyil = new ZYIL(
             source: new FixedEntitySet(entity),
             lower: new FixedNumber(100),
@@ -24,7 +25,7 @@ public class ZYILTests
     [Fact]
     public void Resolve_EntityWithWeightBelowLower_IsNotReturned()
     {
-        var entity = TestFixtures.MakeEntity(weight: 50);
+        var entity = new EntityBuilder().WithWeight(weight: 50).Build();
         var zyil = new ZYIL(
             source: new FixedEntitySet(entity),
             lower: new FixedNumber(100),
@@ -39,7 +40,7 @@ public class ZYILTests
     [Fact]
     public void Resolve_EntityWithWeightAboveUpper_IsNotReturned()
     {
-        var entity = TestFixtures.MakeEntity(weight: 2000);
+        var entity = new EntityBuilder().WithWeight(weight: 2000).Build();
         var zyil = new ZYIL(
             source: new FixedEntitySet(entity),
             lower: new FixedNumber(100),
@@ -54,7 +55,7 @@ public class ZYILTests
     [Fact]
     public void Resolve_EntityWithWeightEqualToLower_IsNotReturned()
     {
-        var entity = TestFixtures.MakeEntity(weight: 100);
+        var entity = new EntityBuilder().WithWeight(weight: 100).Build();
         var zyil = new ZYIL(
             source: new FixedEntitySet(entity),
             lower: new FixedNumber(100),
@@ -69,7 +70,7 @@ public class ZYILTests
     [Fact]
     public void Resolve_EntityWithWeightEqualToUpper_IsNotReturned()
     {
-        var entity = TestFixtures.MakeEntity(weight: 1000);
+        var entity = new EntityBuilder().WithWeight(weight: 1000).Build();
         var zyil = new ZYIL(
             source: new FixedEntitySet(entity),
             lower: new FixedNumber(100),
@@ -84,9 +85,9 @@ public class ZYILTests
     [Fact]
     public void Resolve_MultipleEntities_ReturnsOnlyThoseInRange()
     {
-        var light = TestFixtures.MakeEntity(weight: 50);
-        var medium = TestFixtures.MakeEntity(weight: 500);
-        var heavy = TestFixtures.MakeEntity(weight: 2000);
+        var light = new EntityBuilder().WithWeight(weight: 50).Build();
+        var medium = new EntityBuilder().WithWeight(weight: 500).Build();
+        var heavy = new EntityBuilder().WithWeight(weight: 2000).Build();
         var zyil = new ZYIL(
             source: new FixedEntitySet(light, medium, heavy),
             lower: new FixedNumber(100),

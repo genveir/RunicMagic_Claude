@@ -24,7 +24,7 @@ namespace RunicMagic.World.Runes.FilterRunes
             var filtered = source.Entities
                 .Where(e =>
                 {
-                    var current = e.CurrentReservoir?.Invoke() ?? 0L;
+                    var current = e.Reservoir?.Current() ?? 0L;
                     return current > lower.Value && current < upper.Value;
                 })
                 .ToList();
