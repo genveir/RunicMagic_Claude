@@ -18,6 +18,12 @@ Nothing can consume ExecutableStatement — ZU must appear first in the token st
 |------|---------|-----------|
 | `VUN` | push | (Set, Number, Location = PAR(OH)) → Statement |
 | `VAR` | pull | (Set, Number, Location = PAR(OH)) → Statement |
+| `CJIR` | rotate clockwise | (Set, Number, Location = PAR(Set)) → Statement |
+| `CJAR` | rotate counterclockwise | (Set, Number, Location = PAR(Set)) → Statement |
+
+`CJIR` rotates each entity in the Set clockwise around the given origin by `Number` rune-rotation units, where TOT (2 744) = one full turn. The default origin is the centroid of the Set being rotated.
+
+`CJAR` is identical to `CJIR` but rotates counterclockwise. Power cost is the same for both directions.
 
 ## Power Sourcing
 
