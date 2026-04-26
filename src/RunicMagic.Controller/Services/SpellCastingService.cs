@@ -65,7 +65,7 @@ internal class SpellCastingService(WorldModel world, SpellExecutor spellExecutor
             PowerFilledEvent e => $"{e.Entity.Label} gained {e.Amount} power.",
             EntityFullEvent e => $"{e.Entity.Label} is full.",
             EffectNotFiredEvent e => $"Effect '{e.Effect}' did not fire: {e.Reason}.",
-            ExecutorDisintegratedEvent => "The executor disintegrated.",
+            EntityDisintegratedEvent e => $"{e.Entity.Label} disintegrated.",
             SelectionCostNotMetEvent e => $"Selection failed: needed {e.Required} power, drew {e.Drawn}.",
             InscriptionReadEvent e => $"{e.Entity.Label}: {e.Text}",
             EntityRotatedEvent e => $"{e.Entity.Label} rotated {e.AngleDegrees} degrees.",

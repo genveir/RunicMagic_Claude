@@ -149,6 +149,6 @@ public class SpellExecutorTests
         // Target not moved
         target.Location.X.Should().Be(1000);
         // Event emitted
-        result.Events.OfType<ExecutorDisintegratedEvent>().Should().ContainSingle();
+        result.Events.OfType<EntityDisintegratedEvent>().Should().ContainSingle();
     }
 }

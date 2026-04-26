@@ -21,9 +21,9 @@ public class SpellExecutor
 
         if (evalDrawn < runeCount)
         {
-            result.Add(new ExecutorDisintegratedEvent());
             foreach (var entity in executor.Entities)
             {
+                result.Add(new EntityDisintegratedEvent(entity));
                 _world.Remove(entity.Id);
             }
             return result;
