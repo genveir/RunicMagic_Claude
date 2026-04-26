@@ -406,3 +406,22 @@ public class RectangleIsWithinDistanceFromRectangleTests
         result.Should().BeFalse();
     }
 }
+
+public class RectangleGetDistanceFromDegenerateTests
+{
+    [Fact]
+    public void ZeroWidthRect_DistanceToOtherRect_IsCorrect()
+    {
+        // Width=0 collapses adjacent corners to the same point, producing zero-length segments.
+        // This exercises the lenSq==0 branch in PointToSegmentDistance, where the nearest
+        // point on the "segment" is just the endpoint itself.
+        // Line at x=0, spanning y:[-50,50]. Box centred at (200,0), spanning x:[150,250].
+        // Nearest point on line: (0,0). Nearest face of box: x=150. Gap = 150.
+        var line = new Rectangle(new Location(0, 0), Width: 0, Height: 100, Angle: 0);
+        var box = new Rectangle(new Location(200, 0), Width: 100, Height: 100, Angle: 0);
+
+        var result = line.GetDistanceFromRectangle(box);
+
+        result.Should().BeApproximately(150, precision: 0.001);
+    }
+}

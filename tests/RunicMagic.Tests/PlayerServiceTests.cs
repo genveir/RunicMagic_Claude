@@ -163,6 +163,121 @@ public class PlayerServiceTests
     }
 
     [Fact]
+    public async Task SetIndicateTarget_NoCasterSelected_ReturnsNoCasterMessage()
+    {
+        var (service, _) = MakeService();
+
+        var result = await service.SetIndicateTarget(new WorldCoordinate(500, 0));
+
+        result.Text.Should().ContainSingle().Which.Should().Contain("No caster selected");
+    }
+
+    [Fact]
+    public async Task SetIndicateTarget_NothingAtPoint_ReturnsNothingToIndicateMessage()
+    {
+        var (service, world) = MakeService();
+        var caster = MakeAgencyEntity(x: 0, y: 0);
+        world.Add(caster);
+        await service.SetCaster(new WorldCoordinate(0, 0));
+
+        var result = await service.SetIndicateTarget(new WorldCoordinate(5000, 5000));
+
+        result.Text.Should().ContainSingle().Which.Should().Contain("Nothing to indicate");
+    }
+
+    [Fact]
+    public async Task SetIndicateTarget_TargetIsCaster_SetsIndicateTargetToSelfWithNullDirection()
+    {
+        var (service, world) = MakeService();
+        var caster = MakeAgencyEntity(x: 0, y: 0);
+        world.Add(caster);
+        await service.SetCaster(new WorldCoordinate(0, 0));
+
+        await service.SetIndicateTarget(new WorldCoordinate(0, 0));
+
+        caster.IndicateTarget.Should().NotBeNull();
+        caster.IndicateTarget!.EntityId.Should().Be(caster.Id);
+        caster.IndicateTarget!.Direction.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task SetIndicateTarget_TargetIsCaster_ReturnsIndicatingSelfMessage()
+    {
+        var (service, world) = MakeService();
+        var caster = MakeAgencyEntity(x: 0, y: 0);
+        world.Add(caster);
+        await service.SetCaster(new WorldCoordinate(0, 0));
+
+        var result = await service.SetIndicateTarget(new WorldCoordinate(0, 0));
+
+        result.Text.Should().ContainSingle().Which.Should().Contain("self");
+    }
+
+    [Fact]
+    public async Task SetIndicateTarget_ObstacleBlocksTarget_ReturnsBlockedMessage()
+    {
+        var (service, world) = MakeService();
+        var caster = MakeAgencyEntity(x: 0, y: 0);
+        var obstacle = new EntityBuilder().WithLocation(200, 0).Build();
+        var target = new EntityBuilder().WithLocation(500, 0).WithLabel("target").Build();
+        world.Add(caster);
+        world.Add(obstacle);
+        world.Add(target);
+        await service.SetCaster(new WorldCoordinate(0, 0));
+
+        var result = await service.SetIndicateTarget(new WorldCoordinate(500, 0));
+
+        result.Text.Should().ContainSingle().Which.Should().Contain("in the way");
+    }
+
+    [Fact]
+    public async Task SetIndicateTarget_TargetOutOfRange_ReturnsOutOfRangeMessage()
+    {
+        var (service, world) = MakeService();
+        var caster = MakeAgencyEntity(x: 0, y: 0);
+        var target = new EntityBuilder().WithLocation(2000, 0).WithLabel("faraway").Build();
+        world.Add(caster);
+        world.Add(target);
+        await service.SetCaster(new WorldCoordinate(0, 0));
+
+        var result = await service.SetIndicateTarget(new WorldCoordinate(2000, 0));
+
+        result.Text.Should().ContainSingle().Which.Should().Contain("out of reach");
+    }
+
+    [Fact]
+    public async Task SetIndicateTarget_TargetInRange_SetsIndicateTargetWithDirection()
+    {
+        var (service, world) = MakeService();
+        var caster = MakeAgencyEntity(x: 0, y: 0);
+        var target = new EntityBuilder().WithLocation(500, 0).WithLabel("target").Build();
+        world.Add(caster);
+        world.Add(target);
+        await service.SetCaster(new WorldCoordinate(0, 0));
+
+        await service.SetIndicateTarget(new WorldCoordinate(500, 0));
+
+        caster.IndicateTarget.Should().NotBeNull();
+        caster.IndicateTarget!.EntityId.Should().Be(target.Id);
+        caster.IndicateTarget!.Direction.Should().NotBeNull();
+    }
+
+    [Fact]
+    public async Task SetIndicateTarget_TargetInRange_ReturnsIndicatingMessage()
+    {
+        var (service, world) = MakeService();
+        var caster = MakeAgencyEntity(x: 0, y: 0);
+        var target = new EntityBuilder().WithLocation(500, 0).WithLabel("target").Build();
+        world.Add(caster);
+        world.Add(target);
+        await service.SetCaster(new WorldCoordinate(0, 0));
+
+        var result = await service.SetIndicateTarget(new WorldCoordinate(500, 0));
+
+        result.Text.Should().ContainSingle().Which.Should().Contain("target");
+    }
+
+    [Fact]
     public void Prompt_NoCasterSelected_ReturnsNoCasterPrompt()
     {
         var (service, _) = MakeService();
