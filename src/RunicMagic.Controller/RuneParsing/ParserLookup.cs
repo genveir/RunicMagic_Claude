@@ -74,6 +74,7 @@ namespace RunicMagic.Controller.RuneParsing
             statementRuneParsers["SHU"] = new SHUParser(); // with power source
             statementRuneParsers["GWYAH"] = new GWYAHParser(); // invoke
             statementRuneParsers["CRIYR"] = new CRIYRParser(); // read inscription
+            statementRuneParsers["TIORJ"] = new TIORJParser(); // fill
         }
 
         private static void FillEntitySetRuneParsers()

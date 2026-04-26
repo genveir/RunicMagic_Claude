@@ -47,6 +47,45 @@ internal static class PowerService
         return totalDrawn;
     }
 
+    public static void FillWithOvercharge(EntitySet toFill, EntitySet? returnSource, long amount, SpellContext context)
+    {
+        var remaining = amount - FillPower(toFill, amount, context.Result);
+        var currentSet = toFill;
+
+        while (remaining > 0)
+        {
+            var scope = new EntitySet(currentSet.GetScope().Entities.Where(e => e.Reservoir != null).ToList());
+
+            var damageDealt = DamageService.Damage(currentSet, remaining * 2, context);
+            remaining -= (damageDealt + 1) / 2;
+
+            if (remaining <= 0 || !scope.Entities.Any())
+            {
+                break;
+            }
+
+            remaining -= FillPower(scope, remaining, context.Result);
+            currentSet = scope;
+        }
+
+        if (remaining > 0)
+        {
+            var damageDealt = DamageService.Damage(context.Executor, remaining * 2, context);
+            remaining -= (damageDealt + 1) / 2;
+        }
+
+        if (remaining > 0)
+        {
+            var damageDealt = DamageService.Damage(context.Caster, remaining * 2, context);
+            remaining -= (damageDealt + 1) / 2;
+        }
+
+        if (remaining > 0 && returnSource != null)
+        {
+            FillWithOvercharge(returnSource, null, remaining, context);
+        }
+    }
+
     public static long FillPower(EntitySet entitySet, long amount, SpellResult result)
     {
         var groups = entitySet.Entities
