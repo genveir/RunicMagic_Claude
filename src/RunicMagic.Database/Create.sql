@@ -1,3 +1,9 @@
+if db_name() != 'RunicMagic'
+begin
+    print 'ERROR: This script must be run in the RunicMagic database.';
+    set noexec on;
+end
+
 drop table if exists EntityLife;
 drop table if exists EntityCharge;
 drop table if exists Inscription;
@@ -49,3 +55,5 @@ create table Inscription (
     EntityId uniqueidentifier not null constraint FK_Inscription_Entities references Entities (Id),
     SpellText nvarchar(max)   not null
 );
+
+set noexec off;

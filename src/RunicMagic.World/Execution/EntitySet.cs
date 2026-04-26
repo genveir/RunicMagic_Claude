@@ -13,7 +13,9 @@ public class EntitySet
     {
         get
         {
-            return _entities;
+            return _entities
+                .Where(e => e.StructuralIntegrity.CurrentIntegrity > 0)
+                .ToList();
         }
     }
 

@@ -2,13 +2,13 @@
 
 ## Spatial Model
 
-The world is a 2D coordinate space measured in millimeters. Every Entity has a position and dimensions, represented as an axis-aligned rectangle. There are no entities without spatial representation.
+The world is a 2D coordinate space measured in millimeters. Every Entity has a position, dimensions, and an orientation angle, represented as an oriented (rotatable) rectangle. There are no entities without spatial representation.
 
 Spatial relationships between entities:
 
-- **Containment** — entity A is contained by entity B if A's rectangle fits entirely within B's rectangle
-- **Touch** — entities whose rectangles are adjacent or overlapping
-- **Proximity** — the measurable distance between two entities
+- **Containment** — entity A is contained by entity B if all of A's corners lie within B's rectangle
+- **Touch** — entities whose rectangles intersect or are adjacent
+- **Proximity** — the measurable surface-to-surface distance between two entities
 
 ## Entity Taxonomy
 
@@ -36,10 +36,10 @@ Current entity data:
 | `StructuralIntegrity` | Attribute | complex | `StructuralIntegrityCapability`: `MaxIntegrity` + `CurrentIntegrity`; always present. Damage to structural integrity also caps `Life.CurrentHitPoints` to the new `CurrentIntegrity` — the reverse does not apply. |
 | `PointingDirection` | Transient | scalar | The direction the entity is consciously aiming; null = not pointing |
 | `IndicateTarget` | Transient | complex | The entity the caster is consciously indicating, with optional approach direction; null = not indicating |
-| `ParsedInscriptions` | Transient | `IStatement[]` | Spells inscribed on this entity, pre-parsed at load time; empty = none |
+| `RawInscriptions` | Transient | `string[]` | Raw inscription texts loaded from the `Inscription` table; empty = none |
+| `ParsedInscriptions` | Transient | `IStatement[]` | Spells inscribed on this entity, pre-parsed at load time from `RawInscriptions`; empty = none. Any inscription whose rune text fails to parse is silently dropped. Any entity type can have inscriptions. |
 | `Scope` | Derived | delegate | Returns the set of entities reachable from this entity |
-| `Reservoir` | Derived | delegate | Draws up to N power; closes over whichever property holds its state; null = no power |
-| `MaxReservoir` | Derived | delegate | Returns the entity's maximum power; null = no power (cost to select this entity is 0) |
+| `Reservoir` | Derived | `ReservoirCapability?` | Exposes power query and draw/fill operations; closes over whichever property holds its state; null = no power |
 
 A complex property's null object is its own "absent" marker — no separate boolean needed. A boolean property uses `false` as its absent marker.
 
@@ -55,8 +55,9 @@ The implementation may use convenience classes (e.g. `Creature`) to stamp out en
 - `EntityId Id`
 - `string Label`
 - `long Weight`
-- Position: `double X, Y` (via `Location`)
+- Position: `Location Location` (holds `double X, Y`)
 - Dimensions: `long Width, Height`
+- `double Angle` — orientation in radians; 0 = axis-aligned
 
 **Properties** (optional, persisted):
 - `bool HasAgency` — false = absent
@@ -68,16 +69,22 @@ The implementation may use convenience classes (e.g. `Creature`) to stamp out en
 **Transient** (session-only):
 - `Direction? PointingDirection` — null = not pointing
 - `IndicateTarget? IndicateTarget` — entity the caster consciously indicates, with optional approach direction; null = not indicating
-- `IStatement[] ParsedInscriptions` — spells inscribed on this entity; pre-parsed from the `Inscription` table at world load; empty = none. Any inscription whose rune text fails to parse is silently dropped. Any entity type can have inscriptions.
+- `string[] RawInscriptions` — raw inscription texts loaded at world load; empty = none
+- `IStatement[] ParsedInscriptions` — spells inscribed on this entity; pre-parsed from `RawInscriptions` at world load; empty = none. Any inscription whose rune text fails to parse is silently dropped.
 
 **Derived** (wired at load, no persistence):
 - `Func<Entity[]>? Scope` — computed on call; closes over world state
-- `Func<long, ReservoirDraw>? Reservoir` — takes amount requested, returns draw result; closes over whichever property holds its state; null = no power
-- `Func<long>? MaxReservoir` — returns the entity's maximum power; null = no power
+- `ReservoirCapability? Reservoir` — exposes `Max`, `Current`, `Draw`, and `Fill` delegates; closes over whichever property holds its state; null = no power
 
 ### Derived delegates
 
-`Reservoir` and `Scope` are delegates rather than interface implementations. Their state lives in the property objects (`LifeCapability`, `ChargeCapability`) that the closures capture — not inside the delegate itself. This keeps state inspectable and persistable.
+`Reservoir` and `Scope` are wired at load time. Their state lives in the property objects (`LifeCapability`, `ChargeCapability`) that the closures capture — not inside the delegate objects themselves. This keeps state inspectable and persistable.
+
+`ReservoirCapability` bundles four delegates:
+- `Func<long> Max` — returns the entity's maximum power capacity
+- `Func<long> Current` — returns the entity's current power level
+- `Func<long, ReservoirDraw> Draw` — draws up to N power; returns how much was drawn and whether the reservoir is now drained
+- `Func<long, ReservoirFill> Fill` — fills up to N power; returns how much was filled and whether the reservoir is now full
 
 Examples:
 - A creature's `Reservoir` closes over its `LifeCapability` and draws from `CurrentHitPoints`.
@@ -99,7 +106,9 @@ The world is loaded in full at startup into a `Dictionary<EntityId, Entity>`. Th
 - `GetAll()` — all entities in the world
 - `Find(EntityId)` — single entity by identity; returns null if not found
 - `GetEntitiesAtPoint(Location)` — entities whose bounds contain the given point
-- `GetEntitiesWithinDistance(Entity, double)` — entities whose bounds are within the given distance of the source entity's position; excludes the source itself; used to compute scope
+- `GetEntitiesWithinDistance(Entity, double)` — entities whose bounds are within the given surface-to-surface distance of the source entity's bounds; excludes the source itself; used to compute scope
 - `GetContainedEntities(Entity)` — entities whose bounds fit entirely within the container's bounds; excludes the container itself
 
-`Rectangle` is a custom `readonly record struct` with no dependency on `System.Drawing`.
+### Rectangle
+
+`Rectangle` is a `readonly record struct` with no dependency on `System.Drawing`. It represents an oriented rectangle: `Location` is the centre point, `Width` and `Height` are the full extents (as `double`), and `Angle` is the orientation in radians. All spatial operations (containment, intersection, ray-cast, distance) account for rotation.

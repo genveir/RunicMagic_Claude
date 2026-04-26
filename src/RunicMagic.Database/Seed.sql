@@ -1,3 +1,9 @@
+if db_name() != 'RunicMagic'
+begin
+    print 'ERROR: This script must be run in the RunicMagic database.';
+    set noexec on;
+end
+
 delete from entitylife;
 delete from entitycharge;
 delete from inscription;
@@ -48,4 +54,7 @@ values
 
 insert into Inscription (EntityId, SpellText)
 values
-    (@rock, 'VUN ZYHE LA ZYSE LA ZYSE HORO MOST TOT TOT');
+    (@rock, 'CJIR ZYHE LA ZYSE LA ZYSE HORO MOST TOT DEID DEID TOT'),
+    (@rock, 'VAR ZYHE HORO IR TET DOT ZYSE LA ZYSE HORO MOST TOT MO EID TOT FET DET PAR ZYSE LA ZYSE HORO MOST TOT');
+
+set noexec off;
