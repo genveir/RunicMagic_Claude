@@ -1,20 +1,19 @@
 using RunicMagic.World.Runes.LocationRunes;
 using RunicMagic.World.Runes.RuneTypes;
 
-namespace RunicMagic.Controller.RuneParsing.LocationRunes
+namespace RunicMagic.Controller.RuneParsing.LocationRunes;
+
+internal class GERParser : IRuneParser<ILocation>
 {
-    internal class GERParser : IRuneParser<ILocation>
+    public ParsingResult<ILocation> Parse(TokenStream tokenStream)
     {
-        public ParsingResult<ILocation> Parse(TokenStream tokenStream)
+        var entitySetResult = RuneParsingDispatcher.ParseNextTaxedEntitySet(tokenStream);
+
+        if (!entitySetResult.Succeeded)
         {
-            var entitySetResult = RuneParsingDispatcher.ParseNextTaxedEntitySet(tokenStream);
-
-            if (!entitySetResult.Succeeded)
-            {
-                return ParsingResult<ILocation>.Fail(entitySetResult.Error);
-            }
-
-            return ParsingResult<ILocation>.Succeed(new GER(entitySetResult.Value));
+            return ParsingResult<ILocation>.Fail(entitySetResult.Error);
         }
+
+        return ParsingResult<ILocation>.Succeed(new GER(entitySetResult.Value));
     }
 }

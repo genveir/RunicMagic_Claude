@@ -2,70 +2,69 @@ using RunicMagic.World.Execution;
 using RunicMagic.World.Geometry;
 using RunicMagic.World.Runes.RuneTypes;
 
-namespace RunicMagic.World.Runes.EffectRunes
+namespace RunicMagic.World.Runes.EffectRunes;
+
+// ROTATE CLOCKWISE
+public class CJIR : IStatement
 {
-    // ROTATE CLOCKWISE
-    public class CJIR : IStatement
+    public IEntitySet ToRotate { get; }
+    public INumber HowMuch { get; }
+    public ILocation Origin { get; }
+
+    public CJIR(IEntitySet toRotate, INumber howMuch, ILocation origin)
     {
-        public IEntitySet ToRotate { get; }
-        public INumber HowMuch { get; }
-        public ILocation Origin { get; }
+        ToRotate = toRotate;
+        HowMuch = howMuch;
+        Origin = origin;
+    }
 
-        public CJIR(IEntitySet toRotate, INumber howMuch, ILocation origin)
+    public void Execute(SpellContext context)
+    {
+        var toRotate = ToRotate.Resolve(context);
+        var angleDegrees = HowMuch.Evaluate(context).Value;
+        var origin = Origin.Evaluate(context);
+
+        // Y-axis is down, so positive angle is clockwise.
+        var theta = angleDegrees / 2744.0 * 2 * Math.PI;
+
+        var totalCost = 0L;
+        foreach (var entity in toRotate.Entities)
         {
-            ToRotate = toRotate;
-            HowMuch = howMuch;
-            Origin = origin;
+            totalCost += RotationCostCalculator.ComputeEntityCost(entity, origin, theta);
         }
 
-        public void Execute(SpellContext context)
+        var drawn = context.DrawPower(totalCost);
+        if (drawn < totalCost)
         {
-            var toRotate = ToRotate.Resolve(context);
-            var angleDegrees = HowMuch.Evaluate(context).Value;
-            var origin = Origin.Evaluate(context);
-
-            // Y-axis is down, so positive angle is clockwise.
-            var theta = angleDegrees / 2744.0 * 2 * Math.PI;
-
-            var totalCost = 0L;
-            foreach (var entity in toRotate.Entities)
-            {
-                totalCost += RotationCostCalculator.ComputeEntityCost(entity, origin, theta);
-            }
-
-            var drawn = context.DrawPower(totalCost);
-            if (drawn < totalCost)
-            {
-                context.Result.Add(new EffectNotFiredEvent(
-                    "CJIR",
-                    $"Insufficient power: needed {totalCost}, drew {drawn}"
-                ));
-                return;
-            }
-
-            foreach (var entity in toRotate.Entities)
-            {
-                var dx = entity.Location.X - origin.X;
-                var dy = entity.Location.Y - origin.Y;
-                var cos = Math.Cos(theta);
-                var sin = Math.Sin(theta);
-                entity.Location = new Location(
-                    origin.X + dx * cos - dy * sin,
-                    origin.Y + dx * sin + dy * cos
-                );
-                entity.Angle += theta;
-
-                if (angleDegrees > 0)
-                {
-                    context.Result.Add(new EntityRotatedEvent(entity, angleDegrees));
-                }
-            }
+            context.Result.Add(new EffectNotFiredEvent(
+                "CJIR",
+                $"Insufficient power: needed {totalCost}, drew {drawn}"
+            ));
+            return;
         }
 
-        public override string ToString()
+        foreach (var entity in toRotate.Entities)
         {
-            var result = $"CJIR ( {ToRotate}, {HowMuch}, {Origin} )";
-            return result;
+            var dx = entity.Location.X - origin.X;
+            var dy = entity.Location.Y - origin.Y;
+            var cos = Math.Cos(theta);
+            var sin = Math.Sin(theta);
+            entity.Location = new Location(
+                origin.X + dx * cos - dy * sin,
+                origin.Y + dx * sin + dy * cos
+            );
+            entity.Angle += theta;
+
+            if (angleDegrees > 0)
+            {
+                context.Result.Add(new EntityRotatedEvent(entity, angleDegrees));
+            }
         }
+    }
+
+    public override string ToString()
+    {
+        var result = $"CJIR ( {ToRotate}, {HowMuch}, {Origin} )";
+        return result;
     }
 }

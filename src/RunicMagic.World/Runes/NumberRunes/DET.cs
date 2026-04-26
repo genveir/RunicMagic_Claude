@@ -1,22 +1,21 @@
 using RunicMagic.World.Execution;
 using RunicMagic.World.Runes.RuneTypes;
 
-namespace RunicMagic.World.Runes.NumberRunes
+namespace RunicMagic.World.Runes.NumberRunes;
+
+// TWO
+public class DET : INumber
 {
-    // TWO
-    public class DET : INumber
+    public DET() { }
+
+    public Number Evaluate(SpellContext context)
     {
-        public DET() { }
+        var result = new Number(2);
+        return result;
+    }
 
-        public Number Evaluate(SpellContext context)
-        {
-            var result = new Number(2);
-            return result;
-        }
-
-        public override string ToString()
-        {
-            return "DET";
-        }
+    public override string ToString()
+    {
+        return "DET";
     }
 }

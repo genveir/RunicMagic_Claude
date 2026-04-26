@@ -1,13 +1,12 @@
 ﻿using RunicMagic.World.Runes.DebugRunes;
 using RunicMagic.World.Runes.RuneTypes;
 
-namespace RunicMagic.Controller.RuneParsing.DebugRunes
+namespace RunicMagic.Controller.RuneParsing.DebugRunes;
+
+internal class GAParser : IRuneParser<IEntitySet>
 {
-    internal class GAParser : IRuneParser<IEntitySet>
+    public ParsingResult<IEntitySet> Parse(TokenStream tokenStream)
     {
-        public ParsingResult<IEntitySet> Parse(TokenStream tokenStream)
-        {
-            return ParsingResult<IEntitySet>.Succeed(new GA());
-        }
+        return ParsingResult<IEntitySet>.Succeed(new GA());
     }
 }

@@ -1,9 +1,8 @@
 using RunicMagic.World.Execution;
 
-namespace RunicMagic.World.Runes.RuneTypes
+namespace RunicMagic.World.Runes.RuneTypes;
+
+public interface INumber
 {
-    public interface INumber
-    {
-        Number Evaluate(SpellContext context);
-    }
+    Number Evaluate(SpellContext context);
 }

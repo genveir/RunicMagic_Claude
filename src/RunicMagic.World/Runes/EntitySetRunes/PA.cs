@@ -1,58 +1,57 @@
 using RunicMagic.World.Execution;
 using RunicMagic.World.Runes.RuneTypes;
 
-namespace RunicMagic.World.Runes.EntitySetRunes
+namespace RunicMagic.World.Runes.EntitySetRunes;
+
+public class PA : IEntitySet
 {
-    public class PA : IEntitySet
+    public IEntitySet ToGetScopeOf { get; }
+
+    public PA(IEntitySet toGetScopeOf)
     {
-        public IEntitySet ToGetScopeOf { get; }
+        ToGetScopeOf = toGetScopeOf;
+    }
 
-        public PA(IEntitySet toGetScopeOf)
+    public EntitySet Resolve(SpellContext context)
+    {
+        var inputSet = ToGetScopeOf.Resolve(context);
+        if (!inputSet.Entities.Any())
         {
-            ToGetScopeOf = toGetScopeOf;
+            return new EntitySet([]);
         }
 
-        public EntitySet Resolve(SpellContext context)
+        HashSet<EntityId>? intersection = null;
+        var entityById = new Dictionary<EntityId, Entity>();
+
+        foreach (var entity in inputSet.Entities)
         {
-            var inputSet = ToGetScopeOf.Resolve(context);
-            if (!inputSet.Entities.Any())
+            var scope = entity.Scope?.Invoke() ?? [];
+            foreach (var member in scope)
             {
-                return new EntitySet([]);
+                entityById[member.Id] = member;
             }
-
-            HashSet<EntityId>? intersection = null;
-            var entityById = new Dictionary<EntityId, Entity>();
-
-            foreach (var entity in inputSet.Entities)
+            var scopeIds = scope.Select(e => e.Id).ToHashSet();
+            if (intersection is null)
             {
-                var scope = entity.Scope?.Invoke() ?? [];
-                foreach (var member in scope)
-                {
-                    entityById[member.Id] = member;
-                }
-                var scopeIds = scope.Select(e => e.Id).ToHashSet();
-                if (intersection is null)
-                {
-                    intersection = scopeIds;
-                }
-                else
-                {
-                    intersection.IntersectWith(scopeIds);
-                }
+                intersection = scopeIds;
             }
-
-            var members = (intersection ?? [])
-                .Select(id => entityById[id])
-                .ToList();
-            var result = new EntitySet(members);
-            context.EntityResolutionCount?.UnionWith(result.Entities.Select(e => e.Id));
-            return result;
+            else
+            {
+                intersection.IntersectWith(scopeIds);
+            }
         }
 
-        public override string ToString()
-        {
-            var result = $"PA ( {ToGetScopeOf} )";
-            return result;
-        }
+        var members = (intersection ?? [])
+            .Select(id => entityById[id])
+            .ToList();
+        var result = new EntitySet(members);
+        context.EntityResolutionCount?.UnionWith(result.Entities.Select(e => e.Id));
+        return result;
+    }
+
+    public override string ToString()
+    {
+        var result = $"PA ( {ToGetScopeOf} )";
+        return result;
     }
 }

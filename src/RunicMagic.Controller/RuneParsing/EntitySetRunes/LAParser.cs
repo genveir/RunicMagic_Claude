@@ -1,21 +1,20 @@
 using RunicMagic.World.Runes.EntitySetRunes;
 using RunicMagic.World.Runes.RuneTypes;
 
-namespace RunicMagic.Controller.RuneParsing.EntitySetRunes
+namespace RunicMagic.Controller.RuneParsing.EntitySetRunes;
+
+internal class LAParser : IRuneParser<IEntitySet>
 {
-    internal class LAParser : IRuneParser<IEntitySet>
+    public ParsingResult<IEntitySet> Parse(TokenStream tokenStream)
     {
-        public ParsingResult<IEntitySet> Parse(TokenStream tokenStream)
+        var toGetScopeOfResult = RuneParsingDispatcher.ParseNextRune<IEntitySet>(tokenStream, defaultTokens: ["OH"]);
+
+        if (!toGetScopeOfResult.Succeeded)
         {
-            var toGetScopeOfResult = RuneParsingDispatcher.ParseNextRune<IEntitySet>(tokenStream, defaultTokens: ["OH"]);
-
-            if (!toGetScopeOfResult.Succeeded)
-            {
-                return ParsingResult<IEntitySet>.Fail(toGetScopeOfResult.Error);
-            }
-
-            var result = new LA(toGetScopeOfResult.Value);
-            return ParsingResult<IEntitySet>.Succeed(result);
+            return ParsingResult<IEntitySet>.Fail(toGetScopeOfResult.Error);
         }
+
+        var result = new LA(toGetScopeOfResult.Value);
+        return ParsingResult<IEntitySet>.Succeed(result);
     }
 }

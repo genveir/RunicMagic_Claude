@@ -1,9 +1,8 @@
 using RunicMagic.World.Execution;
 
-namespace RunicMagic.World.Runes.RuneTypes
+namespace RunicMagic.World.Runes.RuneTypes;
+
+public interface IEntitySet
 {
-    public interface IEntitySet
-    {
-        EntitySet Resolve(SpellContext context);
-    }
+    EntitySet Resolve(SpellContext context);
 }

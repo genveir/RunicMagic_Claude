@@ -1,82 +1,81 @@
 using RunicMagic.World.Execution;
 using RunicMagic.World.Runes.RuneTypes;
 
-namespace RunicMagic.Controller.RuneParsing
+namespace RunicMagic.Controller.RuneParsing;
+
+internal static class RuneParsingDispatcher
 {
-    internal static class RuneParsingDispatcher
+    internal static ParsingResult<IEntitySet> ParseNextTaxedEntitySet(TokenStream tokenStream)
     {
-        internal static ParsingResult<IEntitySet> ParseNextTaxedEntitySet(TokenStream tokenStream)
+        var result = ParseNextRune<IEntitySet>(tokenStream);
+        if (!result.Succeeded)
         {
-            var result = ParseNextRune<IEntitySet>(tokenStream);
-            if (!result.Succeeded)
-            {
-                return result;
-            }
-            var taxed = new EntitySetSelectionCostResolver(result.Value);
-            return ParsingResult<IEntitySet>.Succeed(taxed);
+            return result;
+        }
+        var taxed = new EntitySetSelectionCostResolver(result.Value);
+        return ParsingResult<IEntitySet>.Succeed(taxed);
+    }
+
+    internal static ParsingResult<IEntitySet> ParseNextTaxedEntitySet(TokenStream tokenStream, string[] defaultTokens)
+    {
+        var result = ParseNextRune<IEntitySet>(tokenStream, defaultTokens);
+        if (!result.Succeeded)
+        {
+            return result;
+        }
+        var taxed = new EntitySetSelectionCostResolver(result.Value);
+        return ParsingResult<IEntitySet>.Succeed(taxed);
+    }
+
+    internal static ParsingResult<TRuneType> ParseNextRune<TRuneType>(TokenStream tokenStream)
+    {
+        var next = tokenStream.Next();
+        if (next == null)
+        {
+            return ParsingResult<TRuneType>.Fail(new RanOutOfTokensEvent());
         }
 
-        internal static ParsingResult<IEntitySet> ParseNextTaxedEntitySet(TokenStream tokenStream, string[] defaultTokens)
+        return ParseCurrentRune<TRuneType>(tokenStream, next!);
+    }
+
+    internal static ParsingResult<TRuneType> ParseNextRune<TRuneType>(TokenStream tokenStream, string[] defaultTokens)
+    {
+        if (defaultTokens.Length == 0)
         {
-            var result = ParseNextRune<IEntitySet>(tokenStream, defaultTokens);
-            if (!result.Succeeded)
-            {
-                return result;
-            }
-            var taxed = new EntitySetSelectionCostResolver(result.Value);
-            return ParsingResult<IEntitySet>.Succeed(taxed);
+            throw new InvalidOperationException("Cannot provide an empty array of default tokens.");
         }
 
-        internal static ParsingResult<TRuneType> ParseNextRune<TRuneType>(TokenStream tokenStream)
+        var next = tokenStream.Next();
+        if (next == null)
         {
-            var next = tokenStream.Next();
-            if (next == null)
-            {
-                return ParsingResult<TRuneType>.Fail(new RanOutOfTokensEvent());
-            }
-
-            return ParseCurrentRune<TRuneType>(tokenStream, next!);
-        }
-
-        internal static ParsingResult<TRuneType> ParseNextRune<TRuneType>(TokenStream tokenStream, string[] defaultTokens)
-        {
-            if (defaultTokens.Length == 0)
-            {
-                throw new InvalidOperationException("Cannot provide an empty array of default tokens.");
-            }
-
-            var next = tokenStream.Next();
-            if (next == null)
-            {
-                tokenStream.InsertAtCursor(defaultTokens);
-                next = tokenStream.Next()!;
-                return ParseCurrentRune<TRuneType>(tokenStream, next);
-            }
-
-            var runeTypeParser = ParserLookup.FindRuneParserByName<TRuneType>(next);
-            if (runeTypeParser == null)
-            {
-                tokenStream.Backtrack();
-                tokenStream.InsertAtCursor(defaultTokens);
-                next = tokenStream.Next()!;
-                return ParseCurrentRune<TRuneType>(tokenStream, next);
-            }
-
+            tokenStream.InsertAtCursor(defaultTokens);
+            next = tokenStream.Next()!;
             return ParseCurrentRune<TRuneType>(tokenStream, next);
         }
 
-        private static ParsingResult<TRuneType> ParseCurrentRune<TRuneType>(TokenStream tokenStream, string current)
+        var runeTypeParser = ParserLookup.FindRuneParserByName<TRuneType>(next);
+        if (runeTypeParser == null)
         {
-            var runeTypeParser = ParserLookup.FindRuneParserByName<TRuneType>(current);
-            if (runeTypeParser == null)
-            {
-                return ParsingResult<TRuneType>.Fail(new UnexpectedTokenEvent(current, typeof(TRuneType).Name));
-            }
-
-            var parseResult = runeTypeParser.Parse(tokenStream);
-            return parseResult.Succeeded
-                ? ParsingResult<TRuneType>.Succeed(parseResult.Value)
-                : ParsingResult<TRuneType>.Fail(parseResult.Error);
+            tokenStream.Backtrack();
+            tokenStream.InsertAtCursor(defaultTokens);
+            next = tokenStream.Next()!;
+            return ParseCurrentRune<TRuneType>(tokenStream, next);
         }
+
+        return ParseCurrentRune<TRuneType>(tokenStream, next);
+    }
+
+    private static ParsingResult<TRuneType> ParseCurrentRune<TRuneType>(TokenStream tokenStream, string current)
+    {
+        var runeTypeParser = ParserLookup.FindRuneParserByName<TRuneType>(current);
+        if (runeTypeParser == null)
+        {
+            return ParsingResult<TRuneType>.Fail(new UnexpectedTokenEvent(current, typeof(TRuneType).Name));
+        }
+
+        var parseResult = runeTypeParser.Parse(tokenStream);
+        return parseResult.Succeeded
+            ? ParsingResult<TRuneType>.Succeed(parseResult.Value)
+            : ParsingResult<TRuneType>.Fail(parseResult.Error);
     }
 }

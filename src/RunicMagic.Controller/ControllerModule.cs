@@ -3,23 +3,22 @@ using RunicMagic.Controller.Abstractions;
 using RunicMagic.Controller.EntityConstruction;
 using RunicMagic.Controller.Services;
 
-namespace RunicMagic.Controller
+namespace RunicMagic.Controller;
+
+public static class ControllerModule
 {
-    public static class ControllerModule
+    public static IServiceCollection RegisterControllerModule(this IServiceCollection services)
     {
-        public static IServiceCollection RegisterControllerModule(this IServiceCollection services)
-        {
-            services.AddSingleton<PlayerService>();
-            services.AddSingleton<IPlayerViewInterface>(svc => svc.GetRequiredService<PlayerService>());
-            services.AddSingleton<IPlayerOutputSink>(svc => svc.GetRequiredService<PlayerService>());
+        services.AddSingleton<PlayerService>();
+        services.AddSingleton<IPlayerViewInterface>(svc => svc.GetRequiredService<PlayerService>());
+        services.AddSingleton<IPlayerOutputSink>(svc => svc.GetRequiredService<PlayerService>());
 
-            services.AddSingleton<SpellCastingService>();
+        services.AddSingleton<SpellCastingService>();
 
-            services.AddSingleton<EntityFactory>();
-            services.AddSingleton<WorldLoadingService>();
-            services.AddSingleton<WorldRenderingService>();
+        services.AddSingleton<EntityFactory>();
+        services.AddSingleton<WorldLoadingService>();
+        services.AddSingleton<WorldRenderingService>();
 
-            return services;
-        }
+        return services;
     }
 }

@@ -1,9 +1,8 @@
 using RunicMagic.World.Execution;
 
-namespace RunicMagic.World.Runes.RuneTypes
+namespace RunicMagic.World.Runes.RuneTypes;
+
+public interface IExecutableStatement
 {
-    public interface IExecutableStatement
-    {
-        void Execute(SpellContext context);
-    }
+    void Execute(SpellContext context);
 }

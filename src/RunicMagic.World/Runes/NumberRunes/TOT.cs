@@ -1,22 +1,21 @@
 using RunicMagic.World.Execution;
 using RunicMagic.World.Runes.RuneTypes;
 
-namespace RunicMagic.World.Runes.NumberRunes
+namespace RunicMagic.World.Runes.NumberRunes;
+
+// FOURTEEN CUBED (2 744)
+public class TOT : INumber
 {
-    // FOURTEEN CUBED (2 744)
-    public class TOT : INumber
+    public TOT() { }
+
+    public Number Evaluate(SpellContext context)
     {
-        public TOT() { }
+        var result = new Number(2744);
+        return result;
+    }
 
-        public Number Evaluate(SpellContext context)
-        {
-            var result = new Number(2744);
-            return result;
-        }
-
-        public override string ToString()
-        {
-            return "TOT";
-        }
+    public override string ToString()
+    {
+        return "TOT";
     }
 }

@@ -1,22 +1,21 @@
 using RunicMagic.World.Execution;
 using RunicMagic.World.Runes.RuneTypes;
 
-namespace RunicMagic.World.Runes.NumberRunes
+namespace RunicMagic.World.Runes.NumberRunes;
+
+// FOURTEEN
+public class HOT : INumber
 {
-    // FOURTEEN
-    public class HOT : INumber
+    public HOT() { }
+
+    public Number Evaluate(SpellContext context)
     {
-        public HOT() { }
+        var result = new Number(14);
+        return result;
+    }
 
-        public Number Evaluate(SpellContext context)
-        {
-            var result = new Number(14);
-            return result;
-        }
-
-        public override string ToString()
-        {
-            return "HOT";
-        }
+    public override string ToString()
+    {
+        return "HOT";
     }
 }

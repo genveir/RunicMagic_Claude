@@ -1,35 +1,34 @@
 using RunicMagic.World.Execution;
 using RunicMagic.World.Runes.RuneTypes;
 
-namespace RunicMagic.World.Runes.InvocationRunes
+namespace RunicMagic.World.Runes.InvocationRunes;
+
+// INVOKE
+public class GWYAH : IStatement
 {
-    // INVOKE
-    public class GWYAH : IStatement
+    public IEntitySet Target { get; }
+
+    public GWYAH(IEntitySet target)
     {
-        public IEntitySet Target { get; }
+        Target = target;
+    }
 
-        public GWYAH(IEntitySet target)
+    public void Execute(SpellContext context)
+    {
+        var targets = Target.Resolve(context);
+        foreach (var entity in targets.Entities)
         {
-            Target = target;
-        }
-
-        public void Execute(SpellContext context)
-        {
-            var targets = Target.Resolve(context);
-            foreach (var entity in targets.Entities)
+            foreach (var inscription in entity.ParsedInscriptions)
             {
-                foreach (var inscription in entity.ParsedInscriptions)
-                {
-                    var forked = context.ForkWithNewExecutor(new EntitySet([entity]));
-                    inscription.Execute(forked);
-                }
+                var forked = context.ForkWithNewExecutor(new EntitySet([entity]));
+                inscription.Execute(forked);
             }
         }
+    }
 
-        public override string ToString()
-        {
-            var result = $"GWYAH ( {Target} )";
-            return result;
-        }
+    public override string ToString()
+    {
+        var result = $"GWYAH ( {Target} )";
+        return result;
     }
 }

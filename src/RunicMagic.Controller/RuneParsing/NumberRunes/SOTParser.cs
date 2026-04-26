@@ -1,13 +1,12 @@
 using RunicMagic.World.Runes.NumberRunes;
 using RunicMagic.World.Runes.RuneTypes;
 
-namespace RunicMagic.Controller.RuneParsing.NumberRunes
+namespace RunicMagic.Controller.RuneParsing.NumberRunes;
+
+internal class SOTParser : IRuneParser<INumber>
 {
-    internal class SOTParser : IRuneParser<INumber>
+    public ParsingResult<INumber> Parse(TokenStream tokenStream)
     {
-        public ParsingResult<INumber> Parse(TokenStream tokenStream)
-        {
-            return ParsingResult<INumber>.Succeed(new SOT());
-        }
+        return ParsingResult<INumber>.Succeed(new SOT());
     }
 }

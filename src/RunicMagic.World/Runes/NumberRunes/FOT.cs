@@ -1,22 +1,21 @@
 using RunicMagic.World.Execution;
 using RunicMagic.World.Runes.RuneTypes;
 
-namespace RunicMagic.World.Runes.NumberRunes
+namespace RunicMagic.World.Runes.NumberRunes;
+
+// FOURTEEN TO THE FIFTH (537 824)
+public class FOT : INumber
 {
-    // FOURTEEN TO THE FIFTH (537 824)
-    public class FOT : INumber
+    public FOT() { }
+
+    public Number Evaluate(SpellContext context)
     {
-        public FOT() { }
+        var result = new Number(537824);
+        return result;
+    }
 
-        public Number Evaluate(SpellContext context)
-        {
-            var result = new Number(537824);
-            return result;
-        }
-
-        public override string ToString()
-        {
-            return "FOT";
-        }
+    public override string ToString()
+    {
+        return "FOT";
     }
 }

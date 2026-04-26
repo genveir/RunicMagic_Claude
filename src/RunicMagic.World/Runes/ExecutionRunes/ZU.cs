@@ -1,27 +1,26 @@
 using RunicMagic.World.Execution;
 using RunicMagic.World.Runes.RuneTypes;
 
-namespace RunicMagic.World.Runes.ExecutionRunes
+namespace RunicMagic.World.Runes.ExecutionRunes;
+
+// EXECUTE
+public class ZU : IExecutableStatement
 {
-    // EXECUTE
-    public class ZU : IExecutableStatement
+    public IStatement Statement { get; }
+
+    public ZU(IStatement statement)
     {
-        public IStatement Statement { get; }
+        Statement = statement;
+    }
 
-        public ZU(IStatement statement)
-        {
-            Statement = statement;
-        }
+    public void Execute(SpellContext context)
+    {
+        Statement.Execute(context);
+    }
 
-        public void Execute(SpellContext context)
-        {
-            Statement.Execute(context);
-        }
-
-        public override string ToString()
-        {
-            var result = $"ZU ( {Statement} )";
-            return result;
-        }
+    public override string ToString()
+    {
+        var result = $"ZU ( {Statement} )";
+        return result;
     }
 }

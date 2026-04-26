@@ -1,22 +1,21 @@
 using RunicMagic.World.Execution;
 using RunicMagic.World.Runes.RuneTypes;
 
-namespace RunicMagic.World.Runes.NumberRunes
+namespace RunicMagic.World.Runes.NumberRunes;
+
+// ZERO
+public class JON : INumber
 {
-    // ZERO
-    public class JON : INumber
+    public JON() { }
+
+    public Number Evaluate(SpellContext context)
     {
-        public JON() { }
+        var result = new Number(0);
+        return result;
+    }
 
-        public Number Evaluate(SpellContext context)
-        {
-            var result = new Number(0);
-            return result;
-        }
-
-        public override string ToString()
-        {
-            return "JON";
-        }
+    public override string ToString()
+    {
+        return "JON";
     }
 }

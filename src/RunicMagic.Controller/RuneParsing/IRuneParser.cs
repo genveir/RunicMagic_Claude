@@ -1,7 +1,6 @@
-﻿namespace RunicMagic.Controller.RuneParsing
+﻿namespace RunicMagic.Controller.RuneParsing;
+
+internal interface IRuneParser<T>
 {
-    internal interface IRuneParser<T>
-    {
-        ParsingResult<T> Parse(TokenStream tokenStream);
-    }
+    ParsingResult<T> Parse(TokenStream tokenStream);
 }
