@@ -2,11 +2,20 @@
 
 ## To Do — Milestone 2
 
-Next ticket number: RMC-75
+Next ticket number: RMC-84
 Next bugfix number: BUG-4
 
 | Key | Title | Description | Blocked By |
 |-----|-------|-------------|------------|
+| RMC-76 | Game clock | Add a 60 FPS game loop as a hosted service in Controller. Non-catching: if a tick runs long, the next starts immediately without trying to catch up. Each tick calls world AI and pushes SSE. | |
+| RMC-81 | Queue spells for tick processing | Spell casts are enqueued rather than executed immediately. The game loop drains the queue at the start of each tick, before AI runs. | RMC-76 |
+| RMC-82 | Motion effects queue | Movement effects (VUN, VAR, CJIR, CJAR) produce incremental motion effects on entities rather than resolving atomically. The game loop drains these each tick, advancing entities toward their destinations. | RMC-81 |
+| RMC-77 | World AI system | Add an `AiCapability` to the entity model. World exposes `TickAi(deltaSeconds)` which iterates all entities with AI and calls their tick. | |
+| RMC-80 | PatrolAi behavior | First concrete AI behavior: `PatrolAiCapability` — walks an entity back and forth along a list of waypoints at a configurable speed. Needs DB schema for waypoints and speed. | RMC-77 |
+| RMC-78 | SSE world push | Add an SSE endpoint in View. On each game tick, the Controller pushes the current world rendering to all connected clients. The client subscribes on load and re-renders the SVG on each event. | RMC-76 |
+| RMC-83 | Movement service | Introduce a movement service that sits between any "I want to move" request (AI, future systems) and the actual position update. The service is the single place that knows about ongoing motion effects and gates or modifies autonomous movement accordingly. For now: an entity under an active motion effect cannot produce its own movement. | RMC-82 RMC-77 |
+| RMC-79 | Guard NPC scenario | Add a guard entity to the test world with a patrol path along a visible corridor. The guard should be visually distinct. | RMC-80 RMC-78 RMC-83 |
+| RMC-75 | 🏁 Milestone 3 — Have a guard walk by and get pushed | Implement a simple guard NPC that walks back and forth along a predefined path and push him away with a DAN-targeted spell. This will require the engine to have a concept of time. | RMC-79 RMC-82 |
 
 ## To Do — Other
 
@@ -17,9 +26,9 @@ Next bugfix number: BUG-4
 | RMC-38 | Register entity destruction | It should be possible to destroy entities. When this happens, the game should register that the entity is destroyed | |
 | RMC-39 | Stop spell execution on caster or executor death or destruction | When the caster or executor of a spell cease to be in an active state the spell should stop executing | RMC-37 RMC-38 |
 | RMC-14 | Design channeling and persistent effects | Written runes stay active while power is channeled. Define what "channeling" means mechanically — what keeps a spell alive, how it is terminated, and how the executor tracks ongoing effects. | |
-| RMC-7 | Identify missing runes | There are no runes that manipulate entity sets, or effects other than pushing. Audit the full rune set for gaps needed to write meaningful spells. | |
 | RMC-48 | Formalize movement with collision | VUN currently teleports entities to their destination. Replace this with movement through space: the entity travels along the push vector and stops when it hits an entity (a wall, door, etc.) rather than passing through it. | |
 | RMC-74 | Cone selection rune | A spatial selector that selects all entities within a cone projected from an origin entity in its pointing direction. Parametrised by angle (half-width) and range. | |
+| BUG-4 | Up/Down arrow in terminal doesn't reprint prompt | When using the up or down arrow to redo earlier commands in the terminal, it cuts into the prompt | |
 
 ## In Progress
 | Key | Title | Description | Remarks |
@@ -34,37 +43,3 @@ Next bugfix number: BUG-4
 
 | Key | Title |
 |-----|-------|
-| RMC-54 | Clarify entity property model — capabilities, state, and transient data |
-| RMC-49 | Add pointing direction to entity model |
-| RMC-55 | Add GER rune for weighted centering |
-| RMC-56 | PlayerService knows which entity is the caster |
-| RMC-50 | UI knows which entity is the caster |
-| RMC-46 | Move caster position in-game |
-| RMC-51 | UI point-to-aim interaction |
-| RMC-53 | Add translucency capability to entity model and database |
-| RMC-52 | DAN(pointing at) rune |
-| RMC-47 | 🚩 Mini-milestone — point at an entity and push it |
-| RMC-42 | KAL rune and touching mechanic |
-| RMC-66 | CJIR(rotate clockwise) and CJAR(rotate counterclockwise) runes | 
-| BUG-3 | Terminal scrolling does not take resizable height into account |
-| RMC-57 | SHU rune — explicit power source |
-| RMC-43 | Seed the milestone world |
-| RMC-15 | Design power sourcing implementation |
-| RMC-16 | Design inscribed spells on objects |
-| RMC-58 | Add inscription to the rock |
-| RMC-59 | Expansion selectors cost power scaled by selected entities' max power |
-| RMC-40 | GWYAH rune — invoke inscriptions on a Set |
-| RMC-61 | HORO rune — spatial selector for nearby entities |
-| RMC-62 | Work on the number system |
-| RMC-70 | Tax peak selection breadth during set resolution |
-| RMC-63 | ZYIL rune — weight range filter and weight singletons |
-| RMC-64 | FUIL rune — power range filter and power singletons |
-| RMC-69 | Proximity selectors — closest, farthest, distance range |
-| RMC-68 | Is-alive filter rune |
-| RMC-71 | PA rune — intersection of scopes |
-| RMC-67 | Set operation runes — union, intersection, difference |
-| RMC-72 | CRIYR(read inscription) rune |
-| RMC-73 | StructuralIntegrity — damage model for all entities |
-| RMC-65 | TIORJ rune — fill |
-| RMC-44 | Design the inscription spell |
-| RMC-45 | 🏁 Milestone 2 — trigger an inscription through a window |
