@@ -123,29 +123,49 @@ async function submitInput() {
     if (cmd.length) history.push(cmd);
 
     term.write('\r\n');
-
-    const result = await sendCommand(cmd);
-
-    for (const line of result.text) {
-        if (line) term.writeln(line);
-    }
-
-    updateCanvas(result.entities);
-    writePrompt(result.prompt);
-    term.scrollToBottom();
+    await sendCommand(cmd);
 }
 
 
 // ── API ───────────────────────────────────────────────────────────────────────
 
 async function sendCommand(cmd) {
-    const response = await fetch('/command', {
+    await fetch('/command', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify(cmd),
     });
-    return response.json();
 }
+
+
+// ── SSE ───────────────────────────────────────────────────────────────────────
+
+let latestEntities = null;
+
+const eventSource = new EventSource('/events');
+eventSource.onmessage = (e) => {
+    const result = JSON.parse(e.data);
+    for (const line of (result.text ?? [])) {
+        if (line) term.writeln(line);
+    }
+    if (result.prompt) {
+        writePrompt(result.prompt);
+    }
+    if (result.text?.length || result.prompt) {
+        term.scrollToBottom();
+    }
+    if (result.entities?.length) {
+        latestEntities = result.entities;
+    }
+};
+
+(function renderLoop() {
+    if (latestEntities) {
+        updateCanvas(latestEntities);
+        latestEntities = null;
+    }
+    requestAnimationFrame(renderLoop);
+})();
 
 
 // ── Canvas ────────────────────────────────────────────────────────────────────
@@ -324,24 +344,15 @@ svg.addEventListener('click', async e => {
     const mode = currentMode;
     setMode(null);
 
-    const result = await sendModeClick(mode, svgPt.x, -svgPt.y);
-
-    term.write('\r\n');
-    for (const line of result.text) {
-        if (line) term.writeln(line);
-    }
-    updateCanvas(result.entities);
-    writePrompt(result.prompt);
-    term.scrollToBottom();
+    await sendModeClick(mode, svgPt.x, -svgPt.y);
 });
 
 async function sendModeClick(mode, x, y) {
-    const response = await fetch(`/${mode}`, {
+    await fetch(`/${mode}`, {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({ x, y }),
     });
-    return response.json();
 }
 
 
@@ -376,14 +387,3 @@ document.addEventListener('mouseup', () => {
     document.body.style.cursor     = '';
     document.body.style.userSelect = '';
 });
-
-
-// ── Init ──────────────────────────────────────────────────────────────────────
-
-async function init() {
-    const entities = await fetch('/world').then(r => r.json());
-    updateCanvas(entities);
-    writePrompt('[no caster] >');
-}
-
-init();

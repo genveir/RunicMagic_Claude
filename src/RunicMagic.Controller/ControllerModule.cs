@@ -19,6 +19,8 @@ public static class ControllerModule
         services.AddSingleton<WorldLoadingService>();
         services.AddSingleton<WorldRenderingService>();
 
+        services.AddHostedService<GameLoopService>();
+
         return services;
     }
 }

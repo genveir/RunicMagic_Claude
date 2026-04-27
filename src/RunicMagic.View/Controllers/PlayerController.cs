@@ -5,53 +5,38 @@ using RunicMagic.Controller.Models;
 namespace RunicMagic.View.Controllers;
 
 [ApiController]
-public class PlayerController : ControllerBase
+public class PlayerController(IPlayerViewInterface player) : ControllerBase
 {
-    private readonly IPlayerViewInterface playerViewInterface;
-
-    public PlayerController(IPlayerViewInterface playerViewInterface)
-    {
-        this.playerViewInterface = playerViewInterface;
-    }
-
     [HttpPost("pick-caster")]
-    public async Task<CommandResult> PickCaster([FromBody] CanvasClickRequest request)
+    public async Task<IActionResult> PickCaster([FromBody] CanvasClickRequest request)
     {
-        var worldCoordinate = new WorldCoordinate(request.X, request.Y);
+        await player.SetCaster(new WorldCoordinate(request.X, request.Y));
 
-        var commandResult = await playerViewInterface.SetCaster(worldCoordinate);
-
-        return commandResult;
+        return NoContent();
     }
 
     [HttpPost("move-caster")]
-    public async Task<CommandResult> MoveCaster([FromBody] CanvasClickRequest request)
+    public async Task<IActionResult> MoveCaster([FromBody] CanvasClickRequest request)
     {
-        var worldCoordinate = new WorldCoordinate(request.X, request.Y);
+        await player.MoveCaster(new WorldCoordinate(request.X, request.Y));
 
-        var commandResult = await playerViewInterface.MoveCaster(worldCoordinate);
-
-        return commandResult;
+        return NoContent();
     }
 
     [HttpPost("point-at")]
-    public async Task<CommandResult> PointAt([FromBody] CanvasClickRequest request)
+    public async Task<IActionResult> PointAt([FromBody] CanvasClickRequest request)
     {
-        var worldCoordinate = new WorldCoordinate(request.X, request.Y);
+        await player.SetPointingDirection(new WorldCoordinate(request.X, request.Y));
 
-        var commandResult = await playerViewInterface.SetPointingDirection(worldCoordinate);
-
-        return commandResult;
+        return NoContent();
     }
 
     [HttpPost("indicate")]
-    public async Task<CommandResult> Indicate([FromBody] CanvasClickRequest request)
+    public async Task<IActionResult> Indicate([FromBody] CanvasClickRequest request)
     {
-        var worldCoordinate = new WorldCoordinate(request.X, request.Y);
+        await player.SetIndicateTarget(new WorldCoordinate(request.X, request.Y));
 
-        var commandResult = await playerViewInterface.SetIndicateTarget(worldCoordinate);
-
-        return commandResult;
+        return NoContent();
     }
 }
 

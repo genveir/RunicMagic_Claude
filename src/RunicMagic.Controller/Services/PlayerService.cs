@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using RunicMagic.Controller.Abstractions;
 using RunicMagic.Controller.Models;
 using RunicMagic.World;
@@ -16,7 +17,7 @@ internal class PlayerService(
     private EntityId? casterId = null;
 
     private readonly List<string> _pendingText = [];
-    private readonly List<EntityRenderingModel> _pendingEntities = [];
+    private readonly ConcurrentQueue<Action> _queue = new();
 
     public string Prompt
     {
@@ -38,106 +39,112 @@ internal class PlayerService(
         }
     }
 
-    public Task<CommandResult> RegisterInput(string input)
+    public Task RegisterInput(string input)
     {
-        var responseLines = spellCasting.Cast(input, casterId);
-        foreach (var line in responseLines)
+        _queue.Enqueue(() =>
         {
-            SendText(line);
-        }
-
-        return Task.FromResult(FlushPendingOutputs());
+            var responseLines = spellCasting.Cast(input, casterId);
+            foreach (var line in responseLines)
+                SendText(line);
+        });
+        return Task.CompletedTask;
     }
 
-    public Task<CommandResult> SetCaster(WorldCoordinate worldCoordinate)
+    public Task SetCaster(WorldCoordinate worldCoordinate)
     {
-        var entities = world.GetEntitiesAtPoint(worldCoordinate.ToLocation())
-            .Where(e => e.HasAgency)
-            .ToList();
+        _queue.Enqueue(() =>
+        {
+            var entities = world.GetEntitiesAtPoint(worldCoordinate.ToLocation())
+                .Where(e => e.HasAgency)
+                .ToList();
 
-        if (entities.Count == 0)
-        {
-            SendText($"No entities with agency found at ({worldCoordinate.X}, {worldCoordinate.Y}).");
-        }
-        else if (entities.Count > 1)
-        {
-            SendText($"Multiple entities with agency found at ({worldCoordinate.X}, {worldCoordinate.Y}). Unable to resolve a caster.");
-        }
-        else
-        {
-            var casterEntity = entities[0];
-            casterId = casterEntity.Id;
-            SendText($"Caster set to entity {casterEntity.Label} at ({worldCoordinate.X}, {worldCoordinate.Y}).");
-        }
-
-        return Task.FromResult(FlushPendingOutputs());
+            if (entities.Count == 0)
+            {
+                SendText($"No entities with agency found at ({worldCoordinate.X}, {worldCoordinate.Y}).");
+            }
+            else if (entities.Count > 1)
+            {
+                SendText($"Multiple entities with agency found at ({worldCoordinate.X}, {worldCoordinate.Y}). Unable to resolve a caster.");
+            }
+            else
+            {
+                var casterEntity = entities[0];
+                casterId = casterEntity.Id;
+                SendText($"Caster set to entity {casterEntity.Label} at ({worldCoordinate.X}, {worldCoordinate.Y}).");
+            }
+        });
+        return Task.CompletedTask;
     }
 
-    public Task<CommandResult> MoveCaster(WorldCoordinate worldCoordinate)
+    public Task MoveCaster(WorldCoordinate worldCoordinate)
     {
-        var (caster, error) = CheckForCaster(checkForDeath: true);
-        if (error != null) return Task.FromResult(error);
-        if (caster == null) throw new InvalidOperationException("Unexpected null caster after check.");
+        _queue.Enqueue(() =>
+        {
+            var caster = CheckForCaster(checkForDeath: true);
+            if (caster == null) return;
 
-        teleport.Teleport(caster, new Location(worldCoordinate.X, worldCoordinate.Y));
-        SendText($"Caster moved to ({worldCoordinate.X}, {worldCoordinate.Y}).");
-
-        return Task.FromResult(FlushPendingOutputs());
+            teleport.Teleport(caster, new Location(worldCoordinate.X, worldCoordinate.Y));
+            SendText($"Caster moved to ({worldCoordinate.X}, {worldCoordinate.Y}).");
+        });
+        return Task.CompletedTask;
     }
 
-    public Task<CommandResult> SetPointingDirection(WorldCoordinate worldCoordinate)
+    public Task SetPointingDirection(WorldCoordinate worldCoordinate)
     {
-        var (caster, error) = CheckForCaster(checkForDeath: true);
-        if (error != null) return Task.FromResult(error);
-        if (caster == null) throw new InvalidOperationException("Unexpected null caster after check.");
+        _queue.Enqueue(() =>
+        {
+            var caster = CheckForCaster(checkForDeath: true);
+            if (caster == null) return;
 
-        var to = new Location(worldCoordinate.X, worldCoordinate.Y);
-        caster.PointingDirection = Direction.FromPoints(caster.Location, to);
-        SendText("Pointing direction set.");
-
-        return Task.FromResult(FlushPendingOutputs());
+            var to = new Location(worldCoordinate.X, worldCoordinate.Y);
+            caster.PointingDirection = Direction.FromPoints(caster.Location, to);
+            SendText("Pointing direction set.");
+        });
+        return Task.CompletedTask;
     }
 
-    public Task<CommandResult> SetIndicateTarget(WorldCoordinate worldCoordinate)
+    public Task SetIndicateTarget(WorldCoordinate worldCoordinate)
     {
-        var (caster, error) = CheckForCaster(checkForDeath: true);
-        if (error != null) return Task.FromResult(error);
-        if (caster == null) throw new InvalidOperationException("Unexpected null caster after check.");
-
-        var entities = world.GetEntitiesAtPoint(worldCoordinate.ToLocation());
-        if (entities.Count == 0)
+        _queue.Enqueue(() =>
         {
-            SendText("Nothing to indicate at that position.");
-            return Task.FromResult(FlushPendingOutputs());
-        }
+            var caster = CheckForCaster(checkForDeath: true);
+            if (caster == null) return;
 
-        if (entities.Any(e => e.Id == caster.Id))
-        {
-            caster.IndicateTarget = new IndicateTarget(caster.Id, Direction: null);
-            SendText("Indicating self.");
-            return Task.FromResult(FlushPendingOutputs());
-        }
+            var entities = world.GetEntitiesAtPoint(worldCoordinate.ToLocation());
+            if (entities.Count == 0)
+            {
+                SendText("Nothing to indicate at that position.");
+                return;
+            }
 
-        var to = worldCoordinate.ToLocation();
-        var direction = Direction.FromPoints(caster.Location, to);
-        var castResult = rayCast.Cast(caster.Id, caster.Location, direction, skipTranslucent: false);
+            if (entities.Any(e => e.Id == caster.Id))
+            {
+                caster.IndicateTarget = new IndicateTarget(caster.Id, Direction: null);
+                SendText("Indicating self.");
+                return;
+            }
 
-        if (castResult.HitEntity == null || entities.All(e => e.Id != castResult.HitEntity.Id))
-        {
-            SendText("Cannot reach that — something is in the way.");
-            return Task.FromResult(FlushPendingOutputs());
-        }
+            var to = worldCoordinate.ToLocation();
+            var direction = Direction.FromPoints(caster.Location, to);
+            var castResult = rayCast.Cast(caster.Id, caster.Location, direction, skipTranslucent: false);
 
-        var distance = castResult.LocationOfIntersect.GetDistanceTo(caster.Location);
-        if (distance > 1000)
-        {
-            SendText($"{castResult.HitEntity.Label} is out of reach.");
-            return Task.FromResult(FlushPendingOutputs());
-        }
+            if (castResult.HitEntity == null || entities.All(e => e.Id != castResult.HitEntity.Id))
+            {
+                SendText("Cannot reach that — something is in the way.");
+                return;
+            }
 
-        caster.IndicateTarget = new IndicateTarget(castResult.HitEntity.Id, direction);
-        SendText($"Indicating {castResult.HitEntity.Label}.");
-        return Task.FromResult(FlushPendingOutputs());
+            var distance = castResult.LocationOfIntersect.GetDistanceTo(caster.Location);
+            if (distance > 1000)
+            {
+                SendText($"{castResult.HitEntity.Label} is out of reach.");
+                return;
+            }
+
+            caster.IndicateTarget = new IndicateTarget(castResult.HitEntity.Id, direction);
+            SendText($"Indicating {castResult.HitEntity.Label}.");
+        });
+        return Task.CompletedTask;
     }
 
     public void SendText(string text)
@@ -145,49 +152,41 @@ internal class PlayerService(
         _pendingText.Add(text);
     }
 
-    public void SendWorldEntities()
+    public CommandResult? DrainAndFlush()
     {
-        _pendingEntities.AddRange(worldRendering.GetAllRenderingModels(casterId));
+        if (_queue.IsEmpty)
+            return null;
+
+        while (_queue.TryDequeue(out var action))
+            action();
+
+        var entities = worldRendering.GetAllRenderingModels(casterId);
+        var result = new CommandResult([.. _pendingText], entities, Prompt);
+        _pendingText.Clear();
+        return result;
     }
 
-    private (Entity? caster, CommandResult? error) CheckForCaster(bool checkForDeath)
+    private Entity? CheckForCaster(bool checkForDeath)
     {
-        (Entity?, CommandResult?) result = (null, null);
-
         if (casterId == null)
         {
             SendText("No caster selected.");
-            result = (null, FlushPendingOutputs());
+            return null;
         }
-        else
+
+        var caster = world.Find(casterId.Value);
+        if (caster == null)
         {
-            var caster = world.Find(casterId.Value);
-            if (caster == null)
-            {
-                SendText("Caster not found in world.");
-                result = (null, FlushPendingOutputs());
-            }
-            else if (checkForDeath && caster.Life == null)
-            {
-                SendText("[dead caster] >");
-                result = (null, FlushPendingOutputs());
-            }
-            else
-            {
-                result = (caster, null);
-            }
+            SendText("Caster not found in world.");
+            return null;
         }
 
-        return result;
-    }
+        if (checkForDeath && caster.Life == null)
+        {
+            SendText("[dead caster] >");
+            return null;
+        }
 
-    private CommandResult FlushPendingOutputs()
-    {
-        SendWorldEntities();
-
-        var result = new CommandResult([.. _pendingText], [.. _pendingEntities], Prompt);
-        _pendingText.Clear();
-        _pendingEntities.Clear();
-        return result;
+        return caster;
     }
 }

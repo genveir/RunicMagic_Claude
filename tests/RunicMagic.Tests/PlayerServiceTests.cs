@@ -36,7 +36,8 @@ public class PlayerServiceTests
     {
         var (service, _) = MakeService();
 
-        var result = await service.SetCaster(new WorldCoordinate(1000, 1000));
+        await service.SetCaster(new WorldCoordinate(1000, 1000));
+        var result = service.DrainAndFlush()!;
 
         result.Text.Should().ContainSingle().Which.Should().Contain("No entities with agency");
     }
@@ -48,7 +49,8 @@ public class PlayerServiceTests
         var entity = MakeAgencyEntity(x: 0, y: 0, label: "hero");
         world.Add(entity);
 
-        var result = await service.SetCaster(new WorldCoordinate(0, 0));
+        await service.SetCaster(new WorldCoordinate(0, 0));
+        var result = service.DrainAndFlush()!;
 
         result.Text.Should().ContainSingle().Which.Should().Contain("hero");
     }
@@ -60,7 +62,8 @@ public class PlayerServiceTests
         var entity = MakeAgencyEntity(x: 0, y: 0, label: "hero");
         world.Add(entity);
 
-        var result = await service.SetCaster(new WorldCoordinate(0, 0));
+        await service.SetCaster(new WorldCoordinate(0, 0));
+        var result = service.DrainAndFlush()!;
 
         result.Entities.Should().Contain(m => m.Label == "hero" && m.IsCaster);
     }
@@ -72,7 +75,8 @@ public class PlayerServiceTests
         world.Add(MakeAgencyEntity(x: 0, y: 0, label: "hero"));
         world.Add(MakeAgencyEntity(x: 0, y: 0, label: "villain"));
 
-        var result = await service.SetCaster(new WorldCoordinate(0, 0));
+        await service.SetCaster(new WorldCoordinate(0, 0));
+        var result = service.DrainAndFlush()!;
 
         result.Text.Should().ContainSingle().Which.Should().Contain("Multiple entities");
     }
@@ -82,7 +86,8 @@ public class PlayerServiceTests
     {
         var (service, _) = MakeService();
 
-        var result = await service.MoveCaster(new WorldCoordinate(100, 100));
+        await service.MoveCaster(new WorldCoordinate(100, 100));
+        var result = service.DrainAndFlush()!;
 
         result.Text.Should().ContainSingle().Which.Should().Contain("No caster selected");
     }
@@ -94,8 +99,8 @@ public class PlayerServiceTests
         var entity = MakeAgencyEntity(x: 0, y: 0);
         world.Add(entity);
         await service.SetCaster(new WorldCoordinate(0, 0));
-
         await service.MoveCaster(new WorldCoordinate(500, 300));
+        service.DrainAndFlush();
 
         entity.Location.X.Should().Be(500);
         entity.Location.Y.Should().Be(300);
@@ -108,8 +113,10 @@ public class PlayerServiceTests
         var entity = MakeAgencyEntity(x: 0, y: 0);
         world.Add(entity);
         await service.SetCaster(new WorldCoordinate(0, 0));
+        service.DrainAndFlush();
 
-        var result = await service.MoveCaster(new WorldCoordinate(500, 300));
+        await service.MoveCaster(new WorldCoordinate(500, 300));
+        var result = service.DrainAndFlush()!;
 
         result.Text.Should().ContainSingle().Which.Should().Contain("moved");
     }
@@ -119,7 +126,8 @@ public class PlayerServiceTests
     {
         var (service, _) = MakeService();
 
-        var result = await service.RegisterInput("ZU VUN LA IR HOT IR HOT HOT");
+        await service.RegisterInput("ZU VUN LA IR HOT IR HOT HOT");
+        var result = service.DrainAndFlush()!;
 
         result.Text.Should().Contain(l => l.Contains("No caster selected"));
     }
@@ -129,7 +137,8 @@ public class PlayerServiceTests
     {
         var (service, _) = MakeService();
 
-        var result = await service.SetPointingDirection(new WorldCoordinate(500, 0));
+        await service.SetPointingDirection(new WorldCoordinate(500, 0));
+        var result = service.DrainAndFlush()!;
 
         result.Text.Should().ContainSingle().Which.Should().Contain("No caster selected");
     }
@@ -141,8 +150,8 @@ public class PlayerServiceTests
         var entity = MakeAgencyEntity(x: 0, y: 0);
         world.Add(entity);
         await service.SetCaster(new WorldCoordinate(0, 0));
-
         await service.SetPointingDirection(new WorldCoordinate(1000, 0));
+        service.DrainAndFlush();
 
         entity.PointingDirection.Should().NotBeNull();
         entity.PointingDirection!.Value.X.Should().BeApproximately(1.0, precision: 0.001);
@@ -156,8 +165,10 @@ public class PlayerServiceTests
         var entity = MakeAgencyEntity(x: 0, y: 0);
         world.Add(entity);
         await service.SetCaster(new WorldCoordinate(0, 0));
+        service.DrainAndFlush();
 
-        var result = await service.SetPointingDirection(new WorldCoordinate(1000, 0));
+        await service.SetPointingDirection(new WorldCoordinate(1000, 0));
+        var result = service.DrainAndFlush()!;
 
         result.Text.Should().ContainSingle().Which.Should().Contain("Pointing direction set");
     }
@@ -167,7 +178,8 @@ public class PlayerServiceTests
     {
         var (service, _) = MakeService();
 
-        var result = await service.SetIndicateTarget(new WorldCoordinate(500, 0));
+        await service.SetIndicateTarget(new WorldCoordinate(500, 0));
+        var result = service.DrainAndFlush()!;
 
         result.Text.Should().ContainSingle().Which.Should().Contain("No caster selected");
     }
@@ -179,8 +191,10 @@ public class PlayerServiceTests
         var caster = MakeAgencyEntity(x: 0, y: 0);
         world.Add(caster);
         await service.SetCaster(new WorldCoordinate(0, 0));
+        service.DrainAndFlush();
 
-        var result = await service.SetIndicateTarget(new WorldCoordinate(5000, 5000));
+        await service.SetIndicateTarget(new WorldCoordinate(5000, 5000));
+        var result = service.DrainAndFlush()!;
 
         result.Text.Should().ContainSingle().Which.Should().Contain("Nothing to indicate");
     }
@@ -192,8 +206,8 @@ public class PlayerServiceTests
         var caster = MakeAgencyEntity(x: 0, y: 0);
         world.Add(caster);
         await service.SetCaster(new WorldCoordinate(0, 0));
-
         await service.SetIndicateTarget(new WorldCoordinate(0, 0));
+        service.DrainAndFlush();
 
         caster.IndicateTarget.Should().NotBeNull();
         caster.IndicateTarget!.EntityId.Should().Be(caster.Id);
@@ -207,8 +221,10 @@ public class PlayerServiceTests
         var caster = MakeAgencyEntity(x: 0, y: 0);
         world.Add(caster);
         await service.SetCaster(new WorldCoordinate(0, 0));
+        service.DrainAndFlush();
 
-        var result = await service.SetIndicateTarget(new WorldCoordinate(0, 0));
+        await service.SetIndicateTarget(new WorldCoordinate(0, 0));
+        var result = service.DrainAndFlush()!;
 
         result.Text.Should().ContainSingle().Which.Should().Contain("self");
     }
@@ -224,8 +240,10 @@ public class PlayerServiceTests
         world.Add(obstacle);
         world.Add(target);
         await service.SetCaster(new WorldCoordinate(0, 0));
+        service.DrainAndFlush();
 
-        var result = await service.SetIndicateTarget(new WorldCoordinate(500, 0));
+        await service.SetIndicateTarget(new WorldCoordinate(500, 0));
+        var result = service.DrainAndFlush()!;
 
         result.Text.Should().ContainSingle().Which.Should().Contain("in the way");
     }
@@ -239,8 +257,10 @@ public class PlayerServiceTests
         world.Add(caster);
         world.Add(target);
         await service.SetCaster(new WorldCoordinate(0, 0));
+        service.DrainAndFlush();
 
-        var result = await service.SetIndicateTarget(new WorldCoordinate(2000, 0));
+        await service.SetIndicateTarget(new WorldCoordinate(2000, 0));
+        var result = service.DrainAndFlush()!;
 
         result.Text.Should().ContainSingle().Which.Should().Contain("out of reach");
     }
@@ -254,8 +274,8 @@ public class PlayerServiceTests
         world.Add(caster);
         world.Add(target);
         await service.SetCaster(new WorldCoordinate(0, 0));
-
         await service.SetIndicateTarget(new WorldCoordinate(500, 0));
+        service.DrainAndFlush();
 
         caster.IndicateTarget.Should().NotBeNull();
         caster.IndicateTarget!.EntityId.Should().Be(target.Id);
@@ -271,10 +291,36 @@ public class PlayerServiceTests
         world.Add(caster);
         world.Add(target);
         await service.SetCaster(new WorldCoordinate(0, 0));
+        service.DrainAndFlush();
 
-        var result = await service.SetIndicateTarget(new WorldCoordinate(500, 0));
+        await service.SetIndicateTarget(new WorldCoordinate(500, 0));
+        var result = service.DrainAndFlush()!;
 
         result.Text.Should().ContainSingle().Which.Should().Contain("target");
+    }
+
+    [Fact]
+    public void DrainAndFlush_EmptyQueue_ReturnsNull()
+    {
+        var (service, _) = MakeService();
+
+        var result = service.DrainAndFlush();
+
+        result.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task DrainAndFlush_MultipleQueuedActions_CombinesAllTextIntoOneResult()
+    {
+        var (service, world) = MakeService();
+        var entity = MakeAgencyEntity(x: 0, y: 0);
+        world.Add(entity);
+        await service.SetCaster(new WorldCoordinate(0, 0));
+        await service.MoveCaster(new WorldCoordinate(500, 300));
+
+        var result = service.DrainAndFlush()!;
+
+        result.Text.Should().HaveCount(2);
     }
 
     [Fact]
@@ -293,6 +339,7 @@ public class PlayerServiceTests
         entity.Life = new LifeCapability(maxHitPoints: 20, currentHitPoints: 15);
         world.Add(entity);
         await service.SetCaster(new WorldCoordinate(0, 0));
+        service.DrainAndFlush();
 
         service.Prompt.Should().Be("(15/20H) (1000/1000I) >");
     }
@@ -305,6 +352,7 @@ public class PlayerServiceTests
         entity.Life = null;
         world.Add(entity);
         await service.SetCaster(new WorldCoordinate(0, 0));
+        service.DrainAndFlush();
 
         service.Prompt.Should().Be("[dead caster] >");
     }

@@ -1,5 +1,7 @@
 using RunicMagic.Controller;
+using RunicMagic.Controller.Abstractions;
 using RunicMagic.Controller.Services;
+using RunicMagic.View.Services;
 using Serilog;
 using System.Text.Json;
 
@@ -16,6 +18,9 @@ public class Program
 
         var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
             ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+
+        builder.Services.AddSingleton<SseConnectionManager>();
+        builder.Services.AddSingleton<IWorldTickSink>(svc => svc.GetRequiredService<SseConnectionManager>());
 
         builder.Services.RegisterApplicationModules(connectionString);
 

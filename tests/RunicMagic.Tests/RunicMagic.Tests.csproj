@@ -21,6 +21,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\RunicMagic.Controller\RunicMagic.Controller.csproj" />
     <ProjectReference Include="..\..\src\RunicMagic.Database\RunicMagic.Database.csproj" />
+    <ProjectReference Include="..\..\src\RunicMagic.View\RunicMagic.View.csproj" />
     <ProjectReference Include="..\..\src\RunicMagic.World\RunicMagic.World.csproj" />
   </ItemGroup>
 

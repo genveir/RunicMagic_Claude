@@ -4,15 +4,15 @@ namespace RunicMagic.Controller.Abstractions;
 
 public interface IPlayerViewInterface
 {
-    Task<CommandResult> RegisterInput(string input);
+    Task RegisterInput(string input);
 
-    Task<CommandResult> SetCaster(WorldCoordinate worldCoordinate);
+    Task SetCaster(WorldCoordinate worldCoordinate);
 
-    Task<CommandResult> MoveCaster(WorldCoordinate worldCoordinate);
+    Task MoveCaster(WorldCoordinate worldCoordinate);
 
-    Task<CommandResult> SetPointingDirection(WorldCoordinate worldCoordinate);
+    Task SetPointingDirection(WorldCoordinate worldCoordinate);
 
-    Task<CommandResult> SetIndicateTarget(WorldCoordinate worldCoordinate);
+    Task SetIndicateTarget(WorldCoordinate worldCoordinate);
 
     string Prompt { get; }
 }
