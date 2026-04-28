@@ -9,7 +9,6 @@ public static class WorldModule
     {
         services.AddSingleton<WorldModel>();
         services.AddSingleton<SpellExecutor>();
-        services.AddSingleton<TeleportEntityService>();
         services.AddSingleton<RayCastService>();
         return services;
     }

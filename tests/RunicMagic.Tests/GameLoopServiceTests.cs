@@ -15,8 +15,7 @@ public class GameLoopServiceTests
         var world = new WorldModel();
         var worldRendering = new WorldRenderingService(world, new RayCastService(world));
         var spellCasting = new SpellCastingService(world, new SpellExecutor(world));
-        var teleport = new TeleportEntityService();
-        var playerService = new PlayerService(world, worldRendering, spellCasting, teleport, new RayCastService(world));
+        var playerService = new PlayerService(world, worldRendering, spellCasting, new RayCastService(world));
         var sink = new CapturingSink();
         var loop = new GameLoopService(playerService, sink);
         return (loop, playerService, sink);

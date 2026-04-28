@@ -1,9 +1,10 @@
-using System.Collections.Concurrent;
 using RunicMagic.Controller.Abstractions;
 using RunicMagic.Controller.Models;
 using RunicMagic.World;
 using RunicMagic.World.Execution;
 using RunicMagic.World.Geometry;
+using RunicMagic.World.Services;
+using System.Collections.Concurrent;
 
 namespace RunicMagic.Controller.Services;
 
@@ -11,7 +12,6 @@ internal class PlayerService(
         WorldModel world,
         WorldRenderingService worldRendering,
         SpellCastingService spellCasting,
-        TeleportEntityService teleport,
         RayCastService rayCast) : IPlayerViewInterface, IPlayerOutputSink
 {
     private EntityId? casterId = null;
@@ -83,7 +83,7 @@ internal class PlayerService(
             var caster = CheckForCaster(checkForDeath: true);
             if (caster == null) return;
 
-            teleport.Teleport(caster, new Location(worldCoordinate.X, worldCoordinate.Y));
+            TeleportEntityService.Teleport(caster, new Location(worldCoordinate.X, worldCoordinate.Y));
             SendText($"Caster moved to ({worldCoordinate.X}, {worldCoordinate.Y}).");
         });
         return Task.CompletedTask;
