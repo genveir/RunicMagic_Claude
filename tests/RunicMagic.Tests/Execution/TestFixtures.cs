@@ -23,22 +23,6 @@ internal static class TestFixtures
     }
 }
 
-internal class FixedEntitySet : IEntitySet
-{
-    private readonly EntitySet _resolved;
-
-    internal FixedEntitySet(params Entity[] entities)
-    {
-        _resolved = new EntitySet(entities);
-    }
-
-    public EntitySet Resolve(SpellContext context)
-    {
-        context.EntityResolutionCount?.UnionWith(_resolved.Entities.Select(e => e.Id));
-        return _resolved;
-    }
-}
-
 internal class FixedNumber : INumber
 {
     private readonly long _value;
@@ -70,20 +54,5 @@ internal class FixedPointEntitySet : IEntitySet
             .WithSize(1, 1)
             .Build();
         return new EntitySet([entity]);
-    }
-}
-
-internal class FixedLocation : ILocation
-{
-    private readonly Location _location;
-
-    internal FixedLocation(long x, long y)
-    {
-        _location = new Location(x, y);
-    }
-
-    public Location Evaluate(SpellContext context)
-    {
-        return _location;
     }
 }

@@ -17,7 +17,7 @@ public class GameLoopServiceTests
         var spellCasting = new SpellCastingService(world, new SpellExecutor(world));
         var playerService = new PlayerService(world, worldRendering, spellCasting, new RayCastService(world));
         var sink = new CapturingSink();
-        var loop = new GameLoopService(playerService, sink);
+        var loop = new GameLoopService(playerService, world, sink);
         return (loop, playerService, sink);
     }
 

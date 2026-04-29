@@ -17,7 +17,7 @@ public class SpellContext
     public EntitySet Caster { get; }
     public EntitySet Executor { get; }
     public WorldModel World { get; }
-    public SpellResult Result { get; }
+    public SpellResult Result { get; internal set; }
 
     public void PushPowerSource(EntitySet source)
     {

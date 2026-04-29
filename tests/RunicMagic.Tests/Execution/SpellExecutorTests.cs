@@ -43,11 +43,17 @@ public class SpellExecutorTests
         );
 
         var spellExecutor = new SpellExecutor(world);
-        var result = spellExecutor.Execute(spell, runeCount: 11, caster, executor);
+        spellExecutor.Execute(spell, runeCount: 11, caster, executor);
 
-        target.Location.X.Should().Be(3744);
-        target.Location.Y.Should().Be(0);
-        result.Events.OfType<EntityPushedEvent>().Should().ContainSingle()
+        SpellResult finalTickResult = new SpellResult();
+        for (var i = 0; i < 56; i++)
+        {
+            finalTickResult = world.TickMotion();
+        }
+
+        target.Location.X.Should().BeApproximately(3744, 0.001);
+        target.Location.Y.Should().BeApproximately(0, 0.001);
+        finalTickResult.Events.OfType<EntityPushedEvent>().Should().ContainSingle()
             .Which.Entity.Should().Be(target);
     }
 

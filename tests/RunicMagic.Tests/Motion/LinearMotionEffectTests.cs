@@ -1,0 +1,234 @@
+using FluentAssertions;
+using RunicMagic.Tests.Builders;
+using RunicMagic.Tests.Execution;
+using RunicMagic.World;
+using RunicMagic.World.Capabilities;
+using RunicMagic.World.Execution;
+using RunicMagic.World.Motion;
+using Xunit;
+
+namespace RunicMagic.Tests.Motion;
+
+public class LinearMotionEffectTests
+{
+    private static LinearMotionEffect MakePushEffect(
+        SpellContext context,
+        Entity entity,
+        long totalDistance,
+        long perTickCost = 0)
+    {
+        var totalWeight = entity.Weight;
+        var totalCost = totalDistance * totalWeight / 1_000_000;
+        var computedPerTickCost = totalCost / 56;
+        return new LinearMotionEffect(
+            context: context,
+            entities: new FixedEntitySet(entity),
+            origin: new FixedLocation(0, 0),
+            perTickDistance: totalDistance / 56.0,
+            perTickCost: perTickCost > 0 ? perTickCost : computedPerTickCost,
+            totalDistanceMm: totalDistance,
+            isAway: true,
+            effectName: "VUN"
+        );
+    }
+
+    [Fact]
+    public void TryAdvance_After56Ticks_EntityReachesDestination()
+    {
+        var entity = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(1).Build();
+        var context = TestFixtures.MakeContext();
+        var effect = MakePushEffect(context, entity, totalDistance: 560);
+
+        for (var i = 0; i < 56; i++)
+        {
+            effect.TryAdvance(new SpellResult());
+        }
+
+        entity.Location.X.Should().BeApproximately(1560, 0.001);
+        entity.Location.Y.Should().BeApproximately(0, 0.001);
+        effect.IsComplete.Should().BeTrue();
+    }
+
+    [Fact]
+    public void TryAdvance_IsCompleteAfter56Ticks()
+    {
+        var entity = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(1).Build();
+        var context = TestFixtures.MakeContext();
+        var effect = MakePushEffect(context, entity, totalDistance: 100);
+
+        effect.IsComplete.Should().BeFalse();
+
+        for (var i = 0; i < 55; i++) effect.TryAdvance(new SpellResult());
+        effect.IsComplete.Should().BeFalse();
+
+        effect.TryAdvance(new SpellResult());
+        effect.IsComplete.Should().BeTrue();
+    }
+
+    [Fact]
+    public void TryAdvance_EmitsEntityPushedEvent_OnLastTick()
+    {
+        var entity = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(1).Build();
+        var context = TestFixtures.MakeContext();
+        var effect = MakePushEffect(context, entity, totalDistance: 100);
+
+        SpellResult lastResult = new SpellResult();
+        for (var i = 0; i < 56; i++)
+        {
+            lastResult = new SpellResult();
+            effect.TryAdvance(lastResult);
+        }
+
+        lastResult.Events.OfType<EntityPushedEvent>().Should().ContainSingle()
+            .Which.DistanceMm.Should().Be(100);
+    }
+
+    [Fact]
+    public void TryAdvance_NoEntityPushedEvent_OnIntermediateTicks()
+    {
+        var entity = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(1).Build();
+        var context = TestFixtures.MakeContext();
+        var effect = MakePushEffect(context, entity, totalDistance: 100);
+
+        var intermediateResult = new SpellResult();
+        effect.TryAdvance(intermediateResult);
+
+        intermediateResult.Events.OfType<EntityPushedEvent>().Should().BeEmpty();
+    }
+
+    [Fact]
+    public void TryAdvance_InsufficientPower_ReturnsFalse()
+    {
+        // 56000mm × 1000g / 1_000_000 = 56 total cost; 1 per tick
+        var casterEntity = new EntityBuilder()
+            .WithReservoir(draw: amount => new ReservoirDraw(0, false))
+            .Build();
+        var caster = new EntitySet([casterEntity]);
+        var context = TestFixtures.MakeContext(caster: caster);
+
+        var entity = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(1000).Build();
+        var effect = new LinearMotionEffect(
+            context: context,
+            entities: new FixedEntitySet(entity),
+            origin: new FixedLocation(0, 0),
+            perTickDistance: 1000,
+            perTickCost: 1,
+            totalDistanceMm: 56000,
+            isAway: true,
+            effectName: "VUN"
+        );
+
+        var result = new SpellResult();
+        var advanced = effect.TryAdvance(result);
+
+        advanced.Should().BeFalse();
+        result.Events.OfType<EffectNotFiredEvent>().Should().ContainSingle()
+            .Which.Effect.Should().Be("VUN");
+    }
+
+    [Fact]
+    public void TryAdvance_InsufficientPower_EntityDoesNotMove()
+    {
+        var casterEntity = new EntityBuilder()
+            .WithReservoir(draw: amount => new ReservoirDraw(0, false))
+            .Build();
+        var caster = new EntitySet([casterEntity]);
+        var context = TestFixtures.MakeContext(caster: caster);
+
+        var entity = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(1000).Build();
+        var effect = new LinearMotionEffect(
+            context: context,
+            entities: new FixedEntitySet(entity),
+            origin: new FixedLocation(0, 0),
+            perTickDistance: 1000,
+            perTickCost: 1,
+            totalDistanceMm: 56000,
+            isAway: true,
+            effectName: "VUN"
+        );
+
+        effect.TryAdvance(new SpellResult());
+
+        entity.Location.X.Should().Be(1000);
+    }
+
+    [Fact]
+    public void TryAdvance_PartialPower_StopsEarly()
+    {
+        // 1 power per tick, caster has power for exactly 3 ticks
+        var ticksDrawn = 0;
+        var casterEntity = new EntityBuilder()
+            .WithReservoir(draw: amount =>
+            {
+                if (ticksDrawn < 3)
+                {
+                    ticksDrawn++;
+                    return new ReservoirDraw(amount, false);
+                }
+                return new ReservoirDraw(0, false);
+            })
+            .Build();
+        var caster = new EntitySet([casterEntity]);
+        var context = TestFixtures.MakeContext(caster: caster);
+
+        var entity = new EntityBuilder().WithLocation(x: 0, y: 0).WithWeight(1000).Build();
+        var effect = new LinearMotionEffect(
+            context: context,
+            entities: new FixedEntitySet(entity),
+            origin: new FixedLocation(-1000, 0),
+            perTickDistance: 100,
+            perTickCost: 1,
+            totalDistanceMm: 5600,
+            isAway: true,
+            effectName: "VUN"
+        );
+
+        for (var i = 0; i < 56; i++) effect.TryAdvance(new SpellResult());
+
+        // 3 successful ticks × 100mm/tick = 300mm total
+        entity.Location.X.Should().BeApproximately(300, 0.001);
+    }
+
+    [Fact]
+    public void TryAdvance_PullMovesEntityTowardOrigin()
+    {
+        var entity = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(1).Build();
+        var context = TestFixtures.MakeContext();
+        var effect = new LinearMotionEffect(
+            context: context,
+            entities: new FixedEntitySet(entity),
+            origin: new FixedLocation(0, 0),
+            perTickDistance: 500 / 56.0,
+            perTickCost: 0,
+            totalDistanceMm: 500,
+            isAway: false,
+            effectName: "VAR"
+        );
+
+        for (var i = 0; i < 56; i++) effect.TryAdvance(new SpellResult());
+
+        entity.Location.X.Should().BeApproximately(500, 0.001);
+        entity.Location.Y.Should().BeApproximately(0, 0.001);
+    }
+
+    [Fact]
+    public void TryAdvance_ZeroCost_AlwaysSucceeds()
+    {
+        var entity = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(1).Build();
+        var context = TestFixtures.MakeContext(); // no power sources
+        var effect = new LinearMotionEffect(
+            context: context,
+            entities: new FixedEntitySet(entity),
+            origin: new FixedLocation(0, 0),
+            perTickDistance: 10,
+            perTickCost: 0,
+            totalDistanceMm: 560,
+            isAway: true,
+            effectName: "VUN"
+        );
+
+        for (var i = 0; i < 56; i++) effect.TryAdvance(new SpellResult());
+
+        entity.Location.X.Should().BeApproximately(1560, 0.001);
+    }
+}

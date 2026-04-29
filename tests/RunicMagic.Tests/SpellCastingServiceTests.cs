@@ -3,6 +3,7 @@ using RunicMagic.Controller.Services;
 using RunicMagic.Tests.Builders;
 using RunicMagic.World;
 using RunicMagic.World.Capabilities;
+using RunicMagic.World.Execution;
 using Xunit;
 
 namespace RunicMagic.Tests;
@@ -100,10 +101,16 @@ public class SpellCastingServiceTests
         world.Add(target);
 
         var service = MakeService(world);
+        service.Cast("ZU VUN LA IR HOT IR HOT HOT", casterId: casterEntity.Id);
 
-        var lines = service.Cast("ZU VUN LA IR HOT IR HOT HOT", casterId: casterEntity.Id);
+        SpellResult finalTick = new SpellResult();
+        for (var i = 0; i < 56; i++)
+        {
+            finalTick = world.TickMotion();
+        }
 
-        lines.Should().Contain(l => l.Contains("target") && l.Contains("pushed"));
+        var pushedEvent = finalTick.Events.OfType<EntityPushedEvent>().Should().ContainSingle().Subject;
+        pushedEvent.Entity.Should().BeSameAs(target);
     }
 
     [Fact]

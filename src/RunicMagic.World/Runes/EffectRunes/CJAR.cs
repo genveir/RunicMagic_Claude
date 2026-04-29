@@ -1,7 +1,6 @@
 using RunicMagic.World.Execution;
-using RunicMagic.World.Geometry;
+using RunicMagic.World.Motion;
 using RunicMagic.World.Runes.RuneTypes;
-using RunicMagic.World.Services;
 
 namespace RunicMagic.World.Runes.EffectRunes;
 
@@ -25,45 +24,27 @@ public class CJAR : IStatement
         var angleDegrees = HowMuch.Evaluate(context).Value;
         var origin = Origin.Evaluate(context);
 
-        // Y-axis is down, so negative angle is counterclockwise.
-        var theta = -(angleDegrees / 2744.0 * 2 * Math.PI);
-
-        var totalCost = 0L;
-        foreach (var entity in toRotate.Entities)
+        if (!toRotate.Entities.Any() || angleDegrees <= 0)
         {
-            totalCost += RotationCostCalculator.ComputeEntityCost(entity, origin, Math.Abs(theta));
-        }
-
-        var drawn = context.DrawPower(totalCost);
-        if (drawn < totalCost)
-        {
-            context.Result.Add(new EffectNotFiredEvent(
-                "CJAR",
-                $"Insufficient power: needed {totalCost}, drew {drawn}"
-            ));
             return;
         }
 
-        foreach (var entity in toRotate.Entities)
-        {
-            var dx = entity.Location.X - origin.X;
-            var dy = entity.Location.Y - origin.Y;
-            var cos = Math.Cos(theta);
-            var sin = Math.Sin(theta);
+        // Y-axis is down, so negative angle is counterclockwise.
+        var totalTheta = -(angleDegrees / 2744.0 * 2 * Math.PI);
+        var perTickTheta = totalTheta / 56.0;
 
-            var newLocation = new Location(
-                origin.X + dx * cos - dy * sin,
-                origin.Y + dx * sin + dy * cos
-            );
-            var newAngle = entity.Angle + theta;
+        var fixedEntities = new FixedEntitySet(toRotate);
+        var fixedOrigin = new FixedLocation(origin);
 
-            MoveEntityService.Move(entity, newLocation, newAngle);
-
-            if (angleDegrees > 0)
-            {
-                context.Result.Add(new EntityRotatedEvent(entity, angleDegrees));
-            }
-        }
+        var effect = new RotationMotionEffect(
+            context: context,
+            entities: fixedEntities,
+            origin: fixedOrigin,
+            perTickTheta: perTickTheta,
+            totalRuneDegrees: angleDegrees,
+            effectName: "CJAR"
+        );
+        context.World.AddMotionEffect(effect);
     }
 
     public override string ToString()

@@ -1,7 +1,6 @@
 using RunicMagic.World.Execution;
-using RunicMagic.World.Geometry;
+using RunicMagic.World.Motion;
 using RunicMagic.World.Runes.RuneTypes;
-using RunicMagic.World.Services;
 
 namespace RunicMagic.World.Runes.EffectRunes;
 
@@ -25,31 +24,30 @@ public class VUN : IStatement
         long distance = HowFar.Evaluate(context).Value;
         var origin = Origin.Evaluate(context);
 
-        long totalWeight = toMove.Entities.Sum(e => e.Weight);
-        long executionCost = distance * totalWeight / 1_000_000;
-
-        var drawn = context.DrawPower(executionCost);
-        if (drawn < executionCost)
+        if (!toMove.Entities.Any() || distance <= 0)
         {
-            context.Result.Add(new EffectNotFiredEvent(
-                "VUN",
-                $"Insufficient power: needed {executionCost}, drew {drawn}"
-            ));
             return;
         }
 
-        foreach (var entity in toMove.Entities)
-        {
-            var direction = Direction.FromPoints(origin, entity.Location);
-            var destination = entity.Location.Translate(direction, distance);
+        long totalWeight = toMove.Entities.Sum(e => e.Weight);
+        long totalCost = distance * totalWeight / 1_000_000;
+        long perTickCost = totalCost / 56;
+        double perTickDistance = distance / 56.0;
 
-            MoveEntityService.Move(entity, destination, entity.Angle);
+        var fixedEntities = new FixedEntitySet(toMove);
+        var fixedOrigin = new FixedLocation(origin);
 
-            if (distance > 0)
-            {
-                context.Result.Add(new EntityPushedEvent(entity, distance));
-            }
-        }
+        var effect = new LinearMotionEffect(
+            context: context,
+            entities: fixedEntities,
+            origin: fixedOrigin,
+            perTickDistance: perTickDistance,
+            perTickCost: perTickCost,
+            totalDistanceMm: distance,
+            isAway: true,
+            effectName: "VUN"
+        );
+        context.World.AddMotionEffect(effect);
     }
 
     public override string ToString()

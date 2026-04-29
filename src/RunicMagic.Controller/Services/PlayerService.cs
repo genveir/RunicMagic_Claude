@@ -147,6 +147,14 @@ internal class PlayerService(
         return Task.CompletedTask;
     }
 
+    public void ReceiveMotionEvents(SpellResult motionResult)
+    {
+        foreach (var @event in motionResult.Events)
+        {
+            SendText(SpellEventDescriber.Describe(@event));
+        }
+    }
+
     public void SendText(string text)
     {
         _pendingText.Add(text);
@@ -154,7 +162,7 @@ internal class PlayerService(
 
     public CommandResult? DrainAndFlush()
     {
-        if (_queue.IsEmpty)
+        if (_queue.IsEmpty && _pendingText.Count == 0)
             return null;
 
         while (_queue.TryDequeue(out var action))
