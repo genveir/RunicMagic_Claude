@@ -47,13 +47,13 @@ values
 
 insert into EntityLife (EntityId, MaxHitPoints, CurrentHitPoints)
 values
-    (@caster, 1000, 1000),
-    (@secondPlayer, 1000, 1000);
+    (@caster, 1000000000, 1000000000),
+    (@secondPlayer, 1000000000, 1000000000);
 
 insert into EntityCharge (EntityId, MaxCharge, CurrentCharge)
 values
-    (@manaStone, 10000, 10000),
-    (@smallManaStone, 100, 100);
+    (@manaStone, 10000000000, 10000000000),
+    (@smallManaStone, 100000000, 100000000);
 
 insert into Inscription (EntityId, SpellText)
 values

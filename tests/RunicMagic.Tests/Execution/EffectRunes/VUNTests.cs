@@ -23,7 +23,7 @@ public class VUNTests
     public void Execute_PushesEntityAwayFromOrigin()
     {
         var world = new WorldModel();
-        var entity = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(1).Build();
+        var entity = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(0).Build();
         var vun = new VUN(
             toMove: new FixedEntitySet(entity),
             howFar: new FixedNumber(500),
@@ -42,7 +42,7 @@ public class VUNTests
     public void Execute_NullVector_EntityStillMoves()
     {
         var world = new WorldModel();
-        var entity = new EntityBuilder().WithLocation(x: 0, y: 0).WithWeight(1).Build();
+        var entity = new EntityBuilder().WithLocation(x: 0, y: 0).WithWeight(0).Build();
         var vun = new VUN(
             toMove: new FixedEntitySet(entity),
             howFar: new FixedNumber(100),
@@ -66,12 +66,12 @@ public class VUNTests
             .Build();
         var caster = new EntitySet([casterEntity]);
 
-        // 1000mm × 56000g / 1_000_000 = 56 total cost; 56 / 56 = 1 per tick
+        // 56mm × 1g = 56 total cost; 56 / 56 = 1 per tick
         var world = new WorldModel();
-        var target = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(56000).Build();
+        var target = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(1).Build();
         var vun = new VUN(
             toMove: new FixedEntitySet(target),
-            howFar: new FixedNumber(1000),
+            howFar: new FixedNumber(56),
             origin: new FixedLocation(0, 0)
         );
         var context = TestFixtures.MakeContext(caster: caster, world: world);
@@ -99,13 +99,13 @@ public class VUNTests
             .Build();
         var caster = new EntitySet([casterEntity]);
 
-        // 2000mm × 56000g / 1_000_000 = 112 total cost; 112 / 56 = 2 per tick
+        // 112mm × 1g = 112 total cost; 112 / 56 = 2 per tick
         // executor provides 1 per tick (amount/2), caster covers remaining 1
         var world = new WorldModel();
-        var target = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(56000).Build();
+        var target = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(1).Build();
         var vun = new VUN(
             toMove: new FixedEntitySet(target),
-            howFar: new FixedNumber(2000),
+            howFar: new FixedNumber(112),
             origin: new FixedLocation(0, 0)
         );
         var context = TestFixtures.MakeContext(caster: caster, executor: executor, world: world);
@@ -123,8 +123,8 @@ public class VUNTests
     public void Execute_MultipleEntities_AllMoveAwayFromOrigin()
     {
         var world = new WorldModel();
-        var entity1 = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(1).Build();
-        var entity2 = new EntityBuilder().WithLocation(x: 0, y: 1000).WithWeight(1).Build();
+        var entity1 = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(0).Build();
+        var entity2 = new EntityBuilder().WithLocation(x: 0, y: 1000).WithWeight(0).Build();
         var vun = new VUN(
             toMove: new FixedEntitySet(entity1, entity2),
             howFar: new FixedNumber(200),
@@ -145,8 +145,8 @@ public class VUNTests
     public void Execute_EmitsEntityPushedEvent_PerEntity()
     {
         var world = new WorldModel();
-        var entity1 = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(1).Build();
-        var entity2 = new EntityBuilder().WithLocation(x: 0, y: 1000).WithWeight(1).Build();
+        var entity1 = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(0).Build();
+        var entity2 = new EntityBuilder().WithLocation(x: 0, y: 1000).WithWeight(0).Build();
         var vun = new VUN(
             toMove: new FixedEntitySet(entity1, entity2),
             howFar: new FixedNumber(200),
@@ -163,7 +163,7 @@ public class VUNTests
     [Fact]
     public void Execute_InsufficientPower_DoesNotMoveAndEmitsEvent()
     {
-        // 1000mm × 1_000_000g / 1_000_000 = 1000 total cost; 1000 / 56 = 17 per tick
+        // 1000mm × 1_000_000g = 1,000,000,000 total cost
         var world = new WorldModel();
         var entity = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(1_000_000).Build();
         var originalX = entity.Location.X;
@@ -191,7 +191,7 @@ public class VUNTests
     [Fact]
     public void Execute_PartialPower_StopsAfterAffordableTicks()
     {
-        // 1000mm × 56000g / 1_000_000 = 56 total cost; 1 per tick
+        // 1000mm × 56000g = 56,000,000 total cost; 1,000,000 per tick
         // Give the caster power for exactly 2 ticks
         var ticksDrawn = 0;
         var world = new WorldModel();

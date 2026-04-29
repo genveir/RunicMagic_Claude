@@ -1,8 +1,6 @@
 using RunicMagic.World;
-using RunicMagic.World.Capabilities;
 using RunicMagic.World.Execution;
 using RunicMagic.World.Geometry;
-using RunicMagic.World.Runes.RuneTypes;
 
 namespace RunicMagic.Tests.Builders;
 
@@ -105,8 +103,8 @@ internal class EntityBuilder
 
     public EntityBuilder WithReservoir(Func<long>? max = null, Func<long>? current = null, Func<long, ReservoirDraw>? draw = null, Func<long, ReservoirFill>? fill = null)
     {
-        if (max == null) max = () => 1000;
-        if (current == null) current = () => 1000;
+        if (max == null) max = () => 1000000000;
+        if (current == null) current = () => 1000000000;
         if (draw == null) draw = amount => new ReservoirDraw(amount, false);
         if (fill == null) fill = amount => new ReservoirFill(amount, false);
 

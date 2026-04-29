@@ -30,7 +30,7 @@ public class VAR : IStatement
         }
 
         long totalWeight = toMove.Entities.Sum(e => e.Weight);
-        long totalCost = distance * totalWeight / 1_000_000;
+        long totalCost = distance * totalWeight;
         long perTickCost = totalCost / 56;
         double perTickDistance = distance / 56.0;
 

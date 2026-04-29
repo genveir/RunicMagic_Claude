@@ -97,9 +97,9 @@ public class EntitySetSelectionCostResolverTests
 
         resolver.Resolve(context);
 
-        // final set cost = ceil(2000/1000) = 2; breadth = 1 entity; total required = 3; drawn = 1
+        // final set cost = ceil(2000/1_000_000_000) = 1; breadth = 1 × 1_000_000; total required = 1_000_001; drawn = 1
         var evt = result.Events.OfType<SelectionCostNotMetEvent>().Single();
-        evt.Required.Should().Be(3);
+        evt.Required.Should().Be(1_000_001);
         evt.Drawn.Should().Be(1);
     }
 
@@ -114,15 +114,15 @@ public class EntitySetSelectionCostResolverTests
 
         resolver.Resolve(context);
 
-        // final set cost = 0 (no reservoir); breadth = 1; total = 1
-        drawn.Should().ContainSingle().Which.Should().Be(1);
+        // final set cost = 0 (no reservoir); breadth = 1 × 1_000_000; total = 1_000_000
+        drawn.Should().ContainSingle().Which.Should().Be(1_000_000);
     }
 
     [Fact]
-    public void FinalSetCost_EntityWithReservoir_ContributesCeilOfMaxPowerDividedBy1000()
+    public void FinalSetCost_EntityWithReservoir_ContributesCeilOfMaxPowerDividedBy1000000000()
     {
         var target = new EntityBuilder()
-            .WithReservoir(max: () => 3000)
+            .WithReservoir(max: () => 3_000_000_000)
             .Build();
         var inner = new FixedEntitySet(target);
         var resolver = new EntitySetSelectionCostResolver(inner);
@@ -131,15 +131,15 @@ public class EntitySetSelectionCostResolverTests
 
         resolver.Resolve(context);
 
-        // final set cost = 3000/1000 = 3; breadth = 1; total = 4
-        drawn.Should().ContainSingle().Which.Should().Be(4);
+        // final set cost = 3_000_000_000/1_000_000_000 = 3; breadth = 1 × 1_000_000; total = 1_000_003
+        drawn.Should().ContainSingle().Which.Should().Be(1_000_003);
     }
 
     [Fact]
     public void FinalSetCost_PartialMaxPower_RoundsUp()
     {
         var target = new EntityBuilder()
-            .WithReservoir(max: () => 1001)
+            .WithReservoir(max: () => 1_000_000_001)
             .Build();
         var inner = new FixedEntitySet(target);
         var resolver = new EntitySetSelectionCostResolver(inner);
@@ -148,8 +148,8 @@ public class EntitySetSelectionCostResolverTests
 
         resolver.Resolve(context);
 
-        // final set cost = ceil(1001/1000) = 2; breadth = 1; total = 3
-        drawn.Should().ContainSingle().Which.Should().Be(3);
+        // final set cost = ceil(1_000_000_001/1_000_000_000) = 2; breadth = 1 × 1_000_000; total = 1_000_002
+        drawn.Should().ContainSingle().Which.Should().Be(1_000_002);
     }
 
     [Fact]
@@ -170,8 +170,9 @@ public class EntitySetSelectionCostResolverTests
 
         resolver.Resolve(context);
 
-        // casterEntity is exempt → final set cost = 0; breadth = 1; total = 1
-        drawn.Should().ContainSingle().Which.Should().Be(1);
+        // casterEntity is exempt → final set cost = 0; breadth = 1 × 1_000_000; total = 1_000_000
+        // two caster entities at the same charge level → each asked for ceil(1_000_000 / 2) = 500_000
+        drawn.Should().ContainSingle().Which.Should().Be(500_000);
     }
 
     [Fact]
@@ -191,8 +192,8 @@ public class EntitySetSelectionCostResolverTests
 
         resolver.Resolve(context);
 
-        // executorEntity is exempt → final set cost = 0; breadth = 1; total = 1
-        drawn.Should().ContainSingle().Which.Should().Be(1);
+        // executorEntity is exempt → final set cost = 0; breadth = 1 × 1_000_000; total = 1_000_000
+        drawn.Should().ContainSingle().Which.Should().Be(1_000_000);
     }
 
     [Fact]
@@ -208,8 +209,8 @@ public class EntitySetSelectionCostResolverTests
 
         resolver.Resolve(context);
 
-        // all 3 entities have no reservoir → final set cost = 0; breadth = 3; total = 3
-        drawn.Should().ContainSingle().Which.Should().Be(3);
+        // all 3 entities have no reservoir → final set cost = 0; breadth = 3 × 1_000_000; total = 3_000_000
+        drawn.Should().ContainSingle().Which.Should().Be(3_000_000);
     }
 
     [Fact]

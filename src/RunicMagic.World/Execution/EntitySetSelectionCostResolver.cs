@@ -53,7 +53,7 @@ public class EntitySetSelectionCostResolver : IEntitySet
                 continue;
             }
             var maxPower = entity.Reservoir?.Max.Invoke() ?? 0L;
-            cost += (maxPower + 999) / 1000;
+            cost += (maxPower + 999999999) / 1000000000;
         }
 
         return cost;
@@ -63,6 +63,6 @@ public class EntitySetSelectionCostResolver : IEntitySet
     {
         var breadthCount = context.EntityResolutionCount?.Count ?? 0;
 
-        return breadthCount;
+        return breadthCount * 1000000;
     }
 }

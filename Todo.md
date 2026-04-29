@@ -7,7 +7,6 @@ Next bugfix number: BUG-6
 
 | Key | Title | Description | Blocked By |
 |-----|-------|-------------|------------|
-| RMC-85 | Scale up power costs | Remove the `/1_000_000` divisor from motion cost formulas (VUN/VAR and `RotationCostCalculator`) so that 1 power unit = 1 gram-millimeter of work. This prevents small costs from flooring to zero via integer division. Add an overflow guard to `DrawPower`: if the requested cost exceeds `long.MaxValue / 2` (i.e. a cost so large that no realistic source stack could cover it), treat it as fully draining all available sources and return whatever was drawn. Update reservoir defaults and test cost values accordingly. | |
 | RMC-86 | EventTracker — replace SpellResult with a unified change tracker | Rename `SpellResult` to `EventTracker` (or similar) and extend it to track two things: the existing spell events (text feedback) and a `HashSet<Entity>` of every entity touched during the operation. `MoveEntityService.Move` adds the moved entity; `PowerService.DrawPower` adds every entity drawn from. The tracker is already threaded through all call chains (`TryAdvance`, `DrawPower`, etc.) so no signature changes are needed beyond the type itself. `WorldModel.TickMotion` returns the tracker for the tick; the game loop reads its touched-entity set to push canvas deltas alongside any text. Track everything — don't filter by canvas-relevance at this layer. | RMC-85 |
 | RMC-88 | Clean up TryAdvance/TryAdvanceInner split | `LinearMotionEffect` and `RotationMotionEffect` both have a public `TryAdvance` wrapper whose only job is to redirect `context.Result` before delegating to a private `TryAdvanceInner`. This is an artefact of how result redirection was bolted on. Collapse back to a single method — likely resolved naturally as part of the RMC-86 EventTracker overhaul. | RMC-86 |
 | RMC-89 | CalcifiedEntitySet / CalcifiedLocation | Replace `FixedEntitySet` and `FixedLocation` in production with `CalcifiedEntitySet` and `CalcifiedLocation`. Each wraps an inner `IEntitySet` / `ILocation` expression, evaluates it on the first `Resolve()`/`Evaluate()` call, caches the result, and returns the cache on all subsequent calls. The parser inserts these wrappers by default when no live-tracking modifier is present. Effect runes become agnostic — they receive an `IEntitySet`/`ILocation` and pass it straight to the motion effect without inspecting or snapshotting it. Remove `FixedEntitySet` and `FixedLocation` from production code; restore them to the test project as simple test utilities. | |
@@ -41,7 +40,6 @@ Next bugfix number: BUG-6
 
 | Key | Title |
 |-----|-------|
-| RMC-82 | Motion effects queue |
 
 ## Done
 
@@ -50,3 +48,5 @@ Next bugfix number: BUG-6
 | RMC-76 | Game clock |
 | RMC-78 | SSE world push |
 | RMC-81 | Queue spells for tick processing |
+| RMC-82 | Motion effects queue |
+| RMC-85 | Scale up power costs |

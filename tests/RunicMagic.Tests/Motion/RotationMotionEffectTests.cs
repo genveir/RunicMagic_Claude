@@ -33,7 +33,7 @@ public class RotationMotionEffectTests
     public void TryAdvance_After56Ticks_EntityCompletesFullRotation()
     {
         // Entity at (1000, 0). Full 90° CW rotation puts it at (0, 1000).
-        var entity = new EntityBuilder().WithLocation(x: 1000, y: 0).Build();
+        var entity = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(0).Build();
         var context = TestFixtures.MakeContext();
         var effect = MakeCwEffect(context, entity, totalRuneDegrees: QuarterTurn);
 
@@ -47,7 +47,7 @@ public class RotationMotionEffectTests
     [Fact]
     public void TryAdvance_EmitsEntityRotatedEvent_OnLastTick()
     {
-        var entity = new EntityBuilder().WithLocation(x: 1000, y: 0).Build();
+        var entity = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(0).Build();
         var context = TestFixtures.MakeContext();
         var effect = MakeCwEffect(context, entity, totalRuneDegrees: QuarterTurn);
 

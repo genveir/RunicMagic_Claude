@@ -83,8 +83,8 @@ public class SpellExecutorTests
         var spellExecutor = new SpellExecutor(world);
         spellExecutor.Execute(spell, runeCount: 10, caster, executor);
 
-        // evaluation cost = 10 runes = 10
-        drawn.Should().ContainSingle().Which.Should().Be(10);
+        // evaluation cost = 10 runes × 1_000_000 = 10_000_000
+        drawn.Should().ContainSingle().Which.Should().Be(10_000_000);
     }
 
     [Fact]
@@ -112,9 +112,9 @@ public class SpellExecutorTests
         var spellExecutor = new SpellExecutor(world);
         spellExecutor.Execute(spell, runeCount: 10, caster, executor);
 
-        // evaluation cost = 10; executor provides 5 (amount/2), caster covers remaining 5
-        executorDrawn.Should().ContainSingle().Which.Should().Be(10);
-        casterDrawn.Should().ContainSingle().Which.Should().Be(5);
+        // evaluation cost = 10_000_000; executor provides 5_000_000 (amount/2), caster covers remaining 5_000_000
+        executorDrawn.Should().ContainSingle().Which.Should().Be(10_000_000);
+        casterDrawn.Should().ContainSingle().Which.Should().Be(5_000_000);
     }
 
     [Fact]

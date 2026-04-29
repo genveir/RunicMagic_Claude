@@ -27,7 +27,7 @@ public class CJIRTests
     {
         // Entity at (1000, 0). 90° CW around (0, 0) with Y-down puts it at (0, 1000).
         var world = new WorldModel();
-        var entity = new EntityBuilder().WithLocation(x: 1000, y: 0).Build();
+        var entity = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(0).Build();
         var cjir = new CJIR(
             toRotate: new FixedEntitySet(entity),
             howMuch: new FixedNumber(QuarterTurn),
@@ -45,7 +45,7 @@ public class CJIRTests
     public void Execute_UpdatesEntityAngle()
     {
         var world = new WorldModel();
-        var entity = new EntityBuilder().WithLocation(x: 1000, y: 0).Build();
+        var entity = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(0).Build();
         var expectedAngle = QuarterTurn / 2744.0 * 2 * Math.PI;
         var cjir = new CJIR(
             toRotate: new FixedEntitySet(entity),
@@ -81,7 +81,7 @@ public class CJIRTests
     public void Execute_AddsEntityRotatedEvent()
     {
         var world = new WorldModel();
-        var entity = new EntityBuilder().WithLocation(x: 1000, y: 0).Build();
+        var entity = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(0).Build();
         var cjir = new CJIR(
             toRotate: new FixedEntitySet(entity),
             howMuch: new FixedNumber(QuarterTurn),
@@ -112,6 +112,39 @@ public class CJIRTests
 
         tickResult.Events.OfType<EntityRotatedEvent>().Should().BeEmpty();
         entity.Location.X.Should().Be(1000);
+    }
+
+    [Fact]
+    public void Execute_PartialPower_StopsAfterAffordableTicks()
+    {
+        var ticksDrawn = 0;
+        var world = new WorldModel();
+        var entity = new EntityBuilder().WithLocation(x: 1000, y: 0).Build();
+        entity.Weight = 1_000_000;
+        var casterEntity = new EntityBuilder()
+            .WithReservoir(draw: amount =>
+            {
+                if (ticksDrawn < 2)
+                {
+                    ticksDrawn++;
+                    return new ReservoirDraw(amount, false);
+                }
+                return new ReservoirDraw(0, false);
+            })
+            .Build();
+        var caster = new EntitySet([casterEntity]);
+        var cjir = new CJIR(
+            toRotate: new FixedEntitySet(entity),
+            howMuch: new FixedNumber(QuarterTurn),
+            origin: new FixedLocation(0, 0));
+        var context = TestFixtures.MakeContext(caster: caster, world: world);
+
+        cjir.Execute(context);
+        for (var i = 0; i < 10; i++) world.TickMotion();
+
+        // Rotated only 2/56 of the quarter turn; entity should not have reached destination
+        entity.Location.X.Should().BeLessThan(1000);
+        entity.Location.X.Should().BeGreaterThan(0);
     }
 
     [Fact]

@@ -17,9 +17,11 @@ public class SpellExecutor
         var result = new SpellResult();
         var context = new SpellContext(caster, executor, _world, result);
 
-        var evalDrawn = context.DrawPower(runeCount);
+        var toDraw = runeCount * 1000000;
 
-        if (evalDrawn < runeCount)
+        var evalDrawn = context.DrawPower(toDraw);
+
+        if (evalDrawn < toDraw)
         {
             foreach (var entity in executor.Entities)
             {
