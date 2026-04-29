@@ -1,6 +1,7 @@
 using RunicMagic.World.Execution;
 using RunicMagic.World.Geometry;
 using RunicMagic.World.Runes.RuneTypes;
+using RunicMagic.World.Services;
 
 namespace RunicMagic.World.Runes.EffectRunes;
 
@@ -49,11 +50,13 @@ public class CJIR : IStatement
             var dy = entity.Location.Y - origin.Y;
             var cos = Math.Cos(theta);
             var sin = Math.Sin(theta);
-            entity.Location = new Location(
+            var newLocation = new Location(
                 origin.X + dx * cos - dy * sin,
                 origin.Y + dx * sin + dy * cos
             );
-            entity.Angle += theta;
+            var newAngle = entity.Angle + theta;
+
+            MoveEntityService.Move(entity, newLocation, newAngle);
 
             if (angleDegrees > 0)
             {

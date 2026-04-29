@@ -1,6 +1,7 @@
 using RunicMagic.World.Execution;
 using RunicMagic.World.Geometry;
 using RunicMagic.World.Runes.RuneTypes;
+using RunicMagic.World.Services;
 
 namespace RunicMagic.World.Runes.EffectRunes;
 
@@ -41,7 +42,8 @@ public class VUN : IStatement
         {
             var direction = Direction.FromPoints(origin, entity.Location);
             var destination = entity.Location.Translate(direction, distance);
-            entity.Location = destination;
+
+            MoveEntityService.Move(entity, destination, entity.Angle);
 
             if (distance > 0)
             {
