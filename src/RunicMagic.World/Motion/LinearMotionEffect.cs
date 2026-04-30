@@ -7,7 +7,7 @@ namespace RunicMagic.World.Motion;
 
 public class LinearMotionEffect : IMotionEffect
 {
-    private readonly SpellContext _context;
+    private readonly TemporalSpellContext _temporalContext;
     private readonly IEntitySet _entities;
     private readonly ILocation _origin;
     private readonly double _perTickDistance;
@@ -29,7 +29,7 @@ public class LinearMotionEffect : IMotionEffect
         bool isAway,
         string effectName)
     {
-        _context = context;
+        _temporalContext = new(context);
         _entities = entities;
         _origin = origin;
         _perTickDistance = perTickDistance;
@@ -40,31 +40,19 @@ public class LinearMotionEffect : IMotionEffect
         _remainingTicks = 56;
     }
 
-    public bool TryAdvance(IWorldEventTracker tickResult)
+    public bool TryAdvance(IWorldEventTracker eventTracker)
     {
-        var previousResult = _context.EventTracker;
-        _context.EventTracker = tickResult;
-        try
-        {
-            return TryAdvanceInner(tickResult);
-        }
-        finally
-        {
-            _context.EventTracker = previousResult;
-        }
-    }
+        var context = _temporalContext.ToSpellContext(eventTracker);
 
-    private bool TryAdvanceInner(IWorldEventTracker tickResult)
-    {
-        var drawn = _context.DrawPower(_perTickCost);
+        var drawn = context.DrawPower(_perTickCost);
         if (drawn < _perTickCost)
         {
-            tickResult.Add(new EffectNotFiredEvent(_effectName, $"Insufficient power: needed {_perTickCost}, drew {drawn}"));
+            eventTracker.Add(new EffectNotFiredEvent(_effectName, $"Insufficient power: needed {_perTickCost}, drew {drawn}"));
             return false;
         }
 
-        var entities = _entities.Resolve(_context);
-        var origin = _origin.Evaluate(_context);
+        var entities = _entities.Resolve(context);
+        var origin = _origin.Evaluate(context);
 
         foreach (var entity in entities.Entities)
         {
@@ -79,7 +67,7 @@ public class LinearMotionEffect : IMotionEffect
             }
 
             var destination = entity.Location.Translate(direction, _perTickDistance);
-            MoveEntityService.Move(entity, destination, entity.Angle, tickResult);
+            MoveEntityService.Move(entity, destination, entity.Angle, eventTracker);
         }
 
         _remainingTicks--;
@@ -90,11 +78,11 @@ public class LinearMotionEffect : IMotionEffect
             {
                 if (_isAway)
                 {
-                    tickResult.Add(new EntityPushedEvent(entity, _totalDistanceMm));
+                    eventTracker.Add(new EntityPushedEvent(entity, _totalDistanceMm));
                 }
                 else
                 {
-                    tickResult.Add(new EntityPulledEvent(entity, _totalDistanceMm));
+                    eventTracker.Add(new EntityPulledEvent(entity, _totalDistanceMm));
                 }
             }
         }

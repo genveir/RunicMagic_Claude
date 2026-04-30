@@ -7,7 +7,7 @@ namespace RunicMagic.World.Motion;
 
 public class RotationMotionEffect : IMotionEffect
 {
-    private readonly SpellContext _context;
+    private readonly TemporalSpellContext _temporalContext;
     private readonly IEntitySet _entities;
     private readonly ILocation _origin;
     private readonly double _perTickTheta;
@@ -25,7 +25,7 @@ public class RotationMotionEffect : IMotionEffect
         long totalRuneDegrees,
         string effectName)
     {
-        _context = context;
+        _temporalContext = new(context);
         _entities = entities;
         _origin = origin;
         _perTickTheta = perTickTheta;
@@ -34,24 +34,12 @@ public class RotationMotionEffect : IMotionEffect
         _remainingTicks = 56;
     }
 
-    public bool TryAdvance(IWorldEventTracker tickResult)
+    public bool TryAdvance(IWorldEventTracker eventTracker)
     {
-        var previousResult = _context.EventTracker;
-        _context.EventTracker = tickResult;
-        try
-        {
-            return TryAdvanceInner(tickResult);
-        }
-        finally
-        {
-            _context.EventTracker = previousResult;
-        }
-    }
+        var context = _temporalContext.ToSpellContext(eventTracker);
 
-    private bool TryAdvanceInner(IWorldEventTracker tickResult)
-    {
-        var entities = _entities.Resolve(_context);
-        var origin = _origin.Evaluate(_context);
+        var entities = _entities.Resolve(context);
+        var origin = _origin.Evaluate(context);
 
         var totalCost = 0L;
         foreach (var entity in entities.Entities)
@@ -59,10 +47,10 @@ public class RotationMotionEffect : IMotionEffect
             totalCost += RotationCostCalculator.ComputeEntityCost(entity, origin, Math.Abs(_perTickTheta));
         }
 
-        var drawn = _context.DrawPower(totalCost);
+        var drawn = context.DrawPower(totalCost);
         if (drawn < totalCost)
         {
-            tickResult.Add(new EffectNotFiredEvent(_effectName, $"Insufficient power: needed {totalCost}, drew {drawn}"));
+            eventTracker.Add(new EffectNotFiredEvent(_effectName, $"Insufficient power: needed {totalCost}, drew {drawn}"));
             return false;
         }
 
@@ -78,7 +66,7 @@ public class RotationMotionEffect : IMotionEffect
                 origin.Y + dx * sin + dy * cos
             );
             var newAngle = entity.Angle + _perTickTheta;
-            MoveEntityService.Move(entity, newLocation, newAngle, tickResult);
+            MoveEntityService.Move(entity, newLocation, newAngle, eventTracker);
         }
 
         _remainingTicks--;
@@ -87,7 +75,7 @@ public class RotationMotionEffect : IMotionEffect
         {
             foreach (var entity in entities.Entities)
             {
-                tickResult.Add(new EntityRotatedEvent(entity, _totalRuneDegrees));
+                eventTracker.Add(new EntityRotatedEvent(entity, _totalRuneDegrees));
             }
         }
 

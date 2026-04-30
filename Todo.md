@@ -7,7 +7,6 @@ Next bugfix number: BUG-6
 
 | Key | Title | Description | Blocked By |
 |-----|-------|-------------|------------|
-| RMC-88 | Clean up TryAdvance/TryAdvanceInner split | `LinearMotionEffect` and `RotationMotionEffect` both have a public `TryAdvance` wrapper whose only job is to redirect `context.Result` before delegating to a private `TryAdvanceInner`. This is an artefact of how result redirection was bolted on. Collapse back to a single method — likely resolved naturally as part of the RMC-86 EventTracker overhaul. | RMC-86 |
 | RMC-89 | CalcifiedEntitySet / CalcifiedLocation | Replace `FixedEntitySet` and `FixedLocation` in production with `CalcifiedEntitySet` and `CalcifiedLocation`. Each wraps an inner `IEntitySet` / `ILocation` expression, evaluates it on the first `Resolve()`/`Evaluate()` call, caches the result, and returns the cache on all subsequent calls. The parser inserts these wrappers by default when no live-tracking modifier is present. Effect runes become agnostic — they receive an `IEntitySet`/`ILocation` and pass it straight to the motion effect without inspecting or snapshotting it. Remove `FixedEntitySet` and `FixedLocation` from production code; restore them to the test project as simple test utilities. | |
 | RMC-90 | Move linear motion cost calculation into LinearMotionEffect | VUN and VAR compute `totalCost` and `perTickCost` in the rune executor and pass the result in as a constructor parameter. CJIR and CJAR compute cost dynamically inside `RotationMotionEffect.TryAdvance` from the current entity state. Cost calculation should be the motion effect's responsibility in both cases — the rune executor should pass the entity set and distance/angle, not a pre-baked cost. This also correctly handles variable entity sets where the set of entities being moved isn't known at cast time. | RMC-89 |
 | BUG-5 | Entity clicks break during canvas animation | While motion effects are animating, click events on entities are not registered — clicks in open space still work. Likely caused by the constant SSE-driven redraws recreating canvas elements or resetting event listener state between frames. Investigate whether hit targets are being torn down and rebuilt on each redraw, and fix so click handling on entities is stable regardless of redraw rate. | |
@@ -55,3 +54,4 @@ Next bugfix number: BUG-6
 | RMC-86 | EventTracker — World-layer rename and entity tracking |
 | RMC-93 | ControllerEvent hierarchy |
 | RMC-94 | Game loop refactor |
+| RMC-88 | Clean up TryAdvance/TryAdvanceInner split |
