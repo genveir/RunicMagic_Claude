@@ -40,21 +40,21 @@ public class LinearMotionEffect : IMotionEffect
         _remainingTicks = 56;
     }
 
-    public bool TryAdvance(SpellResult tickResult)
+    public bool TryAdvance(IWorldEventTracker tickResult)
     {
-        var previousResult = _context.Result;
-        _context.Result = tickResult;
+        var previousResult = _context.EventTracker;
+        _context.EventTracker = tickResult;
         try
         {
             return TryAdvanceInner(tickResult);
         }
         finally
         {
-            _context.Result = previousResult;
+            _context.EventTracker = previousResult;
         }
     }
 
-    private bool TryAdvanceInner(SpellResult tickResult)
+    private bool TryAdvanceInner(IWorldEventTracker tickResult)
     {
         var drawn = _context.DrawPower(_perTickCost);
         if (drawn < _perTickCost)
@@ -79,7 +79,7 @@ public class LinearMotionEffect : IMotionEffect
             }
 
             var destination = entity.Location.Translate(direction, _perTickDistance);
-            MoveEntityService.Move(entity, destination, entity.Angle);
+            MoveEntityService.Move(entity, destination, entity.Angle, tickResult);
         }
 
         _remainingTicks--;

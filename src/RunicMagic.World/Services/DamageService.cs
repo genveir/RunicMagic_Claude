@@ -35,7 +35,7 @@ internal static class DamageService
 
         if (entity.StructuralIntegrity.CurrentIntegrity == 0)
         {
-            context.Result.Add(new EntityDisintegratedEvent(entity));
+            context.EventTracker.Add(new EntityDisintegratedEvent(entity));
             context.World.Remove(entity.Id);
         }
 
@@ -46,7 +46,7 @@ internal static class DamageService
 
         if (entity.StructuralIntegrity.CurrentIntegrity > 0 && actual > 0)
         {
-            context.Result.Add(new EntityDamagedEvent(entity, actual));
+            context.EventTracker.Add(new EntityDamagedEvent(entity, actual));
         }
         return actual;
     }

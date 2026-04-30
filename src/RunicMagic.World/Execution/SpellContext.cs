@@ -6,18 +6,18 @@ public class SpellContext
 {
     private readonly Stack<EntitySet> _sourceStack = new();
 
-    public SpellContext(EntitySet caster, EntitySet executor, WorldModel world, SpellResult result)
+    public SpellContext(EntitySet caster, EntitySet executor, WorldModel world, IWorldEventTracker eventTracker)
     {
         Caster = caster;
         Executor = executor;
         World = world;
-        Result = result;
+        EventTracker = eventTracker;
     }
 
     public EntitySet Caster { get; }
     public EntitySet Executor { get; }
     public WorldModel World { get; }
-    public SpellResult Result { get; internal set; }
+    public IWorldEventTracker EventTracker { get; internal set; }
 
     public void PushPowerSource(EntitySet source)
     {
@@ -46,7 +46,7 @@ public class SpellContext
 
     public SpellContext ForkWithNewExecutor(EntitySet newExecutor)
     {
-        var forked = new SpellContext(Caster, newExecutor, World, Result);
+        var forked = new SpellContext(Caster, newExecutor, World, EventTracker);
         foreach (var source in _sourceStack.Reverse())
         {
             forked._sourceStack.Push(source);
@@ -68,7 +68,7 @@ public class SpellContext
             {
                 break;
             }
-            remaining -= PowerService.DrawPower(source, remaining, Result);
+            remaining -= PowerService.DrawPower(source, remaining, EventTracker);
         }
         return amount - remaining;
     }

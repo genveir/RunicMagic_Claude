@@ -58,14 +58,12 @@ public class WorldModel
         _motionEffects.Add(effect);
     }
 
-    public SpellResult TickMotion()
+    public void TickMotion(IWorldEventTracker eventTracker)
     {
-        var result = new SpellResult();
-
         List<IMotionEffect> effectsToRemove = new();
         foreach (var motionEffect in _motionEffects)
         {
-            var advanced = motionEffect.TryAdvance(result);
+            var advanced = motionEffect.TryAdvance(eventTracker);
 
             if (!advanced || motionEffect.IsComplete)
             {
@@ -73,8 +71,6 @@ public class WorldModel
             }
         }
         _motionEffects.RemoveAll(effectsToRemove.Contains);
-
-        return result;
     }
 
     private static Rectangle Bounds(Entity e)

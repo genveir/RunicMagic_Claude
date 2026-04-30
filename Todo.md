@@ -2,12 +2,11 @@
 
 ## To Do — Milestone 2
 
-Next ticket number: RMC-91
+Next ticket number: RMC-96
 Next bugfix number: BUG-6
 
 | Key | Title | Description | Blocked By |
 |-----|-------|-------------|------------|
-| RMC-86 | EventTracker — replace SpellResult with a unified change tracker | Rename `SpellResult` to `EventTracker` (or similar) and extend it to track two things: the existing spell events (text feedback) and a `HashSet<Entity>` of every entity touched during the operation. `MoveEntityService.Move` adds the moved entity; `PowerService.DrawPower` adds every entity drawn from. The tracker is already threaded through all call chains (`TryAdvance`, `DrawPower`, etc.) so no signature changes are needed beyond the type itself. `WorldModel.TickMotion` returns the tracker for the tick; the game loop reads its touched-entity set to push canvas deltas alongside any text. Track everything — don't filter by canvas-relevance at this layer. | RMC-85 |
 | RMC-88 | Clean up TryAdvance/TryAdvanceInner split | `LinearMotionEffect` and `RotationMotionEffect` both have a public `TryAdvance` wrapper whose only job is to redirect `context.Result` before delegating to a private `TryAdvanceInner`. This is an artefact of how result redirection was bolted on. Collapse back to a single method — likely resolved naturally as part of the RMC-86 EventTracker overhaul. | RMC-86 |
 | RMC-89 | CalcifiedEntitySet / CalcifiedLocation | Replace `FixedEntitySet` and `FixedLocation` in production with `CalcifiedEntitySet` and `CalcifiedLocation`. Each wraps an inner `IEntitySet` / `ILocation` expression, evaluates it on the first `Resolve()`/`Evaluate()` call, caches the result, and returns the cache on all subsequent calls. The parser inserts these wrappers by default when no live-tracking modifier is present. Effect runes become agnostic — they receive an `IEntitySet`/`ILocation` and pass it straight to the motion effect without inspecting or snapshotting it. Remove `FixedEntitySet` and `FixedLocation` from production code; restore them to the test project as simple test utilities. | |
 | RMC-90 | Move linear motion cost calculation into LinearMotionEffect | VUN and VAR compute `totalCost` and `perTickCost` in the rune executor and pass the result in as a constructor parameter. CJIR and CJAR compute cost dynamically inside `RotationMotionEffect.TryAdvance` from the current entity state. Cost calculation should be the motion effect's responsibility in both cases — the rune executor should pass the entity set and distance/angle, not a pre-baked cost. This also correctly handles variable entity sets where the set of entities being moved isn't known at cast time. | RMC-89 |
@@ -22,6 +21,9 @@ Next bugfix number: BUG-6
 
 | Key | Title | Description | Blocked By |
 |-----|-------|-------------|------------|
+| RMC-95 | Clean up GlobalUsings in test project | `GlobalUsings.cs` currently imports `RunicMagic.World.Capabilities` and `RunicMagic.World.Runes.RuneTypes` — both are narrow domain namespaces that should be explicit where needed. Move them out. Add `FluentAssertions` and `Xunit` as global usings instead, since every test file needs them. | |
+| RMC-91 | Move entry point to Controller; invert View/Controller dependency | Currently View hosts the application, making Controller a dependency of View. This inverts the intended hub-and-spokes architecture. Move the entry point into Controller so that Controller owns the host and View becomes a spoke that Controller depends on, not the other way around. | |
+| RMC-92 | Move status rendering to View | The terminal prompt is currently rendered in the Controller assembly. Controller should instead produce a model carrying the caster's status information (e.g. power, health) and pass it to View, which is responsible for deciding how to format and display that data. | |
 | RMC-60 | Design small items | Define the world model for small items — portable objects a creature can carry (e.g. a mana gem in the caster's pocket). Covers how items are represented, how carrying/inventory works, and how items interact with spells and power sourcing. | |
 | RMC-37 | Kill creatures when they run out of life | At any point during spell execution, living entities may run out of hitpoints. In this case the game should register that they're dead and remove their living and agency properties | |
 | RMC-38 | Register entity destruction | It should be possible to destroy entities. When this happens, the game should register that the entity is destroyed | |
@@ -50,3 +52,6 @@ Next bugfix number: BUG-6
 | RMC-81 | Queue spells for tick processing |
 | RMC-82 | Motion effects queue |
 | RMC-85 | Scale up power costs |
+| RMC-86 | EventTracker — World-layer rename and entity tracking |
+| RMC-93 | ControllerEvent hierarchy |
+| RMC-94 | Game loop refactor |

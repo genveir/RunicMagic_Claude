@@ -1,4 +1,5 @@
 using FluentAssertions;
+using RunicMagic.Controller.Services;
 using RunicMagic.Tests.Builders;
 using RunicMagic.Tests.Execution;
 using RunicMagic.World;
@@ -53,13 +54,13 @@ public class PowerServiceOverchargeTests
         world.Add(target);
         var targetSet = new EntitySet([target]);
 
-        var result = new SpellResult();
+        var result = new EventTracker();
         var context = TestFixtures.MakeContext(world: world, result: result);
 
         PowerService.FillWithOvercharge(targetSet, null, 1, context);
 
-        result.Events.OfType<EntityDisintegratedEvent>().Should().ContainSingle().Which.Entity.Should().Be(target);
-        result.Events.OfType<EntityDamagedEvent>().Should().BeEmpty("entity disintegrated, not merely damaged");
+        result.WorldEvents.OfType<EntityDisintegratedEvent>().Should().ContainSingle().Which.Entity.Should().Be(target);
+        result.WorldEvents.OfType<EntityDamagedEvent>().Should().BeEmpty("entity disintegrated, not merely damaged");
     }
 
     [Fact]
@@ -77,14 +78,14 @@ public class PowerServiceOverchargeTests
             .Build();
         var targetSet = new EntitySet([target]);
 
-        var result = new SpellResult();
+        var result = new EventTracker();
         var context = TestFixtures.MakeContext(result: result);
 
         // 6 power, target absorbs nothing → 12 damage to target → 6 power consumed
         // remaining = 0, scope is never reached
         PowerService.FillWithOvercharge(targetSet, null, 6, context);
 
-        result.Events.OfType<PowerFilledEvent>()
+        result.WorldEvents.OfType<PowerFilledEvent>()
             .Where(e => e.Entity == scopeEntity)
             .Should().BeEmpty("all power was consumed damaging the target");
     }
@@ -222,7 +223,7 @@ public class PowerServiceOverchargeTests
         world.Add(target);
         var targetSet = new EntitySet([target]);
 
-        var result = new SpellResult();
+        var result = new EventTracker();
         var act = () => PowerService.FillWithOvercharge(targetSet, null, 10, TestFixtures.MakeContext(world: world, result: result));
 
         act.Should().NotThrow();

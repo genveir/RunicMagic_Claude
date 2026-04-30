@@ -1,4 +1,5 @@
 using FluentAssertions;
+using RunicMagic.Controller.Services;
 using RunicMagic.Tests.Builders;
 using RunicMagic.Tests.Execution;
 using RunicMagic.World;
@@ -41,7 +42,7 @@ public class LinearMotionEffectTests
 
         for (var i = 0; i < 56; i++)
         {
-            effect.TryAdvance(new SpellResult());
+            effect.TryAdvance(new EventTracker());
         }
 
         entity.Location.X.Should().BeApproximately(1560, 0.001);
@@ -58,10 +59,10 @@ public class LinearMotionEffectTests
 
         effect.IsComplete.Should().BeFalse();
 
-        for (var i = 0; i < 55; i++) effect.TryAdvance(new SpellResult());
+        for (var i = 0; i < 55; i++) effect.TryAdvance(new EventTracker());
         effect.IsComplete.Should().BeFalse();
 
-        effect.TryAdvance(new SpellResult());
+        effect.TryAdvance(new EventTracker());
         effect.IsComplete.Should().BeTrue();
     }
 
@@ -72,14 +73,14 @@ public class LinearMotionEffectTests
         var context = TestFixtures.MakeContext();
         var effect = MakePushEffect(context, entity, totalDistance: 100);
 
-        SpellResult lastResult = new SpellResult();
+        EventTracker lastResult = new EventTracker();
         for (var i = 0; i < 56; i++)
         {
-            lastResult = new SpellResult();
+            lastResult = new EventTracker();
             effect.TryAdvance(lastResult);
         }
 
-        lastResult.Events.OfType<EntityPushedEvent>().Should().ContainSingle()
+        lastResult.WorldEvents.OfType<EntityPushedEvent>().Should().ContainSingle()
             .Which.DistanceMm.Should().Be(100);
     }
 
@@ -90,10 +91,10 @@ public class LinearMotionEffectTests
         var context = TestFixtures.MakeContext();
         var effect = MakePushEffect(context, entity, totalDistance: 100);
 
-        var intermediateResult = new SpellResult();
+        var intermediateResult = new EventTracker();
         effect.TryAdvance(intermediateResult);
 
-        intermediateResult.Events.OfType<EntityPushedEvent>().Should().BeEmpty();
+        intermediateResult.WorldEvents.OfType<EntityPushedEvent>().Should().BeEmpty();
     }
 
     [Fact]
@@ -118,11 +119,11 @@ public class LinearMotionEffectTests
             effectName: "VUN"
         );
 
-        var result = new SpellResult();
+        var result = new EventTracker();
         var advanced = effect.TryAdvance(result);
 
         advanced.Should().BeFalse();
-        result.Events.OfType<EffectNotFiredEvent>().Should().ContainSingle()
+        result.WorldEvents.OfType<EffectNotFiredEvent>().Should().ContainSingle()
             .Which.Effect.Should().Be("VUN");
     }
 
@@ -147,7 +148,7 @@ public class LinearMotionEffectTests
             effectName: "VUN"
         );
 
-        effect.TryAdvance(new SpellResult());
+        effect.TryAdvance(new EventTracker());
 
         entity.Location.X.Should().Be(1000);
     }
@@ -183,7 +184,7 @@ public class LinearMotionEffectTests
             effectName: "VUN"
         );
 
-        for (var i = 0; i < 56; i++) effect.TryAdvance(new SpellResult());
+        for (var i = 0; i < 56; i++) effect.TryAdvance(new EventTracker());
 
         // 3 successful ticks × 100mm/tick = 300mm total
         entity.Location.X.Should().BeApproximately(300, 0.001);
@@ -205,7 +206,7 @@ public class LinearMotionEffectTests
             effectName: "VAR"
         );
 
-        for (var i = 0; i < 56; i++) effect.TryAdvance(new SpellResult());
+        for (var i = 0; i < 56; i++) effect.TryAdvance(new EventTracker());
 
         entity.Location.X.Should().BeApproximately(500, 0.001);
         entity.Location.Y.Should().BeApproximately(0, 0.001);
@@ -227,7 +228,7 @@ public class LinearMotionEffectTests
             effectName: "VUN"
         );
 
-        for (var i = 0; i < 56; i++) effect.TryAdvance(new SpellResult());
+        for (var i = 0; i < 56; i++) effect.TryAdvance(new EventTracker());
 
         entity.Location.X.Should().BeApproximately(1560, 0.001);
     }

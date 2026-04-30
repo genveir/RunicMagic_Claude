@@ -20,7 +20,7 @@ public class EventsController(SseConnectionManager sseManager, IPlayerViewInterf
         Response.ContentType = "text/event-stream";
         Response.Headers.CacheControl = "no-cache";
 
-        var (id, channel) = sseManager.AddConnection(player.Prompt);
+        var (id, channel) = sseManager.AddConnection("no caster >");
         try
         {
             await foreach (var result in channel.Reader.ReadAllAsync(ct))

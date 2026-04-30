@@ -1,8 +1,9 @@
 using FluentAssertions;
+using RunicMagic.Controller.Models;
+using RunicMagic.Controller.RuneParsing;
 using RunicMagic.Controller.Services;
 using RunicMagic.Tests.Builders;
 using RunicMagic.World;
-using RunicMagic.World.Capabilities;
 using RunicMagic.World.Execution;
 using Xunit;
 
@@ -23,66 +24,72 @@ public class SpellCastingServiceTests
     }
 
     [Fact]
-    public void Cast_EmptyInput_ReturnsRanOutOfTokensMessage()
+    public void Cast_EmptyInput_EmitsRanOutOfTokensEvent()
     {
         var world = new WorldModel();
         var caster = AddCaster(world);
         var service = MakeService(world);
+        var tracker = new EventTracker();
 
-        var lines = service.Cast("", casterId: caster.Id);
+        service.Cast("", caster.Id, tracker);
 
-        lines.Should().ContainSingle().Which.Should().Contain("ran out of runes");
+        tracker.ParseEvents.Should().ContainSingle().Which.Should().BeOfType<RanOutOfTokensEvent>();
     }
 
     [Fact]
-    public void Cast_UnrecognisedRune_ReturnsUnexpectedTokenMessage()
+    public void Cast_UnrecognisedRune_EmitsUnexpectedTokenEvent()
     {
         var world = new WorldModel();
         var caster = AddCaster(world);
         var service = MakeService(world);
+        var tracker = new EventTracker();
 
-        var lines = service.Cast("NOTARUNE", casterId: caster.Id);
+        service.Cast("NOTARUNE", caster.Id, tracker);
 
-        lines.Should().ContainSingle().Which.Should().Contain("NOTARUNE");
+        tracker.ParseEvents.Should().ContainSingle().Which.Should().BeOfType<UnexpectedTokenEvent>()
+            .Which.Token.Should().Be("NOTARUNE");
     }
 
     [Fact]
-    public void Cast_IncompleteSpell_ReturnsRanOutOfTokensMessage()
+    public void Cast_IncompleteSpell_EmitsRanOutOfTokensEvent()
     {
         var world = new WorldModel();
         var caster = AddCaster(world);
         var service = MakeService(world);
+        var tracker = new EventTracker();
 
         // ZU VUN A — missing Number argument for VUN
-        var lines = service.Cast("ZU VUN A", casterId: caster.Id);
+        service.Cast("ZU VUN A", caster.Id, tracker);
 
-        lines.Should().ContainSingle().Which.Should().Contain("ran out of runes");
+        tracker.ParseEvents.Should().ContainSingle().Which.Should().BeOfType<RanOutOfTokensEvent>();
     }
 
     [Fact]
-    public void Cast_ValidSpell_NoCasterSelected_ReturnsNoCasterSelectedMessage()
+    public void Cast_ValidSpell_NoCasterSelected_EmitsNoCasterSelectedEvent()
     {
         var world = new WorldModel();
         var service = MakeService(world);
+        var tracker = new EventTracker();
 
-        var lines = service.Cast("ZU VUN LA IR HOT IR HOT HOT", casterId: null);
+        service.Cast("ZU VUN LA IR HOT IR HOT HOT", casterId: null, tracker);
 
-        lines.Should().ContainSingle().Which.Should().Be("No caster selected.");
+        tracker.ControllerEvents.Should().ContainSingle().Which.Should().BeOfType<NoCasterSelectedEvent>();
     }
 
     [Fact]
-    public void Cast_ValidSpell_CasterIdNotInWorld_ReturnsCasterNotFoundMessage()
+    public void Cast_ValidSpell_CasterIdNotInWorld_EmitsCasterNotFoundEvent()
     {
         var world = new WorldModel();
         var service = MakeService(world);
+        var tracker = new EventTracker();
 
-        var lines = service.Cast("ZU VUN LA IR HOT IR HOT HOT", casterId: EntityId.New());
+        service.Cast("ZU VUN LA IR HOT IR HOT HOT", EntityId.New(), tracker);
 
-        lines.Should().ContainSingle().Which.Should().Be("Caster not found in world.");
+        tracker.ControllerEvents.Should().ContainSingle().Which.Should().BeOfType<CasterNotFoundEvent>();
     }
 
     [Fact]
-    public void Cast_MilestoneSpell_ReturnsPushedEvent()
+    public void Cast_MilestoneSpell_EmitsEntityPushedEventOnFinalTick()
     {
         var world = new WorldModel();
 
@@ -101,20 +108,21 @@ public class SpellCastingServiceTests
         world.Add(target);
 
         var service = MakeService(world);
-        service.Cast("ZU VUN LA IR HOT IR HOT HOT", casterId: casterEntity.Id);
+        service.Cast("ZU VUN LA IR HOT IR HOT HOT", casterEntity.Id, new EventTracker());
 
-        SpellResult finalTick = new SpellResult();
+        EventTracker finalTick = new EventTracker();
         for (var i = 0; i < 56; i++)
         {
-            finalTick = world.TickMotion();
+            finalTick = new EventTracker();
+            world.TickMotion(finalTick);
         }
 
-        var pushedEvent = finalTick.Events.OfType<EntityPushedEvent>().Should().ContainSingle().Subject;
-        pushedEvent.Entity.Should().BeSameAs(target);
+        finalTick.WorldEvents.OfType<EntityPushedEvent>().Should().ContainSingle()
+            .Which.Entity.Should().BeSameAs(target);
     }
 
     [Fact]
-    public void Cast_MilestoneSpell_ReturnsPowerDrawnEvent()
+    public void Cast_MilestoneSpell_EmitsPowerDrawnEvents()
     {
         var world = new WorldModel();
 
@@ -133,9 +141,16 @@ public class SpellCastingServiceTests
         world.Add(target);
 
         var service = MakeService(world);
+        service.Cast("ZU VUN LA IR HOT IR HOT HOT", casterEntity.Id, new EventTracker());
 
-        var lines = service.Cast("ZU VUN LA IR HOT IR HOT HOT", casterId: casterEntity.Id);
+        var allWorldEvents = new List<WorldEvent>();
+        for (var i = 0; i < 56; i++)
+        {
+            var tickTracker = new EventTracker();
+            world.TickMotion(tickTracker);
+            allWorldEvents.AddRange(tickTracker.WorldEvents);
+        }
 
-        lines.Should().Contain(l => l.Contains("Caster") && l.Contains("lost") && l.Contains("power"));
+        allWorldEvents.OfType<PowerDrawnEvent>().Should().Contain(e => e.Entity.Label == "Caster");
     }
 }

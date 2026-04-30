@@ -34,21 +34,21 @@ public class RotationMotionEffect : IMotionEffect
         _remainingTicks = 56;
     }
 
-    public bool TryAdvance(SpellResult tickResult)
+    public bool TryAdvance(IWorldEventTracker tickResult)
     {
-        var previousResult = _context.Result;
-        _context.Result = tickResult;
+        var previousResult = _context.EventTracker;
+        _context.EventTracker = tickResult;
         try
         {
             return TryAdvanceInner(tickResult);
         }
         finally
         {
-            _context.Result = previousResult;
+            _context.EventTracker = previousResult;
         }
     }
 
-    private bool TryAdvanceInner(SpellResult tickResult)
+    private bool TryAdvanceInner(IWorldEventTracker tickResult)
     {
         var entities = _entities.Resolve(_context);
         var origin = _origin.Evaluate(_context);
@@ -78,7 +78,7 @@ public class RotationMotionEffect : IMotionEffect
                 origin.Y + dx * sin + dy * cos
             );
             var newAngle = entity.Angle + _perTickTheta;
-            MoveEntityService.Move(entity, newLocation, newAngle);
+            MoveEntityService.Move(entity, newLocation, newAngle, tickResult);
         }
 
         _remainingTicks--;

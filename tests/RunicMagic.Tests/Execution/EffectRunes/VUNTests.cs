@@ -1,4 +1,5 @@
 using FluentAssertions;
+using RunicMagic.Controller.Services;
 using RunicMagic.Tests.Builders;
 using RunicMagic.World;
 using RunicMagic.World.Execution;
@@ -9,12 +10,13 @@ namespace RunicMagic.Tests.Execution.EffectRunes;
 
 public class VUNTests
 {
-    private static SpellResult RunTicks(WorldModel world, int count)
+    private static EventTracker RunTicks(WorldModel world, int count)
     {
-        var last = new SpellResult();
+        var last = new EventTracker();
         for (var i = 0; i < count; i++)
         {
-            last = world.TickMotion();
+            last = new EventTracker();
+            world.TickMotion(last);
         }
         return last;
     }
@@ -157,7 +159,7 @@ public class VUNTests
         vun.Execute(context);
         var finalTickResult = RunTicks(world, 56);
 
-        finalTickResult.Events.OfType<EntityPushedEvent>().Should().HaveCount(2);
+        finalTickResult.WorldEvents.OfType<EntityPushedEvent>().Should().HaveCount(2);
     }
 
     [Fact]
@@ -181,10 +183,11 @@ public class VUNTests
         var context = TestFixtures.MakeContext(caster: caster, world: world);
 
         vun.Execute(context);
-        var tickResult = world.TickMotion();
+        var tickResult = new EventTracker();
+        world.TickMotion(tickResult);
 
         entity.Location.X.Should().Be(originalX);
-        tickResult.Events.OfType<EffectNotFiredEvent>().Should().ContainSingle()
+        tickResult.WorldEvents.OfType<EffectNotFiredEvent>().Should().ContainSingle()
             .Which.Effect.Should().Be("VUN");
     }
 
@@ -217,7 +220,7 @@ public class VUNTests
         var context = TestFixtures.MakeContext(caster: caster, world: world);
 
         vun.Execute(context);
-        for (var i = 0; i < 10; i++) world.TickMotion();
+        for (var i = 0; i < 10; i++) world.TickMotion(new EventTracker());
 
         // Moved 2/56 of the total distance; entity should not be at full destination
         entity.Location.X.Should().BeGreaterThan(1000);
@@ -242,7 +245,7 @@ public class VUNTests
         var context = TestFixtures.MakeContext(caster: caster, world: world);
 
         vun.Execute(context);
-        world.TickMotion();
+        world.TickMotion(new EventTracker());
 
         drawn.Should().BeEmpty();
     }

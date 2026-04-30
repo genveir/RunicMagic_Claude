@@ -1,3 +1,4 @@
+using RunicMagic.Controller.Services;
 using RunicMagic.Tests.Builders;
 using RunicMagic.World;
 using RunicMagic.World.Execution;
@@ -12,13 +13,13 @@ internal static class TestFixtures
         EntitySet? caster = null,
         EntitySet? executor = null,
         WorldModel? world = null,
-        SpellResult? result = null)
+        EventTracker? result = null)
     {
         return new SpellContext(
             caster ?? new EntitySet([]),
             executor ?? new EntitySet([]),
             world ?? new WorldModel(),
-            result ?? new SpellResult()
+            result ?? new EventTracker()
         );
     }
 }

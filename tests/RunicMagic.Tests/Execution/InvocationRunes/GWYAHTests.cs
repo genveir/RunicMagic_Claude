@@ -1,4 +1,5 @@
 using FluentAssertions;
+using RunicMagic.Controller.Services;
 using RunicMagic.Tests.Builders;
 using RunicMagic.World;
 using RunicMagic.World.Capabilities;
@@ -22,13 +23,14 @@ public class GWYAHTests
     [Fact]
     public void Execute_EntityWithNoInscriptions_FiresNothing()
     {
+        var tracker = new EventTracker();
         var target = new EntityBuilder().Build();
-        var context = TestFixtures.MakeContext();
+        var context = TestFixtures.MakeContext(result: tracker);
         var gwyah = new GWYAH(target: new FixedEntitySet(target));
 
         gwyah.Execute(context);
 
-        context.Result.Events.Should().BeEmpty();
+        tracker.WorldEvents.Should().BeEmpty();
     }
 
     // ── Executor is swapped ───────────────────────────────────────────────────

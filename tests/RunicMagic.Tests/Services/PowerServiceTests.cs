@@ -1,4 +1,5 @@
 using FluentAssertions;
+using RunicMagic.Controller.Services;
 using RunicMagic.Tests.Builders;
 using RunicMagic.World.Capabilities;
 using RunicMagic.World.Execution;
@@ -18,7 +19,7 @@ public class PowerServiceTests
         var entity3 = new EntityBuilder().WithReservoir(draw: amount => { drawn.Add(amount); return new ReservoirDraw(amount, false); }).Build();
 
         var set = new EntitySet([entity1, entity2, entity3]);
-        PowerService.DrawPower(set, 10, new SpellResult());
+        PowerService.DrawPower(set, 10, new EventTracker());
 
         // ceil(10/3) = 4
         drawn.Should().AllSatisfy(d => d.Should().Be(4));
@@ -35,7 +36,7 @@ public class PowerServiceTests
         var withoutReservoir = new EntityBuilder().Build();
 
         var set = new EntitySet([withReservoir, withoutReservoir]);
-        PowerService.DrawPower(set, 10, new SpellResult());
+        PowerService.DrawPower(set, 10, new EventTracker());
 
         drawn.Should().HaveCount(1);
         drawn[0].Should().Be(10);
@@ -45,7 +46,7 @@ public class PowerServiceTests
     public void DrawPower_EmptySet_DoesNothing()
     {
         var set = new EntitySet([]);
-        var act = () => PowerService.DrawPower(set, 100, new SpellResult());
+        var act = () => PowerService.DrawPower(set, 100, new EventTracker());
         act.Should().NotThrow();
     }
 
@@ -54,7 +55,7 @@ public class PowerServiceTests
     {
         var entity = new EntityBuilder().Build();
         var set = new EntitySet([entity]);
-        var act = () => PowerService.DrawPower(set, 100, new SpellResult());
+        var act = () => PowerService.DrawPower(set, 100, new EventTracker());
         act.Should().NotThrow();
     }
 
@@ -66,7 +67,7 @@ public class PowerServiceTests
         var entity2 = new EntityBuilder().WithReservoir(draw: amount => { drawn.Add(amount); return new ReservoirDraw(amount, false); }).Build();
 
         var set = new EntitySet([entity1, entity2]);
-        PowerService.DrawPower(set, 20, new SpellResult());
+        PowerService.DrawPower(set, 20, new EventTracker());
 
         drawn.Should().AllSatisfy(d => d.Should().Be(10));
     }
@@ -78,10 +79,10 @@ public class PowerServiceTests
         var entity2 = new EntityBuilder().WithReservoir(draw: amount => new ReservoirDraw(amount, false)).Build();
 
         var set = new EntitySet([entity1, entity2]);
-        var result = new SpellResult();
+        var result = new EventTracker();
         PowerService.DrawPower(set, 20, result);
 
-        result.Events.OfType<PowerDrawnEvent>().Should().HaveCount(2);
+        result.WorldEvents.OfType<PowerDrawnEvent>().Should().HaveCount(2);
     }
 
     [Fact]
@@ -92,10 +93,10 @@ public class PowerServiceTests
             .Build();
 
         var set = new EntitySet([entity]);
-        var result = new SpellResult();
+        var result = new EventTracker();
         PowerService.DrawPower(set, 10, result);
 
-        result.Events.OfType<EntityDrainedEvent>().Should().ContainSingle()
+        result.WorldEvents.OfType<EntityDrainedEvent>().Should().ContainSingle()
             .Which.Entity.Should().Be(entity);
     }
 
@@ -107,7 +108,7 @@ public class PowerServiceTests
             .Build();
 
         var set = new EntitySet([entity]);
-        var totalDrawn = PowerService.DrawPower(set, 20, new SpellResult());
+        var totalDrawn = PowerService.DrawPower(set, 20, new EventTracker());
 
         totalDrawn.Should().Be(10);
     }
@@ -128,7 +129,7 @@ public class PowerServiceTests
             .Build();
 
         var set = new EntitySet([small, large]);
-        var totalDrawn = PowerService.DrawPower(set, 1000, new SpellResult());
+        var totalDrawn = PowerService.DrawPower(set, 1000, new EventTracker());
 
         totalDrawn.Should().Be(1000);
         smallCalled.Should().BeFalse("larger reservoir should satisfy the draw without touching the smaller one");
@@ -149,11 +150,11 @@ public class PowerServiceTests
             .Build();
 
         var set = new EntitySet([small, large]);
-        var result = new SpellResult();
+        var result = new EventTracker();
         var totalDrawn = PowerService.DrawPower(set, 2000, result);
 
         totalDrawn.Should().Be(2000);
-        result.Events.OfType<EntityDrainedEvent>().Should().HaveCount(2);
+        result.WorldEvents.OfType<EntityDrainedEvent>().Should().HaveCount(2);
     }
 
     [Fact]
@@ -172,7 +173,7 @@ public class PowerServiceTests
             .Build();
 
         var set = new EntitySet([entity1, entity2]);
-        PowerService.DrawPower(set, 1000, new SpellResult());
+        PowerService.DrawPower(set, 1000, new EventTracker());
 
         drawn.Should().HaveCount(2);
         drawn.Should().AllSatisfy(d => d.Should().Be(500));
@@ -193,7 +194,7 @@ public class PowerServiceTests
             .Build();
 
         var set = new EntitySet([small, large]);
-        var totalDrawn = PowerService.DrawPower(set, 3000, new SpellResult());
+        var totalDrawn = PowerService.DrawPower(set, 3000, new EventTracker());
 
         totalDrawn.Should().Be(2000);
     }
@@ -207,7 +208,7 @@ public class PowerServiceTests
         var entity3 = new EntityBuilder().WithReservoir(fill: amount => { filled.Add(amount); return new ReservoirFill(amount, false); }).Build();
 
         var set = new EntitySet([entity1, entity2, entity3]);
-        PowerService.FillPower(set, 10, new SpellResult());
+        PowerService.FillPower(set, 10, new EventTracker());
 
         // ceil(10/3) = 4
         filled.Should().AllSatisfy(f => f.Should().Be(4));
@@ -224,7 +225,7 @@ public class PowerServiceTests
         var withoutReservoir = new EntityBuilder().Build();
 
         var set = new EntitySet([withReservoir, withoutReservoir]);
-        PowerService.FillPower(set, 10, new SpellResult());
+        PowerService.FillPower(set, 10, new EventTracker());
 
         filled.Should().HaveCount(1);
         filled[0].Should().Be(10);
@@ -234,7 +235,7 @@ public class PowerServiceTests
     public void FillPower_EmptySet_DoesNothing()
     {
         var set = new EntitySet([]);
-        var act = () => PowerService.FillPower(set, 100, new SpellResult());
+        var act = () => PowerService.FillPower(set, 100, new EventTracker());
         act.Should().NotThrow();
     }
 
@@ -243,7 +244,7 @@ public class PowerServiceTests
     {
         var entity = new EntityBuilder().Build();
         var set = new EntitySet([entity]);
-        var act = () => PowerService.FillPower(set, 100, new SpellResult());
+        var act = () => PowerService.FillPower(set, 100, new EventTracker());
         act.Should().NotThrow();
     }
 
@@ -255,7 +256,7 @@ public class PowerServiceTests
         var entity2 = new EntityBuilder().WithReservoir(fill: amount => { filled.Add(amount); return new ReservoirFill(amount, false); }).Build();
 
         var set = new EntitySet([entity1, entity2]);
-        PowerService.FillPower(set, 20, new SpellResult());
+        PowerService.FillPower(set, 20, new EventTracker());
 
         filled.Should().AllSatisfy(f => f.Should().Be(10));
     }
@@ -267,10 +268,10 @@ public class PowerServiceTests
         var entity2 = new EntityBuilder().WithReservoir(fill: amount => new ReservoirFill(amount, false)).Build();
 
         var set = new EntitySet([entity1, entity2]);
-        var result = new SpellResult();
+        var result = new EventTracker();
         PowerService.FillPower(set, 20, result);
 
-        result.Events.OfType<PowerFilledEvent>().Should().HaveCount(2);
+        result.WorldEvents.OfType<PowerFilledEvent>().Should().HaveCount(2);
     }
 
     [Fact]
@@ -281,10 +282,10 @@ public class PowerServiceTests
             .Build();
 
         var set = new EntitySet([entity]);
-        var result = new SpellResult();
+        var result = new EventTracker();
         PowerService.FillPower(set, 10, result);
 
-        result.Events.OfType<EntityFullEvent>().Should().ContainSingle()
+        result.WorldEvents.OfType<EntityFullEvent>().Should().ContainSingle()
             .Which.Entity.Should().Be(entity);
     }
 
@@ -296,7 +297,7 @@ public class PowerServiceTests
             .Build();
 
         var set = new EntitySet([entity]);
-        var totalFilled = PowerService.FillPower(set, 20, new SpellResult());
+        var totalFilled = PowerService.FillPower(set, 20, new EventTracker());
 
         totalFilled.Should().Be(10);
     }
@@ -317,7 +318,7 @@ public class PowerServiceTests
             .Build();
 
         var set = new EntitySet([empty, full]);
-        var totalFilled = PowerService.FillPower(set, 500, new SpellResult());
+        var totalFilled = PowerService.FillPower(set, 500, new EventTracker());
 
         totalFilled.Should().Be(500);
         fullCalled.Should().BeFalse("emptier reservoir should absorb the fill without touching the fuller one");
@@ -338,11 +339,11 @@ public class PowerServiceTests
             .Build();
 
         var set = new EntitySet([empty, full]);
-        var result = new SpellResult();
+        var result = new EventTracker();
         var totalFilled = PowerService.FillPower(set, 1500, result);
 
         totalFilled.Should().Be(1500);
-        result.Events.OfType<EntityFullEvent>().Should().HaveCount(2);
+        result.WorldEvents.OfType<EntityFullEvent>().Should().HaveCount(2);
     }
 
     [Fact]
@@ -361,7 +362,7 @@ public class PowerServiceTests
             .Build();
 
         var set = new EntitySet([entity1, entity2]);
-        PowerService.FillPower(set, 1000, new SpellResult());
+        PowerService.FillPower(set, 1000, new EventTracker());
 
         filled.Should().HaveCount(2);
         filled.Should().AllSatisfy(f => f.Should().Be(500));
@@ -382,7 +383,7 @@ public class PowerServiceTests
             .Build();
 
         var set = new EntitySet([empty, full]);
-        var totalFilled = PowerService.FillPower(set, 3000, new SpellResult());
+        var totalFilled = PowerService.FillPower(set, 3000, new EventTracker());
 
         totalFilled.Should().Be(1500);
     }

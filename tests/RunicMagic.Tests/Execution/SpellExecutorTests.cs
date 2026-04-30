@@ -1,4 +1,5 @@
 using FluentAssertions;
+using RunicMagic.Controller.Services;
 using RunicMagic.Tests.Builders;
 using RunicMagic.World;
 using RunicMagic.World.Capabilities;
@@ -43,17 +44,18 @@ public class SpellExecutorTests
         );
 
         var spellExecutor = new SpellExecutor(world);
-        spellExecutor.Execute(spell, runeCount: 11, caster, executor);
+        spellExecutor.Execute(spell, new EventTracker(), 11, caster, executor);
 
-        SpellResult finalTickResult = new SpellResult();
+        EventTracker finalTickResult = new EventTracker();
         for (var i = 0; i < 56; i++)
         {
-            finalTickResult = world.TickMotion();
+            finalTickResult = new EventTracker();
+            world.TickMotion(finalTickResult);
         }
 
         target.Location.X.Should().BeApproximately(3744, 0.001);
         target.Location.Y.Should().BeApproximately(0, 0.001);
-        finalTickResult.Events.OfType<EntityPushedEvent>().Should().ContainSingle()
+        finalTickResult.WorldEvents.OfType<EntityPushedEvent>().Should().ContainSingle()
             .Which.Entity.Should().Be(target);
     }
 
@@ -81,7 +83,7 @@ public class SpellExecutorTests
         );
 
         var spellExecutor = new SpellExecutor(world);
-        spellExecutor.Execute(spell, runeCount: 10, caster, executor);
+        spellExecutor.Execute(spell, new EventTracker(), 10, caster, executor);
 
         // evaluation cost = 10 runes × 1_000_000 = 10_000_000
         drawn.Should().ContainSingle().Which.Should().Be(10_000_000);
@@ -110,7 +112,7 @@ public class SpellExecutorTests
         var spell = new ZU(new VUN(toMove: new FixedEntitySet(), howFar: new HET(), origin: new FixedLocation(0, 0)));
 
         var spellExecutor = new SpellExecutor(world);
-        spellExecutor.Execute(spell, runeCount: 10, caster, executor);
+        spellExecutor.Execute(spell, new EventTracker(), 10, caster, executor);
 
         // evaluation cost = 10_000_000; executor provides 5_000_000 (amount/2), caster covers remaining 5_000_000
         executorDrawn.Should().ContainSingle().Which.Should().Be(10_000_000);
@@ -148,13 +150,14 @@ public class SpellExecutorTests
         );
 
         var spellExecutor = new SpellExecutor(world);
-        var result = spellExecutor.Execute(spell, runeCount: 10, caster, executor);
+        var tracker = new EventTracker();
+        spellExecutor.Execute(spell, tracker, 10, caster, executor);
 
         // Executor entity removed from world
         world.Find(executorEntity.Id).Should().BeNull();
         // Target not moved
         target.Location.X.Should().Be(1000);
         // Event emitted
-        result.Events.OfType<EntityDisintegratedEvent>().Should().ContainSingle();
+        tracker.WorldEvents.OfType<EntityDisintegratedEvent>().Should().ContainSingle();
     }
 }

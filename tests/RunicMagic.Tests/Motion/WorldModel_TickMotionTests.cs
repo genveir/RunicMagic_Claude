@@ -1,4 +1,5 @@
 using FluentAssertions;
+using RunicMagic.Controller.Services;
 using RunicMagic.Tests.Builders;
 using RunicMagic.Tests.Execution;
 using RunicMagic.World;
@@ -30,10 +31,10 @@ public class WorldModel_TickMotionTests
         );
         world.AddMotionEffect(effect);
 
-        world.TickMotion();
+        world.TickMotion(new EventTracker());
         entity.Location.X.Should().BeApproximately(10, 0.001);
 
-        world.TickMotion();
+        world.TickMotion(new EventTracker());
         entity.Location.X.Should().BeApproximately(20, 0.001);
     }
 
@@ -56,11 +57,11 @@ public class WorldModel_TickMotionTests
         );
         world.AddMotionEffect(effect);
 
-        for (var i = 0; i < 56; i++) world.TickMotion();
+        for (var i = 0; i < 56; i++) world.TickMotion(new EventTracker());
 
         // After completion, further ticks should not advance the entity
         var xAfterCompletion = entity.Location.X;
-        world.TickMotion();
+        world.TickMotion(new EventTracker());
         entity.Location.X.Should().Be(xAfterCompletion);
     }
 
@@ -88,11 +89,12 @@ public class WorldModel_TickMotionTests
         );
         world.AddMotionEffect(effect);
 
-        world.TickMotion(); // fails immediately
+        world.TickMotion(new EventTracker()); // fails immediately
 
         // Effect removed — a second tick should produce no further events
-        var secondResult = world.TickMotion();
-        secondResult.Events.Should().BeEmpty();
+        var secondResult = new EventTracker();
+        world.TickMotion(secondResult);
+        secondResult.WorldEvents.Should().BeEmpty();
         entity.Location.X.Should().Be(0);
     }
 
@@ -128,10 +130,14 @@ public class WorldModel_TickMotionTests
         world.AddMotionEffect(effect1);
         world.AddMotionEffect(effect2);
 
-        SpellResult finalResult = new SpellResult();
-        for (var i = 0; i < 56; i++) finalResult = world.TickMotion();
+        EventTracker finalResult = new EventTracker();
+        for (var i = 0; i < 56; i++)
+        {
+            finalResult = new EventTracker();
+            world.TickMotion(finalResult);
+        }
 
-        finalResult.Events.OfType<EntityPushedEvent>().Should().HaveCount(2);
+        finalResult.WorldEvents.OfType<EntityPushedEvent>().Should().HaveCount(2);
     }
 
     [Fact]
@@ -139,8 +145,9 @@ public class WorldModel_TickMotionTests
     {
         var world = new WorldModel();
 
-        var result = world.TickMotion();
+        var result = new EventTracker();
+        world.TickMotion(result);
 
-        result.Events.Should().BeEmpty();
+        result.WorldEvents.Should().BeEmpty();
     }
 }

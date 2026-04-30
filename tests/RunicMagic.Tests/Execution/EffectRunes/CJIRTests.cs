@@ -1,4 +1,5 @@
 using FluentAssertions;
+using RunicMagic.Controller.Services;
 using RunicMagic.Tests.Builders;
 using RunicMagic.World;
 using RunicMagic.World.Execution;
@@ -12,12 +13,13 @@ public class CJIRTests
     // 686 = 2744 / 4, so this is exactly 90° in the 2744-degree circle.
     private const long QuarterTurn = 686;
 
-    private static SpellResult RunTicks(WorldModel world, int count)
+    private static EventTracker RunTicks(WorldModel world, int count)
     {
-        var last = new SpellResult();
+        var last = new EventTracker();
         for (var i = 0; i < count; i++)
         {
-            last = world.TickMotion();
+            last = new EventTracker();
+            world.TickMotion(last);
         }
         return last;
     }
@@ -91,7 +93,7 @@ public class CJIRTests
         cjir.Execute(context);
         var finalTickResult = RunTicks(world, 56);
 
-        var rotatedEvent = finalTickResult.Events.OfType<EntityRotatedEvent>().Should().ContainSingle().Subject;
+        var rotatedEvent = finalTickResult.WorldEvents.OfType<EntityRotatedEvent>().Should().ContainSingle().Subject;
         rotatedEvent.Entity.Should().BeSameAs(entity);
         rotatedEvent.AngleDegrees.Should().Be(QuarterTurn);
     }
@@ -108,9 +110,10 @@ public class CJIRTests
         var context = TestFixtures.MakeContext(world: world);
 
         cjir.Execute(context);
-        var tickResult = world.TickMotion();
+        var tickResult = new EventTracker();
+        world.TickMotion(tickResult);
 
-        tickResult.Events.OfType<EntityRotatedEvent>().Should().BeEmpty();
+        tickResult.WorldEvents.OfType<EntityRotatedEvent>().Should().BeEmpty();
         entity.Location.X.Should().Be(1000);
     }
 
@@ -140,7 +143,7 @@ public class CJIRTests
         var context = TestFixtures.MakeContext(caster: caster, world: world);
 
         cjir.Execute(context);
-        for (var i = 0; i < 10; i++) world.TickMotion();
+        for (var i = 0; i < 10; i++) world.TickMotion(new EventTracker());
 
         // Rotated only 2/56 of the quarter turn; entity should not have reached destination
         entity.Location.X.Should().BeLessThan(1000);
@@ -158,9 +161,10 @@ public class CJIRTests
         var context = TestFixtures.MakeContext(world: world);
 
         cjir.Execute(context);
-        var tickResult = world.TickMotion();
+        var tickResult = new EventTracker();
+        world.TickMotion(tickResult);
 
-        tickResult.Events.Should().BeEmpty();
+        tickResult.WorldEvents.Should().BeEmpty();
     }
 
     [Fact]
@@ -178,12 +182,13 @@ public class CJIRTests
         var context = TestFixtures.MakeContext(world: world); // no power sources
 
         cjir.Execute(context);
-        var tickResult = world.TickMotion();
+        var tickResult = new EventTracker();
+        world.TickMotion(tickResult);
 
         entity.Location.X.Should().Be(originalX);
         entity.Location.Y.Should().Be(originalY);
-        tickResult.Events.OfType<EffectNotFiredEvent>().Should().ContainSingle();
-        tickResult.Events.OfType<EntityRotatedEvent>().Should().BeEmpty();
+        tickResult.WorldEvents.OfType<EffectNotFiredEvent>().Should().ContainSingle();
+        tickResult.WorldEvents.OfType<EntityRotatedEvent>().Should().BeEmpty();
     }
 
     [Fact]
@@ -203,15 +208,16 @@ public class CJIRTests
         var context = TestFixtures.MakeContext(executor: executor, world: world);
 
         cjir.Execute(context);
-        var allEvents = new List<SpellEvent>();
-        SpellResult finalTick = new SpellResult();
+        var allEvents = new List<WorldEvent>();
+        EventTracker finalTick = new EventTracker();
         for (var i = 0; i < 56; i++)
         {
-            finalTick = world.TickMotion();
-            allEvents.AddRange(finalTick.Events);
+            finalTick = new EventTracker();
+            world.TickMotion(finalTick);
+            allEvents.AddRange(finalTick.WorldEvents);
         }
 
         allEvents.OfType<PowerDrawnEvent>().Sum(e => e.Amount).Should().BeGreaterThan(0);
-        finalTick.Events.OfType<EntityRotatedEvent>().Should().ContainSingle();
+        finalTick.WorldEvents.OfType<EntityRotatedEvent>().Should().ContainSingle();
     }
 }

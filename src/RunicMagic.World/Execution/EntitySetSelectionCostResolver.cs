@@ -23,7 +23,7 @@ public class EntitySetSelectionCostResolver : IEntitySet
         var drawn = context.DrawPower(cost);
         if (drawn < cost)
         {
-            context.Result.Add(new SelectionCostNotMetEvent(Required: cost, Drawn: drawn));
+            context.EventTracker.Add(new SelectionCostNotMetEvent(Required: cost, Drawn: drawn));
             return new EntitySet([]);
         }
 

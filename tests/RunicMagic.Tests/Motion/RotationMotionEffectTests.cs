@@ -1,4 +1,5 @@
 using FluentAssertions;
+using RunicMagic.Controller.Services;
 using RunicMagic.Tests.Builders;
 using RunicMagic.Tests.Execution;
 using RunicMagic.World;
@@ -37,7 +38,7 @@ public class RotationMotionEffectTests
         var context = TestFixtures.MakeContext();
         var effect = MakeCwEffect(context, entity, totalRuneDegrees: QuarterTurn);
 
-        for (var i = 0; i < 56; i++) effect.TryAdvance(new SpellResult());
+        for (var i = 0; i < 56; i++) effect.TryAdvance(new EventTracker());
 
         entity.Location.X.Should().BeApproximately(0, 0.001);
         entity.Location.Y.Should().BeApproximately(1000, 0.001);
@@ -51,14 +52,14 @@ public class RotationMotionEffectTests
         var context = TestFixtures.MakeContext();
         var effect = MakeCwEffect(context, entity, totalRuneDegrees: QuarterTurn);
 
-        SpellResult lastResult = new SpellResult();
+        EventTracker lastResult = new EventTracker();
         for (var i = 0; i < 56; i++)
         {
-            lastResult = new SpellResult();
+            lastResult = new EventTracker();
             effect.TryAdvance(lastResult);
         }
 
-        lastResult.Events.OfType<EntityRotatedEvent>().Should().ContainSingle()
+        lastResult.WorldEvents.OfType<EntityRotatedEvent>().Should().ContainSingle()
             .Which.AngleDegrees.Should().Be(QuarterTurn);
     }
 
@@ -69,10 +70,10 @@ public class RotationMotionEffectTests
         var context = TestFixtures.MakeContext();
         var effect = MakeCwEffect(context, entity, totalRuneDegrees: QuarterTurn);
 
-        var intermediateResult = new SpellResult();
+        var intermediateResult = new EventTracker();
         effect.TryAdvance(intermediateResult);
 
-        intermediateResult.Events.OfType<EntityRotatedEvent>().Should().BeEmpty();
+        intermediateResult.WorldEvents.OfType<EntityRotatedEvent>().Should().BeEmpty();
     }
 
     [Fact]
@@ -90,11 +91,11 @@ public class RotationMotionEffectTests
 
         var effect = MakeCwEffect(context, entity, totalRuneDegrees: QuarterTurn);
 
-        var result = new SpellResult();
+        var result = new EventTracker();
         var advanced = effect.TryAdvance(result);
 
         advanced.Should().BeFalse();
-        result.Events.OfType<EffectNotFiredEvent>().Should().ContainSingle()
+        result.WorldEvents.OfType<EffectNotFiredEvent>().Should().ContainSingle()
             .Which.Effect.Should().Be("CJIR");
     }
 
@@ -112,7 +113,7 @@ public class RotationMotionEffectTests
         var context = TestFixtures.MakeContext(caster: caster);
 
         var effect = MakeCwEffect(context, entity, totalRuneDegrees: QuarterTurn);
-        effect.TryAdvance(new SpellResult());
+        effect.TryAdvance(new EventTracker());
 
         entity.Location.X.Should().Be(originalX);
     }
@@ -142,18 +143,18 @@ public class RotationMotionEffectTests
         );
 
         // First tick at radius 1000
-        var result1 = new SpellResult();
+        var result1 = new EventTracker();
         effect.TryAdvance(result1);
-        var costAtRadius1000 = result1.Events.OfType<PowerDrawnEvent>().Sum(e => e.Amount);
+        var costAtRadius1000 = result1.WorldEvents.OfType<PowerDrawnEvent>().Sum(e => e.Amount);
 
         // Manually move the entity to a larger radius before the second tick.
         // Reset angle to 0 as well so the cost comparison is purely due to radius.
         entity.Location = new RunicMagic.World.Geometry.Location(2000, 0);
         entity.Angle = 0;
 
-        var result2 = new SpellResult();
+        var result2 = new EventTracker();
         effect.TryAdvance(result2);
-        var costAtRadius2000 = result2.Events.OfType<PowerDrawnEvent>().Sum(e => e.Amount);
+        var costAtRadius2000 = result2.WorldEvents.OfType<PowerDrawnEvent>().Sum(e => e.Amount);
 
         costAtRadius2000.Should().BeGreaterThan(costAtRadius1000);
     }

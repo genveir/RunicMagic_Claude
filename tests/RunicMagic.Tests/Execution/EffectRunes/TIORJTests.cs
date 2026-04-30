@@ -1,4 +1,5 @@
 using FluentAssertions;
+using RunicMagic.Controller.Services;
 using RunicMagic.Tests.Builders;
 using RunicMagic.World.Capabilities;
 using RunicMagic.World.Execution;
@@ -119,7 +120,7 @@ public class TIORJTests
             .WithReservoir(fill: amount => new ReservoirFill(amount, false))
             .Build();
 
-        var result = new SpellResult();
+        var result = new EventTracker();
         var tiorj = new TIORJ(
             from: new FixedEntitySet(source),
             to: new FixedEntitySet(target),
@@ -128,7 +129,7 @@ public class TIORJTests
 
         tiorj.Execute(TestFixtures.MakeContext(result: result));
 
-        result.Events.OfType<PowerDrawnEvent>().Should().ContainSingle().Which.Entity.Should().Be(source);
-        result.Events.OfType<PowerFilledEvent>().Should().ContainSingle().Which.Entity.Should().Be(target);
+        result.WorldEvents.OfType<PowerDrawnEvent>().Should().ContainSingle().Which.Entity.Should().Be(source);
+        result.WorldEvents.OfType<PowerFilledEvent>().Should().ContainSingle().Which.Entity.Should().Be(target);
     }
 }

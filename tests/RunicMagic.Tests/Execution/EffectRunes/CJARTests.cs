@@ -1,4 +1,5 @@
 using FluentAssertions;
+using RunicMagic.Controller.Services;
 using RunicMagic.Tests.Builders;
 using RunicMagic.World;
 using RunicMagic.World.Execution;
@@ -12,14 +13,12 @@ public class CJARTests
     // 686 = 2744 / 4, so this is exactly 90° in the 2744-degree circle.
     private const long QuarterTurn = 686;
 
-    private static SpellResult RunTicks(WorldModel world, int count)
+    private static void RunTicks(WorldModel world, int count, IWorldEventTracker worldEventTracker)
     {
-        var last = new SpellResult();
         for (var i = 0; i < count; i++)
         {
-            last = world.TickMotion();
+            world.TickMotion(worldEventTracker);
         }
-        return last;
     }
 
     [Fact]
@@ -35,7 +34,7 @@ public class CJARTests
         var context = TestFixtures.MakeContext(world: world);
 
         cjar.Execute(context);
-        RunTicks(world, 56);
+        RunTicks(world, 56, context.EventTracker);
 
         entity.Location.X.Should().BeApproximately(0, 0.001);
         entity.Location.Y.Should().BeApproximately(-1000, 0.001);
@@ -54,7 +53,7 @@ public class CJARTests
         var context = TestFixtures.MakeContext(world: world);
 
         cjar.Execute(context);
-        RunTicks(world, 56);
+        RunTicks(world, 56, new EventTracker());
 
         entity.Angle.Should().BeApproximately(expectedAngle, 0.001);
     }
@@ -71,7 +70,7 @@ public class CJARTests
         var context = TestFixtures.MakeContext(world: world);
 
         cjar.Execute(context);
-        RunTicks(world, 56);
+        RunTicks(world, 56, new EventTracker());
 
         entity.Location.X.Should().BeApproximately(500, 0.001);
         entity.Location.Y.Should().BeApproximately(300, 0.001);
@@ -89,9 +88,11 @@ public class CJARTests
         var context = TestFixtures.MakeContext(world: world);
 
         cjar.Execute(context);
-        var finalTickResult = RunTicks(world, 56);
+        for (var i = 0; i < 55; i++) world.TickMotion(new EventTracker());
+        var finalTickResult = new EventTracker();
+        world.TickMotion(finalTickResult);
 
-        var rotatedEvent = finalTickResult.Events.OfType<EntityRotatedEvent>().Should().ContainSingle().Subject;
+        var rotatedEvent = finalTickResult.WorldEvents.OfType<EntityRotatedEvent>().Should().ContainSingle().Subject;
         rotatedEvent.Entity.Should().BeSameAs(entity);
         rotatedEvent.AngleDegrees.Should().Be(QuarterTurn);
     }
@@ -108,9 +109,10 @@ public class CJARTests
         var context = TestFixtures.MakeContext(world: world);
 
         cjar.Execute(context);
-        var tickResult = world.TickMotion();
+        var tickResult = new EventTracker();
+        world.TickMotion(tickResult);
 
-        tickResult.Events.OfType<EntityRotatedEvent>().Should().BeEmpty();
+        tickResult.WorldEvents.OfType<EntityRotatedEvent>().Should().BeEmpty();
         entity.Location.X.Should().Be(1000);
     }
 
@@ -140,7 +142,7 @@ public class CJARTests
         var context = TestFixtures.MakeContext(caster: caster, world: world);
 
         cjar.Execute(context);
-        for (var i = 0; i < 10; i++) world.TickMotion();
+        for (var i = 0; i < 10; i++) world.TickMotion(new EventTracker());
 
         // Rotated only 2/56 of the quarter turn; entity should not have reached destination
         entity.Location.X.Should().BeLessThan(1000);
@@ -158,9 +160,10 @@ public class CJARTests
         var context = TestFixtures.MakeContext(world: world);
 
         cjar.Execute(context);
-        var tickResult = world.TickMotion();
+        var tickResult = new EventTracker();
+        world.TickMotion(tickResult);
 
-        tickResult.Events.Should().BeEmpty();
+        tickResult.WorldEvents.Should().BeEmpty();
     }
 
     [Fact]
@@ -178,12 +181,13 @@ public class CJARTests
         var context = TestFixtures.MakeContext(world: world); // no power sources
 
         cjar.Execute(context);
-        var tickResult = world.TickMotion();
+        var tickResult = new EventTracker();
+        world.TickMotion(tickResult);
 
         entity.Location.X.Should().Be(originalX);
         entity.Location.Y.Should().Be(originalY);
-        tickResult.Events.OfType<EffectNotFiredEvent>().Should().ContainSingle();
-        tickResult.Events.OfType<EntityRotatedEvent>().Should().BeEmpty();
+        tickResult.WorldEvents.OfType<EffectNotFiredEvent>().Should().ContainSingle();
+        tickResult.WorldEvents.OfType<EntityRotatedEvent>().Should().BeEmpty();
     }
 
     [Fact]
@@ -203,16 +207,17 @@ public class CJARTests
         var context = TestFixtures.MakeContext(executor: executor, world: world);
 
         cjar.Execute(context);
-        var allEvents = new List<SpellEvent>();
-        SpellResult finalTick = new SpellResult();
+        var allEvents = new List<WorldEvent>();
+        EventTracker finalTick = new EventTracker();
         for (var i = 0; i < 56; i++)
         {
-            finalTick = world.TickMotion();
-            allEvents.AddRange(finalTick.Events);
+            finalTick = new EventTracker();
+            world.TickMotion(finalTick);
+            allEvents.AddRange(finalTick.WorldEvents);
         }
 
         allEvents.OfType<PowerDrawnEvent>().Sum(e => e.Amount).Should().BeGreaterThan(0);
-        finalTick.Events.OfType<EntityRotatedEvent>().Should().ContainSingle();
+        finalTick.WorldEvents.OfType<EntityRotatedEvent>().Should().ContainSingle();
     }
 
     [Fact]
@@ -248,8 +253,8 @@ public class CJARTests
         cjir.Execute(TestFixtures.MakeContext(executor: new EntitySet([entityA]), world: worldA));
         cjar.Execute(TestFixtures.MakeContext(executor: new EntitySet([entityB]), world: worldB));
 
-        for (var i = 0; i < 56; i++) worldA.TickMotion();
-        for (var i = 0; i < 56; i++) worldB.TickMotion();
+        for (var i = 0; i < 56; i++) worldA.TickMotion(new EventTracker());
+        for (var i = 0; i < 56; i++) worldB.TickMotion(new EventTracker());
 
         totalDrawnByCJIR.Should().Be(totalDrawnByCJAR);
     }

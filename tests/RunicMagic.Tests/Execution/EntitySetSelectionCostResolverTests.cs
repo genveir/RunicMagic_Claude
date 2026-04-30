@@ -1,4 +1,5 @@
 using FluentAssertions;
+using RunicMagic.Controller.Services;
 using RunicMagic.Tests.Builders;
 using RunicMagic.World.Capabilities;
 using RunicMagic.World.Execution;
@@ -71,12 +72,12 @@ public class EntitySetSelectionCostResolverTests
             .Build();
         var inner = new FixedEntitySet(target);
         var resolver = new EntitySetSelectionCostResolver(inner);
-        var result = new SpellResult();
+        var result = new EventTracker();
         var context = TestFixtures.MakeContext(result: result);
 
         resolver.Resolve(context);
 
-        result.Events.OfType<SelectionCostNotMetEvent>().Should().ContainSingle();
+        result.WorldEvents.OfType<SelectionCostNotMetEvent>().Should().ContainSingle();
     }
 
     [Fact]
@@ -92,13 +93,13 @@ public class EntitySetSelectionCostResolverTests
             .WithReservoir(draw: amount => new ReservoirDraw(1, false))
             .Build();
         var caster = new EntitySet([casterEntity]);
-        var result = new SpellResult();
+        var result = new EventTracker();
         var context = TestFixtures.MakeContext(caster: caster, result: result);
 
         resolver.Resolve(context);
 
         // final set cost = ceil(2000/1_000_000_000) = 1; breadth = 1 × 1_000_000; total required = 1_000_001; drawn = 1
-        var evt = result.Events.OfType<SelectionCostNotMetEvent>().Single();
+        var evt = result.WorldEvents.OfType<SelectionCostNotMetEvent>().Single();
         evt.Required.Should().Be(1_000_001);
         evt.Drawn.Should().Be(1);
     }

@@ -1,4 +1,5 @@
 using FluentAssertions;
+using RunicMagic.Controller.Services;
 using RunicMagic.Tests.Builders;
 using RunicMagic.World;
 using RunicMagic.World.Capabilities;
@@ -20,11 +21,12 @@ public class SpellContextTests
         executorEntity.Scope = () => [scopeEntity];
         var executor = new EntitySet([executorEntity]);
 
-        var context = TestFixtures.MakeContext(executor: executor);
+        var tracker = new EventTracker();
+        var context = TestFixtures.MakeContext(executor: executor, result: tracker);
         var drawn = context.DrawPower(10);
 
         drawn.Should().Be(10);
-        var events = context.Result.Events.OfType<PowerDrawnEvent>().ToList();
+        var events = tracker.WorldEvents.OfType<PowerDrawnEvent>().ToList();
         events.Should().ContainSingle().Which.Entity.Should().Be(scopeEntity);
     }
 
@@ -36,11 +38,12 @@ public class SpellContextTests
             .Build();
         var executor = new EntitySet([executorEntity]);
 
-        var context = TestFixtures.MakeContext(executor: executor);
+        var tracker = new EventTracker();
+        var context = TestFixtures.MakeContext(executor: executor, result: tracker);
         var drawn = context.DrawPower(10);
 
         drawn.Should().Be(10);
-        var events = context.Result.Events.OfType<PowerDrawnEvent>().ToList();
+        var events = tracker.WorldEvents.OfType<PowerDrawnEvent>().ToList();
         events.Should().ContainSingle().Which.Entity.Should().Be(executorEntity);
     }
 
@@ -60,11 +63,12 @@ public class SpellContextTests
         casterEntity.Scope = () => [scopeOfCasterEntity];
         var caster = new EntitySet([casterEntity]);
 
-        var context = TestFixtures.MakeContext(caster: caster, executor: executor);
+        var tracker = new EventTracker();
+        var context = TestFixtures.MakeContext(caster: caster, executor: executor, result: tracker);
         var drawn = context.DrawPower(10);
 
         drawn.Should().Be(10);
-        var events = context.Result.Events.OfType<PowerDrawnEvent>().ToList();
+        var events = tracker.WorldEvents.OfType<PowerDrawnEvent>().ToList();
         events.Should().ContainSingle().Which.Entity.Should().Be(scopeOfCasterEntity);
     }
 
@@ -81,11 +85,12 @@ public class SpellContextTests
             .Build();
         var caster = new EntitySet([casterEntity]);
 
-        var context = TestFixtures.MakeContext(caster: caster, executor: executor);
+        var tracker = new EventTracker();
+        var context = TestFixtures.MakeContext(caster: caster, executor: executor, result: tracker);
         var drawn = context.DrawPower(10);
 
         drawn.Should().Be(10);
-        var events = context.Result.Events.OfType<PowerDrawnEvent>().ToList();
+        var events = tracker.WorldEvents.OfType<PowerDrawnEvent>().ToList();
         events.Should().ContainSingle().Which.Entity.Should().Be(casterEntity);
     }
 
@@ -215,12 +220,12 @@ public class SpellContextTests
     [Fact]
     public void ForkWithNewExecutor_ResultIsShared()
     {
-        var result = new SpellResult();
+        var result = new EventTracker();
         var original = TestFixtures.MakeContext(result: result);
 
         var forked = original.ForkWithNewExecutor(new EntitySet([]));
 
-        forked.Result.Should().BeSameAs(result);
+        forked.EventTracker.Should().BeSameAs(result);
     }
 
     [Fact]

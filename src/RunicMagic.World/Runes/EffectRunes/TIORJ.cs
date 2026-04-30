@@ -24,7 +24,7 @@ public class TIORJ : IStatement
         var toSet = To.Resolve(context);
         var amount = Amount.Evaluate(context).Value;
 
-        var drawn = PowerService.DrawPower(fromSet, amount, context.Result);
+        var drawn = PowerService.DrawPower(fromSet, amount, context.EventTracker);
         PowerService.FillWithOvercharge(toSet, fromSet, drawn, context);
     }
 

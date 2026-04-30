@@ -2,6 +2,7 @@ using FluentAssertions;
 using RunicMagic.Controller.Abstractions;
 using RunicMagic.Controller.Models;
 using RunicMagic.Controller.Services;
+using RunicMagic.Tests.Builders;
 using RunicMagic.World;
 using RunicMagic.World.Geometry;
 using Xunit;
@@ -15,10 +16,21 @@ public class GameLoopServiceTests
         var world = new WorldModel();
         var worldRendering = new WorldRenderingService(world, new RayCastService(world));
         var spellCasting = new SpellCastingService(world, new SpellExecutor(world));
-        var playerService = new PlayerService(world, worldRendering, spellCasting, new RayCastService(world));
+        var playerService = new PlayerService(world, spellCasting, new RayCastService(world));
         var sink = new CapturingSink();
-        var loop = new GameLoopService(playerService, world, sink);
+        var loop = new GameLoopService(playerService, world, worldRendering, sink);
         return (loop, playerService, sink);
+    }
+
+    private static (GameLoopService loop, WorldModel world) MakeLoopWithWorld()
+    {
+        var world = new WorldModel();
+        var worldRendering = new WorldRenderingService(world, new RayCastService(world));
+        var spellCasting = new SpellCastingService(world, new SpellExecutor(world));
+        var playerService = new PlayerService(world, spellCasting, new RayCastService(world));
+        var sink = new CapturingSink();
+        var loop = new GameLoopService(playerService, world, worldRendering, sink);
+        return (loop, world);
     }
 
     private class CapturingSink : IWorldTickSink
@@ -69,5 +81,56 @@ public class GameLoopServiceTests
         loop.Tick();
 
         sink.Pushed.Should().HaveCount(1);
+    }
+
+    [Fact]
+    public void GetPrompt_NoCasterSelected_ReturnsNoCasterPrompt()
+    {
+        var (loop, _) = MakeLoopWithWorld();
+
+        var prompt = loop.GetPrompt(casterId: null);
+
+        prompt.Should().Be("[no caster] >");
+    }
+
+    [Fact]
+    public void GetPrompt_CasterNotInWorld_ReturnsDeadCasterPrompt()
+    {
+        var (loop, _) = MakeLoopWithWorld();
+
+        var prompt = loop.GetPrompt(EntityId.New());
+
+        prompt.Should().Be("[dead caster] >");
+    }
+
+    [Fact]
+    public void GetPrompt_CasterWithoutLife_ReturnsDeadCasterPrompt()
+    {
+        var (loop, world) = MakeLoopWithWorld();
+        var entity = new EntityBuilder()
+            .WithLocation(x: 0, y: 0)
+            .WithAgency()
+            .Build();
+        world.Add(entity);
+
+        var prompt = loop.GetPrompt(entity.Id);
+
+        prompt.Should().Be("[dead caster] >");
+    }
+
+    [Fact]
+    public void GetPrompt_CasterWithLife_ShowsHitPointsAndIntegrity()
+    {
+        var (loop, world) = MakeLoopWithWorld();
+        var entity = new EntityBuilder()
+            .WithLocation(x: 0, y: 0)
+            .WithAgency()
+            .WithLife(max: 20, current: 15)
+            .Build();
+        world.Add(entity);
+
+        var prompt = loop.GetPrompt(entity.Id);
+
+        prompt.Should().Be("(15/20H) (1000/1000I) >");
     }
 }
