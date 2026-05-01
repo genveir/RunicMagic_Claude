@@ -2,23 +2,23 @@
 
 ## To Do — Milestone 2
 
-Next ticket number: RMC-98
+Next ticket number: RMC-102
 Next bugfix number: BUG-7
 
 | Key | Title | Description | Blocked By |
 |-----|-------|-------------|------------|
-| RMC-77 | World AI system | Add an `AiCapability` to the entity model. World exposes `TickAi(deltaSeconds)` which iterates all entities with AI and calls their tick. | |
+| RMC-77 | World AI system | Add an `AiCapability` to the entity model. World exposes `TickAi(deltaSeconds)` which iterates all entities with AI and calls their tick. | RMC-79 |
 | RMC-80 | PatrolAi behavior | First concrete AI behavior: `PatrolAiCapability` — walks an entity back and forth along a list of waypoints at a configurable speed. Needs DB schema for waypoints and speed. | RMC-77 |
-| RMC-83 | Movement service | Introduce a movement service that sits between any "I want to move" request (AI, future systems) and the actual position update. The service is the single place that knows about ongoing motion effects and gates or modifies autonomous movement accordingly. For now: an entity under an active motion effect cannot produce its own movement. | RMC-82 RMC-77 |
-| RMC-79 | Guard NPC scenario | Add a guard entity to the test world with a patrol path along a visible corridor. The guard should be visually distinct. | RMC-80 RMC-78 RMC-83 |
-| RMC-75 | 🏁 Milestone 3 — Have a guard walk by and get pushed | Implement a simple guard NPC that walks back and forth along a predefined path and push him away with a DAN-targeted spell. This will require the engine to have a concept of time. | RMC-79 RMC-82 |
+| RMC-83 | Locomotion service | Introduce a `LocomotionService` for simulation-layer movement — self-directed movement by entities (AI, and future player-controlled movement). This is distinct from spell-driven displacement (`LinearMotionEffect`): spells are engine-layer instructions that rewrite world state directly, bypassing physics. Locomotion is a simulated effect that will eventually be subject to friction, gravity, and collision. For now: accept a move request (entity, direction, speed, delta) and apply it. One interaction rule: while a spell-driven displacement effect is active on an entity, the locomotion service refuses movement requests for that entity — the engine layer does not negotiate with the simulation layer. | RMC-80 |
+| RMC-75 | 🏁 Milestone 3 — Have a guard walk by and get pushed | Implement a simple guard NPC that walks back and forth along a predefined path and push him away with a DAN-targeted spell. This will require the engine to have a concept of time. | RMC-83 |
 
 ## To Do — Other
 
 | Key | Title | Description | Blocked By |
 |-----|-------|-------------|------------|
+| RMC-100 | In-game entity creation and modification | Add the ability to create new entities and modify existing ones while the game is running — without restarting or editing seed data. This is a prerequisite for conveniently populating the world during development. | |
+| RMC-101 | Save game state to database | Persist current world state (entities and their properties) to the database. | |
 | RMC-96 | Remove primary constructors | Find all non-record classes and structs that use primary constructors and replace them with explicit constructor bodies. Fields should be declared separately. Records may keep primary constructors. | |
-| RMC-95 | Clean up GlobalUsings in test project | `GlobalUsings.cs` currently imports `RunicMagic.World.Capabilities` and `RunicMagic.World.Runes.RuneTypes` — both are narrow domain namespaces that should be explicit where needed. Move them out. Add `FluentAssertions` and `Xunit` as global usings instead, since every test file needs them. | |
 | RMC-91 | Move entry point to Controller; invert View/Controller dependency | Currently View hosts the application, making Controller a dependency of View. This inverts the intended hub-and-spokes architecture. Move the entry point into Controller so that Controller owns the host and View becomes a spoke that Controller depends on, not the other way around. | |
 | RMC-92 | Move status rendering to View | The terminal prompt is currently rendered in the Controller assembly. Controller should instead produce a model carrying the caster's status information (e.g. power, health) and pass it to View, which is responsible for deciding how to format and display that data. | |
 | RMC-60 | Design small items | Define the world model for small items — portable objects a creature can carry (e.g. a mana gem in the caster's pocket). Covers how items are represented, how carrying/inventory works, and how items interact with spells and power sourcing. | |
@@ -26,10 +26,12 @@ Next bugfix number: BUG-7
 | RMC-38 | Register entity destruction | It should be possible to destroy entities. When this happens, the game should register that the entity is destroyed | |
 | RMC-39 | Stop spell execution on caster or executor death or destruction | When the caster or executor of a spell cease to be in an active state the spell should stop executing | RMC-37 RMC-38 |
 | RMC-14 | Design channeling and persistent effects | Written runes stay active while power is channeled. Define what "channeling" means mechanically — what keeps a spell alive, how it is terminated, and how the executor tracks ongoing effects. | |
-| RMC-48 | Formalize movement with collision | VUN currently teleports entities to their destination. Replace this with movement through space: the entity travels along the push vector and stops when it hits an entity (a wall, door, etc.) rather than passing through it. | |
+| RMC-48 | Formalize movement with collision | VUN currently moves entities to their destination clipping through everything in its path. Replace this with movement through space: the entity travels along the push vector and collides when it hits an entity (a wall, door, etc.) rather than passing through it. | |
 | RMC-74 | Cone selection rune | A spatial selector that selects all entities within a cone projected from an origin entity in its pointing direction. Parametrised by angle (half-width) and range. | |
 | BUG-4 | Up/Down arrow in terminal doesn't reprint prompt | When using the up or down arrow to redo earlier commands in the terminal, it cuts into the prompt | |
 | RMC-84 | Partial view updates via SSE | Instead of posting the full world render on every game tick, post only the entities that changed during that tick. The client merges the delta into its current render state rather than replacing it wholesale. | RMC-78 |
+| RMC-98 | Design velocity-imparting runes | Design runes that impart velocity and hand an entity off to the simulation layer, rather than directly rewriting its position (engine-layer). The key use case is battlefield shrapnel — objects flung into motion that then collide under physics rules, dealing damage. Contrast with VUN/VAR/CJIR/CJAR which are engine-layer instructions that bypass physics. | |
+| RMC-99 | Camera controls on the canvas | Replace the auto-fit viewBox (currently recalculated from the entity bounding box on every tick) with a persistent camera state. Scroll wheel zooms; click-and-drag pans. The keyboard stays reserved for spell input, so no WASD/arrow controls. Initial view on first entity load can still auto-fit, but after that the camera is user-controlled. | |
 
 ## In Progress
 | Key | Title | Description | Remarks |
@@ -58,3 +60,5 @@ Next bugfix number: BUG-7
 | BUG-6 | Malformed rune names produce no output |
 | BUG-5 | Entity clicks break during canvas animation |
 | RMC-90 | Move linear motion cost calculation into LinearMotionEffect |
+| RMC-95 | Clean up GlobalUsings in test project |
+| RMC-79 | Guard NPC scenario |

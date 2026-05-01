@@ -1,4 +1,4 @@
-# Mud — Claude Workflow
+# RunicMagic — Claude Workflow
 
 ## Implementation Permission - IMPORTANT
 - NEVER start implementing ANYTHING without getting express permission from the user.
