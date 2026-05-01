@@ -20,7 +20,6 @@ Next bugfix number: BUG-7
 
 | Key | Title | Description | Blocked By |
 |-----|-------|-------------|------------|
-| RMC-97 | Update design docs to reflect ongoing effects | MagicSystem.md and RuneSet.md do not mention that VUN/VAR/CJIR/CJAR are ongoing effects (56 ticks) with currently-calcified parameters. Document this in the design files. | |
 | RMC-96 | Remove primary constructors | Find all non-record classes and structs that use primary constructors and replace them with explicit constructor bodies. Fields should be declared separately. Records may keep primary constructors. | |
 | RMC-95 | Clean up GlobalUsings in test project | `GlobalUsings.cs` currently imports `RunicMagic.World.Capabilities` and `RunicMagic.World.Runes.RuneTypes` — both are narrow domain namespaces that should be explicit where needed. Move them out. Add `FluentAssertions` and `Xunit` as global usings instead, since every test file needs them. | |
 | RMC-91 | Move entry point to Controller; invert View/Controller dependency | Currently View hosts the application, making Controller a dependency of View. This inverts the intended hub-and-spokes architecture. Move the entry point into Controller so that Controller owns the host and View becomes a spoke that Controller depends on, not the other way around. | |
@@ -58,3 +57,4 @@ Next bugfix number: BUG-7
 | RMC-94 | Game loop refactor |
 | RMC-88 | Clean up TryAdvance/TryAdvanceInner split |
 | RMC-89 | YI/SA decorator runes and live vs calcified evaluation |
+| RMC-97 | Update design docs to reflect ongoing effects |

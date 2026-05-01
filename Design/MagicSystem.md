@@ -46,6 +46,8 @@ The expression tree is evaluated against the world state. Effects are applied as
 
 Each effect-producing rune is responsible for defining its own execution cost. A fireball with radius 1 and a fireball with radius 1000 are the same spell structurally, and cost the same to evaluate; but the execution cost scales with the effect, so magnitude has real consequence.
 
+Some effects are instantaneous; others are **motion effects** that unfold over multiple ticks. See *Motion Effects* below.
+
 All Sets are resolved at the time of their execution. If a previous part of a spell has altered state, that altered state is carried forward. Runes being executed always only see the state as it is when they're executed.
 
 ---
@@ -111,6 +113,16 @@ The cost model consistently rewards mastery. There are no guardrails, no safety 
 - **Failure** punishes overreach without mercy. The engine makes no attempt to pre-validate whether a spell can be afforded. Power is drawn, effects fire, and consequences follow — a spell that cannot be completed will still drain every source it can reach before failing.
 
 A novice and an expert can write the same effect. The expert's version costs less, leaves more in reserve, and is harder to exhaust against. That gap is entirely a function of how well the caster understands the system.
+
+---
+
+## Motion Effects
+
+Some effect runes (VUN, VAR, CJIR, CJAR) do not apply their effect instantaneously. When executed, they register a **motion effect** — a persistent world object that advances over 56 ticks (~one second at 60 FPS). The game loop advances all active motion effects each frame, interleaved with player input.
+
+Execution cost for motion effects is paid incrementally: one draw per tick, sized to cover that tick's share of the total. If a tick's draw cannot be met in full, the effect stops immediately and permanently.
+
+The 56-tick duration is fixed. A motion effect always runs for exactly 56 ticks unless stopped early by power failure.
 
 ---
 

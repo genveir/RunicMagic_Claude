@@ -39,7 +39,7 @@ All output flows through the game loop:
 4. `SseConnectionManager` writes the result to all connected clients' SSE channels
 5. Client `EventSource` receives the event → writes text to terminal, updates prompt, stores entities for next `requestAnimationFrame`
 
-The game loop only pushes when the queue was non-empty (or, in future, when world state changed due to AI or motion effects). Idle ticks produce no SSE traffic.
+The game loop only pushes when the queue was non-empty or when motion effects advanced world state. Idle ticks produce no SSE traffic.
 
 On initial SSE connection, the server immediately sends the current world state (entities + current prompt, no text) so the canvas and prompt are populated without waiting for a player action.
 
