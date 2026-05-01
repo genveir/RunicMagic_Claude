@@ -34,13 +34,11 @@ Next bugfix number: BUG-7
 ## In Progress
 | Key | Title | Description | Remarks |
 |-----|-------|-------------|---------|
-| RMC-90 | Move linear motion cost calculation into LinearMotionEffect | VUN and VAR compute `totalCost` and `perTickCost` in the rune executor and pass the result in as a constructor parameter. CJIR and CJAR compute cost dynamically inside `RotationMotionEffect.TryAdvance` from the current entity state. Cost calculation should be the motion effect's responsibility in both cases — the rune executor should pass the entity set and distance/angle, not a pre-baked cost. This also correctly handles variable entity sets where the set of entities being moved isn't known at cast time. | |
 
 ## Ready For Review
 
 | Key | Title |
 |-----|-------|
-| BUG-5 | Entity clicks break during canvas animation |
 
 ## Done
 
@@ -58,3 +56,5 @@ Next bugfix number: BUG-7
 | RMC-89 | YI/SA decorator runes and live vs calcified evaluation |
 | RMC-97 | Update design docs to reflect ongoing effects |
 | BUG-6 | Malformed rune names produce no output |
+| BUG-5 | Entity clicks break during canvas animation |
+| RMC-90 | Move linear motion cost calculation into LinearMotionEffect |
