@@ -1,6 +1,8 @@
 using RunicMagic.World;
+using RunicMagic.World.Capabilities;
 using RunicMagic.World.Execution;
 using RunicMagic.World.Geometry;
+using RunicMagic.World.Runes.RuneTypes;
 
 namespace RunicMagic.Tests.Builders;
 

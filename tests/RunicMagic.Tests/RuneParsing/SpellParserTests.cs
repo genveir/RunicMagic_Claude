@@ -1,4 +1,3 @@
-using FluentAssertions;
 using RunicMagic.Controller.RuneParsing;
 using RunicMagic.World.Execution;
 using RunicMagic.World.Runes.EffectRunes;
@@ -7,7 +6,7 @@ using RunicMagic.World.Runes.EntitySetRunes;
 using RunicMagic.World.Runes.ExecutionRunes;
 using RunicMagic.World.Runes.LocationRunes;
 using RunicMagic.World.Runes.NumberRunes;
-using Xunit;
+using RunicMagic.World.Runes.RuneTypes;
 
 namespace RunicMagic.Tests.RuneParsing;
 

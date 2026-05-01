@@ -1,10 +1,8 @@
-using FluentAssertions;
 using RunicMagic.Tests.Builders;
 using RunicMagic.World.Capabilities;
 using RunicMagic.World.Execution;
 using RunicMagic.World.Runes.PowerSourceRunes;
 using RunicMagic.World.Runes.RuneTypes;
-using Xunit;
 
 namespace RunicMagic.Tests.Execution.PowerSourceRunes;
 

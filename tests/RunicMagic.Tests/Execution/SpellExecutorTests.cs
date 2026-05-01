@@ -1,4 +1,3 @@
-using FluentAssertions;
 using RunicMagic.Controller.Services;
 using RunicMagic.Tests.Builders;
 using RunicMagic.World;
@@ -10,7 +9,6 @@ using RunicMagic.World.Runes.EntitySetRunes;
 using RunicMagic.World.Runes.ExecutionRunes;
 using RunicMagic.World.Runes.LocationRunes;
 using RunicMagic.World.Runes.NumberRunes;
-using Xunit;
 
 namespace RunicMagic.Tests.Execution;
 

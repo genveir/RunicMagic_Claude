@@ -5,7 +5,7 @@ using RunicMagic.World.Execution;
 using RunicMagic.World.Geometry;
 using RunicMagic.World.Runes.RuneTypes;
 
-namespace RunicMagic.Tests.Execution;
+namespace RunicMagic.Tests.TestUtilities;
 
 internal static class TestFixtures
 {

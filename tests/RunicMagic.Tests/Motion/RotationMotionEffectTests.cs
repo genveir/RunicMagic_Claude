@@ -1,12 +1,9 @@
-using FluentAssertions;
 using RunicMagic.Controller.Services;
 using RunicMagic.Tests.Builders;
-using RunicMagic.Tests.Execution;
 using RunicMagic.World;
 using RunicMagic.World.Capabilities;
 using RunicMagic.World.Execution;
 using RunicMagic.World.Motion;
-using Xunit;
 
 namespace RunicMagic.Tests.Motion;
 

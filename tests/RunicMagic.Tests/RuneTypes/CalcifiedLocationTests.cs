@@ -1,9 +1,6 @@
-using FluentAssertions;
 using RunicMagic.World.Execution;
 using RunicMagic.World.Geometry;
 using RunicMagic.World.Runes.RuneTypes;
-using RunicMagic.Tests.Execution;
-using Xunit;
 
 namespace RunicMagic.Tests.RuneTypes;
 

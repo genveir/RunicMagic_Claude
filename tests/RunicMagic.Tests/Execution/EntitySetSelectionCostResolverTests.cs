@@ -1,9 +1,8 @@
-using FluentAssertions;
 using RunicMagic.Controller.Services;
 using RunicMagic.Tests.Builders;
 using RunicMagic.World.Capabilities;
 using RunicMagic.World.Execution;
-using Xunit;
+using RunicMagic.World.Runes.RuneTypes;
 
 namespace RunicMagic.Tests.Execution;
 

@@ -1,3 +1,3 @@
-global using RunicMagic.World.Capabilities;
-global using RunicMagic.World.Runes.RuneTypes;
+global using FluentAssertions;
 global using RunicMagic.Tests.TestUtilities;
+global using Xunit;
