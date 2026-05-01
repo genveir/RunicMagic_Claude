@@ -22,7 +22,9 @@ internal class GameLoopService(PlayerService playerService, WorldModel world, Wo
 
         world.TickMotion(eventTracker);
 
-        var casterId = playerService.DrainAndFlush(eventTracker);
+        playerService.DrainAndFlush(eventTracker);
+
+        var casterId = playerService.CasterId;
 
         var result = ToCommandResult(eventTracker, casterId);
 

@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using RunicMagic.Controller.Abstractions;
 using RunicMagic.View.Services;
 using System.Text.Json;
 
@@ -7,7 +6,7 @@ namespace RunicMagic.View.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class EventsController(SseConnectionManager sseManager, IPlayerViewInterface player) : ControllerBase
+public class EventsController(SseConnectionManager sseManager) : ControllerBase
 {
     private static readonly JsonSerializerOptions JsonOptions = new()
     {

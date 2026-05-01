@@ -65,7 +65,9 @@ public class PlayerServiceTests
         world.Add(entity);
 
         await service.SetCaster(new WorldCoordinate(0, 0));
-        var result = service.DrainAndFlush(eventTracker)!;
+        service.DrainAndFlush(eventTracker);
+
+        var result = service.CasterId;
 
         result.Should().Be(entity.Id);
     }
@@ -316,17 +318,6 @@ public class PlayerServiceTests
         eventTracker.ControllerEvents.Should().ContainSingle()
             .Which.Should().BeOfType<IndicatingEvent>()
             .Which.Entity.Should().BeSameAs(target);
-    }
-
-    [Fact]
-    public void DrainAndFlush_EmptyQueue_ReturnsNullCasterId()
-    {
-        var (service, _) = MakeService();
-        var eventTracker = new EventTracker();
-
-        var casterId = service.DrainAndFlush(eventTracker);
-
-        casterId.Should().BeNull();
     }
 
     [Fact]

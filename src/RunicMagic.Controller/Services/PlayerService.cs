@@ -13,7 +13,7 @@ internal class PlayerService(
         SpellCastingService spellCasting,
         RayCastService rayCast) : IPlayerViewInterface
 {
-    private EntityId? casterId = null;
+    internal EntityId? CasterId { get; set; } = null;
 
     private readonly ConcurrentQueue<Action<EventTracker>> _queue = new();
 
@@ -21,7 +21,7 @@ internal class PlayerService(
     {
         _queue.Enqueue((eventTracker) =>
         {
-            spellCasting.Cast(input, casterId, eventTracker);
+            spellCasting.Cast(input, CasterId, eventTracker);
         });
         return Task.CompletedTask;
     }
@@ -45,7 +45,7 @@ internal class PlayerService(
             else
             {
                 var casterEntity = entities[0];
-                casterId = casterEntity.Id;
+                CasterId = casterEntity.Id;
                 eventTracker.Add(new CasterSetEvent(casterEntity));
             }
         });
@@ -123,23 +123,21 @@ internal class PlayerService(
         return Task.CompletedTask;
     }
 
-    public EntityId? DrainAndFlush(EventTracker eventTracker)
+    public void DrainAndFlush(EventTracker eventTracker)
     {
         while (_queue.TryDequeue(out var action))
             action(eventTracker);
-
-        return casterId;
     }
 
     private Entity? CheckForCaster(EventTracker eventTracker, bool checkForDeath)
     {
-        if (casterId == null)
+        if (CasterId == null)
         {
             eventTracker.Add(new NoCasterSelectedEvent());
             return null;
         }
 
-        var caster = world.Find(casterId.Value);
+        var caster = world.Find(CasterId.Value);
         if (caster == null)
         {
             eventTracker.Add(new CasterNotFoundEvent());
