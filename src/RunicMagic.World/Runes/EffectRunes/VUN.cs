@@ -28,17 +28,13 @@ public class VUN : IStatement
             return;
         }
 
-        long totalWeight = toMove.Entities.Sum(e => e.Weight);
-        long totalCost = distance * totalWeight;
-        long perTickCost = totalCost / 56;
         double perTickDistance = distance / 56.0;
 
         var effect = new LinearMotionEffect(
             context: context,
-            entities: ToMove,
+            toMove: ToMove,
             origin: Origin,
             perTickDistance: perTickDistance,
-            perTickCost: perTickCost,
             totalDistanceMm: distance,
             isAway: true,
             effectName: "VUN"

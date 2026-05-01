@@ -34,7 +34,7 @@ public class CJAR : IStatement
 
         var effect = new RotationMotionEffect(
             context: context,
-            entities: ToRotate,
+            toMove: ToRotate,
             origin: Origin,
             perTickTheta: perTickTheta,
             totalRuneDegrees: angleDegrees,

@@ -8,10 +8,9 @@ namespace RunicMagic.World.Motion;
 public class LinearMotionEffect : IMotionEffect
 {
     private readonly TemporalSpellContext _temporalContext;
-    private readonly IEntitySet _entities;
+    private readonly IEntitySet _toMove;
     private readonly ILocation _origin;
     private readonly double _perTickDistance;
-    private readonly long _perTickCost;
     private readonly long _totalDistanceMm;
     private readonly bool _isAway;
     private readonly string _effectName;
@@ -21,19 +20,17 @@ public class LinearMotionEffect : IMotionEffect
 
     public LinearMotionEffect(
         SpellContext context,
-        IEntitySet entities,
+        IEntitySet toMove,
         ILocation origin,
         double perTickDistance,
-        long perTickCost,
         long totalDistanceMm,
         bool isAway,
         string effectName)
     {
         _temporalContext = new(context);
-        _entities = entities;
+        _toMove = toMove;
         _origin = origin;
         _perTickDistance = perTickDistance;
-        _perTickCost = perTickCost;
         _totalDistanceMm = totalDistanceMm;
         _isAway = isAway;
         _effectName = effectName;
@@ -44,15 +41,18 @@ public class LinearMotionEffect : IMotionEffect
     {
         var context = _temporalContext.ToSpellContext(eventTracker);
 
-        var drawn = context.DrawPower(_perTickCost);
-        if (drawn < _perTickCost)
+        var entities = _toMove.Resolve(context);
+        var origin = _origin.Evaluate(context);
+
+        long totalWeight = entities.Entities.Sum(e => e.Weight);
+        long perTickCost = (long)Math.Ceiling(_perTickDistance * totalWeight);
+
+        var drawn = context.DrawPower(perTickCost);
+        if (drawn < perTickCost)
         {
-            eventTracker.Add(new EffectNotFiredEvent(_effectName, $"Insufficient power: needed {_perTickCost}, drew {drawn}"));
+            eventTracker.Add(new EffectNotFiredEvent(_effectName, $"Insufficient power: needed {perTickCost}, drew {drawn}"));
             return false;
         }
-
-        var entities = _entities.Resolve(context);
-        var origin = _origin.Evaluate(context);
 
         foreach (var entity in entities.Entities)
         {

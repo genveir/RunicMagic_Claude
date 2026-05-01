@@ -22,7 +22,7 @@ public class RotationMotionEffectTests
         var totalTheta = totalRuneDegrees / 2744.0 * 2 * Math.PI;
         return new RotationMotionEffect(
             context: context,
-            entities: new FixedEntitySet(entity),
+            toMove: new FixedEntitySet(entity),
             origin: new FixedLocation(0, 0),
             perTickTheta: totalTheta / 56.0,
             totalRuneDegrees: totalRuneDegrees,
@@ -135,7 +135,7 @@ public class RotationMotionEffectTests
         var totalTheta = QuarterTurn / 2744.0 * 2 * Math.PI;
         var effect = new RotationMotionEffect(
             context: context,
-            entities: new FixedEntitySet(entity),
+            toMove: new FixedEntitySet(entity),
             origin: new FixedLocation(0, 0),
             perTickTheta: totalTheta / 56.0,
             totalRuneDegrees: QuarterTurn,

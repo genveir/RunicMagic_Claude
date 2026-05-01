@@ -3,7 +3,6 @@ using RunicMagic.Controller.Services;
 using RunicMagic.Tests.Builders;
 using RunicMagic.Tests.Execution;
 using RunicMagic.World;
-using RunicMagic.World.Capabilities;
 using RunicMagic.World.Execution;
 using RunicMagic.World.Motion;
 using Xunit;
@@ -15,18 +14,13 @@ public class LinearMotionEffectTests
     private static LinearMotionEffect MakePushEffect(
         SpellContext context,
         Entity entity,
-        long totalDistance,
-        long perTickCost = 0)
+        long totalDistance)
     {
-        var totalWeight = entity.Weight;
-        var totalCost = totalDistance * totalWeight / 1_000_000;
-        var computedPerTickCost = totalCost / 56;
         return new LinearMotionEffect(
             context: context,
-            entities: new FixedEntitySet(entity),
+            toMove: new FixedEntitySet(entity),
             origin: new FixedLocation(0, 0),
             perTickDistance: totalDistance / 56.0,
-            perTickCost: perTickCost > 0 ? perTickCost : computedPerTickCost,
             totalDistanceMm: totalDistance,
             isAway: true,
             effectName: "VUN"
@@ -36,7 +30,7 @@ public class LinearMotionEffectTests
     [Fact]
     public void TryAdvance_After56Ticks_EntityReachesDestination()
     {
-        var entity = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(1).Build();
+        var entity = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(0).Build();
         var context = TestFixtures.MakeContext();
         var effect = MakePushEffect(context, entity, totalDistance: 560);
 
@@ -53,7 +47,7 @@ public class LinearMotionEffectTests
     [Fact]
     public void TryAdvance_IsCompleteAfter56Ticks()
     {
-        var entity = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(1).Build();
+        var entity = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(0).Build();
         var context = TestFixtures.MakeContext();
         var effect = MakePushEffect(context, entity, totalDistance: 100);
 
@@ -69,7 +63,7 @@ public class LinearMotionEffectTests
     [Fact]
     public void TryAdvance_EmitsEntityPushedEvent_OnLastTick()
     {
-        var entity = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(1).Build();
+        var entity = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(0).Build();
         var context = TestFixtures.MakeContext();
         var effect = MakePushEffect(context, entity, totalDistance: 100);
 
@@ -87,7 +81,7 @@ public class LinearMotionEffectTests
     [Fact]
     public void TryAdvance_NoEntityPushedEvent_OnIntermediateTicks()
     {
-        var entity = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(1).Build();
+        var entity = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(0).Build();
         var context = TestFixtures.MakeContext();
         var effect = MakePushEffect(context, entity, totalDistance: 100);
 
@@ -110,10 +104,9 @@ public class LinearMotionEffectTests
         var entity = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(1000).Build();
         var effect = new LinearMotionEffect(
             context: context,
-            entities: new FixedEntitySet(entity),
+            toMove: new FixedEntitySet(entity),
             origin: new FixedLocation(0, 0),
             perTickDistance: 1000,
-            perTickCost: 1,
             totalDistanceMm: 56000,
             isAway: true,
             effectName: "VUN"
@@ -139,10 +132,9 @@ public class LinearMotionEffectTests
         var entity = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(1000).Build();
         var effect = new LinearMotionEffect(
             context: context,
-            entities: new FixedEntitySet(entity),
+            toMove: new FixedEntitySet(entity),
             origin: new FixedLocation(0, 0),
             perTickDistance: 1000,
-            perTickCost: 1,
             totalDistanceMm: 56000,
             isAway: true,
             effectName: "VUN"
@@ -175,10 +167,9 @@ public class LinearMotionEffectTests
         var entity = new EntityBuilder().WithLocation(x: 0, y: 0).WithWeight(1000).Build();
         var effect = new LinearMotionEffect(
             context: context,
-            entities: new FixedEntitySet(entity),
+            toMove: new FixedEntitySet(entity),
             origin: new FixedLocation(-1000, 0),
             perTickDistance: 100,
-            perTickCost: 1,
             totalDistanceMm: 5600,
             isAway: true,
             effectName: "VUN"
@@ -193,14 +184,13 @@ public class LinearMotionEffectTests
     [Fact]
     public void TryAdvance_PullMovesEntityTowardOrigin()
     {
-        var entity = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(1).Build();
+        var entity = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(0).Build();
         var context = TestFixtures.MakeContext();
         var effect = new LinearMotionEffect(
             context: context,
-            entities: new FixedEntitySet(entity),
+            toMove: new FixedEntitySet(entity),
             origin: new FixedLocation(0, 0),
             perTickDistance: 500 / 56.0,
-            perTickCost: 0,
             totalDistanceMm: 500,
             isAway: false,
             effectName: "VAR"
@@ -215,14 +205,13 @@ public class LinearMotionEffectTests
     [Fact]
     public void TryAdvance_ZeroCost_AlwaysSucceeds()
     {
-        var entity = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(1).Build();
+        var entity = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(0).Build();
         var context = TestFixtures.MakeContext(); // no power sources
         var effect = new LinearMotionEffect(
             context: context,
-            entities: new FixedEntitySet(entity),
+            toMove: new FixedEntitySet(entity),
             origin: new FixedLocation(0, 0),
             perTickDistance: 10,
-            perTickCost: 0,
             totalDistanceMm: 560,
             isAway: true,
             effectName: "VUN"

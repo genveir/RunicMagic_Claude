@@ -19,14 +19,14 @@ public class RotationMotionEffect : IMotionEffect
 
     public RotationMotionEffect(
         SpellContext context,
-        IEntitySet entities,
+        IEntitySet toMove,
         ILocation origin,
         double perTickTheta,
         long totalRuneDegrees,
         string effectName)
     {
         _temporalContext = new(context);
-        _entities = entities;
+        _entities = toMove;
         _origin = origin;
         _perTickTheta = perTickTheta;
         _totalRuneDegrees = totalRuneDegrees;

@@ -3,7 +3,6 @@ using RunicMagic.Controller.Services;
 using RunicMagic.Tests.Builders;
 using RunicMagic.Tests.Execution;
 using RunicMagic.World;
-using RunicMagic.World.Capabilities;
 using RunicMagic.World.Execution;
 using RunicMagic.World.Motion;
 using Xunit;
@@ -15,16 +14,15 @@ public class WorldModel_TickMotionTests
     [Fact]
     public void TickMotion_AdvancesEffect_EachCall()
     {
-        var entity = new EntityBuilder().WithLocation(x: 0, y: 0).WithWeight(1).Build();
+        var entity = new EntityBuilder().WithLocation(x: 0, y: 0).WithWeight(0).Build();
         var world = new WorldModel();
         var context = TestFixtures.MakeContext(world: world);
 
         var effect = new LinearMotionEffect(
             context: context,
-            entities: new FixedEntitySet(entity),
+            toMove: new FixedEntitySet(entity),
             origin: new FixedLocation(-1000, 0),
             perTickDistance: 10,
-            perTickCost: 0,
             totalDistanceMm: 560,
             isAway: true,
             effectName: "VUN"
@@ -41,16 +39,15 @@ public class WorldModel_TickMotionTests
     [Fact]
     public void TickMotion_RemovesEffect_WhenComplete()
     {
-        var entity = new EntityBuilder().WithLocation(x: 0, y: 0).WithWeight(1).Build();
+        var entity = new EntityBuilder().WithLocation(x: 0, y: 0).WithWeight(0).Build();
         var world = new WorldModel();
         var context = TestFixtures.MakeContext(world: world);
 
         var effect = new LinearMotionEffect(
             context: context,
-            entities: new FixedEntitySet(entity),
+            toMove: new FixedEntitySet(entity),
             origin: new FixedLocation(-1000, 0),
             perTickDistance: 10,
-            perTickCost: 0,
             totalDistanceMm: 560,
             isAway: true,
             effectName: "VUN"
@@ -79,10 +76,9 @@ public class WorldModel_TickMotionTests
 
         var effect = new LinearMotionEffect(
             context: context,
-            entities: new FixedEntitySet(entity),
+            toMove: new FixedEntitySet(entity),
             origin: new FixedLocation(-1000, 0),
             perTickDistance: 10,
-            perTickCost: 1,
             totalDistanceMm: 560,
             isAway: true,
             effectName: "VUN"
@@ -101,28 +97,26 @@ public class WorldModel_TickMotionTests
     [Fact]
     public void TickMotion_ReturnsEvents_FromAllActiveEffects()
     {
-        var entity1 = new EntityBuilder().WithLocation(x: 0, y: 0).WithWeight(1).Build();
-        var entity2 = new EntityBuilder().WithLocation(x: 0, y: 0).WithWeight(1).Build();
+        var entity1 = new EntityBuilder().WithLocation(x: 0, y: 0).WithWeight(0).Build();
+        var entity2 = new EntityBuilder().WithLocation(x: 0, y: 0).WithWeight(0).Build();
         var world = new WorldModel();
         var context = TestFixtures.MakeContext(world: world);
 
         // Two separate effects — each completes in 56 ticks, emitting one EntityPushedEvent
         var effect1 = new LinearMotionEffect(
             context: context,
-            entities: new FixedEntitySet(entity1),
+            toMove: new FixedEntitySet(entity1),
             origin: new FixedLocation(-1000, 0),
             perTickDistance: 10,
-            perTickCost: 0,
             totalDistanceMm: 560,
             isAway: true,
             effectName: "VUN"
         );
         var effect2 = new LinearMotionEffect(
             context: context,
-            entities: new FixedEntitySet(entity2),
+            toMove: new FixedEntitySet(entity2),
             origin: new FixedLocation(-1000, 0),
             perTickDistance: 10,
-            perTickCost: 0,
             totalDistanceMm: 560,
             isAway: true,
             effectName: "VUN"
