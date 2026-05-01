@@ -9,7 +9,7 @@ public class GA : IEntitySet
     {
         if (context.EntityResolutionCount != null)
         {
-            context.DrawPower(1000000000);
+            context.DrawPower(1_000_000_000_000_000_000);
             context.EventTracker.Add(new DebugOutputEvent("Accessing the global scope burned out your fragile mortal soul."));
         }
 
