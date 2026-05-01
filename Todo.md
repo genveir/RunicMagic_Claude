@@ -7,7 +7,6 @@ Next bugfix number: BUG-7
 
 | Key | Title | Description | Blocked By |
 |-----|-------|-------------|------------|
-| BUG-5 | Entity clicks break during canvas animation | While motion effects are animating, click events on entities are not registered — clicks in open space still work. Likely caused by the constant SSE-driven redraws recreating canvas elements or resetting event listener state between frames. Investigate whether hit targets are being torn down and rebuilt on each redraw, and fix so click handling on entities is stable regardless of redraw rate. | |
 | RMC-77 | World AI system | Add an `AiCapability` to the entity model. World exposes `TickAi(deltaSeconds)` which iterates all entities with AI and calls their tick. | |
 | RMC-80 | PatrolAi behavior | First concrete AI behavior: `PatrolAiCapability` — walks an entity back and forth along a list of waypoints at a configurable speed. Needs DB schema for waypoints and speed. | RMC-77 |
 | RMC-83 | Movement service | Introduce a movement service that sits between any "I want to move" request (AI, future systems) and the actual position update. The service is the single place that knows about ongoing motion effects and gates or modifies autonomous movement accordingly. For now: an entity under an active motion effect cannot produce its own movement. | RMC-82 RMC-77 |
@@ -41,6 +40,7 @@ Next bugfix number: BUG-7
 
 | Key | Title |
 |-----|-------|
+| BUG-5 | Entity clicks break during canvas animation |
 
 ## Done
 
