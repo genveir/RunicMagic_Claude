@@ -7,7 +7,6 @@ Next bugfix number: BUG-7
 
 | Key | Title | Description | Blocked By |
 |-----|-------|-------------|------------|
-| BUG-6 | Malformed rune names produce no output | `ZU CRYIR DAN` silently does nothing. CRYIR is not a valid rune (correct spelling is CRIYR). Misspelled or unknown rune names should produce a parsing error message rather than failing silently. | |
 | BUG-5 | Entity clicks break during canvas animation | While motion effects are animating, click events on entities are not registered — clicks in open space still work. Likely caused by the constant SSE-driven redraws recreating canvas elements or resetting event listener state between frames. Investigate whether hit targets are being torn down and rebuilt on each redraw, and fix so click handling on entities is stable regardless of redraw rate. | |
 | RMC-77 | World AI system | Add an `AiCapability` to the entity model. World exposes `TickAi(deltaSeconds)` which iterates all entities with AI and calls their tick. | |
 | RMC-80 | PatrolAi behavior | First concrete AI behavior: `PatrolAiCapability` — walks an entity back and forth along a list of waypoints at a configurable speed. Needs DB schema for waypoints and speed. | RMC-77 |
@@ -58,3 +57,4 @@ Next bugfix number: BUG-7
 | RMC-88 | Clean up TryAdvance/TryAdvanceInner split |
 | RMC-89 | YI/SA decorator runes and live vs calcified evaluation |
 | RMC-97 | Update design docs to reflect ongoing effects |
+| BUG-6 | Malformed rune names produce no output |

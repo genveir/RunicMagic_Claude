@@ -1,3 +1,4 @@
+using RunicMagic.Controller.Abstractions;
 using RunicMagic.Controller.Mappers;
 using RunicMagic.Controller.Models;
 using RunicMagic.World;
@@ -5,7 +6,7 @@ using RunicMagic.World.Geometry;
 
 namespace RunicMagic.Controller.Services;
 
-public class WorldRenderingService(WorldModel world, RayCastService rayCast)
+internal class WorldRenderingService(WorldModel world, RayCastService rayCast) : IWorldRenderingService
 {
     public IReadOnlyList<EntityRenderingModel> GetAllRenderingModels(EntityId? casterEntityId)
     {

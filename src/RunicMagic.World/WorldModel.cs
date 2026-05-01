@@ -1,10 +1,11 @@
+using RunicMagic.World.Abstractions;
 using RunicMagic.World.Execution;
 using RunicMagic.World.Geometry;
 using RunicMagic.World.Motion;
 
 namespace RunicMagic.World;
 
-public class WorldModel
+public class WorldModel : IGameLoopWorldModel
 {
     private readonly Dictionary<EntityId, Entity> _entities = new();
     private readonly List<IMotionEffect> _motionEffects = new();

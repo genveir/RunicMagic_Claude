@@ -11,12 +11,13 @@ public static class ControllerModule
     {
         services.AddSingleton<PlayerService>();
         services.AddSingleton<IPlayerViewInterface>(svc => svc.GetRequiredService<PlayerService>());
+        services.AddSingleton<IPlayerGameLoopInterface>(svc => svc.GetRequiredService<PlayerService>());
 
         services.AddSingleton<SpellCastingService>();
 
         services.AddSingleton<EntityFactory>();
         services.AddSingleton<WorldLoadingService>();
-        services.AddSingleton<WorldRenderingService>();
+        services.AddSingleton<IWorldRenderingService, WorldRenderingService>();
 
         services.AddHostedService<GameLoopService>();
 

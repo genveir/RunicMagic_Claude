@@ -65,7 +65,7 @@ public class PlayerServiceTests
         await service.SetCaster(new WorldCoordinate(0, 0));
         service.DrainAndFlush(eventTracker);
 
-        var result = service.CasterId;
+        var result = service.GetCasterId();
 
         result.Should().Be(entity.Id);
     }

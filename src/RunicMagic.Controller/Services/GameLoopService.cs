@@ -2,10 +2,15 @@ using Microsoft.Extensions.Hosting;
 using RunicMagic.Controller.Abstractions;
 using RunicMagic.Controller.Models;
 using RunicMagic.World;
+using RunicMagic.World.Abstractions;
 
 namespace RunicMagic.Controller.Services;
 
-internal class GameLoopService(PlayerService playerService, WorldModel world, WorldRenderingService worldRendering, IWorldTickSink sink) : BackgroundService
+internal class GameLoopService(
+    IPlayerGameLoopInterface playerService,
+    IGameLoopWorldModel world,
+    IWorldRenderingService worldRendering,
+    IWorldTickSink sink) : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken ct)
     {
@@ -24,7 +29,7 @@ internal class GameLoopService(PlayerService playerService, WorldModel world, Wo
 
         playerService.DrainAndFlush(eventTracker);
 
-        var casterId = playerService.CasterId;
+        var casterId = playerService.GetCasterId();
 
         var result = ToCommandResult(eventTracker, casterId);
 
@@ -34,7 +39,7 @@ internal class GameLoopService(PlayerService playerService, WorldModel world, Wo
 
     private CommandResult? ToCommandResult(EventTracker eventTracker, EntityId? casterId)
     {
-        if (eventTracker.TouchedEntities.Count + eventTracker.WorldEvents.Count + eventTracker.ControllerEvents.Count == 0)
+        if (!eventTracker.HasTrackedChanges)
             return null;
 
         List<string> text = [];

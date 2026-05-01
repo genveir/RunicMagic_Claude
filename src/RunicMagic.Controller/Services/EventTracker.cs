@@ -37,4 +37,6 @@ public class EventTracker : IWorldEventTracker
     {
         _touchedEntities.Add(entity);
     }
+
+    public bool HasTrackedChanges => _worldEvents.Count + _controllerEvents.Count + _parseEvents.Count + _touchedEntities.Count > 0;
 }
