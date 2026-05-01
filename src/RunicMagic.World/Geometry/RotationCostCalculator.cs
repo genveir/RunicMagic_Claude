@@ -2,7 +2,7 @@ namespace RunicMagic.World.Geometry;
 
 public static class RotationCostCalculator
 {
-    // Cost = (Weight / Area) * theta * ∬r dA / 1_000_000,
+    // Cost = (Weight / Area) * theta * ∬r dA,
     // where r is each point's distance from the rotation origin.
     // The double integral has a closed-form antiderivative H evaluated at 4 corners.
     public static long ComputeEntityCost(Entity entity, Location origin, double theta)
@@ -27,7 +27,7 @@ public static class RotationCostCalculator
                         + H(a - halfW, b - halfH);
 
         var cost = entity.Weight / ((double)entity.Width * entity.Height)
-                 * theta * arcIntegral / 1_000_000.0;
+                 * theta * arcIntegral;
         return (long)Math.Max(0.0, cost);
     }
 

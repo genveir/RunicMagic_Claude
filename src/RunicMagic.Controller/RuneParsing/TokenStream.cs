@@ -70,4 +70,6 @@ internal class TokenStream
     }
 
     public int Index => index;
+
+    public LivenessMode LivenessMode { get; set; } = LivenessMode.Calcified;
 }

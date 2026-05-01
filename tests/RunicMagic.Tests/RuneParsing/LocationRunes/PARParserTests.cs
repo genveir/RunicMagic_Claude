@@ -1,11 +1,8 @@
-using FluentAssertions;
 using RunicMagic.Controller.RuneParsing;
 using RunicMagic.Controller.RuneParsing.LocationRunes;
-using RunicMagic.Tests.RuneParsing;
-using RunicMagic.World.Runes.LocationRunes;
 using RunicMagic.World.Execution;
+using RunicMagic.World.Runes.LocationRunes;
 using RunicMagic.World.Runes.RuneTypes;
-using Xunit;
 
 namespace RunicMagic.Tests.RuneParsing.LocationRunes;
 
@@ -29,7 +26,8 @@ public class PARParserTests
 
         result.Succeeded.Should().BeTrue();
         var par = result.Value.Should().BeOfType<PAR>().Subject;
-        par.EntitySet.Should().BeOfType<EntitySetSelectionCostResolver>()
+        par.EntitySet.Should().BeOfType<CalcifiedEntitySet>()
+            .Which.Inner.Should().BeOfType<EntitySetSelectionCostResolver>()
             .Which.Inner.Should().BeSameAs(mockEntitySet);
     }
 

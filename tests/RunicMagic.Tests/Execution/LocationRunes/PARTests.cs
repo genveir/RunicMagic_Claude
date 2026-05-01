@@ -1,7 +1,6 @@
-using FluentAssertions;
 using RunicMagic.Tests.Builders;
+using RunicMagic.World.Execution;
 using RunicMagic.World.Runes.LocationRunes;
-using Xunit;
 
 namespace RunicMagic.Tests.Execution.LocationRunes;
 
@@ -35,14 +34,15 @@ public class PARTests
     }
 
     [Fact]
-    public void Evaluate_EmptySet_ReturnsOrigin()
+    public void Evaluate_EmptySet_ReturnsExecutorLocation()
     {
+        var executorEntity = new EntityBuilder().WithLocation(x: 200, y: 400).Build();
         var par = new PAR(new FixedEntitySet());
-        var context = TestFixtures.MakeContext();
+        var context = TestFixtures.MakeContext(executor: new EntitySet([executorEntity]));
 
         var result = par.Evaluate(context);
 
-        result.X.Should().Be(0);
-        result.Y.Should().Be(0);
+        result.X.Should().Be(200);
+        result.Y.Should().Be(400);
     }
 }

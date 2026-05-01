@@ -46,6 +46,8 @@ The expression tree is evaluated against the world state. Effects are applied as
 
 Each effect-producing rune is responsible for defining its own execution cost. A fireball with radius 1 and a fireball with radius 1000 are the same spell structurally, and cost the same to evaluate; but the execution cost scales with the effect, so magnitude has real consequence.
 
+Some effects are instantaneous; others are **motion effects** that unfold over multiple ticks. See *Motion Effects* below.
+
 All Sets are resolved at the time of their execution. If a previous part of a spell has altered state, that altered state is carried forward. Runes being executed always only see the state as it is when they're executed.
 
 ---
@@ -64,7 +66,11 @@ Sets can be derived several ways:
 - **Property filters** — runes that filter a Set by entity properties such as weight or current power.
 - **Set operations** — `AN(union)`, `DU(intersection)`, and `RAL(difference)` combine two Sets into one.
 
-Sets are always evaluated at the point of execution against current world state. A Set referenced twice in a spell may yield different results if the world changed between the two evaluations.
+By default, Sets are **calcified**: they are evaluated once on first execution and the result is cached for the lifetime of the effect. Targeting is locked to the entities that existed the moment the spell fired; subsequent ticks of a motion effect see the same set regardless of how the world changes.
+
+The `SA(activate)` decorator overrides this: a Set wrapped in `SA` is **live** and re-evaluated on every tick. A live set re-selects its entities each tick and reflects any changes to world state. The `YI(calcify)` decorator forces calcification of a subexpression even inside an `SA` context.
+
+A Set referenced twice in a spell with different liveness modes may yield different results at different points in execution.
 
 ---
 
@@ -74,10 +80,12 @@ Power is drawn in three distinct ways during a spell:
 
 1. **Evaluation cost** — paid upfront (step 4) before execution begins, based on rune count.
 2. **Selection cost** — paid each time a Set is consumed by a rune that consumes a Set but doesn't produce one (i.e. not by filters or selectors). Two components are charged together:
-   - **Entity cost**: `ceil(MaxPower / 1000)` per entity in the resolved Set, excluding the caster and executor, who are always free to select.
+   - **Entity cost**: `ceil(MaxPower / 1_000_000_000)` per entity in the resolved Set, excluding the caster and executor, who are always free to select.
    - **Breadth cost**: 1 power per entity touched by any leaf selector (for example HORO, LA) during resolution of that Set, regardless of how many survive filtering. A precise spell that targets exactly what it needs pays less than one that sweeps broadly and filters back down.
 
-   If the full combined cost cannot be met, the Set resolves to empty.
+   For **live** Sets (decorated with `SA`), selection cost is charged **incrementally** across ticks: an entity that was already paid for on a previous tick is not charged the entity cost again, and breadth entities previously counted are not counted again. Only entities that are new to the set on a given tick incur their entity cost and breadth.
+
+   If the full combined cost for the current tick cannot be met, the Set resolves to empty.
 3. **Execution cost** — paid by each effect rune as it fires, scaled by the magnitude of the effect.
 
 All three draws use the same cascade. The engine works through a cascade of power sources, calling `Draw(amount)` on each in turn and carrying forward any shortfall until the cost is met. A source returns however much it can actually provide — which may be less than asked. The engine never inspects a source's internals or queries its reserves; it just takes what it gets and moves on.
@@ -105,6 +113,16 @@ The cost model consistently rewards mastery. There are no guardrails, no safety 
 - **Failure** punishes overreach without mercy. The engine makes no attempt to pre-validate whether a spell can be afforded. Power is drawn, effects fire, and consequences follow — a spell that cannot be completed will still drain every source it can reach before failing.
 
 A novice and an expert can write the same effect. The expert's version costs less, leaves more in reserve, and is harder to exhaust against. That gap is entirely a function of how well the caster understands the system.
+
+---
+
+## Motion Effects
+
+Some effect runes (VUN, VAR, CJIR, CJAR) do not apply their effect instantaneously. When executed, they register a **motion effect** — a persistent world object that advances over 56 ticks (~one second at 60 FPS). The game loop advances all active motion effects each frame, interleaved with player input.
+
+Execution cost for motion effects is paid incrementally: one draw per tick, sized to cover that tick's share of the total. If a tick's draw cannot be met in full, the effect stops immediately and permanently.
+
+The 56-tick duration is fixed. A motion effect always runs for exactly 56 ticks unless stopped early by power failure.
 
 ---
 

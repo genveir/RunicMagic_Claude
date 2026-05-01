@@ -14,6 +14,8 @@
 
 - Never use the `AskUserQuestion` widget. Ask questions as plain open-ended text instead.
 
+- Do not spawn Explore agents speculatively. Before reading any code, state what information is needed and why. If the user wants an Explore agent used, they will say so — and will specify what to look for.
+
 ## Architecture
 
 - The solution follows a hub-and-spokes model. `Controller` is the hub and the only assembly that communicates between other assemblies. Spoke assemblies (`World`, `Database`, etc.) must not reference each other. If two spokes need to share a concept, it either lives in `Controller` or is intentionally represented differently in each spoke (e.g. `EntityData` uses `long TypeId` rather than `EntityType` to avoid `Database` depending on `World`).
@@ -52,6 +54,8 @@
   }
   ```
   Void methods that have nothing to return are exempt.
+
+- Do not use primary constructors except in records. Always use an explicit constructor body so fields are declared separately and remain navigable and debuggable.
 
 - Use named arguments when the purpose of an argument isn't obvious from the call site:
   - Always for inline lambdas (you can't tell from the lambda body alone which parameter it maps to)

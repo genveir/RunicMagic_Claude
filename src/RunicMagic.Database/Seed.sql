@@ -10,6 +10,7 @@ delete from inscription;
 delete from entities;
 
 declare @caster        uniqueidentifier = newid();
+declare @secondPlayer uniqueidentifier = newid();
 declare @manaStone     uniqueidentifier = newid();
 declare @smallManaStone uniqueidentifier = newid();
 declare @rock          uniqueidentifier = newid();
@@ -18,6 +19,7 @@ insert into Entities (Id, EntityTypeId, Label, X, Y, Width, Height, HasAgency, W
 values
     -- caster (outside the room, above the top wall; X,Y are center)
     (@caster,    1, 'Player',               12045,   4142, 900,  300,  1, 70000,    0, 0,                  1000, 1000),
+    (@secondPlayer,    1, 'Player',               2045,   4142, 900,  300,  1, 70000,    0, 0,                  1000, 1000),
     -- mana stone (near top-right interior corner)
     (@manaStone, 2, 'Mana Stone',           8125,    925, 250,  250,  0, 3000,     0, 0,                  1000, 1000),
     -- top wall, split by door
@@ -45,12 +47,13 @@ values
 
 insert into EntityLife (EntityId, MaxHitPoints, CurrentHitPoints)
 values
-    (@caster, 1000, 1000);
+    (@caster, 1000000000, 1000000000),
+    (@secondPlayer, 1000000000, 1000000000);
 
 insert into EntityCharge (EntityId, MaxCharge, CurrentCharge)
 values
-    (@manaStone, 10000, 10000),
-    (@smallManaStone, 100, 100);
+    (@manaStone, 10000000000, 10000000000),
+    (@smallManaStone, 100000000, 100000000);
 
 insert into Inscription (EntityId, SpellText)
 values

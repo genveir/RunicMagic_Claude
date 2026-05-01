@@ -1,10 +1,7 @@
-using FluentAssertions;
 using RunicMagic.Controller.RuneParsing;
 using RunicMagic.Controller.RuneParsing.SetOperationRunes;
-using RunicMagic.Tests.RuneParsing;
 using RunicMagic.World.Runes.RuneTypes;
 using RunicMagic.World.Runes.SetOperationRunes;
-using Xunit;
 
 namespace RunicMagic.Tests.RuneParsing.SetOperationRunes;
 
@@ -30,8 +27,8 @@ public class DUParserTests
 
         result.Succeeded.Should().BeTrue();
         var du = result.Value.Should().BeOfType<DU>().Subject;
-        du.Left.Should().BeSameAs(mockLeft);
-        du.Right.Should().BeSameAs(mockRight);
+        du.Left.Should().BeOfType<CalcifiedEntitySet>().Which.Inner.Should().BeSameAs(mockLeft);
+        du.Right.Should().BeOfType<CalcifiedEntitySet>().Which.Inner.Should().BeSameAs(mockRight);
     }
 
     [Fact]

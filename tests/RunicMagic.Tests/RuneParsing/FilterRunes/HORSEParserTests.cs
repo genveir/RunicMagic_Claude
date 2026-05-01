@@ -1,11 +1,8 @@
-using FluentAssertions;
 using RunicMagic.Controller.RuneParsing;
 using RunicMagic.Controller.RuneParsing.FilterRunes;
-using RunicMagic.Tests.RuneParsing;
 using RunicMagic.World.Runes.EntityReferenceRunes;
 using RunicMagic.World.Runes.FilterRunes;
 using RunicMagic.World.Runes.RuneTypes;
-using Xunit;
 
 namespace RunicMagic.Tests.RuneParsing.FilterRunes;
 
@@ -31,8 +28,8 @@ public class HORSEParserTests
 
         result.Succeeded.Should().BeTrue();
         var horse = result.Value.Should().BeOfType<HORSE>().Subject;
-        horse.Source.Should().BeSameAs(mockSource);
-        horse.Origin.Should().BeSameAs(mockOrigin);
+        horse.Source.Should().BeOfType<CalcifiedEntitySet>().Which.Inner.Should().BeSameAs(mockSource);
+        horse.Origin.Should().BeOfType<CalcifiedEntitySet>().Which.Inner.Should().BeSameAs(mockOrigin);
     }
 
     [Fact]
@@ -45,8 +42,8 @@ public class HORSEParserTests
 
         result.Succeeded.Should().BeTrue();
         var horse = result.Value.Should().BeOfType<HORSE>().Subject;
-        horse.Source.Should().BeSameAs(mockSource);
-        horse.Origin.Should().BeOfType<OH>();
+        horse.Source.Should().BeOfType<CalcifiedEntitySet>().Which.Inner.Should().BeSameAs(mockSource);
+        horse.Origin.Should().BeOfType<CalcifiedEntitySet>().Which.Inner.Should().BeOfType<OH>();
     }
 
     [Fact]

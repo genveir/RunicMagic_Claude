@@ -2,12 +2,11 @@
 
 ## To Do — Milestone 2
 
-Next ticket number: RMC-85
-Next bugfix number: BUG-4
+Next ticket number: RMC-98
+Next bugfix number: BUG-7
 
 | Key | Title | Description | Blocked By |
 |-----|-------|-------------|------------|
-| RMC-82 | Motion effects queue | Movement effects (VUN, VAR, CJIR, CJAR) produce incremental motion effects on entities rather than resolving atomically. The game loop drains these each tick, advancing entities toward their destinations. | RMC-81 |
 | RMC-77 | World AI system | Add an `AiCapability` to the entity model. World exposes `TickAi(deltaSeconds)` which iterates all entities with AI and calls their tick. | |
 | RMC-80 | PatrolAi behavior | First concrete AI behavior: `PatrolAiCapability` — walks an entity back and forth along a list of waypoints at a configurable speed. Needs DB schema for waypoints and speed. | RMC-77 |
 | RMC-83 | Movement service | Introduce a movement service that sits between any "I want to move" request (AI, future systems) and the actual position update. The service is the single place that knows about ongoing motion effects and gates or modifies autonomous movement accordingly. For now: an entity under an active motion effect cannot produce its own movement. | RMC-82 RMC-77 |
@@ -18,6 +17,10 @@ Next bugfix number: BUG-4
 
 | Key | Title | Description | Blocked By |
 |-----|-------|-------------|------------|
+| RMC-96 | Remove primary constructors | Find all non-record classes and structs that use primary constructors and replace them with explicit constructor bodies. Fields should be declared separately. Records may keep primary constructors. | |
+| RMC-95 | Clean up GlobalUsings in test project | `GlobalUsings.cs` currently imports `RunicMagic.World.Capabilities` and `RunicMagic.World.Runes.RuneTypes` — both are narrow domain namespaces that should be explicit where needed. Move them out. Add `FluentAssertions` and `Xunit` as global usings instead, since every test file needs them. | |
+| RMC-91 | Move entry point to Controller; invert View/Controller dependency | Currently View hosts the application, making Controller a dependency of View. This inverts the intended hub-and-spokes architecture. Move the entry point into Controller so that Controller owns the host and View becomes a spoke that Controller depends on, not the other way around. | |
+| RMC-92 | Move status rendering to View | The terminal prompt is currently rendered in the Controller assembly. Controller should instead produce a model carrying the caster's status information (e.g. power, health) and pass it to View, which is responsible for deciding how to format and display that data. | |
 | RMC-60 | Design small items | Define the world model for small items — portable objects a creature can carry (e.g. a mana gem in the caster's pocket). Covers how items are represented, how carrying/inventory works, and how items interact with spells and power sourcing. | |
 | RMC-37 | Kill creatures when they run out of life | At any point during spell execution, living entities may run out of hitpoints. In this case the game should register that they're dead and remove their living and agency properties | |
 | RMC-38 | Register entity destruction | It should be possible to destroy entities. When this happens, the game should register that the entity is destroyed | |
@@ -44,3 +47,14 @@ Next bugfix number: BUG-4
 | RMC-76 | Game clock |
 | RMC-78 | SSE world push |
 | RMC-81 | Queue spells for tick processing |
+| RMC-82 | Motion effects queue |
+| RMC-85 | Scale up power costs |
+| RMC-86 | EventTracker — World-layer rename and entity tracking |
+| RMC-93 | ControllerEvent hierarchy |
+| RMC-94 | Game loop refactor |
+| RMC-88 | Clean up TryAdvance/TryAdvanceInner split |
+| RMC-89 | YI/SA decorator runes and live vs calcified evaluation |
+| RMC-97 | Update design docs to reflect ongoing effects |
+| BUG-6 | Malformed rune names produce no output |
+| BUG-5 | Entity clicks break during canvas animation |
+| RMC-90 | Move linear motion cost calculation into LinearMotionEffect |

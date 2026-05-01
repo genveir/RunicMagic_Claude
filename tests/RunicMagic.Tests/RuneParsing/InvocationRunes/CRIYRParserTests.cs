@@ -1,10 +1,9 @@
-using FluentAssertions;
 using RunicMagic.Controller.RuneParsing;
 using RunicMagic.World.Execution;
 using RunicMagic.World.Runes.EntityReferenceRunes;
 using RunicMagic.World.Runes.ExecutionRunes;
 using RunicMagic.World.Runes.InvocationRunes;
-using Xunit;
+using RunicMagic.World.Runes.RuneTypes;
 
 namespace RunicMagic.Tests.RuneParsing.InvocationRunes;
 
@@ -18,7 +17,8 @@ public class CRIYRParserTests
         result.Succeeded.Should().BeTrue();
         var zu = result.Value.Should().BeOfType<ZU>().Subject;
         var criyr = zu.Statement.Should().BeOfType<CRIYR>().Subject;
-        criyr.Target.Should().BeOfType<EntitySetSelectionCostResolver>()
+        criyr.Target.Should().BeOfType<CalcifiedEntitySet>()
+            .Which.Inner.Should().BeOfType<EntitySetSelectionCostResolver>()
             .Which.Inner.Should().BeOfType<A>();
     }
 
@@ -30,7 +30,8 @@ public class CRIYRParserTests
         result.Succeeded.Should().BeTrue();
         var zu = result.Value.Should().BeOfType<ZU>().Subject;
         var criyr = zu.Statement.Should().BeOfType<CRIYR>().Subject;
-        criyr.Target.Should().BeOfType<EntitySetSelectionCostResolver>()
+        criyr.Target.Should().BeOfType<CalcifiedEntitySet>()
+            .Which.Inner.Should().BeOfType<EntitySetSelectionCostResolver>()
             .Which.Inner.Should().BeOfType<DAN>();
     }
 

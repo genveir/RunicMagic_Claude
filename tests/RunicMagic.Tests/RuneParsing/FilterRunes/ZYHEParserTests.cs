@@ -1,10 +1,7 @@
-using FluentAssertions;
 using RunicMagic.Controller.RuneParsing;
 using RunicMagic.Controller.RuneParsing.FilterRunes;
-using RunicMagic.Tests.RuneParsing;
 using RunicMagic.World.Runes.FilterRunes;
 using RunicMagic.World.Runes.RuneTypes;
-using Xunit;
 
 namespace RunicMagic.Tests.RuneParsing.FilterRunes;
 
@@ -28,7 +25,7 @@ public class ZYHEParserTests
 
         result.Succeeded.Should().BeTrue();
         var zyhe = result.Value.Should().BeOfType<ZYHE>().Subject;
-        zyhe.Source.Should().BeSameAs(mockSource);
+        zyhe.Source.Should().BeOfType<CalcifiedEntitySet>().Which.Inner.Should().BeSameAs(mockSource);
     }
 
     [Fact]

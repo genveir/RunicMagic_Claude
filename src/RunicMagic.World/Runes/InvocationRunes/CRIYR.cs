@@ -20,7 +20,7 @@ public class CRIYR : IStatement
         {
             foreach (var inscription in entity.RawInscriptions)
             {
-                context.Result.Add(new InscriptionReadEvent(entity, inscription));
+                context.EventTracker.Add(new InscriptionReadEvent(entity, inscription));
             }
         }
     }

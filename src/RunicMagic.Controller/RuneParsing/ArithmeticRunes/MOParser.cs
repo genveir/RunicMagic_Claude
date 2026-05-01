@@ -20,6 +20,6 @@ internal class MOParser : IRuneParser<INumber>
         }
 
         var result = new MO(aResult.Value, bResult.Value);
-        return ParsingResult<INumber>.Succeed(result);
+        return ParsingResult<INumber>.Succeed(result, isLive: aResult.IsLive || bResult.IsLive);
     }
 }

@@ -4,7 +4,7 @@ namespace RunicMagic.World.Services;
 
 internal static class PowerService
 {
-    public static long DrawPower(EntitySet entitySet, long amount, SpellResult result)
+    public static long DrawPower(EntitySet entitySet, long amount, IWorldEventTracker result)
     {
         var groups = entitySet.Entities
             .Where(e => e.Reservoir != null)
@@ -27,7 +27,7 @@ internal static class PowerService
         return amount - powerToDraw;
     }
 
-    private static long DrawPower(IEnumerable<Entity> entities, long amount, SpellResult result)
+    private static long DrawPower(IEnumerable<Entity> entities, long amount, IWorldEventTracker result)
     {
         var perEntity = (long)Math.Ceiling((double)amount / entities.Count());
         var totalDrawn = 0L;
@@ -38,6 +38,7 @@ internal static class PowerService
             if (draw.Amount > 0)
             {
                 result.Add(new PowerDrawnEvent(entity, draw.Amount));
+                result.Track(entity);
             }
             if (draw.IsDrained)
             {
@@ -49,7 +50,7 @@ internal static class PowerService
 
     public static void FillWithOvercharge(EntitySet toFill, EntitySet? returnSource, long amount, SpellContext context)
     {
-        var remaining = amount - FillPower(toFill, amount, context.Result);
+        var remaining = amount - FillPower(toFill, amount, context.EventTracker);
         var currentSet = toFill;
 
         while (remaining > 0)
@@ -64,7 +65,7 @@ internal static class PowerService
                 break;
             }
 
-            remaining -= FillPower(scope, remaining, context.Result);
+            remaining -= FillPower(scope, remaining, context.EventTracker);
             currentSet = scope;
         }
 
@@ -86,7 +87,7 @@ internal static class PowerService
         }
     }
 
-    public static long FillPower(EntitySet entitySet, long amount, SpellResult result)
+    public static long FillPower(EntitySet entitySet, long amount, IWorldEventTracker result)
     {
         var groups = entitySet.Entities
             .Where(e => e.Reservoir != null)
@@ -109,7 +110,7 @@ internal static class PowerService
         return amount - powerToFill;
     }
 
-    private static long FillPower(IEnumerable<Entity> entities, long amount, SpellResult result)
+    private static long FillPower(IEnumerable<Entity> entities, long amount, IWorldEventTracker result)
     {
         var perEntity = (long)Math.Ceiling((double)amount / entities.Count());
         var totalFilled = 0L;

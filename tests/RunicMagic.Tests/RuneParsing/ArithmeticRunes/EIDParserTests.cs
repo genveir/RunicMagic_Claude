@@ -1,9 +1,7 @@
-using FluentAssertions;
 using RunicMagic.Controller.RuneParsing;
 using RunicMagic.Controller.RuneParsing.ArithmeticRunes;
 using RunicMagic.World.Runes.NumberRunes;
 using RunicMagic.World.Runes.RuneTypes;
-using Xunit;
 
 namespace RunicMagic.Tests.RuneParsing.ArithmeticRunes;
 
@@ -29,8 +27,8 @@ public class EIDParserTests
 
         result.Succeeded.Should().BeTrue();
         var eid = result.Value.Should().BeOfType<EID>().Subject;
-        eid.A.Should().BeSameAs(mockA);
-        eid.B.Should().BeSameAs(mockB);
+        eid.A.Should().BeOfType<CalcifiedNumber>().Which.Inner.Should().BeSameAs(mockA);
+        eid.B.Should().BeOfType<CalcifiedNumber>().Which.Inner.Should().BeSameAs(mockB);
     }
 
     [Fact]

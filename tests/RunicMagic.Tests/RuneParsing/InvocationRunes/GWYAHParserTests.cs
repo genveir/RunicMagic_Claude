@@ -1,10 +1,9 @@
-using FluentAssertions;
 using RunicMagic.Controller.RuneParsing;
 using RunicMagic.World.Execution;
 using RunicMagic.World.Runes.EntityReferenceRunes;
 using RunicMagic.World.Runes.ExecutionRunes;
 using RunicMagic.World.Runes.InvocationRunes;
-using Xunit;
+using RunicMagic.World.Runes.RuneTypes;
 
 namespace RunicMagic.Tests.RuneParsing.InvocationRunes;
 
@@ -18,7 +17,8 @@ public class GWYAHParserTests
         result.Succeeded.Should().BeTrue();
         var zu = result.Value.Should().BeOfType<ZU>().Subject;
         var gwyah = zu.Statement.Should().BeOfType<GWYAH>().Subject;
-        gwyah.Target.Should().BeOfType<EntitySetSelectionCostResolver>()
+        gwyah.Target.Should().BeOfType<CalcifiedEntitySet>()
+            .Which.Inner.Should().BeOfType<EntitySetSelectionCostResolver>()
             .Which.Inner.Should().BeOfType<A>();
     }
 
@@ -30,7 +30,8 @@ public class GWYAHParserTests
         result.Succeeded.Should().BeTrue();
         var zu = result.Value.Should().BeOfType<ZU>().Subject;
         var gwyah = zu.Statement.Should().BeOfType<GWYAH>().Subject;
-        gwyah.Target.Should().BeOfType<EntitySetSelectionCostResolver>()
+        gwyah.Target.Should().BeOfType<CalcifiedEntitySet>()
+            .Which.Inner.Should().BeOfType<EntitySetSelectionCostResolver>()
             .Which.Inner.Should().BeOfType<DAN>();
     }
 

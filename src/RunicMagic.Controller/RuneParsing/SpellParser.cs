@@ -10,7 +10,7 @@ internal static class SpellParser
 
         var result = RuneParsingDispatcher.ParseNextRune<IExecutableStatement>(tokenStream);
 
-        return ((long)(tokenStream.Index + 1), result);
+        return (tokenStream.Index + 1, result);
     }
 
     public static IStatement? ParseAsStatement(string spellString)

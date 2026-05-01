@@ -13,6 +13,6 @@ internal class FUHEParser : IRuneParser<IEntitySet>
             return ParsingResult<IEntitySet>.Fail(sourceResult.Error);
         }
 
-        return ParsingResult<IEntitySet>.Succeed(new FUHE(sourceResult.Value));
+        return ParsingResult<IEntitySet>.Succeed(new FUHE(sourceResult.Value), isLive: sourceResult.IsLive);
     }
 }

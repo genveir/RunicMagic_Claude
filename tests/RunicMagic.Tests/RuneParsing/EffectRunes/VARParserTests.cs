@@ -1,4 +1,3 @@
-using FluentAssertions;
 using RunicMagic.Controller.RuneParsing;
 using RunicMagic.Controller.RuneParsing.EffectRunes;
 using RunicMagic.World.Execution;
@@ -6,7 +5,6 @@ using RunicMagic.World.Runes.EffectRunes;
 using RunicMagic.World.Runes.EntityReferenceRunes;
 using RunicMagic.World.Runes.LocationRunes;
 using RunicMagic.World.Runes.RuneTypes;
-using Xunit;
 
 namespace RunicMagic.Tests.RuneParsing.EffectRunes;
 
@@ -34,10 +32,11 @@ public class VARParserTests
 
         result.Succeeded.Should().BeTrue();
         var var_ = result.Value.Should().BeOfType<VAR>().Subject;
-        var_.ToMove.Should().BeOfType<EntitySetSelectionCostResolver>()
+        var_.ToMove.Should().BeOfType<CalcifiedEntitySet>()
+            .Which.Inner.Should().BeOfType<EntitySetSelectionCostResolver>()
             .Which.Inner.Should().BeSameAs(mockEntitySet);
-        var_.HowFar.Should().BeSameAs(mockNumber);
-        var_.Origin.Should().BeSameAs(mockLocation);
+        var_.HowFar.Should().BeOfType<CalcifiedNumber>().Which.Inner.Should().BeSameAs(mockNumber);
+        var_.Origin.Should().BeOfType<CalcifiedLocation>().Which.Inner.Should().BeSameAs(mockLocation);
     }
 
     [Fact]
@@ -52,8 +51,10 @@ public class VARParserTests
 
         result.Succeeded.Should().BeTrue();
         var var_ = result.Value.Should().BeOfType<VAR>().Subject;
-        var par = var_.Origin.Should().BeOfType<PAR>().Subject;
-        par.EntitySet.Should().BeOfType<EntitySetSelectionCostResolver>()
+        var par = var_.Origin.Should().BeOfType<CalcifiedLocation>()
+            .Which.Inner.Should().BeOfType<PAR>().Subject;
+        par.EntitySet.Should().BeOfType<CalcifiedEntitySet>()
+            .Which.Inner.Should().BeOfType<EntitySetSelectionCostResolver>()
             .Which.Inner.Should().BeOfType<OH>();
     }
 

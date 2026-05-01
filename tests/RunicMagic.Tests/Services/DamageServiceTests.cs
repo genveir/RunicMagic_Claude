@@ -1,10 +1,8 @@
-using FluentAssertions;
+using RunicMagic.Controller.Services;
 using RunicMagic.Tests.Builders;
-using RunicMagic.Tests.Execution;
 using RunicMagic.World;
 using RunicMagic.World.Execution;
 using RunicMagic.World.Services;
-using Xunit;
 
 namespace RunicMagic.Tests.Services;
 
@@ -54,10 +52,10 @@ public class DamageServiceTests
         var entity2 = new EntityBuilder().WithStructuralIntegrity(1000, 1000).Build();
 
         var set = new EntitySet([entity1, entity2]);
-        var result = new SpellResult();
+        var result = new EventTracker();
         DamageService.Damage(set, 20, TestFixtures.MakeContext(result: result));
 
-        result.Events.OfType<EntityDamagedEvent>().Should().HaveCount(2);
+        result.WorldEvents.OfType<EntityDamagedEvent>().Should().HaveCount(2);
     }
 
     [Fact]
@@ -66,10 +64,10 @@ public class DamageServiceTests
         var entity = new EntityBuilder().WithStructuralIntegrity(100, 10).Build();
 
         var set = new EntitySet([entity]);
-        var result = new SpellResult();
+        var result = new EventTracker();
         DamageService.Damage(set, 100, TestFixtures.MakeContext(result: result));
 
-        result.Events.OfType<EntityDisintegratedEvent>().Should().ContainSingle()
+        result.WorldEvents.OfType<EntityDisintegratedEvent>().Should().ContainSingle()
             .Which.Entity.Should().Be(entity);
     }
 
@@ -91,13 +89,13 @@ public class DamageServiceTests
         var sturdy = new EntityBuilder().WithStructuralIntegrity(1000, 1000).Build();
 
         var set = new EntitySet([fragile, sturdy]);
-        var result = new SpellResult();
+        var result = new EventTracker();
         DamageService.Damage(set, 100, TestFixtures.MakeContext(result: result));
 
         // Round 1: ceil(100/2) = 50 each. Fragile absorbs 5 (dies), sturdy absorbs 50. Remaining = 45.
         // Round 2: ceil(45/1) = 45. Sturdy absorbs 45. Remaining = 0.
         sturdy.StructuralIntegrity.CurrentIntegrity.Should().Be(905);
-        result.Events.OfType<EntityDisintegratedEvent>().Should().ContainSingle();
+        result.WorldEvents.OfType<EntityDisintegratedEvent>().Should().ContainSingle();
     }
 
     [Fact]
@@ -107,11 +105,11 @@ public class DamageServiceTests
         var entity2 = new EntityBuilder().WithStructuralIntegrity(100, 10).Build();
 
         var set = new EntitySet([entity1, entity2]);
-        var result = new SpellResult();
+        var result = new EventTracker();
         var totalDealt = DamageService.Damage(set, 1000, TestFixtures.MakeContext(result: result));
 
         totalDealt.Should().Be(20);
-        result.Events.OfType<EntityDisintegratedEvent>().Should().HaveCount(2);
+        result.WorldEvents.OfType<EntityDisintegratedEvent>().Should().HaveCount(2);
     }
 
     [Fact]
@@ -162,10 +160,10 @@ public class DamageServiceTests
     {
         var entity = new EntityBuilder().WithStructuralIntegrity(1000, 1000).Build();
 
-        var result = new SpellResult();
+        var result = new EventTracker();
         DamageService.Damage(entity, 100, TestFixtures.MakeContext(result: result));
 
-        result.Events.OfType<EntityDamagedEvent>().Should().ContainSingle()
+        result.WorldEvents.OfType<EntityDamagedEvent>().Should().ContainSingle()
             .Which.Should().Match<EntityDamagedEvent>(e => e.Entity == entity && e.Amount == 100);
     }
 
@@ -174,10 +172,10 @@ public class DamageServiceTests
     {
         var entity = new EntityBuilder().WithStructuralIntegrity(1000, 100).Build();
 
-        var result = new SpellResult();
+        var result = new EventTracker();
         DamageService.Damage(entity, 100, TestFixtures.MakeContext(result: result));
 
-        result.Events.OfType<EntityDisintegratedEvent>().Should().ContainSingle()
+        result.WorldEvents.OfType<EntityDisintegratedEvent>().Should().ContainSingle()
             .Which.Entity.Should().Be(entity);
     }
 
@@ -186,10 +184,10 @@ public class DamageServiceTests
     {
         var entity = new EntityBuilder().WithStructuralIntegrity(1000, 100).Build();
 
-        var result = new SpellResult();
+        var result = new EventTracker();
         DamageService.Damage(entity, 100, TestFixtures.MakeContext(result: result));
 
-        result.Events.OfType<EntityDamagedEvent>().Should().BeEmpty();
+        result.WorldEvents.OfType<EntityDamagedEvent>().Should().BeEmpty();
     }
 
     [Fact]
@@ -197,10 +195,10 @@ public class DamageServiceTests
     {
         var entity = new EntityBuilder().WithStructuralIntegrity(1000, 1000).Build();
 
-        var result = new SpellResult();
+        var result = new EventTracker();
         DamageService.Damage(entity, 0, TestFixtures.MakeContext(result: result));
 
-        result.Events.Should().BeEmpty();
+        result.WorldEvents.Should().BeEmpty();
     }
 
     [Fact]

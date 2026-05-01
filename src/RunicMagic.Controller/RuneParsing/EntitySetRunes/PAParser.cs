@@ -14,6 +14,6 @@ internal class PAParser : IRuneParser<IEntitySet>
         }
 
         var result = new PA(toGetScopeOfResult.Value);
-        return ParsingResult<IEntitySet>.Succeed(result);
+        return ParsingResult<IEntitySet>.Succeed(result, isLive: toGetScopeOfResult.IsLive);
     }
 }

@@ -1,8 +1,6 @@
-using FluentAssertions;
 using RunicMagic.Tests.Builders;
 using RunicMagic.World.Execution;
 using RunicMagic.World.Runes.EntityReferenceRunes;
-using Xunit;
 
 namespace RunicMagic.Tests.Execution.EntityReferenceRunes;
 

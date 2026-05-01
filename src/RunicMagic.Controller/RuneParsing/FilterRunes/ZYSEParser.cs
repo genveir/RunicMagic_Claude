@@ -13,6 +13,6 @@ internal class ZYSEParser : IRuneParser<IEntitySet>
             return ParsingResult<IEntitySet>.Fail(sourceResult.Error);
         }
 
-        return ParsingResult<IEntitySet>.Succeed(new ZYSE(sourceResult.Value));
+        return ParsingResult<IEntitySet>.Succeed(new ZYSE(sourceResult.Value), isLive: sourceResult.IsLive);
     }
 }

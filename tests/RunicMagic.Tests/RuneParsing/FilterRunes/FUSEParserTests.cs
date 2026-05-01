@@ -1,10 +1,7 @@
-using FluentAssertions;
 using RunicMagic.Controller.RuneParsing;
 using RunicMagic.Controller.RuneParsing.FilterRunes;
-using RunicMagic.Tests.RuneParsing;
 using RunicMagic.World.Runes.FilterRunes;
 using RunicMagic.World.Runes.RuneTypes;
-using Xunit;
 
 namespace RunicMagic.Tests.RuneParsing.FilterRunes;
 
@@ -28,7 +25,7 @@ public class FUSEParserTests
 
         result.Succeeded.Should().BeTrue();
         var fuse = result.Value.Should().BeOfType<FUSE>().Subject;
-        fuse.Source.Should().BeSameAs(mockSource);
+        fuse.Source.Should().BeOfType<CalcifiedEntitySet>().Which.Inner.Should().BeSameAs(mockSource);
     }
 
     [Fact]

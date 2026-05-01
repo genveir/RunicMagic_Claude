@@ -1,11 +1,8 @@
-using FluentAssertions;
 using RunicMagic.Controller.Mappers;
 using RunicMagic.Controller.Models;
 using RunicMagic.Tests.Builders;
 using RunicMagic.World;
 using RunicMagic.World.Capabilities;
-using RunicMagic.World.Geometry;
-using Xunit;
 
 namespace RunicMagic.Tests;
 

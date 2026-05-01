@@ -19,7 +19,7 @@ public class GER : ILocation
         var entities = EntitySet.Resolve(context).Entities;
         if (entities.Count == 0)
         {
-            return new Location(0, 0);
+            entities = context.Executor.Entities;
         }
         var result = entities
             .Select(e => (e.Location, e.Weight))

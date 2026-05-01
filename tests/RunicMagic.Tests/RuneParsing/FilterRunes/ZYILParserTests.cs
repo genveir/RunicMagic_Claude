@@ -1,10 +1,7 @@
-using FluentAssertions;
 using RunicMagic.Controller.RuneParsing;
 using RunicMagic.Controller.RuneParsing.FilterRunes;
-using RunicMagic.Tests.RuneParsing;
 using RunicMagic.World.Runes.FilterRunes;
 using RunicMagic.World.Runes.RuneTypes;
-using Xunit;
 
 namespace RunicMagic.Tests.RuneParsing.FilterRunes;
 
@@ -32,9 +29,9 @@ public class ZYILParserTests
 
         result.Succeeded.Should().BeTrue();
         var zyil = result.Value.Should().BeOfType<ZYIL>().Subject;
-        zyil.Source.Should().BeSameAs(mockSource);
-        zyil.Lower.Should().BeSameAs(mockLower);
-        zyil.Upper.Should().BeSameAs(mockUpper);
+        zyil.Source.Should().BeOfType<CalcifiedEntitySet>().Which.Inner.Should().BeSameAs(mockSource);
+        zyil.Lower.Should().BeOfType<CalcifiedNumber>().Which.Inner.Should().BeSameAs(mockLower);
+        zyil.Upper.Should().BeOfType<CalcifiedNumber>().Which.Inner.Should().BeSameAs(mockUpper);
     }
 
     [Fact]

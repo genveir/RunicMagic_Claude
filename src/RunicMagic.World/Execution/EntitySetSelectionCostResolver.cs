@@ -6,6 +6,9 @@ public class EntitySetSelectionCostResolver : IEntitySet
 {
     public IEntitySet Inner { get; }
 
+    private readonly HashSet<EntityId> _previouslySelectedEntities = new();
+    private readonly HashSet<EntityId> _previouslySeenInBreadth = new();
+
     public EntitySetSelectionCostResolver(IEntitySet inner)
     {
         Inner = inner;
@@ -16,24 +19,49 @@ public class EntitySetSelectionCostResolver : IEntitySet
         context.OpenResolutionWindow();
         var resolved = Inner.Resolve(context);
 
-        var cost = CalulateCost(context, resolved);
+        var newBreadthIds = GetNewBreadthIds(context);
+        var cost = CalculateCost(context, resolved, newBreadthIds);
 
         context.CloseResolutionWindow();
 
         var drawn = context.DrawPower(cost);
         if (drawn < cost)
         {
-            context.Result.Add(new SelectionCostNotMetEvent(Required: cost, Drawn: drawn));
+            context.EventTracker.Add(new SelectionCostNotMetEvent(Required: cost, Drawn: drawn));
             return new EntitySet([]);
+        }
+
+        foreach (var id in newBreadthIds)
+        {
+            _previouslySeenInBreadth.Add(id);
+        }
+
+        foreach (var entity in resolved.Entities)
+        {
+            _previouslySelectedEntities.Add(entity.Id);
         }
 
         return resolved;
     }
 
-    private long CalulateCost(SpellContext context, EntitySet resolved)
+    private HashSet<EntityId> GetNewBreadthIds(SpellContext context)
+    {
+        var allSeen = context.EntityResolutionCount ?? [];
+        var newIds = new HashSet<EntityId>();
+        foreach (var id in allSeen)
+        {
+            if (!_previouslySeenInBreadth.Contains(id))
+            {
+                newIds.Add(id);
+            }
+        }
+        return newIds;
+    }
+
+    private long CalculateCost(SpellContext context, EntitySet resolved, HashSet<EntityId> newBreadthIds)
     {
         var finalSetCost = CalculateFinalSetCost(context, resolved);
-        var breadthCost = CalculateBreadthCost(context);
+        var breadthCost = CalculateBreadthCost(newBreadthIds);
 
         return finalSetCost + breadthCost;
     }
@@ -52,17 +80,19 @@ public class EntitySetSelectionCostResolver : IEntitySet
             {
                 continue;
             }
+            if (_previouslySelectedEntities.Contains(entity.Id))
+            {
+                continue;
+            }
             var maxPower = entity.Reservoir?.Max.Invoke() ?? 0L;
-            cost += (maxPower + 999) / 1000;
+            cost += (maxPower + 999999999) / 1000000000;
         }
 
         return cost;
     }
 
-    private long CalculateBreadthCost(SpellContext context)
+    private static long CalculateBreadthCost(HashSet<EntityId> newBreadthIds)
     {
-        var breadthCount = context.EntityResolutionCount?.Count ?? 0;
-
-        return breadthCount;
+        return newBreadthIds.Count * 1000000;
     }
 }

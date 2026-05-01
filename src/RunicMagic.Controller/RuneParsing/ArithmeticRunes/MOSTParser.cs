@@ -14,6 +14,6 @@ internal class MOSTParser : IRuneParser<INumber>
         }
 
         var result = new MOST(aResult.Value);
-        return ParsingResult<INumber>.Succeed(result);
+        return ParsingResult<INumber>.Succeed(result, isLive: aResult.IsLive);
     }
 }

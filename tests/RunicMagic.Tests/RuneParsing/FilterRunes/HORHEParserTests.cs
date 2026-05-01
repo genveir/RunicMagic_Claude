@@ -1,11 +1,8 @@
-using FluentAssertions;
 using RunicMagic.Controller.RuneParsing;
 using RunicMagic.Controller.RuneParsing.FilterRunes;
-using RunicMagic.Tests.RuneParsing;
 using RunicMagic.World.Runes.EntityReferenceRunes;
 using RunicMagic.World.Runes.FilterRunes;
 using RunicMagic.World.Runes.RuneTypes;
-using Xunit;
 
 namespace RunicMagic.Tests.RuneParsing.FilterRunes;
 
@@ -31,8 +28,8 @@ public class HORHEParserTests
 
         result.Succeeded.Should().BeTrue();
         var horhe = result.Value.Should().BeOfType<HORHE>().Subject;
-        horhe.Source.Should().BeSameAs(mockSource);
-        horhe.Origin.Should().BeSameAs(mockOrigin);
+        horhe.Source.Should().BeOfType<CalcifiedEntitySet>().Which.Inner.Should().BeSameAs(mockSource);
+        horhe.Origin.Should().BeOfType<CalcifiedEntitySet>().Which.Inner.Should().BeSameAs(mockOrigin);
     }
 
     [Fact]
@@ -45,8 +42,8 @@ public class HORHEParserTests
 
         result.Succeeded.Should().BeTrue();
         var horhe = result.Value.Should().BeOfType<HORHE>().Subject;
-        horhe.Source.Should().BeSameAs(mockSource);
-        horhe.Origin.Should().BeOfType<OH>();
+        horhe.Source.Should().BeOfType<CalcifiedEntitySet>().Which.Inner.Should().BeSameAs(mockSource);
+        horhe.Origin.Should().BeOfType<CalcifiedEntitySet>().Which.Inner.Should().BeOfType<OH>();
     }
 
     [Fact]

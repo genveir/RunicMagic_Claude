@@ -1,10 +1,9 @@
-using FluentAssertions;
+using RunicMagic.Controller.Services;
 using RunicMagic.Tests.Builders;
 using RunicMagic.World;
 using RunicMagic.World.Capabilities;
 using RunicMagic.World.Execution;
 using RunicMagic.World.Runes.DebugRunes;
-using Xunit;
 
 namespace RunicMagic.Tests.Execution.DebugRunes;
 
@@ -30,12 +29,12 @@ public class GATests
     {
         var world = new WorldModel();
         world.Add(new EntityBuilder().Build());
-        var spellResult = new SpellResult();
+        var spellResult = new EventTracker();
         var context = TestFixtures.MakeContext(world: world, result: spellResult);
 
         new GA().Resolve(context);
 
-        spellResult.Events.OfType<DebugOutputEvent>().Should().BeEmpty();
+        spellResult.WorldEvents.OfType<DebugOutputEvent>().Should().BeEmpty();
     }
 
     [Fact]
@@ -60,13 +59,13 @@ public class GATests
     public void Resolve_WithOpenResolutionWindow_EmitsDebugEvent()
     {
         var world = new WorldModel();
-        var spellResult = new SpellResult();
+        var spellResult = new EventTracker();
         var context = TestFixtures.MakeContext(world: world, result: spellResult);
         context.OpenResolutionWindow();
 
         new GA().Resolve(context);
 
-        spellResult.Events.OfType<DebugOutputEvent>().Should().ContainSingle()
+        spellResult.WorldEvents.OfType<DebugOutputEvent>().Should().ContainSingle()
             .Which.Text.Should().Contain("burned out your fragile mortal soul");
     }
 

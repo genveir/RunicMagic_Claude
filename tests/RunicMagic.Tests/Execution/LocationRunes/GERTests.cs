@@ -1,8 +1,7 @@
-using FluentAssertions;
 using RunicMagic.Tests.Builders;
+using RunicMagic.World.Execution;
 using RunicMagic.World.Geometry;
 using RunicMagic.World.Runes.LocationRunes;
-using Xunit;
 
 namespace RunicMagic.Tests.Execution.LocationRunes;
 
@@ -61,13 +60,14 @@ public class GERTests
     }
 
     [Fact]
-    public void Evaluate_EmptySet_ReturnsOrigin()
+    public void Evaluate_EmptySet_ReturnsExecutorLocation()
     {
+        var executorEntity = new EntityBuilder().WithLocation(x: 200, y: 400).WithWeight(10).Build();
         var ger = new GER(new FixedEntitySet());
-        var context = TestFixtures.MakeContext();
+        var context = TestFixtures.MakeContext(executor: new EntitySet([executorEntity]));
 
         var result = ger.Evaluate(context);
 
-        result.Should().Be(new Location(0, 0));
+        result.Should().Be(new Location(200, 400));
     }
 }

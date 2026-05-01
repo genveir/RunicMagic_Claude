@@ -1,11 +1,9 @@
-using FluentAssertions;
 using RunicMagic.Controller.RuneParsing;
 using RunicMagic.Controller.RuneParsing.EffectRunes;
 using RunicMagic.World.Execution;
 using RunicMagic.World.Runes.EffectRunes;
 using RunicMagic.World.Runes.LocationRunes;
 using RunicMagic.World.Runes.RuneTypes;
-using Xunit;
 
 namespace RunicMagic.Tests.RuneParsing.EffectRunes;
 
@@ -33,10 +31,11 @@ public class CJARParserTests
 
         result.Succeeded.Should().BeTrue();
         var cjar = result.Value.Should().BeOfType<CJAR>().Subject;
-        cjar.ToRotate.Should().BeOfType<EntitySetSelectionCostResolver>()
+        cjar.ToRotate.Should().BeOfType<CalcifiedEntitySet>()
+            .Which.Inner.Should().BeOfType<EntitySetSelectionCostResolver>()
             .Which.Inner.Should().BeSameAs(mockEntitySet);
-        cjar.HowMuch.Should().BeSameAs(mockNumber);
-        cjar.Origin.Should().BeSameAs(mockLocation);
+        cjar.HowMuch.Should().BeOfType<CalcifiedNumber>().Which.Inner.Should().BeSameAs(mockNumber);
+        cjar.Origin.Should().BeOfType<CalcifiedLocation>().Which.Inner.Should().BeSameAs(mockLocation);
     }
 
     [Fact]
@@ -53,7 +52,8 @@ public class CJARParserTests
 
         result.Succeeded.Should().BeTrue();
         var cjar = result.Value.Should().BeOfType<CJAR>().Subject;
-        cjar.ToRotate.Should().BeOfType<EntitySetSelectionCostResolver>()
+        cjar.ToRotate.Should().BeOfType<CalcifiedEntitySet>()
+            .Which.Inner.Should().BeOfType<EntitySetSelectionCostResolver>()
             .Which.Inner.Should().BeSameAs(mockEntitySet);
         var par = cjar.Origin.Should().BeOfType<PAR>().Subject;
         par.EntitySet.Should().BeOfType<EntitySetSelectionCostResolver>()

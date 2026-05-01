@@ -13,6 +13,6 @@ internal class DRYALParser : IRuneParser<IEntitySet>
             return ParsingResult<IEntitySet>.Fail(sourceResult.Error);
         }
 
-        return ParsingResult<IEntitySet>.Succeed(new DRYAL(sourceResult.Value));
+        return ParsingResult<IEntitySet>.Succeed(new DRYAL(sourceResult.Value), isLive: sourceResult.IsLive);
     }
 }

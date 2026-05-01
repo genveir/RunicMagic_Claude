@@ -1,8 +1,6 @@
-using FluentAssertions;
 using RunicMagic.Controller.RuneParsing;
 using RunicMagic.World.Runes.EntityReferenceRunes;
 using RunicMagic.World.Runes.RuneTypes;
-using Xunit;
 
 namespace RunicMagic.Tests.RuneParsing;
 
@@ -17,7 +15,7 @@ public class RuneParsingDispatcherTests
         var result = RuneParsingDispatcher.ParseNextRune<IEntitySet>(new TokenStream("Dispatcher_HappyPath_IEntitySet"));
 
         result.Succeeded.Should().BeTrue();
-        result.Value.Should().BeSameAs(mockEntitySet);
+        result.Value.Should().BeOfType<CalcifiedEntitySet>().Which.Inner.Should().BeSameAs(mockEntitySet);
     }
 
     [Fact]
@@ -63,7 +61,7 @@ public class RuneParsingDispatcherTests
         var result = RuneParsingDispatcher.ParseNextRune<IEntitySet>(new TokenStream("Dispatcher_HappyPathWithDefaults_IEntitySet"), defaultTokens: ["A"]);
 
         result.Succeeded.Should().BeTrue();
-        result.Value.Should().BeSameAs(mockEntitySet);
+        result.Value.Should().BeOfType<CalcifiedEntitySet>().Which.Inner.Should().BeSameAs(mockEntitySet);
     }
 
     [Fact]
@@ -72,7 +70,7 @@ public class RuneParsingDispatcherTests
         var result = RuneParsingDispatcher.ParseNextRune<IEntitySet>(new TokenStream(""), defaultTokens: ["A"]);
 
         result.Succeeded.Should().BeTrue();
-        result.Value.Should().BeOfType<A>();
+        result.Value.Should().BeOfType<CalcifiedEntitySet>().Which.Inner.Should().BeOfType<A>();
     }
 
     [Fact]
@@ -81,6 +79,6 @@ public class RuneParsingDispatcherTests
         var result = RuneParsingDispatcher.ParseNextRune<IEntitySet>(new TokenStream("Dispatcher_Unrecognized_IEntitySet"), defaultTokens: ["A"]);
 
         result.Succeeded.Should().BeTrue();
-        result.Value.Should().BeOfType<A>();
+        result.Value.Should().BeOfType<CalcifiedEntitySet>().Which.Inner.Should().BeOfType<A>();
     }
 }

@@ -1,17 +1,15 @@
-using FluentAssertions;
 using Microsoft.Extensions.Logging;
-using Moq;
+using Microsoft.Extensions.Logging.Abstractions;
 using RunicMagic.Controller.EntityConstruction;
 using RunicMagic.Database;
 using RunicMagic.World;
 using RunicMagic.World.Runes.EffectRunes;
-using Xunit;
 
 namespace RunicMagic.Tests.EntityConstruction;
 
 public class EntityFactoryTests
 {
-    private static readonly ILogger<EntityFactory> Logger = new Mock<ILogger<EntityFactory>>().Object;
+    private static readonly ILogger<EntityFactory> Logger = new NullLogger<EntityFactory>();
 
     private static EntityFactory Factory(WorldModel world) => new(world, Logger);
 

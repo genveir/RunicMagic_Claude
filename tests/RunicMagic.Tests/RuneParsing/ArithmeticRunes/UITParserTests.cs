@@ -1,9 +1,7 @@
-using FluentAssertions;
 using RunicMagic.Controller.RuneParsing;
 using RunicMagic.Controller.RuneParsing.ArithmeticRunes;
 using RunicMagic.World.Runes.NumberRunes;
 using RunicMagic.World.Runes.RuneTypes;
-using Xunit;
 
 namespace RunicMagic.Tests.RuneParsing.ArithmeticRunes;
 
@@ -29,8 +27,8 @@ public class UITParserTests
 
         result.Succeeded.Should().BeTrue();
         var uit = result.Value.Should().BeOfType<UIT>().Subject;
-        uit.A.Should().BeSameAs(mockA);
-        uit.B.Should().BeSameAs(mockB);
+        uit.A.Should().BeOfType<CalcifiedNumber>().Which.Inner.Should().BeSameAs(mockA);
+        uit.B.Should().BeOfType<CalcifiedNumber>().Which.Inner.Should().BeSameAs(mockB);
     }
 
     [Fact]

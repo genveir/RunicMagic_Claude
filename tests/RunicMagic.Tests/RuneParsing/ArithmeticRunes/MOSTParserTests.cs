@@ -1,9 +1,7 @@
-using FluentAssertions;
 using RunicMagic.Controller.RuneParsing;
 using RunicMagic.Controller.RuneParsing.ArithmeticRunes;
 using RunicMagic.World.Runes.NumberRunes;
 using RunicMagic.World.Runes.RuneTypes;
-using Xunit;
 
 namespace RunicMagic.Tests.RuneParsing.ArithmeticRunes;
 
@@ -27,7 +25,7 @@ public class MOSTParserTests
 
         result.Succeeded.Should().BeTrue();
         var most = result.Value.Should().BeOfType<MOST>().Subject;
-        most.A.Should().BeSameAs(mockA);
+        most.A.Should().BeOfType<CalcifiedNumber>().Which.Inner.Should().BeSameAs(mockA);
     }
 
     [Fact]

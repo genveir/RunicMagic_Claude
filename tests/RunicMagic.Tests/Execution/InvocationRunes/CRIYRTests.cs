@@ -1,8 +1,7 @@
-using FluentAssertions;
+using RunicMagic.Controller.Services;
 using RunicMagic.Tests.Builders;
 using RunicMagic.World.Execution;
 using RunicMagic.World.Runes.InvocationRunes;
-using Xunit;
 
 namespace RunicMagic.Tests.Execution.InvocationRunes;
 
@@ -13,13 +12,14 @@ public class CRIYRTests
     [Fact]
     public void Execute_EntityWithNoInscriptions_EmitsNoEvents()
     {
+        var tracker = new EventTracker();
         var target = new EntityBuilder().Build();
-        var context = TestFixtures.MakeContext();
+        var context = TestFixtures.MakeContext(result: tracker);
         var criyr = new CRIYR(target: new FixedEntitySet(target));
 
         criyr.Execute(context);
 
-        context.Result.Events.Should().BeEmpty();
+        tracker.WorldEvents.Should().BeEmpty();
     }
 
     // ── Single inscription ────────────────────────────────────────────────────
@@ -27,14 +27,15 @@ public class CRIYRTests
     [Fact]
     public void Execute_EntityWithOneInscription_EmitsOneEvent()
     {
+        var tracker = new EventTracker();
         var target = new EntityBuilder().Build();
         target.RawInscriptions = ["ZU VUN LA TOT"];
-        var context = TestFixtures.MakeContext();
+        var context = TestFixtures.MakeContext(result: tracker);
         var criyr = new CRIYR(target: new FixedEntitySet(target));
 
         criyr.Execute(context);
 
-        var @event = context.Result.Events.Should().ContainSingle().Which
+        var @event = tracker.WorldEvents.Should().ContainSingle().Which
             .Should().BeOfType<InscriptionReadEvent>().Subject;
         @event.Entity.Should().BeSameAs(target);
         @event.Text.Should().Be("ZU VUN LA TOT");
@@ -45,14 +46,15 @@ public class CRIYRTests
     [Fact]
     public void Execute_MultipleInscriptionsOnOneEntity_EmitsOneEventPerInscription()
     {
+        var tracker = new EventTracker();
         var target = new EntityBuilder().Build();
         target.RawInscriptions = ["ZU VUN LA TOT", "ZU GWYAH OH"];
-        var context = TestFixtures.MakeContext();
+        var context = TestFixtures.MakeContext(result: tracker);
         var criyr = new CRIYR(target: new FixedEntitySet(target));
 
         criyr.Execute(context);
 
-        var events = context.Result.Events.Should().HaveCount(2).And
+        var events = tracker.WorldEvents.Should().HaveCount(2).And
             .AllBeOfType<InscriptionReadEvent>().Subject.ToList();
         events[0].Text.Should().Be("ZU VUN LA TOT");
         events[1].Text.Should().Be("ZU GWYAH OH");
@@ -63,18 +65,19 @@ public class CRIYRTests
     [Fact]
     public void Execute_MultipleEntities_EmitsEventsEntityFirst()
     {
+        var tracker = new EventTracker();
         var first = new EntityBuilder().Build();
         first.RawInscriptions = ["ZU VUN LA TOT", "ZU GWYAH OH"];
 
         var second = new EntityBuilder().Build();
         second.RawInscriptions = ["ZU VAR DAN HET"];
 
-        var context = TestFixtures.MakeContext();
+        var context = TestFixtures.MakeContext(result: tracker);
         var criyr = new CRIYR(target: new FixedEntitySet(first, second));
 
         criyr.Execute(context);
 
-        var events = context.Result.Events.Cast<InscriptionReadEvent>().ToList();
+        var events = tracker.WorldEvents.Cast<InscriptionReadEvent>().ToList();
         events.Should().HaveCount(3);
         events[0].Entity.Should().BeSameAs(first);
         events[0].Text.Should().Be("ZU VUN LA TOT");
@@ -89,17 +92,18 @@ public class CRIYRTests
     [Fact]
     public void Execute_SomeEntitiesHaveNoInscriptions_OnlyInscribedEntitiesEmitEvents()
     {
+        var tracker = new EventTracker();
         var withInscription = new EntityBuilder().Build();
         withInscription.RawInscriptions = ["ZU VUN LA TOT"];
 
         var withoutInscription = new EntityBuilder().Build();
 
-        var context = TestFixtures.MakeContext();
+        var context = TestFixtures.MakeContext(result: tracker);
         var criyr = new CRIYR(target: new FixedEntitySet(withInscription, withoutInscription));
 
         criyr.Execute(context);
 
-        context.Result.Events.Should().ContainSingle()
+        tracker.WorldEvents.Should().ContainSingle()
             .Which.Should().BeOfType<InscriptionReadEvent>()
             .Which.Entity.Should().BeSameAs(withInscription);
     }

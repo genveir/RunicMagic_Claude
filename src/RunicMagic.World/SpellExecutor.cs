@@ -12,24 +12,24 @@ public class SpellExecutor
         _world = world;
     }
 
-    public SpellResult Execute(IExecutableStatement spell, long runeCount, EntitySet caster, EntitySet executor)
+    public void Execute(IExecutableStatement spell, IWorldEventTracker eventTracker, long runeCount, EntitySet caster, EntitySet executor)
     {
-        var result = new SpellResult();
-        var context = new SpellContext(caster, executor, _world, result);
+        var context = new SpellContext(caster, executor, _world, eventTracker);
 
-        var evalDrawn = context.DrawPower(runeCount);
+        var toDraw = runeCount * 1000000;
 
-        if (evalDrawn < runeCount)
+        var evalDrawn = context.DrawPower(toDraw);
+
+        if (evalDrawn < toDraw)
         {
             foreach (var entity in executor.Entities)
             {
-                result.Add(new EntityDisintegratedEvent(entity));
+                eventTracker.Add(new EntityDisintegratedEvent(entity));
                 _world.Remove(entity.Id);
             }
-            return result;
+            return;
         }
 
         spell.Execute(context);
-        return result;
     }
 }

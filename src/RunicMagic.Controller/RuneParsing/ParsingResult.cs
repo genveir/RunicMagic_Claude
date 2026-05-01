@@ -2,24 +2,26 @@ namespace RunicMagic.Controller.RuneParsing;
 
 internal class ParsingResult<T>
 {
-    private ParsingResult(bool succeeded, T? value, ParseEvent? error)
+    private ParsingResult(bool succeeded, T? value, ParseEvent? error, bool isLive)
     {
         Succeeded = succeeded;
         _value = value;
         _error = error;
+        IsLive = isLive;
     }
 
-    public static ParsingResult<T> Succeed(T value)
+    public static ParsingResult<T> Succeed(T value, bool isLive = false)
     {
-        return new ParsingResult<T>(true, value, null);
+        return new ParsingResult<T>(true, value, null, isLive);
     }
 
     public static ParsingResult<T> Fail(ParseEvent error)
     {
-        return new ParsingResult<T>(false, default, error);
+        return new ParsingResult<T>(false, default, error, false);
     }
 
     public bool Succeeded { get; }
+    public bool IsLive { get; }
 
     private T? _value;
     public T Value

@@ -1,10 +1,7 @@
-using FluentAssertions;
 using RunicMagic.Controller.RuneParsing;
 using RunicMagic.Controller.RuneParsing.SetOperationRunes;
-using RunicMagic.Tests.RuneParsing;
 using RunicMagic.World.Runes.RuneTypes;
 using RunicMagic.World.Runes.SetOperationRunes;
-using Xunit;
 
 namespace RunicMagic.Tests.RuneParsing.SetOperationRunes;
 
@@ -30,8 +27,8 @@ public class RALParserTests
 
         result.Succeeded.Should().BeTrue();
         var ral = result.Value.Should().BeOfType<RAL>().Subject;
-        ral.Left.Should().BeSameAs(mockLeft);
-        ral.Right.Should().BeSameAs(mockRight);
+        ral.Left.Should().BeOfType<CalcifiedEntitySet>().Which.Inner.Should().BeSameAs(mockLeft);
+        ral.Right.Should().BeOfType<CalcifiedEntitySet>().Which.Inner.Should().BeSameAs(mockRight);
     }
 
     [Fact]

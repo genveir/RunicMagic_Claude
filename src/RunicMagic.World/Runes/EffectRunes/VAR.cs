@@ -1,7 +1,6 @@
 using RunicMagic.World.Execution;
-using RunicMagic.World.Geometry;
+using RunicMagic.World.Motion;
 using RunicMagic.World.Runes.RuneTypes;
-using RunicMagic.World.Services;
 
 namespace RunicMagic.World.Runes.EffectRunes;
 
@@ -22,34 +21,25 @@ public class VAR : IStatement
     public void Execute(SpellContext context)
     {
         var toMove = ToMove.Resolve(context);
-        var distance = HowFar.Evaluate(context).Value;
-        var origin = Origin.Evaluate(context);
+        long distance = HowFar.Evaluate(context).Value;
 
-        var totalWeight = toMove.Entities.Sum(e => e.Weight);
-        var executionCost = distance * totalWeight / 1_000_000;
-
-        var drawn = context.DrawPower(executionCost);
-        if (drawn < executionCost)
+        if (!toMove.Entities.Any() || distance <= 0)
         {
-            context.Result.Add(new EffectNotFiredEvent(
-                "VAR",
-                $"Insufficient power: needed {executionCost}, drew {drawn}"
-            ));
             return;
         }
 
-        foreach (var entity in toMove.Entities)
-        {
-            var direction = Direction.FromPoints(entity.Location, origin);
-            var destination = entity.Location.Translate(direction, distance);
+        double perTickDistance = distance / 56.0;
 
-            MoveEntityService.Move(entity, destination, entity.Angle);
-
-            if (distance > 0)
-            {
-                context.Result.Add(new EntityPulledEvent(entity, distance));
-            }
-        }
+        var effect = new LinearMotionEffect(
+            context: context,
+            toMove: ToMove,
+            origin: Origin,
+            perTickDistance: perTickDistance,
+            totalDistanceMm: distance,
+            isAway: false,
+            effectName: "VAR"
+        );
+        context.World.AddMotionEffect(effect);
     }
 
     public override string ToString()

@@ -1,10 +1,11 @@
+using RunicMagic.Controller.Services;
 using RunicMagic.Tests.Builders;
 using RunicMagic.World;
 using RunicMagic.World.Execution;
 using RunicMagic.World.Geometry;
 using RunicMagic.World.Runes.RuneTypes;
 
-namespace RunicMagic.Tests.Execution;
+namespace RunicMagic.Tests.TestUtilities;
 
 internal static class TestFixtures
 {
@@ -12,30 +13,14 @@ internal static class TestFixtures
         EntitySet? caster = null,
         EntitySet? executor = null,
         WorldModel? world = null,
-        SpellResult? result = null)
+        EventTracker? result = null)
     {
         return new SpellContext(
             caster ?? new EntitySet([]),
             executor ?? new EntitySet([]),
             world ?? new WorldModel(),
-            result ?? new SpellResult()
+            result ?? new EventTracker()
         );
-    }
-}
-
-internal class FixedEntitySet : IEntitySet
-{
-    private readonly EntitySet _resolved;
-
-    internal FixedEntitySet(params Entity[] entities)
-    {
-        _resolved = new EntitySet(entities);
-    }
-
-    public EntitySet Resolve(SpellContext context)
-    {
-        context.EntityResolutionCount?.UnionWith(_resolved.Entities.Select(e => e.Id));
-        return _resolved;
     }
 }
 
@@ -70,20 +55,5 @@ internal class FixedPointEntitySet : IEntitySet
             .WithSize(1, 1)
             .Build();
         return new EntitySet([entity]);
-    }
-}
-
-internal class FixedLocation : ILocation
-{
-    private readonly Location _location;
-
-    internal FixedLocation(long x, long y)
-    {
-        _location = new Location(x, y);
-    }
-
-    public Location Evaluate(SpellContext context)
-    {
-        return _location;
     }
 }

@@ -1,11 +1,8 @@
-using FluentAssertions;
 using RunicMagic.Controller.RuneParsing;
 using RunicMagic.Controller.RuneParsing.EntitySetRunes;
-using RunicMagic.Tests.RuneParsing;
 using RunicMagic.World.Runes.EntityReferenceRunes;
 using RunicMagic.World.Runes.EntitySetRunes;
 using RunicMagic.World.Runes.RuneTypes;
-using Xunit;
 
 namespace RunicMagic.Tests.RuneParsing.EntitySetRunes;
 
@@ -29,7 +26,7 @@ public class PAParserTests
 
         result.Succeeded.Should().BeTrue();
         var pa = result.Value.Should().BeOfType<PA>().Subject;
-        pa.ToGetScopeOf.Should().BeSameAs(mockEntitySet);
+        pa.ToGetScopeOf.Should().BeOfType<CalcifiedEntitySet>().Which.Inner.Should().BeSameAs(mockEntitySet);
     }
 
     [Fact]
@@ -39,6 +36,6 @@ public class PAParserTests
 
         result.Succeeded.Should().BeTrue();
         var pa = result.Value.Should().BeOfType<PA>().Subject;
-        pa.ToGetScopeOf.Should().BeOfType<OH>();
+        pa.ToGetScopeOf.Should().BeOfType<CalcifiedEntitySet>().Which.Inner.Should().BeOfType<OH>();
     }
 }

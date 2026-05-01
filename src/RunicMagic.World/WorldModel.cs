@@ -1,10 +1,14 @@
+using RunicMagic.World.Abstractions;
+using RunicMagic.World.Execution;
 using RunicMagic.World.Geometry;
+using RunicMagic.World.Motion;
 
 namespace RunicMagic.World;
 
-public class WorldModel
+public class WorldModel : IGameLoopWorldModel
 {
     private readonly Dictionary<EntityId, Entity> _entities = new();
+    private readonly List<IMotionEffect> _motionEffects = new();
 
     public void Add(Entity entity)
     {
@@ -48,6 +52,26 @@ public class WorldModel
     {
         var entities = _entities.Values.Where(e => e.Id != container.Id && Bounds(container).Contains(Bounds(e))).ToList();
         return entities;
+    }
+
+    public void AddMotionEffect(IMotionEffect effect)
+    {
+        _motionEffects.Add(effect);
+    }
+
+    public void TickMotion(IWorldEventTracker eventTracker)
+    {
+        List<IMotionEffect> effectsToRemove = new();
+        foreach (var motionEffect in _motionEffects)
+        {
+            var advanced = motionEffect.TryAdvance(eventTracker);
+
+            if (!advanced || motionEffect.IsComplete)
+            {
+                effectsToRemove.Add(motionEffect);
+            }
+        }
+        _motionEffects.RemoveAll(effectsToRemove.Contains);
     }
 
     private static Rectangle Bounds(Entity e)

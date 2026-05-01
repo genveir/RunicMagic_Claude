@@ -13,6 +13,4 @@ public interface IPlayerViewInterface
     Task SetPointingDirection(WorldCoordinate worldCoordinate);
 
     Task SetIndicateTarget(WorldCoordinate worldCoordinate);
-
-    string Prompt { get; }
 }

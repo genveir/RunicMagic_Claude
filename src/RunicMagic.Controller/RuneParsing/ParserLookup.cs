@@ -1,5 +1,6 @@
 ﻿using RunicMagic.Controller.RuneParsing.ArithmeticRunes;
 using RunicMagic.Controller.RuneParsing.DebugRunes;
+using RunicMagic.Controller.RuneParsing.DecoratorRunes;
 using RunicMagic.Controller.RuneParsing.EffectRunes;
 using RunicMagic.Controller.RuneParsing.EntityReferenceRunes;
 using RunicMagic.Controller.RuneParsing.EntitySetRunes;
@@ -79,6 +80,8 @@ internal static class ParserLookup
 
     private static void FillEntitySetRuneParsers()
     {
+        entitySetRuneParsers["SA"] = new SAParser<IEntitySet>(); // activate (live)
+        entitySetRuneParsers["YI"] = new YIParser<IEntitySet>(); // calcify
         entitySetRuneParsers["GA"] = new GAParser(); // global context
         entitySetRuneParsers["A"] = new AParser(); // me, caster
         entitySetRuneParsers["OH"] = new OHParser(); // this, executor
@@ -108,6 +111,8 @@ internal static class ParserLookup
 
     private static void FillNumberRuneParsers()
     {
+        numberRuneParsers["SA"] = new SAParser<INumber>(); // activate (live)
+        numberRuneParsers["YI"] = new YIParser<INumber>(); // calcify
         numberRuneParsers["JON"] = new JONParser(); // zero
         numberRuneParsers["HET"] = new HETParser(); // one
         numberRuneParsers["DET"] = new DETParser(); // two
@@ -129,6 +134,8 @@ internal static class ParserLookup
 
     private static void FillLocationRuneParsers()
     {
+        locationRuneParsers["SA"] = new SAParser<ILocation>(); // activate (live)
+        locationRuneParsers["YI"] = new YIParser<ILocation>(); // calcify
         locationRuneParsers["PAR"] = new PARParser(); // centroid of
         locationRuneParsers["GER"] = new GERParser(); // weighted centroid of
     }

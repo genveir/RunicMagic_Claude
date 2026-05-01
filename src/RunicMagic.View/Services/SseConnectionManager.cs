@@ -1,12 +1,11 @@
-using System.Collections.Concurrent;
-using System.Threading.Channels;
 using RunicMagic.Controller.Abstractions;
 using RunicMagic.Controller.Models;
-using RunicMagic.Controller.Services;
+using System.Collections.Concurrent;
+using System.Threading.Channels;
 
 namespace RunicMagic.View.Services;
 
-public class SseConnectionManager(WorldRenderingService worldRendering) : IWorldTickSink
+public class SseConnectionManager(IWorldRenderingService worldRendering) : IWorldTickSink
 {
     private readonly ConcurrentDictionary<Guid, Channel<CommandResult>> _connections = new();
 

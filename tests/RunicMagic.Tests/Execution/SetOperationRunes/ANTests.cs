@@ -1,7 +1,5 @@
-using FluentAssertions;
 using RunicMagic.Tests.Builders;
 using RunicMagic.World.Runes.SetOperationRunes;
-using Xunit;
 
 namespace RunicMagic.Tests.Execution.SetOperationRunes;
 

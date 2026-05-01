@@ -1,7 +1,5 @@
-using FluentAssertions;
 using RunicMagic.Tests.Builders;
 using RunicMagic.World.Runes.FilterRunes;
-using Xunit;
 
 namespace RunicMagic.Tests.Execution.FilterRunes;
 

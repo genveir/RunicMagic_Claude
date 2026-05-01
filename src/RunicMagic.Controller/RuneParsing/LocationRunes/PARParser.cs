@@ -14,6 +14,6 @@ internal class PARParser : IRuneParser<ILocation>
             return ParsingResult<ILocation>.Fail(entitySetResult.Error);
         }
 
-        return ParsingResult<ILocation>.Succeed(new PAR(entitySetResult.Value));
+        return ParsingResult<ILocation>.Succeed(new PAR(entitySetResult.Value), isLive: entitySetResult.IsLive);
     }
 }
