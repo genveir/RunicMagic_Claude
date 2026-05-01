@@ -13,6 +13,6 @@ internal class FUSEParser : IRuneParser<IEntitySet>
             return ParsingResult<IEntitySet>.Fail(sourceResult.Error);
         }
 
-        return ParsingResult<IEntitySet>.Succeed(new FUSE(sourceResult.Value));
+        return ParsingResult<IEntitySet>.Succeed(new FUSE(sourceResult.Value), isLive: sourceResult.IsLive);
     }
 }

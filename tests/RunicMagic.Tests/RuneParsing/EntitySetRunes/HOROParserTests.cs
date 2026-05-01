@@ -31,8 +31,8 @@ public class HOROParserTests
 
         result.Succeeded.Should().BeTrue();
         var horo = result.Value.Should().BeOfType<HORO>().Subject;
-        horo.HowFar.Should().BeSameAs(mockHowFar);
-        horo.Origin.Should().BeSameAs(mockOrigin);
+        horo.HowFar.Should().BeOfType<CalcifiedNumber>().Which.Inner.Should().BeSameAs(mockHowFar);
+        horo.Origin.Should().BeOfType<CalcifiedEntitySet>().Which.Inner.Should().BeSameAs(mockOrigin);
     }
 
     [Fact]
@@ -45,8 +45,8 @@ public class HOROParserTests
 
         result.Succeeded.Should().BeTrue();
         var horo = result.Value.Should().BeOfType<HORO>().Subject;
-        horo.HowFar.Should().BeSameAs(mockHowFar);
-        horo.Origin.Should().BeOfType<OH>();
+        horo.HowFar.Should().BeOfType<CalcifiedNumber>().Which.Inner.Should().BeSameAs(mockHowFar);
+        horo.Origin.Should().BeOfType<CalcifiedEntitySet>().Which.Inner.Should().BeOfType<OH>();
     }
 
     [Fact]

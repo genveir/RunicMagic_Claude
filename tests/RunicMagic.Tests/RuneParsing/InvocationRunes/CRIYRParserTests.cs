@@ -18,7 +18,8 @@ public class CRIYRParserTests
         result.Succeeded.Should().BeTrue();
         var zu = result.Value.Should().BeOfType<ZU>().Subject;
         var criyr = zu.Statement.Should().BeOfType<CRIYR>().Subject;
-        criyr.Target.Should().BeOfType<EntitySetSelectionCostResolver>()
+        criyr.Target.Should().BeOfType<CalcifiedEntitySet>()
+            .Which.Inner.Should().BeOfType<EntitySetSelectionCostResolver>()
             .Which.Inner.Should().BeOfType<A>();
     }
 
@@ -30,7 +31,8 @@ public class CRIYRParserTests
         result.Succeeded.Should().BeTrue();
         var zu = result.Value.Should().BeOfType<ZU>().Subject;
         var criyr = zu.Statement.Should().BeOfType<CRIYR>().Subject;
-        criyr.Target.Should().BeOfType<EntitySetSelectionCostResolver>()
+        criyr.Target.Should().BeOfType<CalcifiedEntitySet>()
+            .Which.Inner.Should().BeOfType<EntitySetSelectionCostResolver>()
             .Which.Inner.Should().BeOfType<DAN>();
     }
 

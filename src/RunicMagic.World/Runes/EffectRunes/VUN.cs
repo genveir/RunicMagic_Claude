@@ -22,7 +22,6 @@ public class VUN : IStatement
     {
         var toMove = ToMove.Resolve(context);
         long distance = HowFar.Evaluate(context).Value;
-        var origin = Origin.Evaluate(context);
 
         if (!toMove.Entities.Any() || distance <= 0)
         {
@@ -34,13 +33,10 @@ public class VUN : IStatement
         long perTickCost = totalCost / 56;
         double perTickDistance = distance / 56.0;
 
-        var fixedEntities = new FixedEntitySet(toMove);
-        var fixedOrigin = new FixedLocation(origin);
-
         var effect = new LinearMotionEffect(
             context: context,
-            entities: fixedEntities,
-            origin: fixedOrigin,
+            entities: ToMove,
+            origin: Origin,
             perTickDistance: perTickDistance,
             perTickCost: perTickCost,
             totalDistanceMm: distance,

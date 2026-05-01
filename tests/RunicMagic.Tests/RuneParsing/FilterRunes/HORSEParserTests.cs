@@ -31,8 +31,8 @@ public class HORSEParserTests
 
         result.Succeeded.Should().BeTrue();
         var horse = result.Value.Should().BeOfType<HORSE>().Subject;
-        horse.Source.Should().BeSameAs(mockSource);
-        horse.Origin.Should().BeSameAs(mockOrigin);
+        horse.Source.Should().BeOfType<CalcifiedEntitySet>().Which.Inner.Should().BeSameAs(mockSource);
+        horse.Origin.Should().BeOfType<CalcifiedEntitySet>().Which.Inner.Should().BeSameAs(mockOrigin);
     }
 
     [Fact]
@@ -45,8 +45,8 @@ public class HORSEParserTests
 
         result.Succeeded.Should().BeTrue();
         var horse = result.Value.Should().BeOfType<HORSE>().Subject;
-        horse.Source.Should().BeSameAs(mockSource);
-        horse.Origin.Should().BeOfType<OH>();
+        horse.Source.Should().BeOfType<CalcifiedEntitySet>().Which.Inner.Should().BeSameAs(mockSource);
+        horse.Origin.Should().BeOfType<CalcifiedEntitySet>().Which.Inner.Should().BeOfType<OH>();
     }
 
     [Fact]

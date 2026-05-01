@@ -29,8 +29,8 @@ public class IRParserTests
 
         result.Succeeded.Should().BeTrue();
         var ir = result.Value.Should().BeOfType<IR>().Subject;
-        ir.A.Should().BeSameAs(mockA);
-        ir.B.Should().BeSameAs(mockB);
+        ir.A.Should().BeOfType<CalcifiedNumber>().Which.Inner.Should().BeSameAs(mockA);
+        ir.B.Should().BeOfType<CalcifiedNumber>().Which.Inner.Should().BeSameAs(mockB);
     }
 
     [Fact]

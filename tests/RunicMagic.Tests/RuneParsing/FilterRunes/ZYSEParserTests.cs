@@ -28,7 +28,7 @@ public class ZYSEParserTests
 
         result.Succeeded.Should().BeTrue();
         var zyse = result.Value.Should().BeOfType<ZYSE>().Subject;
-        zyse.Source.Should().BeSameAs(mockSource);
+        zyse.Source.Should().BeOfType<CalcifiedEntitySet>().Which.Inner.Should().BeSameAs(mockSource);
     }
 
     [Fact]

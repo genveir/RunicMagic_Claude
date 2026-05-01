@@ -25,6 +25,6 @@ internal class FUILParser : IRuneParser<IEntitySet>
             return ParsingResult<IEntitySet>.Fail(upperResult.Error);
         }
 
-        return ParsingResult<IEntitySet>.Succeed(new FUIL(source: sourceResult.Value, lower: lowerResult.Value, upper: upperResult.Value));
+        return ParsingResult<IEntitySet>.Succeed(new FUIL(source: sourceResult.Value, lower: lowerResult.Value, upper: upperResult.Value), isLive: sourceResult.IsLive || lowerResult.IsLive || upperResult.IsLive);
     }
 }

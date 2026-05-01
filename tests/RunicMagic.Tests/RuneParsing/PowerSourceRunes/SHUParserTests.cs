@@ -30,7 +30,8 @@ public class SHUParserTests
 
         result.Succeeded.Should().BeTrue();
         var shu = result.Value.Should().BeOfType<SHU>().Subject;
-        shu.Source.Should().BeOfType<EntitySetSelectionCostResolver>()
+        shu.Source.Should().BeOfType<CalcifiedEntitySet>()
+            .Which.Inner.Should().BeOfType<EntitySetSelectionCostResolver>()
             .Which.Inner.Should().BeSameAs(mockSource);
         shu.Statement.Should().BeSameAs(mockStatement);
     }

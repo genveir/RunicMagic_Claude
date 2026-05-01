@@ -21,7 +21,7 @@ internal class CJIRParser : IRuneParser<IStatement>
             return ParsingResult<IStatement>.Fail(howMuchResult.Error);
         }
 
-        var originDefault = new[] { "PAR" }.Concat(toRotateTokens).ToArray();
+        var originDefault = new[] { "SA", "PAR" }.Concat(toRotateTokens).ToArray();
         var originResult = RuneParsingDispatcher.ParseNextRune<ILocation>(tokenStream, originDefault);
         if (!originResult.Succeeded)
         {

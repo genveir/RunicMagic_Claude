@@ -19,6 +19,6 @@ internal class ANParser : IRuneParser<IEntitySet>
             return ParsingResult<IEntitySet>.Fail(rightResult.Error);
         }
 
-        return ParsingResult<IEntitySet>.Succeed(new AN(left: leftResult.Value, right: rightResult.Value));
+        return ParsingResult<IEntitySet>.Succeed(new AN(left: leftResult.Value, right: rightResult.Value), isLive: leftResult.IsLive || rightResult.IsLive);
     }
 }

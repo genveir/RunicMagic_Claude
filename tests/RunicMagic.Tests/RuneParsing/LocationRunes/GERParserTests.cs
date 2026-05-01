@@ -29,7 +29,8 @@ public class GERParserTests
 
         result.Succeeded.Should().BeTrue();
         var ger = result.Value.Should().BeOfType<GER>().Subject;
-        ger.EntitySet.Should().BeOfType<EntitySetSelectionCostResolver>()
+        ger.EntitySet.Should().BeOfType<CalcifiedEntitySet>()
+            .Which.Inner.Should().BeOfType<EntitySetSelectionCostResolver>()
             .Which.Inner.Should().BeSameAs(mockEntitySet);
     }
 

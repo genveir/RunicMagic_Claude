@@ -9,6 +9,19 @@ namespace RunicMagic.Tests.Execution;
 
 public class EntitySetSelectionCostResolverTests
 {
+    // A mutable entity set that can be reprogrammed between Resolve calls.
+    // Mimics a live entity set that re-evaluates each tick.
+    private class MutableEntitySet : IEntitySet
+    {
+        public EntitySet NextResult { get; set; } = new EntitySet([]);
+
+        public EntitySet Resolve(SpellContext context)
+        {
+            context.EntityResolutionCount?.UnionWith(NextResult.Entities.Select(e => e.Id));
+            return NextResult;
+        }
+    }
+
     // Helper: builds a caster EntitySet that tracks how much power is drawn.
     private static (EntitySet caster, List<long> drawn) MakeTrackingCaster()
     {
@@ -229,5 +242,97 @@ public class EntitySetSelectionCostResolverTests
         // the inner resolution window was opened and closed; the outer window should be untouched
         context.EntityResolutionCount.Should().BeEmpty();
         context.CloseResolutionWindow();
+    }
+
+    // ── Incremental charging ──────────────────────────────────────────────────────────────────────
+
+    [Fact]
+    public void Resolve_SecondCallWithSameEntity_ChargesZeroAdditionalCost()
+    {
+        var target = new EntityBuilder()
+            .WithReservoir(max: () => 1_000_000_000)
+            .Build();
+        var inner = new FixedEntitySet(target);
+        var resolver = new EntitySetSelectionCostResolver(inner);
+        var (caster, drawn) = MakeTrackingCaster();
+        var context = TestFixtures.MakeContext(caster: caster);
+
+        resolver.Resolve(context); // first call: final cost 1 + breadth 1_000_000 = 1_000_001
+        drawn.Clear();
+
+        resolver.Resolve(context); // second call: entity already charged, breadth already seen
+
+        // total drawn on second call must be zero
+        drawn.Sum().Should().Be(0);
+    }
+
+    [Fact]
+    public void Resolve_SecondCallWithNewEntity_OnlyChargesNewEntity()
+    {
+        var firstEntity = new EntityBuilder()
+            .WithReservoir(max: () => 1_000_000_000)
+            .Build();
+        var secondEntity = new EntityBuilder()
+            .WithReservoir(max: () => 1_000_000_000)
+            .Build();
+
+        var inner = new MutableEntitySet { NextResult = new EntitySet([firstEntity]) };
+        var resolver = new EntitySetSelectionCostResolver(inner);
+        var (caster, drawn) = MakeTrackingCaster();
+        var context = TestFixtures.MakeContext(caster: caster);
+
+        resolver.Resolve(context); // first call: firstEntity final cost 1 + breadth 1_000_000 = 1_000_001
+        drawn.Clear();
+
+        inner.NextResult = new EntitySet([secondEntity]);
+        resolver.Resolve(context); // second call: secondEntity is new → final cost 1 + breadth 1_000_000 = 1_000_001
+
+        drawn.Sum().Should().Be(1_000_001);
+    }
+
+    [Fact]
+    public void Resolve_SecondCallWithPreviousAndNewEntity_OnlyChargesNewEntity()
+    {
+        var existingEntity = new EntityBuilder()
+            .WithReservoir(max: () => 1_000_000_000)
+            .Build();
+        var newEntity = new EntityBuilder()
+            .WithReservoir(max: () => 1_000_000_000)
+            .Build();
+
+        var inner = new MutableEntitySet { NextResult = new EntitySet([existingEntity]) };
+        var resolver = new EntitySetSelectionCostResolver(inner);
+        var (caster, drawn) = MakeTrackingCaster();
+        var context = TestFixtures.MakeContext(caster: caster);
+
+        resolver.Resolve(context); // first call: existingEntity charged
+        drawn.Clear();
+
+        inner.NextResult = new EntitySet([existingEntity, newEntity]);
+        resolver.Resolve(context);
+        // second call: existingEntity skipped (already paid), newEntity is new
+        // final cost = 1 (newEntity only), breadth: newEntity's id is new → 1 × 1_000_000
+        // existingEntity's id was seen in breadth on first call → not charged again
+
+        drawn.Sum().Should().Be(1_000_001);
+    }
+
+    [Fact]
+    public void Resolve_BreadthNotChargedAgainForPreviouslySeenEntities()
+    {
+        var target = new EntityBuilder().Build(); // no reservoir → final set cost = 0
+        var inner = new FixedEntitySet(target);
+        var resolver = new EntitySetSelectionCostResolver(inner);
+        var (caster, drawn) = MakeTrackingCaster();
+        var context = TestFixtures.MakeContext(caster: caster);
+
+        resolver.Resolve(context); // first call: breadth = 1 × 1_000_000 = 1_000_000
+        var firstDraw = drawn.Sum();
+        drawn.Clear();
+
+        resolver.Resolve(context); // second call: breadth entity already seen → breadth cost = 0
+
+        firstDraw.Should().Be(1_000_000);
+        drawn.Sum().Should().Be(0);
     }
 }

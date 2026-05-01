@@ -64,7 +64,11 @@ Sets can be derived several ways:
 - **Property filters** — runes that filter a Set by entity properties such as weight or current power.
 - **Set operations** — `AN(union)`, `DU(intersection)`, and `RAL(difference)` combine two Sets into one.
 
-Sets are always evaluated at the point of execution against current world state. A Set referenced twice in a spell may yield different results if the world changed between the two evaluations.
+By default, Sets are **calcified**: they are evaluated once on first execution and the result is cached for the lifetime of the effect. Targeting is locked to the entities that existed the moment the spell fired; subsequent ticks of a motion effect see the same set regardless of how the world changes.
+
+The `SA(activate)` decorator overrides this: a Set wrapped in `SA` is **live** and re-evaluated on every tick. A live set re-selects its entities each tick and reflects any changes to world state. The `YI(calcify)` decorator forces calcification of a subexpression even inside an `SA` context.
+
+A Set referenced twice in a spell with different liveness modes may yield different results at different points in execution.
 
 ---
 
@@ -77,7 +81,9 @@ Power is drawn in three distinct ways during a spell:
    - **Entity cost**: `ceil(MaxPower / 1_000_000_000)` per entity in the resolved Set, excluding the caster and executor, who are always free to select.
    - **Breadth cost**: 1 power per entity touched by any leaf selector (for example HORO, LA) during resolution of that Set, regardless of how many survive filtering. A precise spell that targets exactly what it needs pays less than one that sweeps broadly and filters back down.
 
-   If the full combined cost cannot be met, the Set resolves to empty.
+   For **live** Sets (decorated with `SA`), selection cost is charged **incrementally** across ticks: an entity that was already paid for on a previous tick is not charged the entity cost again, and breadth entities previously counted are not counted again. Only entities that are new to the set on a given tick incur their entity cost and breadth.
+
+   If the full combined cost for the current tick cannot be met, the Set resolves to empty.
 3. **Execution cost** — paid by each effect rune as it fires, scaled by the magnitude of the effect.
 
 All three draws use the same cascade. The engine works through a cascade of power sources, calling `Draw(amount)` on each in turn and carrying forward any shortfall until the cost is met. A source returns however much it can actually provide — which may be less than asked. The engine never inspects a source's internals or queries its reserves; it just takes what it gets and moves on.

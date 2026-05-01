@@ -27,7 +27,7 @@ public class MOSTParserTests
 
         result.Succeeded.Should().BeTrue();
         var most = result.Value.Should().BeOfType<MOST>().Subject;
-        most.A.Should().BeSameAs(mockA);
+        most.A.Should().BeOfType<CalcifiedNumber>().Which.Inner.Should().BeSameAs(mockA);
     }
 
     [Fact]

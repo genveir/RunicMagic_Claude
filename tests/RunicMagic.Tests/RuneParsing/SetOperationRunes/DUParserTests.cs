@@ -30,8 +30,8 @@ public class DUParserTests
 
         result.Succeeded.Should().BeTrue();
         var du = result.Value.Should().BeOfType<DU>().Subject;
-        du.Left.Should().BeSameAs(mockLeft);
-        du.Right.Should().BeSameAs(mockRight);
+        du.Left.Should().BeOfType<CalcifiedEntitySet>().Which.Inner.Should().BeSameAs(mockLeft);
+        du.Right.Should().BeOfType<CalcifiedEntitySet>().Which.Inner.Should().BeSameAs(mockRight);
     }
 
     [Fact]

@@ -31,8 +31,8 @@ public class HORHEParserTests
 
         result.Succeeded.Should().BeTrue();
         var horhe = result.Value.Should().BeOfType<HORHE>().Subject;
-        horhe.Source.Should().BeSameAs(mockSource);
-        horhe.Origin.Should().BeSameAs(mockOrigin);
+        horhe.Source.Should().BeOfType<CalcifiedEntitySet>().Which.Inner.Should().BeSameAs(mockSource);
+        horhe.Origin.Should().BeOfType<CalcifiedEntitySet>().Which.Inner.Should().BeSameAs(mockOrigin);
     }
 
     [Fact]
@@ -45,8 +45,8 @@ public class HORHEParserTests
 
         result.Succeeded.Should().BeTrue();
         var horhe = result.Value.Should().BeOfType<HORHE>().Subject;
-        horhe.Source.Should().BeSameAs(mockSource);
-        horhe.Origin.Should().BeOfType<OH>();
+        horhe.Source.Should().BeOfType<CalcifiedEntitySet>().Which.Inner.Should().BeSameAs(mockSource);
+        horhe.Origin.Should().BeOfType<CalcifiedEntitySet>().Which.Inner.Should().BeOfType<OH>();
     }
 
     [Fact]

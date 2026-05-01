@@ -29,8 +29,8 @@ public class UITParserTests
 
         result.Succeeded.Should().BeTrue();
         var uit = result.Value.Should().BeOfType<UIT>().Subject;
-        uit.A.Should().BeSameAs(mockA);
-        uit.B.Should().BeSameAs(mockB);
+        uit.A.Should().BeOfType<CalcifiedNumber>().Which.Inner.Should().BeSameAs(mockA);
+        uit.B.Should().BeOfType<CalcifiedNumber>().Which.Inner.Should().BeSameAs(mockB);
     }
 
     [Fact]

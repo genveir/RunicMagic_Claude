@@ -31,6 +31,6 @@ internal class HORILParser : IRuneParser<IEntitySet>
             return ParsingResult<IEntitySet>.Fail(originResult.Error);
         }
 
-        return ParsingResult<IEntitySet>.Succeed(new HORIL(source: sourceResult.Value, lower: lowerResult.Value, upper: upperResult.Value, origin: originResult.Value));
+        return ParsingResult<IEntitySet>.Succeed(new HORIL(source: sourceResult.Value, lower: lowerResult.Value, upper: upperResult.Value, origin: originResult.Value), isLive: sourceResult.IsLive || lowerResult.IsLive || upperResult.IsLive || originResult.IsLive);
     }
 }

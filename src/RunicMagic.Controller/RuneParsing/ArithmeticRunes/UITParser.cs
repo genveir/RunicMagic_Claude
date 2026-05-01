@@ -20,6 +20,6 @@ internal class UITParser : IRuneParser<INumber>
         }
 
         var result = new UIT(aResult.Value, bResult.Value);
-        return ParsingResult<INumber>.Succeed(result);
+        return ParsingResult<INumber>.Succeed(result, isLive: aResult.IsLive || bResult.IsLive);
     }
 }

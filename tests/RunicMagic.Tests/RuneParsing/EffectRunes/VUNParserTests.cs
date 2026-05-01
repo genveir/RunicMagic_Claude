@@ -34,10 +34,11 @@ public class VUNParserTests
 
         result.Succeeded.Should().BeTrue();
         var vun = result.Value.Should().BeOfType<VUN>().Subject;
-        vun.ToMove.Should().BeOfType<EntitySetSelectionCostResolver>()
+        vun.ToMove.Should().BeOfType<CalcifiedEntitySet>()
+            .Which.Inner.Should().BeOfType<EntitySetSelectionCostResolver>()
             .Which.Inner.Should().BeSameAs(mockEntitySet);
-        vun.HowFar.Should().BeSameAs(mockNumber);
-        vun.Origin.Should().BeSameAs(mockLocation);
+        vun.HowFar.Should().BeOfType<CalcifiedNumber>().Which.Inner.Should().BeSameAs(mockNumber);
+        vun.Origin.Should().BeOfType<CalcifiedLocation>().Which.Inner.Should().BeSameAs(mockLocation);
     }
 
     [Fact]
@@ -52,8 +53,10 @@ public class VUNParserTests
 
         result.Succeeded.Should().BeTrue();
         var vun = result.Value.Should().BeOfType<VUN>().Subject;
-        var par = vun.Origin.Should().BeOfType<PAR>().Subject;
-        par.EntitySet.Should().BeOfType<EntitySetSelectionCostResolver>()
+        var par = vun.Origin.Should().BeOfType<CalcifiedLocation>()
+            .Which.Inner.Should().BeOfType<PAR>().Subject;
+        par.EntitySet.Should().BeOfType<CalcifiedEntitySet>()
+            .Which.Inner.Should().BeOfType<EntitySetSelectionCostResolver>()
             .Which.Inner.Should().BeOfType<OH>();
     }
 

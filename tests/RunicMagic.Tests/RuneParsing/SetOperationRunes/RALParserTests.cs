@@ -30,8 +30,8 @@ public class RALParserTests
 
         result.Succeeded.Should().BeTrue();
         var ral = result.Value.Should().BeOfType<RAL>().Subject;
-        ral.Left.Should().BeSameAs(mockLeft);
-        ral.Right.Should().BeSameAs(mockRight);
+        ral.Left.Should().BeOfType<CalcifiedEntitySet>().Which.Inner.Should().BeSameAs(mockLeft);
+        ral.Right.Should().BeOfType<CalcifiedEntitySet>().Which.Inner.Should().BeSameAs(mockRight);
     }
 
     [Fact]

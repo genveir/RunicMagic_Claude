@@ -22,7 +22,6 @@ public class CJAR : IStatement
     {
         var toRotate = ToRotate.Resolve(context);
         var angleDegrees = HowMuch.Evaluate(context).Value;
-        var origin = Origin.Evaluate(context);
 
         if (!toRotate.Entities.Any() || angleDegrees <= 0)
         {
@@ -33,13 +32,10 @@ public class CJAR : IStatement
         var totalTheta = -(angleDegrees / 2744.0 * 2 * Math.PI);
         var perTickTheta = totalTheta / 56.0;
 
-        var fixedEntities = new FixedEntitySet(toRotate);
-        var fixedOrigin = new FixedLocation(origin);
-
         var effect = new RotationMotionEffect(
             context: context,
-            entities: fixedEntities,
-            origin: fixedOrigin,
+            entities: ToRotate,
+            origin: Origin,
             perTickTheta: perTickTheta,
             totalRuneDegrees: angleDegrees,
             effectName: "CJAR"

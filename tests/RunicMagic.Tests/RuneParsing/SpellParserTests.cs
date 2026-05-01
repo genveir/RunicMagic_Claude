@@ -24,12 +24,15 @@ public class SpellParserTests
         var zu = result.Value.Should().BeOfType<ZU>().Subject;
         var vun = zu.Statement.Should().BeOfType<VUN>().Subject;
 
-        vun.ToMove.Should().BeOfType<EntitySetSelectionCostResolver>()
+        vun.ToMove.Should().BeOfType<CalcifiedEntitySet>()
+            .Which.Inner.Should().BeOfType<EntitySetSelectionCostResolver>()
             .Which.Inner.Should().BeOfType<A>();
-        vun.HowFar.Should().BeOfType<HET>();
+        vun.HowFar.Should().BeOfType<CalcifiedNumber>().Which.Inner.Should().BeOfType<HET>();
 
-        var par = vun.Origin.Should().BeOfType<PAR>().Subject;
-        par.EntitySet.Should().BeOfType<EntitySetSelectionCostResolver>()
+        var par = vun.Origin.Should().BeOfType<CalcifiedLocation>()
+            .Which.Inner.Should().BeOfType<PAR>().Subject;
+        par.EntitySet.Should().BeOfType<CalcifiedEntitySet>()
+            .Which.Inner.Should().BeOfType<EntitySetSelectionCostResolver>()
             .Which.Inner.Should().BeOfType<OH>();
     }
 
@@ -44,18 +47,23 @@ public class SpellParserTests
         var zu = result.Value.Should().BeOfType<ZU>().Subject;
         var vun = zu.Statement.Should().BeOfType<VUN>().Subject;
 
-        var la = vun.ToMove.Should().BeOfType<EntitySetSelectionCostResolver>()
+        var la = vun.ToMove.Should().BeOfType<CalcifiedEntitySet>()
+            .Which.Inner.Should().BeOfType<EntitySetSelectionCostResolver>()
             .Which.Inner.Should().BeOfType<LA>().Subject;
-        la.ToGetScopeOf.Should().BeOfType<OH>();
+        la.ToGetScopeOf.Should().BeOfType<CalcifiedEntitySet>().Which.Inner.Should().BeOfType<OH>();
 
-        var ir1 = vun.HowFar.Should().BeOfType<IR>().Subject;
-        ir1.A.Should().BeOfType<HOT>();
-        var ir2 = ir1.B.Should().BeOfType<IR>().Subject;
-        ir2.A.Should().BeOfType<HOT>();
-        ir2.B.Should().BeOfType<HOT>();
+        var ir1 = vun.HowFar.Should().BeOfType<CalcifiedNumber>()
+            .Which.Inner.Should().BeOfType<IR>().Subject;
+        ir1.A.Should().BeOfType<CalcifiedNumber>().Which.Inner.Should().BeOfType<HOT>();
+        var ir2 = ir1.B.Should().BeOfType<CalcifiedNumber>()
+            .Which.Inner.Should().BeOfType<IR>().Subject;
+        ir2.A.Should().BeOfType<CalcifiedNumber>().Which.Inner.Should().BeOfType<HOT>();
+        ir2.B.Should().BeOfType<CalcifiedNumber>().Which.Inner.Should().BeOfType<HOT>();
 
-        var par = vun.Origin.Should().BeOfType<PAR>().Subject;
-        par.EntitySet.Should().BeOfType<EntitySetSelectionCostResolver>()
+        var par = vun.Origin.Should().BeOfType<CalcifiedLocation>()
+            .Which.Inner.Should().BeOfType<PAR>().Subject;
+        par.EntitySet.Should().BeOfType<CalcifiedEntitySet>()
+            .Which.Inner.Should().BeOfType<EntitySetSelectionCostResolver>()
             .Which.Inner.Should().BeOfType<OH>();
     }
 

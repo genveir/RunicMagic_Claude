@@ -33,10 +33,11 @@ public class CJIRParserTests
 
         result.Succeeded.Should().BeTrue();
         var cjir = result.Value.Should().BeOfType<CJIR>().Subject;
-        cjir.ToRotate.Should().BeOfType<EntitySetSelectionCostResolver>()
+        cjir.ToRotate.Should().BeOfType<CalcifiedEntitySet>()
+            .Which.Inner.Should().BeOfType<EntitySetSelectionCostResolver>()
             .Which.Inner.Should().BeSameAs(mockEntitySet);
-        cjir.HowMuch.Should().BeSameAs(mockNumber);
-        cjir.Origin.Should().BeSameAs(mockLocation);
+        cjir.HowMuch.Should().BeOfType<CalcifiedNumber>().Which.Inner.Should().BeSameAs(mockNumber);
+        cjir.Origin.Should().BeOfType<CalcifiedLocation>().Which.Inner.Should().BeSameAs(mockLocation);
     }
 
     [Fact]
@@ -53,7 +54,8 @@ public class CJIRParserTests
 
         result.Succeeded.Should().BeTrue();
         var cjir = result.Value.Should().BeOfType<CJIR>().Subject;
-        cjir.ToRotate.Should().BeOfType<EntitySetSelectionCostResolver>()
+        cjir.ToRotate.Should().BeOfType<CalcifiedEntitySet>()
+            .Which.Inner.Should().BeOfType<EntitySetSelectionCostResolver>()
             .Which.Inner.Should().BeSameAs(mockEntitySet);
         var par = cjir.Origin.Should().BeOfType<PAR>().Subject;
         par.EntitySet.Should().BeOfType<EntitySetSelectionCostResolver>()

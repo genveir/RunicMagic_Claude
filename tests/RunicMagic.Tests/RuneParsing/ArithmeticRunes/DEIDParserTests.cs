@@ -27,7 +27,7 @@ public class DEIDParserTests
 
         result.Succeeded.Should().BeTrue();
         var deid = result.Value.Should().BeOfType<DEID>().Subject;
-        deid.A.Should().BeSameAs(mockA);
+        deid.A.Should().BeOfType<CalcifiedNumber>().Which.Inner.Should().BeSameAs(mockA);
     }
 
     [Fact]

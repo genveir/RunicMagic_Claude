@@ -14,6 +14,6 @@ internal class GERParser : IRuneParser<ILocation>
             return ParsingResult<ILocation>.Fail(entitySetResult.Error);
         }
 
-        return ParsingResult<ILocation>.Succeed(new GER(entitySetResult.Value));
+        return ParsingResult<ILocation>.Succeed(new GER(entitySetResult.Value), isLive: entitySetResult.IsLive);
     }
 }

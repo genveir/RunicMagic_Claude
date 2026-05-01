@@ -28,7 +28,7 @@ public class DRYALParserTests
 
         result.Succeeded.Should().BeTrue();
         var dryal = result.Value.Should().BeOfType<DRYAL>().Subject;
-        dryal.Source.Should().BeSameAs(mockSource);
+        dryal.Source.Should().BeOfType<CalcifiedEntitySet>().Which.Inner.Should().BeSameAs(mockSource);
     }
 
     [Fact]

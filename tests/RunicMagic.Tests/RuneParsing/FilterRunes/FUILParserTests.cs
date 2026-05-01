@@ -32,9 +32,9 @@ public class FUILParserTests
 
         result.Succeeded.Should().BeTrue();
         var fuil = result.Value.Should().BeOfType<FUIL>().Subject;
-        fuil.Source.Should().BeSameAs(mockSource);
-        fuil.Lower.Should().BeSameAs(mockLower);
-        fuil.Upper.Should().BeSameAs(mockUpper);
+        fuil.Source.Should().BeOfType<CalcifiedEntitySet>().Which.Inner.Should().BeSameAs(mockSource);
+        fuil.Lower.Should().BeOfType<CalcifiedNumber>().Which.Inner.Should().BeSameAs(mockLower);
+        fuil.Upper.Should().BeOfType<CalcifiedNumber>().Which.Inner.Should().BeSameAs(mockUpper);
     }
 
     [Fact]

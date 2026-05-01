@@ -28,7 +28,7 @@ public class FUHEParserTests
 
         result.Succeeded.Should().BeTrue();
         var fuhe = result.Value.Should().BeOfType<FUHE>().Subject;
-        fuhe.Source.Should().BeSameAs(mockSource);
+        fuhe.Source.Should().BeOfType<CalcifiedEntitySet>().Which.Inner.Should().BeSameAs(mockSource);
     }
 
     [Fact]

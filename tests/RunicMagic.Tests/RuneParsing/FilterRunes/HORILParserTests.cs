@@ -35,10 +35,10 @@ public class HORILParserTests
 
         result.Succeeded.Should().BeTrue();
         var horil = result.Value.Should().BeOfType<HORIL>().Subject;
-        horil.Source.Should().BeSameAs(mockSource);
-        horil.Lower.Should().BeSameAs(mockLower);
-        horil.Upper.Should().BeSameAs(mockUpper);
-        horil.Origin.Should().BeSameAs(mockOrigin);
+        horil.Source.Should().BeOfType<CalcifiedEntitySet>().Which.Inner.Should().BeSameAs(mockSource);
+        horil.Lower.Should().BeOfType<CalcifiedNumber>().Which.Inner.Should().BeSameAs(mockLower);
+        horil.Upper.Should().BeOfType<CalcifiedNumber>().Which.Inner.Should().BeSameAs(mockUpper);
+        horil.Origin.Should().BeOfType<CalcifiedEntitySet>().Which.Inner.Should().BeSameAs(mockOrigin);
     }
 
     [Fact]
@@ -55,10 +55,10 @@ public class HORILParserTests
 
         result.Succeeded.Should().BeTrue();
         var horil = result.Value.Should().BeOfType<HORIL>().Subject;
-        horil.Source.Should().BeSameAs(mockSource);
-        horil.Lower.Should().BeSameAs(mockLower);
-        horil.Upper.Should().BeSameAs(mockUpper);
-        horil.Origin.Should().BeOfType<OH>();
+        horil.Source.Should().BeOfType<CalcifiedEntitySet>().Which.Inner.Should().BeSameAs(mockSource);
+        horil.Lower.Should().BeOfType<CalcifiedNumber>().Which.Inner.Should().BeSameAs(mockLower);
+        horil.Upper.Should().BeOfType<CalcifiedNumber>().Which.Inner.Should().BeSameAs(mockUpper);
+        horil.Origin.Should().BeOfType<CalcifiedEntitySet>().Which.Inner.Should().BeOfType<OH>();
     }
 
     [Fact]

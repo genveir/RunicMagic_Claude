@@ -12,16 +12,33 @@ are listed at the bottom.
 ZU is a root rune. It consumes a Statement and applies it to the world.
 Nothing can consume ExecutableStatement — ZU must appear first in the token stream.
 
+## Decorators
+
+| Rune | Meaning | Signature |
+|------|---------|-----------|
+| `SA` | activate (live) | (T) → T |
+| `YI` | calcify | (T) → T |
+
+Both decorators are polymorphic: T may be Set, Location, or Number. They do not apply to Statements or ExecutableStatements.
+
+By default, all expressions are **calcified**: a Set, Location, or Number is evaluated once when first needed and the result is cached for the lifetime of the effect. This means targeting is locked to the entities and positions that existed at the moment the spell fired.
+
+`SA` makes an expression **live**: it is re-evaluated on every tick. A live Set re-selects its entities each tick; a live Location recomputes its coordinates; a live Number recomputes its value. Live expressions pay selection cost incrementally — the entity cost is only charged for entities that were not already in the set on a previous tick, and breadth is accumulated the same way.
+
+`YI` forces calcification of a subexpression, even when it appears inside an `SA` context. Its primary use is to lock one argument while leaving others live.
+
+Liveness propagates upward: if any argument of a compound expression is live, the compound itself is live and will not be calcified by an ancestor. `YI` can cut this propagation for a specific subtree.
+
 ## Effects
 
 | Rune | Meaning | Signature |
 |------|---------|-----------|
 | `VUN` | push | (Set, Number, Location = PAR(OH)) → Statement |
 | `VAR` | pull | (Set, Number, Location = PAR(OH)) → Statement |
-| `CJIR` | rotate clockwise | (Set, Number, Location = PAR(Set)) → Statement |
-| `CJAR` | rotate counterclockwise | (Set, Number, Location = PAR(Set)) → Statement |
+| `CJIR` | rotate clockwise | (Set, Number, Location = SA PAR(Set)) → Statement |
+| `CJAR` | rotate counterclockwise | (Set, Number, Location = SA PAR(Set)) → Statement |
 
-`CJIR` rotates each entity in the Set clockwise around the given origin by `Number` rune-rotation units, where TOT (2 744) = one full turn. The default origin is the centroid of the Set being rotated.
+`CJIR` rotates each entity in the Set clockwise around the given origin by `Number` rune-rotation units, where TOT (2 744) = one full turn. The default origin is `SA PAR(Set)` — a live centroid of the rotating Set itself. Because it is live, the pivot tracks the entities as they move, keeping the rotation anchor at the group's actual centre on every tick.
 
 `CJAR` is identical to `CJIR` but rotates counterclockwise. Power cost is the same for both directions.
 

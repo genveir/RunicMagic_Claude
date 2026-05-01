@@ -20,6 +20,6 @@ internal class EIDParser : IRuneParser<INumber>
         }
 
         var result = new EID(aResult.Value, bResult.Value);
-        return ParsingResult<INumber>.Succeed(result);
+        return ParsingResult<INumber>.Succeed(result, isLive: aResult.IsLive || bResult.IsLive);
     }
 }

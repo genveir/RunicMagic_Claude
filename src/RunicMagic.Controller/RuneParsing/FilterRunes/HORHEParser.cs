@@ -19,6 +19,6 @@ internal class HORHEParser : IRuneParser<IEntitySet>
             return ParsingResult<IEntitySet>.Fail(originResult.Error);
         }
 
-        return ParsingResult<IEntitySet>.Succeed(new HORHE(source: sourceResult.Value, origin: originResult.Value));
+        return ParsingResult<IEntitySet>.Succeed(new HORHE(source: sourceResult.Value, origin: originResult.Value), isLive: sourceResult.IsLive || originResult.IsLive);
     }
 }

@@ -18,7 +18,8 @@ public class GWYAHParserTests
         result.Succeeded.Should().BeTrue();
         var zu = result.Value.Should().BeOfType<ZU>().Subject;
         var gwyah = zu.Statement.Should().BeOfType<GWYAH>().Subject;
-        gwyah.Target.Should().BeOfType<EntitySetSelectionCostResolver>()
+        gwyah.Target.Should().BeOfType<CalcifiedEntitySet>()
+            .Which.Inner.Should().BeOfType<EntitySetSelectionCostResolver>()
             .Which.Inner.Should().BeOfType<A>();
     }
 
@@ -30,7 +31,8 @@ public class GWYAHParserTests
         result.Succeeded.Should().BeTrue();
         var zu = result.Value.Should().BeOfType<ZU>().Subject;
         var gwyah = zu.Statement.Should().BeOfType<GWYAH>().Subject;
-        gwyah.Target.Should().BeOfType<EntitySetSelectionCostResolver>()
+        gwyah.Target.Should().BeOfType<CalcifiedEntitySet>()
+            .Which.Inner.Should().BeOfType<EntitySetSelectionCostResolver>()
             .Which.Inner.Should().BeOfType<DAN>();
     }
 

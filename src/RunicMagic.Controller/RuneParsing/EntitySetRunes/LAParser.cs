@@ -15,6 +15,6 @@ internal class LAParser : IRuneParser<IEntitySet>
         }
 
         var result = new LA(toGetScopeOfResult.Value);
-        return ParsingResult<IEntitySet>.Succeed(result);
+        return ParsingResult<IEntitySet>.Succeed(result, isLive: toGetScopeOfResult.IsLive);
     }
 }

@@ -19,6 +19,6 @@ internal class HOROParser : IRuneParser<IEntitySet>
             return ParsingResult<IEntitySet>.Fail(originResult.Error);
         }
 
-        return ParsingResult<IEntitySet>.Succeed(new HORO(howFar: howFarResult.Value, origin: originResult.Value));
+        return ParsingResult<IEntitySet>.Succeed(new HORO(howFar: howFarResult.Value, origin: originResult.Value), isLive: howFarResult.IsLive || originResult.IsLive);
     }
 }

@@ -32,9 +32,9 @@ public class ZYILParserTests
 
         result.Succeeded.Should().BeTrue();
         var zyil = result.Value.Should().BeOfType<ZYIL>().Subject;
-        zyil.Source.Should().BeSameAs(mockSource);
-        zyil.Lower.Should().BeSameAs(mockLower);
-        zyil.Upper.Should().BeSameAs(mockUpper);
+        zyil.Source.Should().BeOfType<CalcifiedEntitySet>().Which.Inner.Should().BeSameAs(mockSource);
+        zyil.Lower.Should().BeOfType<CalcifiedNumber>().Which.Inner.Should().BeSameAs(mockLower);
+        zyil.Upper.Should().BeOfType<CalcifiedNumber>().Which.Inner.Should().BeSameAs(mockUpper);
     }
 
     [Fact]

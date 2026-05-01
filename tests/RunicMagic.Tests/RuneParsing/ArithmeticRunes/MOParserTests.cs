@@ -29,8 +29,8 @@ public class MOParserTests
 
         result.Succeeded.Should().BeTrue();
         var mo = result.Value.Should().BeOfType<MO>().Subject;
-        mo.A.Should().BeSameAs(mockA);
-        mo.B.Should().BeSameAs(mockB);
+        mo.A.Should().BeOfType<CalcifiedNumber>().Which.Inner.Should().BeSameAs(mockA);
+        mo.B.Should().BeOfType<CalcifiedNumber>().Which.Inner.Should().BeSameAs(mockB);
     }
 
     [Fact]

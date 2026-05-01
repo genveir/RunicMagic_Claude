@@ -14,6 +14,6 @@ internal class DEIDParser : IRuneParser<INumber>
         }
 
         var result = new DEID(aResult.Value);
-        return ParsingResult<INumber>.Succeed(result);
+        return ParsingResult<INumber>.Succeed(result, isLive: aResult.IsLive);
     }
 }

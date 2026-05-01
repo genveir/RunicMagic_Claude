@@ -19,6 +19,6 @@ internal class HORSEParser : IRuneParser<IEntitySet>
             return ParsingResult<IEntitySet>.Fail(originResult.Error);
         }
 
-        return ParsingResult<IEntitySet>.Succeed(new HORSE(source: sourceResult.Value, origin: originResult.Value));
+        return ParsingResult<IEntitySet>.Succeed(new HORSE(source: sourceResult.Value, origin: originResult.Value), isLive: sourceResult.IsLive || originResult.IsLive);
     }
 }

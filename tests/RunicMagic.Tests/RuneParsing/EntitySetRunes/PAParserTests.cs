@@ -29,7 +29,7 @@ public class PAParserTests
 
         result.Succeeded.Should().BeTrue();
         var pa = result.Value.Should().BeOfType<PA>().Subject;
-        pa.ToGetScopeOf.Should().BeSameAs(mockEntitySet);
+        pa.ToGetScopeOf.Should().BeOfType<CalcifiedEntitySet>().Which.Inner.Should().BeSameAs(mockEntitySet);
     }
 
     [Fact]
@@ -39,6 +39,6 @@ public class PAParserTests
 
         result.Succeeded.Should().BeTrue();
         var pa = result.Value.Should().BeOfType<PA>().Subject;
-        pa.ToGetScopeOf.Should().BeOfType<OH>();
+        pa.ToGetScopeOf.Should().BeOfType<CalcifiedEntitySet>().Which.Inner.Should().BeOfType<OH>();
     }
 }

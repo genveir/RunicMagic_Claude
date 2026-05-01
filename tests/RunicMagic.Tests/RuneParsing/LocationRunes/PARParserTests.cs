@@ -29,7 +29,8 @@ public class PARParserTests
 
         result.Succeeded.Should().BeTrue();
         var par = result.Value.Should().BeOfType<PAR>().Subject;
-        par.EntitySet.Should().BeOfType<EntitySetSelectionCostResolver>()
+        par.EntitySet.Should().BeOfType<CalcifiedEntitySet>()
+            .Which.Inner.Should().BeOfType<EntitySetSelectionCostResolver>()
             .Which.Inner.Should().BeSameAs(mockEntitySet);
     }
 

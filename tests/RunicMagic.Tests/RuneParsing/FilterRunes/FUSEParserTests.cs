@@ -28,7 +28,7 @@ public class FUSEParserTests
 
         result.Succeeded.Should().BeTrue();
         var fuse = result.Value.Should().BeOfType<FUSE>().Subject;
-        fuse.Source.Should().BeSameAs(mockSource);
+        fuse.Source.Should().BeOfType<CalcifiedEntitySet>().Which.Inner.Should().BeSameAs(mockSource);
     }
 
     [Fact]
