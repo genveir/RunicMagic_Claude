@@ -18,7 +18,7 @@ declare @rock           uniqueidentifier = newid();
 insert into Entities (Id, EntityTypeId, Label, X, Y, Width, Height, HasAgency, Weight, IsTranslucent, Angle, MaxStructuralIntegrity, CurrentStructuralIntegrity)
 values
     -- caster (outside the room; X,Y are center)
-    (@caster,    1, 'Player',               12045,   4142, 900,  300,  1, 70000,    0, 0,                  1000, 1000),
+    (@caster,    1, 'Player',               12045,   4142, 300,  900,  1, 70000,    0, 0,                  1000, 1000),
     -- mana stone (near top-right interior corner)
     (@manaStone, 2, 'Mana Stone',           8125,    925, 250,  250,  0, 3000,     0, 0,                  1000, 1000),
     -- bottom wall (low Y = bottom of screen), split by door
@@ -41,7 +41,7 @@ values
     (newid(),    3, 'Corridor Bottom Wall',    -2000, 2400, 600, 4800, 0, 28800000,  0, 0,                  1000, 1000),
     (newid(),    3, 'Corridor Top Wall',       -2000, 9000, 600, 4700, 0, 28200000,  0, 0,                  1000, 1000),
     -- guard (in the corridor)
-    (@guard,     1, 'Guard',                -1000,   10000, 900,  300,  1, 70000,    0, 0,                  1000, 1000),
+    (@guard,     1, 'Guard',                -1000,   10000, 300,  900,  1, 70000,    0, 270 * PI() / 180,                  1000, 1000),
     -- small mana stone (next to the rock)
     (@smallManaStone, 2, 'Small Mana Stone', 5000, 5600, 100, 100, 0, 500,    0, 0,                  1000, 1000),
     -- rock (center of room, to be inscribed)

@@ -25,9 +25,9 @@ internal class GameLoopService(
     {
         var eventTracker = new EventTracker();
 
-        world.TickMotion(eventTracker);
-
         playerService.DrainAndFlush(eventTracker);
+
+        world.HandleTick(eventTracker);
 
         var casterId = playerService.GetCasterId();
 

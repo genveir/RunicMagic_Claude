@@ -37,7 +37,7 @@ public class LinearMotionEffect : IMotionEffect
         _remainingTicks = 56;
     }
 
-    public bool TryAdvance(IWorldEventTracker eventTracker)
+    public MotionEffectResult TryAdvance(IWorldEventTracker eventTracker)
     {
         var context = _temporalContext.ToSpellContext(eventTracker);
 
@@ -51,7 +51,7 @@ public class LinearMotionEffect : IMotionEffect
         if (drawn < perTickCost)
         {
             eventTracker.Add(new EffectNotFiredEvent(_effectName, $"Insufficient power: needed {perTickCost}, drew {drawn}"));
-            return false;
+            return new(Advanced: false, EntitiesUnderMotion: []);
         }
 
         foreach (var entity in entities.Entities)
@@ -87,6 +87,6 @@ public class LinearMotionEffect : IMotionEffect
             }
         }
 
-        return true;
+        return new(Advanced: true, EntitiesUnderMotion: entities.Entities);
     }
 }

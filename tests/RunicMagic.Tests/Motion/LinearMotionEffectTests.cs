@@ -111,7 +111,7 @@ public class LinearMotionEffectTests
         );
 
         var result = new EventTracker();
-        var advanced = effect.TryAdvance(result);
+        var (advanced, _) = effect.TryAdvance(result);
 
         advanced.Should().BeFalse();
         result.WorldEvents.OfType<EffectNotFiredEvent>().Should().ContainSingle()
@@ -218,5 +218,42 @@ public class LinearMotionEffectTests
         for (var i = 0; i < 56; i++) effect.TryAdvance(new EventTracker());
 
         entity.Location.X.Should().BeApproximately(1560, 0.001);
+    }
+
+    [Fact]
+    public void TryAdvance_ReturnsEntitiesUnderMotion_OnSuccess()
+    {
+        var entity = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(0).Build();
+        var context = TestFixtures.MakeContext();
+        var effect = MakePushEffect(context, entity, totalDistance: 560);
+
+        var (_, entitiesUnderMotion) = effect.TryAdvance(new EventTracker());
+
+        entitiesUnderMotion.Should().ContainSingle().Which.Should().BeSameAs(entity);
+    }
+
+    [Fact]
+    public void TryAdvance_ReturnsNoEntitiesUnderMotion_OnInsufficientPower()
+    {
+        var casterEntity = new EntityBuilder()
+            .WithReservoir(draw: amount => new ReservoirDraw(0, false))
+            .Build();
+        var caster = new EntitySet([casterEntity]);
+        var context = TestFixtures.MakeContext(caster: caster);
+
+        var entity = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(1000).Build();
+        var effect = new LinearMotionEffect(
+            context: context,
+            toMove: new FixedEntitySet(entity),
+            origin: new FixedLocation(0, 0),
+            perTickDistance: 1000,
+            totalDistanceMm: 56000,
+            isAway: true,
+            effectName: "VUN"
+        );
+
+        var (_, entitiesUnderMotion) = effect.TryAdvance(new EventTracker());
+
+        entitiesUnderMotion.Should().BeEmpty();
     }
 }

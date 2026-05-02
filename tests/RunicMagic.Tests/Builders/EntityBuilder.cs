@@ -23,6 +23,7 @@ internal class EntityBuilder
 
     private LifeCapability? _life;
     private ChargeCapability? _charge;
+    private LocomotionCapability? _locomotion;
     private Func<Entity[]>? _scope;
     private ReservoirCapability? _reservoir;
     private Direction? _pointingDirection;
@@ -99,6 +100,12 @@ internal class EntityBuilder
         return this;
     }
 
+    public EntityBuilder WithLocomotion()
+    {
+        _locomotion = new LocomotionCapability();
+        return this;
+    }
+
     public EntityBuilder WithLife(long max, long current)
     {
         _life = new LifeCapability(max, current);
@@ -164,6 +171,7 @@ internal class EntityBuilder
         {
             Life = _life,
             Charge = _charge,
+            Locomotion = _locomotion,
             Scope = _scope,
             Reservoir = _reservoir,
             PointingDirection = _pointingDirection,

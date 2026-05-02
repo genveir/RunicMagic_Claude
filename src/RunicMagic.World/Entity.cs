@@ -60,6 +60,10 @@ public class Entity
     public string[] RawInscriptions { get; set; } = [];
     public IStatement[] ParsedInscriptions { get; set; } = [];
 
+    public LocomotionCapability? Locomotion { get; set; }
+
+    public bool IsUnderEngineMotion { get; set; } = false;
+
     public override string ToString()
     {
         return $"Entity {Label}";

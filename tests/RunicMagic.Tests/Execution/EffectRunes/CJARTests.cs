@@ -16,7 +16,7 @@ public class CJARTests
     {
         for (var i = 0; i < count; i++)
         {
-            world.TickMotion(worldEventTracker);
+            world.HandleTick(worldEventTracker);
         }
     }
 
@@ -87,9 +87,9 @@ public class CJARTests
         var context = TestFixtures.MakeContext(world: world);
 
         cjar.Execute(context);
-        for (var i = 0; i < 55; i++) world.TickMotion(new EventTracker());
+        for (var i = 0; i < 55; i++) world.HandleTick(new EventTracker());
         var finalTickResult = new EventTracker();
-        world.TickMotion(finalTickResult);
+        world.HandleTick(finalTickResult);
 
         var rotatedEvent = finalTickResult.WorldEvents.OfType<EntityRotatedEvent>().Should().ContainSingle().Subject;
         rotatedEvent.Entity.Should().BeSameAs(entity);
@@ -109,7 +109,7 @@ public class CJARTests
 
         cjar.Execute(context);
         var tickResult = new EventTracker();
-        world.TickMotion(tickResult);
+        world.HandleTick(tickResult);
 
         tickResult.WorldEvents.OfType<EntityRotatedEvent>().Should().BeEmpty();
         entity.Location.X.Should().Be(1000);
@@ -141,7 +141,7 @@ public class CJARTests
         var context = TestFixtures.MakeContext(caster: caster, world: world);
 
         cjar.Execute(context);
-        for (var i = 0; i < 10; i++) world.TickMotion(new EventTracker());
+        for (var i = 0; i < 10; i++) world.HandleTick(new EventTracker());
 
         // Rotated only 2/56 of the quarter turn; entity should not have reached destination
         entity.Location.X.Should().BeLessThan(1000);
@@ -160,7 +160,7 @@ public class CJARTests
 
         cjar.Execute(context);
         var tickResult = new EventTracker();
-        world.TickMotion(tickResult);
+        world.HandleTick(tickResult);
 
         tickResult.WorldEvents.Should().BeEmpty();
     }
@@ -181,7 +181,7 @@ public class CJARTests
 
         cjar.Execute(context);
         var tickResult = new EventTracker();
-        world.TickMotion(tickResult);
+        world.HandleTick(tickResult);
 
         entity.Location.X.Should().Be(originalX);
         entity.Location.Y.Should().Be(originalY);
@@ -211,7 +211,7 @@ public class CJARTests
         for (var i = 0; i < 56; i++)
         {
             finalTick = new EventTracker();
-            world.TickMotion(finalTick);
+            world.HandleTick(finalTick);
             allEvents.AddRange(finalTick.WorldEvents);
         }
 
@@ -252,8 +252,8 @@ public class CJARTests
         cjir.Execute(TestFixtures.MakeContext(executor: new EntitySet([entityA]), world: worldA));
         cjar.Execute(TestFixtures.MakeContext(executor: new EntitySet([entityB]), world: worldB));
 
-        for (var i = 0; i < 56; i++) worldA.TickMotion(new EventTracker());
-        for (var i = 0; i < 56; i++) worldB.TickMotion(new EventTracker());
+        for (var i = 0; i < 56; i++) worldA.HandleTick(new EventTracker());
+        for (var i = 0; i < 56; i++) worldB.HandleTick(new EventTracker());
 
         totalDrawnByCJIR.Should().Be(totalDrawnByCJAR);
     }

@@ -48,7 +48,7 @@ public class SpellExecutorTests
         for (var i = 0; i < 56; i++)
         {
             finalTickResult = new EventTracker();
-            world.TickMotion(finalTickResult);
+            world.HandleTick(finalTickResult);
         }
 
         target.Location.X.Should().BeApproximately(3744, 0.001);

@@ -6,12 +6,13 @@ Most tickets in this file are written by an assistant with incomplete informatio
 
 ## To Do — Milestone 2
 
-Next ticket number: RMC-104
-Next bugfix number: BUG-7
+Next ticket number: RMC-108
+Next bugfix number: BUG-8
 
 | Key | Title | Description | Blocked By |
 |-----|-------|-------------|------------|
-| RMC-83  | Locomotion service | Introduce a `LocomotionService` for simulation-layer movement — self-directed movement by entities (AI, and future player-controlled movement). This is distinct from spell-driven displacement (e.g `LinearMotionEffect`): spells are engine-layer instructions that rewrite world state directly, bypassing physics. Locomotion is a simulated effect that will eventually be subject to friction, gravity, and collision. For now: accept a move request (entity, direction, speed, delta) and apply it. One interaction rule: while a spell-driven displacement effect is active on an entity, the locomotion service refuses movement requests for that entity | |
+| BUG-7   | Prompt printed on every tick | The terminal prompt is reprinted on every game tick regardless of whether there were any text events. It should only print when there is actual output to display. | |
+| RMC-105 | Locomotion physics model | Define the actual physics of locomotion: how speed, acceleration, and deceleration emerge from entity properties (strength, weight, locomotion efficiency). Max speed should follow from physics rather than being a stored cap. Covers the correct formulas, units, and any additional properties needed. | RMC-83 |
 | RMC-103 | LocomotionCapability | Add a `LocomotionCapability` to the capability system. Entities that can move under their own power carry this capability; it stores their current and max movement speed, as well as their turning rate. | RMC-83 |
 | RMC-80  | PatrolAi behavior | First concrete AI behavior: `PatrolAiBehavior` — walks an entity back and forth along a list of waypoints at a configurable speed. Needs DB schema for waypoints and speed. | RMC-77, RMC-103 |
 | RMC-75  | 🏁 Milestone 3 — Have a guard walk by and get pushed | Implement a simple guard NPC that walks back and forth along a predefined path and push him away with a DAN-targeted spell. This will require the engine to have a concept of time. | RMC-83 |
@@ -20,6 +21,8 @@ Next bugfix number: BUG-7
 
 | Key | Title | Description | Blocked By |
 |-----|-------|-------------|------------|
+| RMC-107 | Show facing direction on canvas entities | Render a facing indicator (e.g. a line or arrow) on entities in the world canvas so their current angle is visually obvious. Useful for debugging locomotion and AI behavior. | |
+| RMC-106 | Change base motion constant from 56 to 70 ticks | The base motion constant used for motion timing is currently 56 ticks. Change it to 70. | |
 | RMC-100 | In-game entity creation and modification | Add the ability to create new entities and modify existing ones while the game is running — without restarting or editing seed data. This is a prerequisite for conveniently populating the world during development. | |
 | RMC-101 | Save game state to database | Persist current world state (entities and their properties) to the database. | |
 | RMC-96  | Remove primary constructors | Find all non-record classes and structs that use primary constructors and replace them with explicit constructor bodies. Fields should be declared separately. Records may keep primary constructors. | |
@@ -36,6 +39,7 @@ Next bugfix number: BUG-7
 | RMC-84  | Partial view updates via SSE | Instead of posting the full world render on every game tick, post only the entities that changed during that tick. The client merges the delta into its current render state rather than replacing it wholesale. | RMC-78 |
 | RMC-98  | Design velocity-imparting runes | Design runes that impart velocity and hand an entity off to the simulation layer, rather than directly rewriting its position (engine-layer). The key use case is battlefield shrapnel — objects flung into motion that then collide under physics rules, dealing damage. Contrast with VUN/VAR/CJIR/CJAR which are engine-layer instructions that bypass physics. | |
 | RMC-102 | Remove defaults from EntityData; add test builder | `EntityData` properties currently have default values, which lets tests construct incomplete objects silently. Remove the defaults so the compiler enforces full initialisation, and introduce an `EntityDataBuilder` (or similar) in the test project to make constructing valid test instances convenient. | |
+| RMC-104 | Normalise current/max parameter order | Audit all methods that take both a `current` and a `max` value of the same type and ensure `current` comes before `max` consistently across the codebase. | |
 | RMC-99  | Camera controls on the canvas | Replace the auto-fit viewBox (currently recalculated from the entity bounding box on every tick) with a persistent camera state. Scroll wheel zooms; click-and-drag pans. The keyboard stays reserved for spell input, so no WASD/arrow controls. Initial view on first entity load can still auto-fit, but after that the camera is user-controlled. | |
 
 ## In Progress
@@ -51,20 +55,21 @@ Next bugfix number: BUG-7
 
 | Key | Title |
 |-----|-------|
-| RMC-76 | Game clock |
-| RMC-78 | SSE world push |
-| RMC-81 | Queue spells for tick processing |
-| RMC-82 | Motion effects queue |
-| RMC-85 | Scale up power costs |
-| RMC-86 | EventTracker — World-layer rename and entity tracking |
-| RMC-93 | ControllerEvent hierarchy |
-| RMC-94 | Game loop refactor |
-| RMC-88 | Clean up TryAdvance/TryAdvanceInner split |
-| RMC-89 | YI/SA decorator runes and live vs calcified evaluation |
-| RMC-97 | Update design docs to reflect ongoing effects |
-| BUG-6 | Malformed rune names produce no output |
-| BUG-5 | Entity clicks break during canvas animation |
-| RMC-90 | Move linear motion cost calculation into LinearMotionEffect |
-| RMC-95 | Clean up GlobalUsings in test project |
-| RMC-79 | Guard NPC scenario |
-| RMC-77 | World AI system |
+| RMC-76  | Game clock |
+| RMC-78  | SSE world push |
+| RMC-81  | Queue spells for tick processing |
+| RMC-82  | Motion effects queue |
+| RMC-85  | Scale up power costs |
+| RMC-86  | EventTracker — World-layer rename and entity tracking |
+| RMC-93  | ControllerEvent hierarchy |
+| RMC-94  | Game loop refactor |
+| RMC-88  | Clean up TryAdvance/TryAdvanceInner split |
+| RMC-89  | YI/SA decorator runes and live vs calcified evaluation |
+| RMC-97  | Update design docs to reflect ongoing effects |
+| BUG-6   | Malformed rune names produce no output |
+| BUG-5   | Entity clicks break during canvas animation |
+| RMC-90  | Move linear motion cost calculation into LinearMotionEffect |
+| RMC-95  | Clean up GlobalUsings in test project |
+| RMC-79  | Guard NPC scenario |
+| RMC-77  | World AI system |
+| RMC-83  | Locomotion service |

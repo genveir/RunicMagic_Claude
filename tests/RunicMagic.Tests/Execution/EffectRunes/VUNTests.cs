@@ -15,7 +15,7 @@ public class VUNTests
         for (var i = 0; i < count; i++)
         {
             last = new EventTracker();
-            world.TickMotion(last);
+            world.HandleTick(last);
         }
         return last;
     }
@@ -183,7 +183,7 @@ public class VUNTests
 
         vun.Execute(context);
         var tickResult = new EventTracker();
-        world.TickMotion(tickResult);
+        world.HandleTick(tickResult);
 
         entity.Location.X.Should().Be(originalX);
         tickResult.WorldEvents.OfType<EffectNotFiredEvent>().Should().ContainSingle()
@@ -219,7 +219,7 @@ public class VUNTests
         var context = TestFixtures.MakeContext(caster: caster, world: world);
 
         vun.Execute(context);
-        for (var i = 0; i < 10; i++) world.TickMotion(new EventTracker());
+        for (var i = 0; i < 10; i++) world.HandleTick(new EventTracker());
 
         // Moved 2/56 of the total distance; entity should not be at full destination
         entity.Location.X.Should().BeGreaterThan(1000);
@@ -244,7 +244,7 @@ public class VUNTests
         var context = TestFixtures.MakeContext(caster: caster, world: world);
 
         vun.Execute(context);
-        world.TickMotion(new EventTracker());
+        world.HandleTick(new EventTracker());
 
         drawn.Should().BeEmpty();
     }

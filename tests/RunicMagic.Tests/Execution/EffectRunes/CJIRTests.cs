@@ -18,7 +18,7 @@ public class CJIRTests
         for (var i = 0; i < count; i++)
         {
             last = new EventTracker();
-            world.TickMotion(last);
+            world.HandleTick(last);
         }
         return last;
     }
@@ -110,7 +110,7 @@ public class CJIRTests
 
         cjir.Execute(context);
         var tickResult = new EventTracker();
-        world.TickMotion(tickResult);
+        world.HandleTick(tickResult);
 
         tickResult.WorldEvents.OfType<EntityRotatedEvent>().Should().BeEmpty();
         entity.Location.X.Should().Be(1000);
@@ -142,7 +142,7 @@ public class CJIRTests
         var context = TestFixtures.MakeContext(caster: caster, world: world);
 
         cjir.Execute(context);
-        for (var i = 0; i < 10; i++) world.TickMotion(new EventTracker());
+        for (var i = 0; i < 10; i++) world.HandleTick(new EventTracker());
 
         // Rotated only 2/56 of the quarter turn; entity should not have reached destination
         entity.Location.X.Should().BeLessThan(1000);
@@ -161,7 +161,7 @@ public class CJIRTests
 
         cjir.Execute(context);
         var tickResult = new EventTracker();
-        world.TickMotion(tickResult);
+        world.HandleTick(tickResult);
 
         tickResult.WorldEvents.Should().BeEmpty();
     }
@@ -182,7 +182,7 @@ public class CJIRTests
 
         cjir.Execute(context);
         var tickResult = new EventTracker();
-        world.TickMotion(tickResult);
+        world.HandleTick(tickResult);
 
         entity.Location.X.Should().Be(originalX);
         entity.Location.Y.Should().Be(originalY);
@@ -212,7 +212,7 @@ public class CJIRTests
         for (var i = 0; i < 56; i++)
         {
             finalTick = new EventTracker();
-            world.TickMotion(finalTick);
+            world.HandleTick(finalTick);
             allEvents.AddRange(finalTick.WorldEvents);
         }
 

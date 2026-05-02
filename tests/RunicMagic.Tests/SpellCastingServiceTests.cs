@@ -113,7 +113,7 @@ public class SpellCastingServiceTests
         for (var i = 0; i < 56; i++)
         {
             finalTick = new EventTracker();
-            world.TickMotion(finalTick);
+            world.HandleTick(finalTick);
         }
 
         finalTick.WorldEvents.OfType<EntityPushedEvent>().Should().ContainSingle()
@@ -146,7 +146,7 @@ public class SpellCastingServiceTests
         for (var i = 0; i < 56; i++)
         {
             var tickTracker = new EventTracker();
-            world.TickMotion(tickTracker);
+            world.HandleTick(tickTracker);
             allWorldEvents.AddRange(tickTracker.WorldEvents);
         }
 

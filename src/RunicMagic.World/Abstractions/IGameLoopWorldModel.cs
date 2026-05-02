@@ -4,9 +4,7 @@ namespace RunicMagic.World.Abstractions;
 
 public interface IGameLoopWorldModel
 {
-    void TickMotion(IWorldEventTracker eventTracker);
-
-    void TickAI(IWorldEventTracker eventTracker);
+    void HandleTick(IWorldEventTracker eventTracker);
 
     Entity? Find(EntityId id);
 }

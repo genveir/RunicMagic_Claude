@@ -34,7 +34,7 @@ public class RotationMotionEffect : IMotionEffect
         _remainingTicks = 56;
     }
 
-    public bool TryAdvance(IWorldEventTracker eventTracker)
+    public MotionEffectResult TryAdvance(IWorldEventTracker eventTracker)
     {
         var context = _temporalContext.ToSpellContext(eventTracker);
 
@@ -51,7 +51,7 @@ public class RotationMotionEffect : IMotionEffect
         if (drawn < totalCost)
         {
             eventTracker.Add(new EffectNotFiredEvent(_effectName, $"Insufficient power: needed {totalCost}, drew {drawn}"));
-            return false;
+            return new(Advanced: false, EntitiesUnderMotion: []);
         }
 
         var cos = Math.Cos(_perTickTheta);
@@ -79,6 +79,6 @@ public class RotationMotionEffect : IMotionEffect
             }
         }
 
-        return true;
+        return new(Advanced: true, EntitiesUnderMotion: entities.Entities);
     }
 }

@@ -140,7 +140,7 @@ public class WorldModelTests
         var world = new WorldModel();
         world.Add(entity);
 
-        world.TickAI(new EventTracker());
+        world.HandleTick(new EventTracker());
 
         behavior.CallCount.Should().Be(1);
     }
@@ -153,7 +153,7 @@ public class WorldModelTests
         var world = new WorldModel();
         world.Add(entity);
 
-        world.TickAI(new EventTracker());
+        world.HandleTick(new EventTracker());
 
         behavior.CallCount.Should().Be(0);
     }
@@ -173,7 +173,7 @@ public class WorldModelTests
         world.Add(new EntityBuilder().WithAICapability(ai1).Build());
         world.Add(new EntityBuilder().WithAICapability(ai2).Build());
 
-        world.TickAI(new EventTracker());
+        world.HandleTick(new EventTracker());
 
         b1.CallCount.Should().Be(1);
         b2.CallCount.Should().Be(1);
@@ -191,7 +191,7 @@ public class WorldModelTests
         world.Add(entity);
 
         var tracker = new EventTracker();
-        world.TickAI(tracker);
+        world.HandleTick(tracker);
 
         behavior.ReceivedTracker.Should().BeSameAs(tracker);
     }

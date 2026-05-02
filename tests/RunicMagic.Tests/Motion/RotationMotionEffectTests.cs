@@ -89,7 +89,7 @@ public class RotationMotionEffectTests
         var effect = MakeCwEffect(context, entity, totalRuneDegrees: QuarterTurn);
 
         var result = new EventTracker();
-        var advanced = effect.TryAdvance(result);
+        var (advanced, _) = effect.TryAdvance(result);
 
         advanced.Should().BeFalse();
         result.WorldEvents.OfType<EffectNotFiredEvent>().Should().ContainSingle()
@@ -154,5 +154,36 @@ public class RotationMotionEffectTests
         var costAtRadius2000 = result2.WorldEvents.OfType<PowerDrawnEvent>().Sum(e => e.Amount);
 
         costAtRadius2000.Should().BeGreaterThan(costAtRadius1000);
+    }
+
+    [Fact]
+    public void TryAdvance_ReturnsEntitiesUnderMotion_OnSuccess()
+    {
+        var entity = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(0).Build();
+        var context = TestFixtures.MakeContext();
+        var effect = MakeCwEffect(context, entity, totalRuneDegrees: QuarterTurn);
+
+        var (_, entitiesUnderMotion) = effect.TryAdvance(new EventTracker());
+
+        entitiesUnderMotion.Should().ContainSingle().Which.Should().BeSameAs(entity);
+    }
+
+    [Fact]
+    public void TryAdvance_ReturnsNoEntitiesUnderMotion_OnInsufficientPower()
+    {
+        var entity = new EntityBuilder().WithLocation(x: 1000, y: 0).Build();
+        entity.Weight = 1_000_000;
+
+        var casterEntity = new EntityBuilder()
+            .WithReservoir(draw: amount => new ReservoirDraw(0, false))
+            .Build();
+        var caster = new EntitySet([casterEntity]);
+        var context = TestFixtures.MakeContext(caster: caster);
+
+        var effect = MakeCwEffect(context, entity, totalRuneDegrees: QuarterTurn);
+
+        var (_, entitiesUnderMotion) = effect.TryAdvance(new EventTracker());
+
+        entitiesUnderMotion.Should().BeEmpty();
     }
 }

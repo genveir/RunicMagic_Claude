@@ -64,29 +64,52 @@ public class WorldModel : IGameLoopWorldModel
         _motionEffects.Add(effect);
     }
 
-    public void TickMotion(IWorldEventTracker eventTracker)
+    public void HandleTick(IWorldEventTracker eventTracker)
     {
+        var entitiesUnderMotion = TickMotion(eventTracker);
+
+        TickEntities(eventTracker, entitiesUnderMotion);
+    }
+
+    private HashSet<Entity> TickMotion(IWorldEventTracker eventTracker)
+    {
+        HashSet<Entity> entitiesUnderEngineMotion = [];
+
         List<IMotionEffect> effectsToRemove = new();
         foreach (var motionEffect in _motionEffects)
         {
-            var advanced = motionEffect.TryAdvance(eventTracker);
+            var (advanced, entities) = motionEffect.TryAdvance(eventTracker);
 
             if (!advanced || motionEffect.IsComplete)
             {
                 effectsToRemove.Add(motionEffect);
             }
+
+            foreach (var entity in entities)
+            {
+                entitiesUnderEngineMotion.Add(entity);
+            }
         }
         _motionEffects.RemoveAll(effectsToRemove.Contains);
+
+        return entitiesUnderEngineMotion;
     }
 
-    public void TickAI(IWorldEventTracker eventTracker)
+    private void TickEntities(IWorldEventTracker eventTracker, HashSet<Entity> entitiesUnderEngineMotion)
     {
         foreach (var entity in _entities.Values)
         {
-            if (entity.AI.BehaviorCount > 0)
-            {
-                entity.AI.Execute(entity, this, eventTracker);
-            }
+            entity.IsUnderEngineMotion = entitiesUnderEngineMotion.Contains(entity);
+
+            TickAI(eventTracker, entity);
+        }
+    }
+
+    private void TickAI(IWorldEventTracker eventTracker, Entity entity)
+    {
+        if (entity.AI.BehaviorCount > 0)
+        {
+            entity.AI.Execute(entity, this, eventTracker);
         }
     }
 

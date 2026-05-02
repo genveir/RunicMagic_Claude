@@ -27,10 +27,10 @@ public class WorldModel_TickMotionTests
         );
         world.AddMotionEffect(effect);
 
-        world.TickMotion(new EventTracker());
+        world.HandleTick(new EventTracker());
         entity.Location.X.Should().BeApproximately(10, 0.001);
 
-        world.TickMotion(new EventTracker());
+        world.HandleTick(new EventTracker());
         entity.Location.X.Should().BeApproximately(20, 0.001);
     }
 
@@ -52,11 +52,11 @@ public class WorldModel_TickMotionTests
         );
         world.AddMotionEffect(effect);
 
-        for (var i = 0; i < 56; i++) world.TickMotion(new EventTracker());
+        for (var i = 0; i < 56; i++) world.HandleTick(new EventTracker());
 
         // After completion, further ticks should not advance the entity
         var xAfterCompletion = entity.Location.X;
-        world.TickMotion(new EventTracker());
+        world.HandleTick(new EventTracker());
         entity.Location.X.Should().Be(xAfterCompletion);
     }
 
@@ -83,11 +83,11 @@ public class WorldModel_TickMotionTests
         );
         world.AddMotionEffect(effect);
 
-        world.TickMotion(new EventTracker()); // fails immediately
+        world.HandleTick(new EventTracker()); // fails immediately
 
         // Effect removed — a second tick should produce no further events
         var secondResult = new EventTracker();
-        world.TickMotion(secondResult);
+        world.HandleTick(secondResult);
         secondResult.WorldEvents.Should().BeEmpty();
         entity.Location.X.Should().Be(0);
     }
@@ -126,7 +126,7 @@ public class WorldModel_TickMotionTests
         for (var i = 0; i < 56; i++)
         {
             finalResult = new EventTracker();
-            world.TickMotion(finalResult);
+            world.HandleTick(finalResult);
         }
 
         finalResult.WorldEvents.OfType<EntityPushedEvent>().Should().HaveCount(2);
@@ -138,8 +138,71 @@ public class WorldModel_TickMotionTests
         var world = new WorldModel();
 
         var result = new EventTracker();
-        world.TickMotion(result);
+        world.HandleTick(result);
 
         result.WorldEvents.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void HandleTick_SetsIsUnderEngineMotion_True_WhenEntityIsUnderActiveEffect()
+    {
+        var entity = new EntityBuilder().WithLocation(x: 0, y: 0).WithWeight(0).Build();
+        var world = new WorldModel();
+        world.Add(entity);
+        var context = TestFixtures.MakeContext(world: world);
+
+        var effect = new LinearMotionEffect(
+            context: context,
+            toMove: new FixedEntitySet(entity),
+            origin: new FixedLocation(-1000, 0),
+            perTickDistance: 10,
+            totalDistanceMm: 560,
+            isAway: true,
+            effectName: "VUN"
+        );
+        world.AddMotionEffect(effect);
+
+        world.HandleTick(new EventTracker());
+
+        entity.IsUnderEngineMotion.Should().BeTrue();
+    }
+
+    [Fact]
+    public void HandleTick_SetsIsUnderEngineMotion_False_WhenEntityIsNotUnderAnyEffect()
+    {
+        var entity = new EntityBuilder().WithLocation(x: 0, y: 0).WithWeight(0).Build();
+        var world = new WorldModel();
+        world.Add(entity);
+
+        world.HandleTick(new EventTracker());
+
+        entity.IsUnderEngineMotion.Should().BeFalse();
+    }
+
+    [Fact]
+    public void HandleTick_ClearsIsUnderEngineMotion_AfterEffectCompletes()
+    {
+        var entity = new EntityBuilder().WithLocation(x: 0, y: 0).WithWeight(0).Build();
+        var world = new WorldModel();
+        world.Add(entity);
+        var context = TestFixtures.MakeContext(world: world);
+
+        var effect = new LinearMotionEffect(
+            context: context,
+            toMove: new FixedEntitySet(entity),
+            origin: new FixedLocation(-1000, 0),
+            perTickDistance: 10,
+            totalDistanceMm: 560,
+            isAway: true,
+            effectName: "VUN"
+        );
+        world.AddMotionEffect(effect);
+
+        for (var i = 0; i < 56; i++) world.HandleTick(new EventTracker());
+
+        // Effect is complete and removed; next tick should clear the flag
+        world.HandleTick(new EventTracker());
+
+        entity.IsUnderEngineMotion.Should().BeFalse();
     }
 }
