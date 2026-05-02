@@ -11,6 +11,7 @@ public class SseConnectionManagerTests
     private static SseConnectionManager MakeManager()
     {
         var world = new WorldModel();
+        world.Add(new EntityBuilder().WithLocation(x: 1000, y: 1000).Build());
         var worldRendering = new WorldRenderingService(world, new RayCastService(world));
         return new SseConnectionManager(worldRendering);
     }
@@ -20,17 +21,17 @@ public class SseConnectionManagerTests
     {
         var manager = MakeManager();
 
-        var (_, channel) = manager.AddConnection(initialPrompt: "[no caster] >");
+        var (_, channel) = manager.AddConnection();
 
         channel.Reader.TryRead(out var result).Should().BeTrue();
-        result!.Prompt.Should().Be("[no caster] >");
+        result!.Entities.Count.Should().Be(1);
     }
 
     [Fact]
     public void Push_SingleConnection_ChannelReceivesResult()
     {
         var manager = MakeManager();
-        var (_, channel) = manager.AddConnection(initialPrompt: "prompt");
+        var (_, channel) = manager.AddConnection();
         channel.Reader.TryRead(out _);
 
         var pushed = new CommandResult(["hello"], [], "prompt");
@@ -44,8 +45,8 @@ public class SseConnectionManagerTests
     public void Push_MultipleConnections_AllChannelsReceiveResult()
     {
         var manager = MakeManager();
-        var (_, channel1) = manager.AddConnection(initialPrompt: "prompt");
-        var (_, channel2) = manager.AddConnection(initialPrompt: "prompt");
+        var (_, channel1) = manager.AddConnection();
+        var (_, channel2) = manager.AddConnection();
         channel1.Reader.TryRead(out _);
         channel2.Reader.TryRead(out _);
 
@@ -62,7 +63,7 @@ public class SseConnectionManagerTests
     public void RemoveConnection_CompletesChannel()
     {
         var manager = MakeManager();
-        var (id, channel) = manager.AddConnection(initialPrompt: "prompt");
+        var (id, channel) = manager.AddConnection();
         channel.Reader.TryRead(out _);
 
         manager.RemoveConnection(id);
@@ -74,7 +75,7 @@ public class SseConnectionManagerTests
     public void Push_AfterRemoveConnection_RemovedChannelReceivesNothing()
     {
         var manager = MakeManager();
-        var (id, channel) = manager.AddConnection(initialPrompt: "prompt");
+        var (id, channel) = manager.AddConnection();
         channel.Reader.TryRead(out _);
         manager.RemoveConnection(id);
 

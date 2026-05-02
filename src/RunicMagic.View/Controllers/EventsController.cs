@@ -19,7 +19,7 @@ public class EventsController(SseConnectionManager sseManager) : ControllerBase
         Response.ContentType = "text/event-stream";
         Response.Headers.CacheControl = "no-cache";
 
-        var (id, channel) = sseManager.AddConnection("no caster >");
+        var (id, channel) = sseManager.AddConnection();
         try
         {
             await foreach (var result in channel.Reader.ReadAllAsync(ct))

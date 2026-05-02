@@ -9,14 +9,14 @@ public class SseConnectionManager(IWorldRenderingService worldRendering) : IWorl
 {
     private readonly ConcurrentDictionary<Guid, Channel<CommandResult>> _connections = new();
 
-    public (Guid Id, Channel<CommandResult> Channel) AddConnection(string initialPrompt)
+    public (Guid Id, Channel<CommandResult> Channel) AddConnection()
     {
         var id = Guid.NewGuid();
         var channel = Channel.CreateUnbounded<CommandResult>();
         _connections[id] = channel;
 
         var entities = worldRendering.GetAllRenderingModels(casterEntityId: null);
-        var initial = new CommandResult([], entities, initialPrompt);
+        var initial = new CommandResult([], entities, string.Empty);
         channel.Writer.TryWrite(initial);
 
         return (id, channel);

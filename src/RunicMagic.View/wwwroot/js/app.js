@@ -21,6 +21,8 @@ function writePrompt(prompt) {
     term.write(prompt ?? '>');
 }
 
+writePrompt('[no caster] >');
+
 
 // ── Input handling ────────────────────────────────────────────────────────────
 
@@ -148,7 +150,7 @@ eventSource.onmessage = (e) => {
     for (const line of (result.text ?? [])) {
         if (line) term.writeln(line);
     }
-    if (result.prompt) {
+    if (result.text?.length && result.prompt) {
         writePrompt(result.prompt);
     }
     if (result.text?.length || result.prompt) {

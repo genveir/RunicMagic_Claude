@@ -4,6 +4,8 @@
 
 Most tickets in this file are written by an assistant with incomplete information about the project and its current state. Treat the tickets as unrefined user stories the user wants to see implemented, rather than polished tasks ready for development.
 
+The Key column in every table uses right-padded cells so all keys render at the same visual width. The baseline is 7 characters (RMC-NNN). When inserting a row, pad the key with trailing spaces to reach 7 characters before the closing "|"
+
 ## To Do — Milestone 2
 
 Next ticket number: RMC-108
@@ -11,7 +13,6 @@ Next bugfix number: BUG-8
 
 | Key | Title | Description | Blocked By |
 |-----|-------|-------------|------------|
-| BUG-7   | Prompt printed on every tick | The terminal prompt is reprinted on every game tick regardless of whether there were any text events. It should only print when there is actual output to display. | |
 | RMC-105 | Locomotion physics model | Define the actual physics of locomotion: how speed, acceleration, and deceleration emerge from entity properties (strength, weight, locomotion efficiency). Max speed should follow from physics rather than being a stored cap. Covers the correct formulas, units, and any additional properties needed. | RMC-83 |
 | RMC-103 | LocomotionCapability | Add a `LocomotionCapability` to the capability system. Entities that can move under their own power carry this capability; it stores their current and max movement speed, as well as their turning rate. | RMC-83 |
 | RMC-80  | PatrolAi behavior | First concrete AI behavior: `PatrolAiBehavior` — walks an entity back and forth along a list of waypoints at a configurable speed. Needs DB schema for waypoints and speed. | RMC-77, RMC-103 |
@@ -73,3 +74,4 @@ Next bugfix number: BUG-8
 | RMC-79  | Guard NPC scenario |
 | RMC-77  | World AI system |
 | RMC-83  | Locomotion service |
+| BUG-7   | Prompt printed on every tick |
