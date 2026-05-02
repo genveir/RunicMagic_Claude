@@ -4,7 +4,7 @@
 
 Most tickets in this file are written by an assistant with incomplete information about the project and its current state. Treat the tickets as unrefined user stories the user wants to see implemented, rather than polished tasks ready for development.
 
-The Key column in every table uses right-padded cells so all keys render at the same visual width. The baseline is 7 characters (RMC-NNN). When inserting a row, pad the key with trailing spaces to reach 7 characters before the closing "|"
+The Key column in every table uses right-padded cells. The baseline is 7 characters (RMC-NNN). When inserting a row, pad the key with trailing spaces to reach 7 characters before the closing "|"
 
 ## To Do — Milestone 2
 
@@ -13,9 +13,9 @@ Next bugfix number: BUG-8
 
 | Key | Title | Description | Blocked By |
 |-----|-------|-------------|------------|
-| RMC-105 | Locomotion physics model | Define the actual physics of locomotion: how speed, acceleration, and deceleration emerge from entity properties (strength, weight, locomotion efficiency). Max speed should follow from physics rather than being a stored cap. Covers the correct formulas, units, and any additional properties needed. | RMC-83 |
-| RMC-103 | LocomotionCapability | Add a `LocomotionCapability` to the capability system. Entities that can move under their own power carry this capability; it stores their current and max movement speed, as well as their turning rate. | RMC-83 |
-| RMC-80  | PatrolAi behavior | First concrete AI behavior: `PatrolAiBehavior` — walks an entity back and forth along a list of waypoints at a configurable speed. Needs DB schema for waypoints and speed. | RMC-77, RMC-103 |
+| RMC-105 | Simulation-layer physics service | Implement the simulation layer for entity motion. Add a `VelocityVector?` field to `Entity` (null = stationary). Implement a physics service that each tick integrates velocity, applied forces (drive force from locomotion or a launch impulse), and drag, then writes updated `Location` and velocity back to the entity. Entities where `IsUnderEngineMotion` is true are skipped — the engine layer has them and physics does not negotiate. Covers both self-propelled entities (a guard walking) and passive ones (a rock in flight, an entity sliding on ice). The service has no concept of creature intent; that belongs to `LocomotionCapability`. | |
+| RMC-103 | LocomotionCapability | Add `LocomotionCapability` to `Entity` (already stubbed as a nullable property). The capability carries the bio-mechanical properties that only self-propelling entities have: strength, locomotion efficiency, drag coefficient, traction coefficient, CoM/stance width ratio, and gait inertia. Each tick, it computes a drive force from the entity's current intent (desired direction and gait, set by AI or player) and submits it to the physics service. Max speed is not stored — it emerges from physics. A rock, a wall, or a plant has no `LocomotionCapability`. | RMC-105 |
+| RMC-80  | PatrolAi behavior | First concrete AI behavior: `PatrolAiBehavior` — walks an entity back and forth along a list of waypoints. Sets locomotion intent (desired direction) each tick; the physics service and `LocomotionCapability` handle the actual motion. Needs DB schema for waypoints. | RMC-77, RMC-103, RMC-105 |
 | RMC-75  | 🏁 Milestone 3 — Have a guard walk by and get pushed | Implement a simple guard NPC that walks back and forth along a predefined path and push him away with a DAN-targeted spell. This will require the engine to have a concept of time. | RMC-83 |
 
 ## To Do — Other
@@ -23,7 +23,7 @@ Next bugfix number: BUG-8
 | Key | Title | Description | Blocked By |
 |-----|-------|-------------|------------|
 | RMC-107 | Show facing direction on canvas entities | Render a facing indicator (e.g. a line or arrow) on entities in the world canvas so their current angle is visually obvious. Useful for debugging locomotion and AI behavior. | |
-| RMC-106 | Change base motion constant from 56 to 70 ticks | The base motion constant used for motion timing is currently 56 ticks. Change it to 70. | |
+| RMC-106 | Change base motion constant from 56 to 70 ticks | The base motion constant used for motion timing is currently 56 ticks. Change it to 70. Also make it a constant in the technical sense. | |
 | RMC-100 | In-game entity creation and modification | Add the ability to create new entities and modify existing ones while the game is running — without restarting or editing seed data. This is a prerequisite for conveniently populating the world during development. | |
 | RMC-101 | Save game state to database | Persist current world state (entities and their properties) to the database. | |
 | RMC-96  | Remove primary constructors | Find all non-record classes and structs that use primary constructors and replace them with explicit constructor bodies. Fields should be declared separately. Records may keep primary constructors. | |
