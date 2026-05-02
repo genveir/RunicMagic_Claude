@@ -1,6 +1,7 @@
 <Solution>
   <Folder Name="/Design/">
     <File Path="Design/Fiction.md" />
+    <File Path="Design/Locomotion.md" />
     <File Path="Design/MagicSystem.md" />
     <File Path="Design/RuneSet.md" />
     <File Path="Design/TypeSystem.md" />
