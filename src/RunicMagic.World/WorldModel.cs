@@ -17,7 +17,12 @@ public class WorldModel : IGameLoopWorldModel
 
     public void Remove(EntityId id)
     {
-        _entities.Remove(id);
+        var entity = _entities.GetValueOrDefault(id);
+
+        if (entity != null)
+        {
+            _entities.Remove(id);
+        }
     }
 
     public Entity? Find(EntityId id)
@@ -72,6 +77,17 @@ public class WorldModel : IGameLoopWorldModel
             }
         }
         _motionEffects.RemoveAll(effectsToRemove.Contains);
+    }
+
+    public void TickAI(IWorldEventTracker eventTracker)
+    {
+        foreach (var entity in _entities.Values)
+        {
+            if (entity.AI.BehaviorCount > 0)
+            {
+                entity.AI.Execute(entity, this, eventTracker);
+            }
+        }
     }
 
     private static Rectangle Bounds(Entity e)

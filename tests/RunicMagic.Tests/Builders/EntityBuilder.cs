@@ -1,4 +1,5 @@
 using RunicMagic.World;
+using RunicMagic.World.AI;
 using RunicMagic.World.Capabilities;
 using RunicMagic.World.Execution;
 using RunicMagic.World.Geometry;
@@ -18,6 +19,7 @@ internal class EntityBuilder
     private bool _isTranslucent = false;
     private double _angle = 0;
     private StructuralIntegrityCapability _structuralIntegrity = new StructuralIntegrityCapability(1000, 1000);
+    private AICapability _aiCapability = new AICapability([]);
 
     private LifeCapability? _life;
     private ChargeCapability? _charge;
@@ -91,6 +93,12 @@ internal class EntityBuilder
         return this;
     }
 
+    public EntityBuilder WithAICapability(AICapability aiCapability)
+    {
+        _aiCapability = aiCapability;
+        return this;
+    }
+
     public EntityBuilder WithLife(long max, long current)
     {
         _life = new LifeCapability(max, current);
@@ -151,7 +159,8 @@ internal class EntityBuilder
             weight: _weight,
             isTranslucent: _isTranslucent,
             angle: _angle,
-            structuralIntegrity: _structuralIntegrity)
+            structuralIntegrity: _structuralIntegrity,
+            aiCapability: _aiCapability)
         {
             Life = _life,
             Charge = _charge,

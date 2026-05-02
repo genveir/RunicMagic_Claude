@@ -62,6 +62,8 @@ public class GameLoopServiceTests
 
         public void TickMotion(IWorldEventTracker eventTracker) { }
 
+        public void TickAI(IWorldEventTracker eventTracker) { }
+
         public Entity? Find(EntityId id)
         {
             return FindResult;

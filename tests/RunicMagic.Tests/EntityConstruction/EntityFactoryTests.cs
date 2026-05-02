@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using RunicMagic.Controller.EntityConstruction;
 using RunicMagic.Database;
 using RunicMagic.World;
+using RunicMagic.World.AI;
 using RunicMagic.World.Runes.EffectRunes;
 
 namespace RunicMagic.Tests.EntityConstruction;
@@ -294,6 +295,20 @@ public class EntityFactoryTests
             X: 0, Y: 0, Width: 10, Height: 5, HasAgency: false, Weight: 0));
 
         entity.Reservoir.Should().BeNull();
+    }
+
+    // ── AI ────────────────────────────────────────────────────────────────────
+
+    [Fact]
+    public void Create_EntityHasAICapability_WithZeroBehaviors()
+    {
+        var world = new WorldModel();
+        var entity = Factory(world).Create(new EntityData(
+            Guid.NewGuid(), (long)EntityType.Object, "rock",
+            X: 0, Y: 0, Width: 5, Height: 5, HasAgency: false, Weight: 0));
+
+        entity.AI.Should().NotBeNull();
+        entity.AI.BehaviorCount.Should().Be(0);
     }
 
     // ── Object ────────────────────────────────────────────────────────────────

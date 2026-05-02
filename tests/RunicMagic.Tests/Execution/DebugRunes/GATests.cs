@@ -70,7 +70,7 @@ public class GATests
     }
 
     [Fact]
-    public void Resolve_WithOpenResolutionWindow_DrawsOneBillionPower()
+    public void Resolve_WithOpenResolutionWindow_DrawsABillionTimesABillionPower()
     {
         var drawn = new List<long>();
         var casterEntity = new EntityBuilder()
@@ -84,7 +84,7 @@ public class GATests
 
         new GA().Resolve(context);
 
-        drawn.Should().ContainSingle().Which.Should().Be(1_000_000_000);
+        drawn.Should().ContainSingle().Which.Should().Be(1_000_000_000_000_000_000);
     }
 
     [Fact]

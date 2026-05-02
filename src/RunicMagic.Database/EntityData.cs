@@ -18,4 +18,5 @@ public record EntityData(
     long? CurrentCharge = null,
     string[]? InscriptionTexts = null,
     long MaxStructuralIntegrity = 1000,
-    long CurrentStructuralIntegrity = 1000);
+    long CurrentStructuralIntegrity = 1000,
+    AIData? AIData = null);

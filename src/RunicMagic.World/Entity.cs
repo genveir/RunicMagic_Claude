@@ -1,3 +1,4 @@
+using RunicMagic.World.AI;
 using RunicMagic.World.Capabilities;
 using RunicMagic.World.Execution;
 using RunicMagic.World.Geometry;
@@ -17,7 +18,8 @@ public class Entity
         long weight,
         bool isTranslucent,
         double angle,
-        StructuralIntegrityCapability structuralIntegrity)
+        StructuralIntegrityCapability structuralIntegrity,
+        AICapability aiCapability)
     {
         Id = id;
         Label = label;
@@ -29,6 +31,7 @@ public class Entity
         IsTranslucent = isTranslucent;
         Angle = angle;
         StructuralIntegrity = structuralIntegrity;
+        AI = aiCapability;
     }
 
     public EntityId Id { get; }
@@ -49,6 +52,7 @@ public class Entity
     public LifeCapability? Life { get; set; }
     public ChargeCapability? Charge { get; set; }
     public StructuralIntegrityCapability StructuralIntegrity { get; set; }
+    public AICapability AI { get; set; }
 
     public Direction? PointingDirection { get; set; }
     public IndicateTarget? IndicateTarget { get; set; }

@@ -1,5 +1,8 @@
+using RunicMagic.Controller.Services;
 using RunicMagic.Tests.Builders;
 using RunicMagic.World;
+using RunicMagic.World.AI;
+using RunicMagic.World.Execution;
 
 namespace RunicMagic.Tests;
 
@@ -109,5 +112,99 @@ public class WorldModelTests
         var result = world.GetContainedEntities(container);
 
         Assert.DoesNotContain(container, result);
+    }
+
+    // ── Remove ────────────────────────────────────────────────────────────────
+
+    [Fact]
+    public void Remove_DoesNotThrow_WhenEntityNotPresent()
+    {
+        var world = new WorldModel();
+        var unknownId = new EntityId(Guid.NewGuid());
+
+        var act = () => world.Remove(unknownId);
+
+        act.Should().NotThrow();
+    }
+
+    // ── TickAI ────────────────────────────────────────────────────────────────
+
+    [Fact]
+    public void TickAI_ExecutesBehavior_OnEntityWithBehaviors()
+    {
+        var behavior = new RecordingBehavior();
+        var ai = new AICapability([]);
+        ai.AddBehavior(behavior);
+
+        var entity = new EntityBuilder().WithAICapability(ai).Build();
+        var world = new WorldModel();
+        world.Add(entity);
+
+        world.TickAI(new EventTracker());
+
+        behavior.CallCount.Should().Be(1);
+    }
+
+    [Fact]
+    public void TickAI_SkipsEntity_WithNoBehaviors()
+    {
+        var behavior = new RecordingBehavior();
+        var entity = new EntityBuilder().WithAICapability(new AICapability([])).Build();
+        var world = new WorldModel();
+        world.Add(entity);
+
+        world.TickAI(new EventTracker());
+
+        behavior.CallCount.Should().Be(0);
+    }
+
+    [Fact]
+    public void TickAI_ExecutesBehaviors_OnAllEligibleEntities()
+    {
+        var b1 = new RecordingBehavior();
+        var b2 = new RecordingBehavior();
+
+        var ai1 = new AICapability([]);
+        ai1.AddBehavior(b1);
+        var ai2 = new AICapability([]);
+        ai2.AddBehavior(b2);
+
+        var world = new WorldModel();
+        world.Add(new EntityBuilder().WithAICapability(ai1).Build());
+        world.Add(new EntityBuilder().WithAICapability(ai2).Build());
+
+        world.TickAI(new EventTracker());
+
+        b1.CallCount.Should().Be(1);
+        b2.CallCount.Should().Be(1);
+    }
+
+    [Fact]
+    public void TickAI_PassesEventTracker_ToBehavior()
+    {
+        var behavior = new RecordingBehavior();
+        var ai = new AICapability([]);
+        ai.AddBehavior(behavior);
+
+        var entity = new EntityBuilder().WithAICapability(ai).Build();
+        var world = new WorldModel();
+        world.Add(entity);
+
+        var tracker = new EventTracker();
+        world.TickAI(tracker);
+
+        behavior.ReceivedTracker.Should().BeSameAs(tracker);
+    }
+
+    private class RecordingBehavior : IAIBehavior
+    {
+        public int CallCount { get; private set; }
+        public IWorldEventTracker? ReceivedTracker { get; private set; }
+
+        public void Execute(Entity entity, WorldModel worldModel, IWorldEventTracker eventTracker)
+        {
+            CallCount++;
+            ReceivedTracker = eventTracker;
+        }
     }
 }

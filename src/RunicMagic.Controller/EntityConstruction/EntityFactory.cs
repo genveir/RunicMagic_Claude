@@ -2,6 +2,7 @@ using Microsoft.Extensions.Logging;
 using RunicMagic.Controller.RuneParsing;
 using RunicMagic.Database;
 using RunicMagic.World;
+using RunicMagic.World.AI;
 using RunicMagic.World.Capabilities;
 using RunicMagic.World.Geometry;
 using RunicMagic.World.Runes.RuneTypes;
@@ -10,36 +11,39 @@ namespace RunicMagic.Controller.EntityConstruction;
 
 public class EntityFactory(WorldModel world, ILogger<EntityFactory> logger)
 {
-    public Entity Create(EntityData data)
+    public Entity Create(EntityData entityData)
     {
-        var type = data.TypeId switch
+        var type = entityData.TypeId switch
         {
             1 => EntityType.Creature,
             2 => EntityType.ManaSource,
             3 => EntityType.Object,
-            _ => throw new ArgumentException($"Unknown entity type ID: {data.TypeId}")
+            _ => throw new ArgumentException($"Unknown entity type ID: {entityData.TypeId}")
         };
 
+        var aiCapability = SetupAI(entityData.AIData);
+
         var entity = new Entity(
-            id: new EntityId(data.Id),
-            label: data.Label,
-            location: new Location(data.X, data.Y),
-            width: data.Width,
-            height: data.Height,
-            hasAgency: data.HasAgency,
-            weight: data.Weight,
-            isTranslucent: data.IsTranslucent,
-            angle: data.Angle,
-            structuralIntegrity: new StructuralIntegrityCapability(data.MaxStructuralIntegrity, data.CurrentStructuralIntegrity));
+            id: new EntityId(entityData.Id),
+            label: entityData.Label,
+            location: new Location(entityData.X, entityData.Y),
+            width: entityData.Width,
+            height: entityData.Height,
+            hasAgency: entityData.HasAgency,
+            weight: entityData.Weight,
+            isTranslucent: entityData.IsTranslucent,
+            angle: entityData.Angle,
+            structuralIntegrity: new StructuralIntegrityCapability(entityData.MaxStructuralIntegrity, entityData.CurrentStructuralIntegrity),
+            aiCapability: aiCapability);
 
-        if (data.MaxHitPoints.HasValue && data.CurrentHitPoints.HasValue)
-            entity.Life = new LifeCapability(data.MaxHitPoints.Value, data.CurrentHitPoints.Value);
+        if (entityData.MaxHitPoints.HasValue && entityData.CurrentHitPoints.HasValue)
+            entity.Life = new LifeCapability(entityData.MaxHitPoints.Value, entityData.CurrentHitPoints.Value);
 
-        if (data.MaxCharge.HasValue && data.CurrentCharge.HasValue)
-            entity.Charge = new ChargeCapability(data.MaxCharge.Value, data.CurrentCharge.Value);
+        if (entityData.MaxCharge.HasValue && entityData.CurrentCharge.HasValue)
+            entity.Charge = new ChargeCapability(entityData.MaxCharge.Value, entityData.CurrentCharge.Value);
 
         WireDelegates(type, entity);
-        ParseInscriptions(entity, data.InscriptionTexts);
+        ParseInscriptions(entity, entityData.InscriptionTexts);
         return entity;
     }
 
@@ -65,7 +69,7 @@ public class EntityFactory(WorldModel world, ILogger<EntityFactory> logger)
 
     private void WireDelegates(EntityType type, Entity entity)
     {
-        entity.Scope = () => GetEntitiesWithinDistance(entity, distance: 500);
+        entity.Scope = () => world.GetEntitiesWithinDistance(entity, distance: 500).ToArray();
 
         switch (type)
         {
@@ -82,8 +86,8 @@ public class EntityFactory(WorldModel world, ILogger<EntityFactory> logger)
         }
     }
 
-    private Entity[] GetEntitiesWithinDistance(Entity entity, long distance)
+    private AICapability SetupAI(AIData? aiData)
     {
-        return world.GetEntitiesWithinDistance(entity, distance).ToArray();
+        return new AICapability([]);
     }
 }

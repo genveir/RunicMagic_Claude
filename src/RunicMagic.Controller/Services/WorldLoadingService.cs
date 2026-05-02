@@ -8,7 +8,11 @@ public class WorldLoadingService(WorldLoader loader, EntityFactory factory, Worl
 {
     public async Task LoadAsync()
     {
-        foreach (var data in await loader.LoadAsync())
-            world.Add(factory.Create(data));
+        var entities = await loader.LoadAsync();
+
+        foreach (var entityData in entities)
+        {
+            world.Add(factory.Create(entityData));
+        }
     }
 }

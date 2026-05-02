@@ -6,5 +6,7 @@ public interface IGameLoopWorldModel
 {
     void TickMotion(IWorldEventTracker eventTracker);
 
+    void TickAI(IWorldEventTracker eventTracker);
+
     Entity? Find(EntityId id);
 }
