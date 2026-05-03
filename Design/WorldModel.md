@@ -34,10 +34,13 @@ Current entity data:
 | `Life` | Property | complex | `LifeCapability`: `MaxHitPoints` + `CurrentHitPoints`; null = not alive |
 | `Charge` | Property | complex | `ChargeCapability`: `MaxCharge` + `CurrentCharge`; null = uncharged |
 | `StructuralIntegrity` | Attribute | complex | `StructuralIntegrityCapability`: `MaxIntegrity` + `CurrentIntegrity`; always present. Damage to structural integrity also caps `Life.CurrentHitPoints` to the new `CurrentIntegrity` — the reverse does not apply. |
+| `AI` | Property | complex | `AICapability`: collection of AI behaviours; empty = no AI |
+| `Locomotion` | Property | complex | `LocomotionCapability`: movement parameters; null = cannot move under own agency |
 | `PointingDirection` | Transient | scalar | The direction the entity is consciously aiming; null = not pointing |
 | `IndicateTarget` | Transient | complex | The entity the caster is consciously indicating, with optional approach direction; null = not indicating |
 | `RawInscriptions` | Transient | `string[]` | Raw inscription texts loaded from the `Inscription` table; empty = none |
 | `ParsedInscriptions` | Transient | `IStatement[]` | Spells inscribed on this entity, pre-parsed at load time from `RawInscriptions`; empty = none. Any inscription whose rune text fails to parse is silently dropped. Any entity type can have inscriptions. |
+| `IsUnderEngineMotion` | Transient | boolean | `false` = not under engine motion; set by the game loop while an engine motion effect is active for this entity |
 | `Scope` | Derived | delegate | Returns the set of entities reachable from this entity |
 | `Reservoir` | Derived | `ReservoirCapability?` | Exposes power query and draw/fill operations; closes over whichever property holds its state; null = no power |
 
@@ -65,12 +68,15 @@ The implementation may use convenience classes (e.g. `Creature`) to stamp out en
 - `LifeCapability? Life` — null = absent; holds `MaxHitPoints` + `CurrentHitPoints`
 - `ChargeCapability? Charge` — null = absent; holds `MaxCharge` + `CurrentCharge`
 - `StructuralIntegrityCapability StructuralIntegrity` — always present; stored as columns on `Entities`; holds `MaxIntegrity` + `CurrentIntegrity`
+- `AICapability AI` — always present as an object; empty = no AI behaviours
+- `LocomotionCapability? Locomotion` — null = cannot move under own agency
 
 **Transient** (session-only):
 - `Direction? PointingDirection` — null = not pointing
 - `IndicateTarget? IndicateTarget` — entity the caster consciously indicates, with optional approach direction; null = not indicating
 - `string[] RawInscriptions` — raw inscription texts loaded at world load; empty = none
 - `IStatement[] ParsedInscriptions` — spells inscribed on this entity; pre-parsed from `RawInscriptions` at world load; empty = none. Any inscription whose rune text fails to parse is silently dropped.
+- `bool IsUnderEngineMotion` — set by the game loop while an engine motion effect is active for this entity; `LocomotionService` checks this before moving
 
 **Derived** (wired at load, no persistence):
 - `Func<Entity[]>? Scope` — computed on call; closes over world state
@@ -112,3 +118,21 @@ The world is loaded in full at startup into a `Dictionary<EntityId, Entity>`. Th
 ### Rectangle
 
 `Rectangle` is a `readonly record struct` with no dependency on `System.Drawing`. It represents an oriented rectangle: `Location` is the centre point, `Width` and `Height` are the full extents (as `double`), and `Angle` is the orientation in radians. All spatial operations (containment, intersection, ray-cast, distance) account for rotation.
+
+## Motion
+
+Motion in the world has two orthogonal axes. See `Design/Fiction.md` for the design rationale behind the engine/simulated split.
+
+### Engine vs Simulated
+
+**Engine motion** is the magic system directly rewriting an entity's position. It does not negotiate with physics. The effect runes `VUN(push)`, `VAR(pull)`, `CJIR(rotate clockwise)`, and `CJAR(rotate counterclockwise)` produce engine motion effects that advance over 56 ticks.
+
+**Simulated motion** is an entity moving under its own agency — a creature walking, a projectile in flight. It participates in the physics simulation and is subject to friction, collision, and other environmental forces. `LocomotionService` drives this layer.
+
+While an entity is under engine motion, its simulated locomotion is suspended. The bridge between the two layers is the transient flag `Entity.IsUnderEngineMotion`. The game loop sets this flag on any entity that appears in an active engine motion effect's entity set; `LocomotionService` checks it and returns early if set.
+
+### Move vs Teleport
+
+**Move** carries an entity from its current position to a destination by traversing the space in between. The entity occupies every intermediate point along the path. Both engine motion effects and `LocomotionService` use move semantics — the difference is who is driving and whether physics applies.
+
+**Teleport** is an instantaneous position change. The entity does not pass through intermediate space and does not interact with anything along the way. `TeleportEntityService` provides this operation and is used for placement and similar out-of-simulation repositioning.
