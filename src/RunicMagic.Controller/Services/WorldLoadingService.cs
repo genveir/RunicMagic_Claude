@@ -4,7 +4,6 @@ using RunicMagic.World;
 using RunicMagic.World.Entities;
 using RunicMagic.World.Entities.AI;
 using RunicMagic.World.Entities.Capabilities;
-using RunicMagic.World.Geometry;
 using RunicMagic.World.Motion.Simulated;
 
 namespace RunicMagic.Controller.Services;
@@ -28,6 +27,7 @@ public class WorldLoadingService(WorldLoader loader, EntityFactory factory, Worl
         var guard = world.GetAll().FirstOrDefault(e => e.Label == "Guard");
 
         guard!.Locomotion = new LocomotionCapability();
+        guard.DragCoefficient = 0.4;
         guard.AI.AddBehavior(new RunAheadBehavior());
     }
 
@@ -35,8 +35,9 @@ public class WorldLoadingService(WorldLoader loader, EntityFactory factory, Worl
     {
         public void Execute(Entity entity, WorldModel worldModel, IWorldEventTracker eventTracker)
         {
-            var direction = new Direction(Math.Cos(entity.Angle), Math.Sin(entity.Angle));
-            LocomotionService.TryMove(entity, direction, eventTracker);
+            var fx = 100_000 * Math.Cos(entity.Angle);
+            var fy = 100_000 * Math.Sin(entity.Angle);
+            entity.PendingImpulses.Add(new ForceVector(fx, fy));
         }
     }
 }

@@ -17,7 +17,9 @@ The raw force a creature can apply through its locomotion system. Combines muscl
 The creature's total weight including carried load. Heavier creatures require more force to accelerate and are penalised more on slopes and soft ground. Load bearing is simply an addition to this value.
 
 ### Drag Coefficient
-The creature's aerodynamic resistance profile. Less significant at low speeds but becomes the dominant resistive force at high speeds (scales with v²). A crouched or streamlined creature has a lower coefficient. Relevant primarily at speeds above ~10 m/s.
+An entity's aerodynamic resistance profile. Less significant at low speeds but becomes the dominant resistive force at high speeds (scales with v²). A crouched or streamlined creature has a lower coefficient. Relevant primarily at speeds above ~10 m/s.
+
+Drag coefficient is not a locomotion-specific property — a rock or a thrown bench also experiences drag. It lives on `Entity` directly rather than on `LocomotionCapability`.
 
 ### Locomotion Efficiency
 A coefficient (0–1) representing how well the creature converts raw strength into forward motion. This is the most behaviourally rich property in the system. It captures:
@@ -45,9 +47,11 @@ A scalar representing how committed the creature is to its current movement patt
 ### Straight-Line Speed and Acceleration
 ```
 max_acceleration = (strength / weight) × efficiency
-drag_force = drag_coefficient × v²
+drag_force = drag_coefficient × projected_width × v²
 top_speed = velocity at which drag_force = max_drive_force
 ```
+
+`projected_width` is the silhouette width of the entity's rectangle perpendicular to its direction of motion (`Rectangle.GetProjectedWidth(Direction)`). This means a spear flying point-first has lower drag than the same spear flying sideways — the drag coefficient captures how aerodynamic the entity is relative to its shape, and the shape itself contributes through projected width.
 
 Heavier creatures accelerate slower. Higher efficiency raises both acceleration and top speed. Drag sets a terminal velocity that scales with the square root of available drive force divided by drag coefficient.
 

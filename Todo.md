@@ -13,7 +13,6 @@ Next bugfix number: BUG-8
 
 | Key | Title | Description | Blocked By |
 |-----|-------|-------------|------------|
-| RMC-105 | Simulation-layer physics service | Implement the simulation layer for entity motion. Add a `VelocityVector?` field to `Entity` (null = stationary). Implement a physics service that each tick integrates velocity, applied forces (drive force from locomotion or a launch impulse), and drag, then writes updated `Location` and velocity back to the entity. Entities where `IsUnderEngineMotion` is true are skipped — the engine layer has them and physics does not negotiate. Covers both self-propelled entities (a guard walking) and passive ones (a rock in flight, an entity sliding on ice). The service has no concept of creature intent; that belongs to `LocomotionCapability`. | |
 | RMC-103 | LocomotionCapability | Add `LocomotionCapability` to `Entity` (already stubbed as a nullable property). The capability carries the bio-mechanical properties that only self-propelling entities have: strength, locomotion efficiency, drag coefficient, traction coefficient, CoM/stance width ratio, and gait inertia. Each tick, it computes a drive force from the entity's current intent (desired direction and gait, set by AI or player) and submits it to the physics service. Max speed is not stored — it emerges from physics. A rock, a wall, or a plant has no `LocomotionCapability`. | RMC-105 |
 | RMC-80  | PatrolAi behavior | First concrete AI behavior: `PatrolAiBehavior` — walks an entity back and forth along a list of waypoints. Sets locomotion intent (desired direction) each tick; the physics service and `LocomotionCapability` handle the actual motion. Needs DB schema for waypoints. | RMC-77, RMC-103, RMC-105 |
 | RMC-75  | 🏁 Milestone 3 — Have a guard walk by and get pushed | Implement a simple guard NPC that walks back and forth along a predefined path and push him away with a DAN-targeted spell. This will require the engine to have a concept of time. | RMC-83 |
@@ -75,3 +74,4 @@ Next bugfix number: BUG-8
 | RMC-77  | World AI system |
 | RMC-83  | Locomotion service |
 | BUG-7   | Prompt printed on every tick |
+| RMC-105 | Simulation-layer physics service |

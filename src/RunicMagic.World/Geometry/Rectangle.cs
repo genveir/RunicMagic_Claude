@@ -177,6 +177,17 @@ public readonly record struct Rectangle(Location Location, double Width, double 
         return result;
     }
 
+    // Returns the width of this rectangle's silhouette projected perpendicular to the given direction.
+    // Used by the physics service to compute the cross-sectional area exposed to drag.
+    public double GetProjectedWidth(Direction direction)
+    {
+        var sinAngle = Math.Sin(Angle);
+        var cosAngle = Math.Cos(Angle);
+        var result = Width * Math.Abs(sinAngle * direction.X - cosAngle * direction.Y)
+                   + Height * Math.Abs(cosAngle * direction.X + sinAngle * direction.Y);
+        return result;
+    }
+
     // Returns a new rectangle with its centre rotated around world origin by the given angle
     // and its own orientation incremented by the same amount.
     private Rectangle RotateAroundWorldOrigin(double angle)

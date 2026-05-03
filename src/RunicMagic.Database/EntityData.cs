@@ -19,4 +19,5 @@ public record EntityData(
     string[]? InscriptionTexts = null,
     long MaxStructuralIntegrity = 1000,
     long CurrentStructuralIntegrity = 1000,
+    double DragCoefficient = 0.0,
     AIData? AIData = null);

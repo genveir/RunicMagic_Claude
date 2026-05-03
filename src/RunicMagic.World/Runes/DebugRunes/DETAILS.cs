@@ -37,6 +37,7 @@ public class DETAILS : IStatement
             {
                 var distance = entity.GetDistance(context.Caster.Entities[0].Location);
                 context.EventTracker.Add(new DebugOutputEvent($"DETAILS: {entity.Label} is at location {entity.Location} with width {entity.Width} and height {entity.Height} at rotation {entity.Angle}."));
+                context.EventTracker.Add(new DebugOutputEvent($"DETAILS: {entity.Label} is moving at {entity.Velocity} in mm/tick."));
                 context.EventTracker.Add(new DebugOutputEvent($"DETAILS: {entity.Label} is {distance}mm away."));
             }
         }

@@ -2,6 +2,7 @@ using RunicMagic.World.Abstractions;
 using RunicMagic.World.Entities;
 using RunicMagic.World.Geometry;
 using RunicMagic.World.Motion.Engine;
+using RunicMagic.World.Motion.Simulated;
 
 namespace RunicMagic.World;
 
@@ -69,6 +70,7 @@ public class WorldModel : IGameLoopWorldModel
         var entitiesUnderMotion = TickEngineMotion(eventTracker);
 
         TickEntities(eventTracker, entitiesUnderMotion);
+        TickPhysics(eventTracker);
     }
 
     private HashSet<Entity> TickEngineMotion(IWorldEventTracker eventTracker)
@@ -111,6 +113,11 @@ public class WorldModel : IGameLoopWorldModel
         {
             entity.AI.Execute(entity, this, eventTracker);
         }
+    }
+
+    private void TickPhysics(IWorldEventTracker eventTracker)
+    {
+        PhysicsService.Tick(_entities.Values.ToList(), eventTracker);
     }
 
     private static Rectangle Bounds(Entity e)

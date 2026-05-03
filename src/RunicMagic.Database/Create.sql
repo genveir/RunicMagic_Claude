@@ -33,7 +33,8 @@ create table Entities (
     IsTranslucent bit              not null constraint DF_Entities_IsTranslucent default 0,
     Angle         float            not null constraint DF_Entities_Angle default 0,
     MaxStructuralIntegrity bigint not null,
-    CurrentStructuralIntegrity bigint not null
+    CurrentStructuralIntegrity bigint not null,
+    DragCoefficient float not null
 );
 
 create table EntityLife (

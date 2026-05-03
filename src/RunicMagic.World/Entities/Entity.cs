@@ -2,6 +2,7 @@ using RunicMagic.World.Entities.AI;
 using RunicMagic.World.Entities.Capabilities;
 using RunicMagic.World.Execution;
 using RunicMagic.World.Geometry;
+using RunicMagic.World.Motion.Simulated;
 using RunicMagic.World.Runes.RuneTypes;
 
 namespace RunicMagic.World.Entities;
@@ -19,7 +20,8 @@ public class Entity
         bool isTranslucent,
         double angle,
         StructuralIntegrityCapability structuralIntegrity,
-        AICapability aiCapability)
+        AICapability aiCapability,
+        double dragCoefficient)
     {
         Id = id;
         Label = label;
@@ -32,6 +34,7 @@ public class Entity
         Angle = angle;
         StructuralIntegrity = structuralIntegrity;
         AI = aiCapability;
+        DragCoefficient = dragCoefficient;
     }
 
     public EntityId Id { get; }
@@ -45,6 +48,7 @@ public class Entity
     public bool HasAgency { get; set; }
     public bool IsTranslucent { get; set; }
     public long Weight { get; set; }
+    public double DragCoefficient { get; set; }
 
     public Func<Entity[]>? Scope { get; set; }
 
@@ -63,6 +67,9 @@ public class Entity
     public LocomotionCapability? Locomotion { get; set; }
 
     public bool IsUnderEngineMotion { get; set; } = false;
+
+    public VelocityVector? Velocity { get; set; }
+    public List<ForceVector> PendingImpulses { get; } = [];
 
     public override string ToString()
     {

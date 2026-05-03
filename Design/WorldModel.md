@@ -29,6 +29,7 @@ Current entity data:
 |---|---|---|---|
 | `Id`, `Label` | Attribute | — | Out-of-world concerns: persistence identity and display |
 | `Weight`, bounds | Attribute | scalar | |
+| `DragCoefficient` | Attribute | scalar | Aerodynamic resistance coefficient; used with projected cross-sectional area to compute drag force each physics tick |
 | `HasAgency` | Property | boolean | `false` = no agency |
 | `IsTranslucent` | Property | boolean | `false` = opaque; used by ray-cast runes |
 | `Life` | Property | complex | `LifeCapability`: `MaxHitPoints` + `CurrentHitPoints`; null = not alive |
@@ -40,7 +41,9 @@ Current entity data:
 | `IndicateTarget` | Transient | complex | The entity the caster is consciously indicating, with optional approach direction; null = not indicating |
 | `RawInscriptions` | Transient | `string[]` | Raw inscription texts loaded from the `Inscription` table; empty = none |
 | `ParsedInscriptions` | Transient | `IStatement[]` | Spells inscribed on this entity, pre-parsed at load time from `RawInscriptions`; empty = none. Any inscription whose rune text fails to parse is silently dropped. Any entity type can have inscriptions. |
-| `IsUnderEngineMotion` | Transient | boolean | `false` = not under engine motion; set by the game loop while an engine motion effect is active for this entity |
+| `IsUnderEngineMotion` | Transient | boolean | `false` = not under engine motion; set by the game loop while an engine motion effect is active for this entity; `PhysicsService` skips entities where this is true |
+| `Velocity` | Transient | `VelocityVector?` | Current velocity in mm/tick; null = stationary. Integrated by `PhysicsService` each tick. |
+| `PendingImpulses` | Transient | `List<ForceVector>` | Force vectors (g·mm/tick²) queued for this tick; written by AI behaviours, locomotion, and spells; consumed and cleared by `PhysicsService` each tick |
 | `Scope` | Derived | delegate | Returns the set of entities reachable from this entity |
 | `Reservoir` | Derived | `ReservoirCapability?` | Exposes power query and draw/fill operations; closes over whichever property holds its state; null = no power |
 
@@ -61,6 +64,7 @@ The implementation may use convenience classes (e.g. `Creature`) to stamp out en
 - Position: `Location Location` (holds `double X, Y`)
 - Dimensions: `long Width, Height`
 - `double Angle` — orientation in radians; 0 = axis-aligned
+- `double DragCoefficient` — aerodynamic resistance; 0 = no drag
 
 **Properties** (optional, persisted):
 - `bool HasAgency` — false = absent
@@ -76,7 +80,9 @@ The implementation may use convenience classes (e.g. `Creature`) to stamp out en
 - `IndicateTarget? IndicateTarget` — entity the caster consciously indicates, with optional approach direction; null = not indicating
 - `string[] RawInscriptions` — raw inscription texts loaded at world load; empty = none
 - `IStatement[] ParsedInscriptions` — spells inscribed on this entity; pre-parsed from `RawInscriptions` at world load; empty = none. Any inscription whose rune text fails to parse is silently dropped.
-- `bool IsUnderEngineMotion` — set by the game loop while an engine motion effect is active for this entity; `LocomotionService` checks this before moving
+- `bool IsUnderEngineMotion` — set by the game loop while an engine motion effect is active for this entity; `PhysicsService` skips this entity while the flag is set
+- `VelocityVector? Velocity` — current velocity in mm/tick; null = stationary
+- `List<ForceVector> PendingImpulses` — force vectors queued this tick; cleared by `PhysicsService` after integration
 
 **Derived** (wired at load, no persistence):
 - `Func<Entity[]>? Scope` — computed on call; closes over world state
@@ -117,7 +123,7 @@ The world is loaded in full at startup into a `Dictionary<EntityId, Entity>`. Th
 
 ### Rectangle
 
-`Rectangle` is a `readonly record struct` with no dependency on `System.Drawing`. It represents an oriented rectangle: `Location` is the centre point, `Width` and `Height` are the full extents (as `double`), and `Angle` is the orientation in radians. All spatial operations (containment, intersection, ray-cast, distance) account for rotation.
+`Rectangle` is a `readonly record struct` with no dependency on `System.Drawing`. It represents an oriented rectangle: `Location` is the centre point, `Width` and `Height` are the full extents (as `double`), and `Angle` is the orientation in radians. All spatial operations (containment, intersection, ray-cast, distance) account for rotation. `GetProjectedWidth(Direction)` returns the silhouette width perpendicular to a direction of motion; used by `PhysicsService` to compute the cross-sectional area exposed to drag.
 
 ## Motion
 
@@ -127,12 +133,14 @@ Motion in the world has two orthogonal axes. See `Design/Fiction.md` for the des
 
 **Engine motion** is the magic system directly rewriting an entity's position. It does not negotiate with physics. The effect runes `VUN(push)`, `VAR(pull)`, `CJIR(rotate clockwise)`, and `CJAR(rotate counterclockwise)` produce engine motion effects that advance over 56 ticks.
 
-**Simulated motion** is an entity moving under its own agency — a creature walking, a projectile in flight. It participates in the physics simulation and is subject to friction, collision, and other environmental forces. `LocomotionService` drives this layer.
+**Simulated motion** is an entity moving under its own agency — a creature walking, a projectile in flight. It participates in the physics simulation and is subject to drag and other environmental forces. `PhysicsService` drives this layer.
 
-While an entity is under engine motion, its simulated locomotion is suspended. The bridge between the two layers is the transient flag `Entity.IsUnderEngineMotion`. The game loop sets this flag on any entity that appears in an active engine motion effect's entity set; `LocomotionService` checks it and returns early if set.
+Each tick, AI behaviours, locomotion, and spells write `ForceVector` impulses to `Entity.PendingImpulses`. `PhysicsService` then integrates all pending impulses into velocity, applies drag (using `DragCoefficient` and the entity's projected cross-sectional area), and updates position via `MoveEntityService`.
+
+While an entity is under engine motion, its simulated physics are suspended. The bridge between the two layers is the transient flag `Entity.IsUnderEngineMotion`. The game loop sets this flag on any entity that appears in an active engine motion effect's entity set; `PhysicsService` skips and clears impulses for any entity where it is set.
 
 ### Move vs Teleport
 
-**Move** carries an entity from its current position to a destination by traversing the space in between. The entity occupies every intermediate point along the path. Both engine motion effects and `LocomotionService` use move semantics — the difference is who is driving and whether physics applies.
+**Move** carries an entity from its current position to a destination by traversing the space in between. The entity occupies every intermediate point along the path. Both engine motion effects and `PhysicsService` use move semantics — the difference is who is driving and whether physics applies.
 
 **Teleport** is an instantaneous position change. The entity does not pass through intermediate space and does not interact with anything along the way. `TeleportEntityService` provides this operation and is used for placement and similar out-of-simulation repositioning.

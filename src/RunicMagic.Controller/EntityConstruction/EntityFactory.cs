@@ -35,7 +35,8 @@ public class EntityFactory(WorldModel world, ILogger<EntityFactory> logger)
             isTranslucent: entityData.IsTranslucent,
             angle: entityData.Angle,
             structuralIntegrity: new StructuralIntegrityCapability(entityData.MaxStructuralIntegrity, entityData.CurrentStructuralIntegrity),
-            aiCapability: aiCapability);
+            aiCapability: aiCapability,
+            dragCoefficient: entityData.DragCoefficient);
 
         if (entityData.MaxHitPoints.HasValue && entityData.CurrentHitPoints.HasValue)
             entity.Life = new LifeCapability(entityData.MaxHitPoints.Value, entityData.CurrentHitPoints.Value);
