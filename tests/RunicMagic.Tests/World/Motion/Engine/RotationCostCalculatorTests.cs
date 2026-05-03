@@ -1,6 +1,7 @@
 using RunicMagic.World.Geometry;
+using RunicMagic.World.Motion.Engine;
 
-namespace RunicMagic.Tests.World.Geometry;
+namespace RunicMagic.Tests.World.Motion.Engine;
 
 public class RotationCostCalculatorTests
 {

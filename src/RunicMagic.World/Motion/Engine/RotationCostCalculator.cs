@@ -1,6 +1,7 @@
 using RunicMagic.World.Entities;
+using RunicMagic.World.Geometry;
 
-namespace RunicMagic.World.Geometry;
+namespace RunicMagic.World.Motion.Engine;
 
 public static class RotationCostCalculator
 {
