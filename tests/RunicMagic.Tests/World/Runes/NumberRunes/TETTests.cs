@@ -1,0 +1,17 @@
+using RunicMagic.World.Runes.NumberRunes;
+
+namespace RunicMagic.Tests.World.Runes.NumberRunes;
+
+public class TETTests
+{
+    [Fact]
+    public void Evaluate_ReturnsThree()
+    {
+        var tet = new TET();
+        var context = TestFixtures.MakeContext();
+
+        var result = tet.Evaluate(context);
+
+        result.Value.Should().Be(3);
+    }
+}

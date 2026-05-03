@@ -1,0 +1,41 @@
+using RunicMagic.Controller.RuneParsing;
+using RunicMagic.Controller.RuneParsing.LocationRunes;
+using RunicMagic.World.Execution;
+using RunicMagic.World.Runes.LocationRunes;
+using RunicMagic.World.Runes.RuneTypes;
+
+namespace RunicMagic.Tests.Controller.RuneParsing.LocationRunes;
+
+public class GERParserTests
+{
+    [Fact]
+    public void ResolvesFromParserLookup()
+    {
+        var parser = ParserLookup.FindRuneParserByName<ILocation>("GER");
+
+        parser.Should().BeOfType<GERParser>();
+    }
+
+    [Fact]
+    public void Parse_WithEntitySet_WrapsInGER()
+    {
+        var mockEntitySet = new MockEntitySet();
+        ParserLookup.AddRuneParser("GER_HappyPath_IEntitySet", new MockParser<IEntitySet>(mockEntitySet));
+
+        var result = new GERParser().Parse(new TokenStream("GER_HappyPath_IEntitySet"));
+
+        result.Succeeded.Should().BeTrue();
+        var ger = result.Value.Should().BeOfType<GER>().Subject;
+        ger.EntitySet.Should().BeOfType<CalcifiedEntitySet>()
+            .Which.Inner.Should().BeOfType<EntitySetSelectionCostResolver>()
+            .Which.Inner.Should().BeSameAs(mockEntitySet);
+    }
+
+    [Fact]
+    public void Parse_WithEmptyStream_Fails()
+    {
+        var result = new GERParser().Parse(new TokenStream(""));
+
+        result.Succeeded.Should().BeFalse();
+    }
+}

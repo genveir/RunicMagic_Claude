@@ -1,0 +1,124 @@
+using RunicMagic.World;
+using RunicMagic.World.Entities;
+using RunicMagic.World.Execution;
+using RunicMagic.World.Geometry;
+using RunicMagic.World.Runes.EntityReferenceRunes;
+
+namespace RunicMagic.Tests.World.Runes.EntityReferenceRunes;
+
+public class DANTests
+{
+    private static readonly Direction Right = new(1, 0);
+
+    private static Entity MakeEntity(long x, long y, long width = 100, long height = 100)
+    {
+        return new EntityBuilder().WithLocation(x, y).WithSize(width, height).Build();
+    }
+
+    [Fact]
+    public void Resolve_EmptyCaster_ReturnsEmptySet()
+    {
+        var context = TestFixtures.MakeContext();
+
+        var result = new DAN().Resolve(context);
+
+        result.Entities.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void Resolve_CasterWithNoPointingDirection_ReturnsEmptySet()
+    {
+        var casterEntity = MakeEntity(x: 0, y: 0);
+        var context = TestFixtures.MakeContext(
+            caster: new EntitySet([casterEntity]),
+            world: new WorldModel());
+
+        var result = new DAN().Resolve(context);
+
+        result.Entities.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void Resolve_CasterPointingAtNothing_ReturnsEmptySet()
+    {
+        var world = new WorldModel();
+        var casterEntity = MakeEntity(x: 0, y: 0);
+        casterEntity.PointingDirection = Right;
+        world.Add(casterEntity);
+        var context = TestFixtures.MakeContext(
+            caster: new EntitySet([casterEntity]),
+            world: world);
+
+        var result = new DAN().Resolve(context);
+
+        result.Entities.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void Resolve_CasterPointingAtEntity_ReturnsSingletonWithThatEntity()
+    {
+        var world = new WorldModel();
+        var casterEntity = MakeEntity(x: 0, y: 0);
+        casterEntity.PointingDirection = Right;
+        var target = MakeEntity(x: 500, y: 0);
+        world.Add(casterEntity);
+        world.Add(target);
+        var context = TestFixtures.MakeContext(
+            caster: new EntitySet([casterEntity]),
+            world: world);
+
+        var result = new DAN().Resolve(context);
+
+        result.Entities.Should().ContainSingle().Which.Should().BeSameAs(target);
+    }
+
+    [Fact]
+    public void Resolve_TranslucentEntityInPath_IsNotReturned()
+    {
+        var world = new WorldModel();
+        var casterEntity = MakeEntity(x: 0, y: 0);
+        casterEntity.PointingDirection = Right;
+        var glass = new EntityBuilder().WithLabel("glass").WithLocation(300, 0).WithTranslucency().Build();
+        world.Add(casterEntity);
+        world.Add(glass);
+        var context = TestFixtures.MakeContext(
+            caster: new EntitySet([casterEntity]),
+            world: world);
+
+        var result = new DAN().Resolve(context);
+
+        result.Entities.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void Resolve_WindowOpen_EntityHit_AddsEntityIdToResolutionCount()
+    {
+        var world = new WorldModel();
+        var casterEntity = MakeEntity(x: 0, y: 0);
+        casterEntity.PointingDirection = Right;
+        var target = MakeEntity(x: 500, y: 0);
+        world.Add(casterEntity);
+        world.Add(target);
+        var context = TestFixtures.MakeContext(caster: new EntitySet([casterEntity]), world: world);
+        context.OpenResolutionWindow();
+
+        new DAN().Resolve(context);
+
+        context.EntityResolutionCount.Should().Contain(target.Id);
+    }
+
+    [Fact]
+    public void Resolve_WindowOpen_NoEntityHit_ResolutionCountEmpty()
+    {
+        var world = new WorldModel();
+        var casterEntity = MakeEntity(x: 0, y: 0);
+        casterEntity.PointingDirection = Right;
+        world.Add(casterEntity);
+        var context = TestFixtures.MakeContext(caster: new EntitySet([casterEntity]), world: world);
+        context.OpenResolutionWindow();
+
+        new DAN().Resolve(context);
+
+        context.EntityResolutionCount.Should().BeEmpty();
+    }
+}

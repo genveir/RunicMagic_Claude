@@ -1,0 +1,137 @@
+using RunicMagic.World.Entities.Capabilities;
+using RunicMagic.World.Execution;
+using RunicMagic.World.Runes.PowerSourceRunes;
+using RunicMagic.World.Runes.RuneTypes;
+
+namespace RunicMagic.Tests.World.Runes.PowerSourceRunes;
+
+public class SHUTests
+{
+    [Fact]
+    public void Execute_DrawsFromPushedSourceBeforeExecutor()
+    {
+        var drawOrder = new List<string>();
+
+        var sourceEntity = new EntityBuilder()
+            .WithReservoir(draw: amount => { drawOrder.Add("source"); return new ReservoirDraw(amount, false); })
+            .Build();
+
+        var executorEntity = new EntityBuilder()
+            .WithReservoir(draw: amount => { drawOrder.Add("executor"); return new ReservoirDraw(amount, false); })
+            .Build();
+        var executor = new EntitySet([executorEntity]);
+
+        var context = TestFixtures.MakeContext(executor: executor);
+        var shu = new SHU(
+            source: new FixedEntitySet(sourceEntity),
+            statement: new DrawingStatement(amount: 1)
+        );
+
+        shu.Execute(context);
+
+        drawOrder[0].Should().Be("source");
+    }
+
+    [Fact]
+    public void Execute_PopsSourceAfterStatement_SubsequentDrawSkipsSource()
+    {
+        var sourceDrawn = false;
+
+        var sourceEntity = new EntityBuilder()
+            .WithReservoir(draw: amount => { sourceDrawn = true; return new ReservoirDraw(amount, false); })
+            .Build();
+
+        var casterEntity = new EntityBuilder()
+            .WithReservoir(draw: amount => new ReservoirDraw(amount, false))
+            .Build();
+        var caster = new EntitySet([casterEntity]);
+
+        var context = TestFixtures.MakeContext(caster: caster);
+        var shu = new SHU(
+            source: new FixedEntitySet(sourceEntity),
+            statement: new NoOpStatement()
+        );
+
+        shu.Execute(context);
+        sourceDrawn = false;
+        context.DrawPower(1);
+
+        sourceDrawn.Should().BeFalse();
+    }
+
+    [Fact]
+    public void Execute_Nested_InnerSourceDrawsBeforeOuter()
+    {
+        var drawOrder = new List<string>();
+
+        var outerEntity = new EntityBuilder()
+            .WithReservoir(draw: amount => { drawOrder.Add("outer"); return new ReservoirDraw(0, false); })
+            .Build();
+
+        var innerEntity = new EntityBuilder()
+            .WithReservoir(draw: amount => { drawOrder.Add("inner"); return new ReservoirDraw(0, false); })
+            .Build();
+
+        var casterEntity = new EntityBuilder()
+            .WithReservoir(draw: amount => { drawOrder.Add("caster"); return new ReservoirDraw(amount, false); })
+            .Build();
+        var caster = new EntitySet([casterEntity]);
+
+        var context = TestFixtures.MakeContext(caster: caster);
+        var inner = new SHU(
+            source: new FixedEntitySet(innerEntity),
+            statement: new DrawingStatement(amount: 1)
+        );
+        var outer = new SHU(
+            source: new FixedEntitySet(outerEntity),
+            statement: inner
+        );
+
+        outer.Execute(context);
+
+        drawOrder.Should().Equal("inner", "outer", "caster");
+    }
+
+    [Fact]
+    public void Execute_SourceDepleted_FallsBackToExecutorThenCaster()
+    {
+        var drawOrder = new List<string>();
+
+        var sourceEntity = new EntityBuilder()
+            .WithReservoir(draw: amount => { drawOrder.Add("source"); return new ReservoirDraw(0, false); })
+            .Build();
+
+        var executorEntity = new EntityBuilder()
+            .WithReservoir(draw: amount => { drawOrder.Add("executor"); return new ReservoirDraw(0, false); })
+            .Build();
+        var executor = new EntitySet([executorEntity]);
+
+        var casterEntity = new EntityBuilder()
+            .WithReservoir(draw: amount => { drawOrder.Add("caster"); return new ReservoirDraw(amount, false); })
+            .Build();
+        var caster = new EntitySet([casterEntity]);
+
+        var context = TestFixtures.MakeContext(caster: caster, executor: executor);
+        var shu = new SHU(
+            source: new FixedEntitySet(sourceEntity),
+            statement: new DrawingStatement(amount: 1)
+        );
+
+        shu.Execute(context);
+
+        drawOrder.Should().Equal("source", "executor", "caster");
+    }
+
+    private class DrawingStatement(long amount) : IStatement
+    {
+        public void Execute(SpellContext context)
+        {
+            context.DrawPower(amount);
+        }
+    }
+
+    private class NoOpStatement : IStatement
+    {
+        public void Execute(SpellContext context) { }
+    }
+}
