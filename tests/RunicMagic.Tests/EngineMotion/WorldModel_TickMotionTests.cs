@@ -1,10 +1,10 @@
 using RunicMagic.Controller.Services;
 using RunicMagic.World;
-using RunicMagic.World.Capabilities;
+using RunicMagic.World.Entities.Capabilities;
 using RunicMagic.World.Execution;
-using RunicMagic.World.Motion;
+using RunicMagic.World.Motion.Engine;
 
-namespace RunicMagic.Tests.Motion;
+namespace RunicMagic.Tests.EngineMotion;
 
 public class WorldModel_TickMotionTests
 {
@@ -15,7 +15,7 @@ public class WorldModel_TickMotionTests
         var world = new WorldModel();
         var context = TestFixtures.MakeContext(world: world);
 
-        var effect = new LinearMotionEffect(
+        var effect = new LinearEngineMotionEffect(
             context: context,
             toMove: new FixedEntitySet(entity),
             origin: new FixedLocation(-1000, 0),
@@ -40,7 +40,7 @@ public class WorldModel_TickMotionTests
         var world = new WorldModel();
         var context = TestFixtures.MakeContext(world: world);
 
-        var effect = new LinearMotionEffect(
+        var effect = new LinearEngineMotionEffect(
             context: context,
             toMove: new FixedEntitySet(entity),
             origin: new FixedLocation(-1000, 0),
@@ -71,7 +71,7 @@ public class WorldModel_TickMotionTests
         var world = new WorldModel();
         var context = TestFixtures.MakeContext(caster: caster, world: world);
 
-        var effect = new LinearMotionEffect(
+        var effect = new LinearEngineMotionEffect(
             context: context,
             toMove: new FixedEntitySet(entity),
             origin: new FixedLocation(-1000, 0),
@@ -100,7 +100,7 @@ public class WorldModel_TickMotionTests
         var context = TestFixtures.MakeContext(world: world);
 
         // Two separate effects — each completes in 56 ticks, emitting one EntityPushedEvent
-        var effect1 = new LinearMotionEffect(
+        var effect1 = new LinearEngineMotionEffect(
             context: context,
             toMove: new FixedEntitySet(entity1),
             origin: new FixedLocation(-1000, 0),
@@ -109,7 +109,7 @@ public class WorldModel_TickMotionTests
             isAway: true,
             effectName: "VUN"
         );
-        var effect2 = new LinearMotionEffect(
+        var effect2 = new LinearEngineMotionEffect(
             context: context,
             toMove: new FixedEntitySet(entity2),
             origin: new FixedLocation(-1000, 0),
@@ -150,7 +150,7 @@ public class WorldModel_TickMotionTests
         world.Add(entity);
         var context = TestFixtures.MakeContext(world: world);
 
-        var effect = new LinearMotionEffect(
+        var effect = new LinearEngineMotionEffect(
             context: context,
             toMove: new FixedEntitySet(entity),
             origin: new FixedLocation(-1000, 0),
@@ -186,7 +186,7 @@ public class WorldModel_TickMotionTests
         world.Add(entity);
         var context = TestFixtures.MakeContext(world: world);
 
-        var effect = new LinearMotionEffect(
+        var effect = new LinearEngineMotionEffect(
             context: context,
             toMove: new FixedEntitySet(entity),
             origin: new FixedLocation(-1000, 0),

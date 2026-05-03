@@ -1,4 +1,4 @@
-namespace RunicMagic.World.Capabilities;
+namespace RunicMagic.World.Entities.Capabilities;
 
 public class StructuralIntegrityCapability(long maxIntegrity, long currentIntegrity)
 {

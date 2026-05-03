@@ -1,7 +1,7 @@
-﻿using RunicMagic.World.Execution;
+﻿using RunicMagic.World.Entities;
 using RunicMagic.World.Geometry;
 
-namespace RunicMagic.World.Services;
+namespace RunicMagic.World.Motion.Shared;
 
 internal static class MoveEntityService
 {

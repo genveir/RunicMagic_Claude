@@ -1,4 +1,4 @@
-using RunicMagic.World;
+using RunicMagic.World.Entities;
 using RunicMagic.World.Execution;
 using RunicMagic.World.Runes.RuneTypes;
 

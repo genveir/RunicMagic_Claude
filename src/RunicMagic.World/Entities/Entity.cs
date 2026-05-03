@@ -1,10 +1,10 @@
-using RunicMagic.World.AI;
-using RunicMagic.World.Capabilities;
+using RunicMagic.World.Entities.AI;
+using RunicMagic.World.Entities.Capabilities;
 using RunicMagic.World.Execution;
 using RunicMagic.World.Geometry;
 using RunicMagic.World.Runes.RuneTypes;
 
-namespace RunicMagic.World;
+namespace RunicMagic.World.Entities;
 
 public class Entity
 {

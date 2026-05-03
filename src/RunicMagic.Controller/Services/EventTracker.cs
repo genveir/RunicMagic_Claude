@@ -1,6 +1,7 @@
 using RunicMagic.Controller.Models;
 using RunicMagic.Controller.RuneParsing;
 using RunicMagic.World;
+using RunicMagic.World.Entities;
 using RunicMagic.World.Execution;
 
 namespace RunicMagic.Controller.Services;

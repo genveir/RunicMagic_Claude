@@ -1,7 +1,7 @@
 using RunicMagic.Controller.Mappers;
 using RunicMagic.Controller.Models;
-using RunicMagic.World;
-using RunicMagic.World.Capabilities;
+using RunicMagic.World.Entities;
+using RunicMagic.World.Entities.Capabilities;
 
 namespace RunicMagic.Tests;
 

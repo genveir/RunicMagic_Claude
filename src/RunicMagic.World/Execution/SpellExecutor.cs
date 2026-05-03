@@ -1,7 +1,6 @@
-using RunicMagic.World.Execution;
 using RunicMagic.World.Runes.RuneTypes;
 
-namespace RunicMagic.World;
+namespace RunicMagic.World.Execution;
 
 public class SpellExecutor
 {

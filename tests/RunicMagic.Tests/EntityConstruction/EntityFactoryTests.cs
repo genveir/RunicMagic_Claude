@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using RunicMagic.Controller.EntityConstruction;
 using RunicMagic.Database;
 using RunicMagic.World;
+using RunicMagic.World.Entities;
 using RunicMagic.World.Runes.EffectRunes;
 
 namespace RunicMagic.Tests.EntityConstruction;

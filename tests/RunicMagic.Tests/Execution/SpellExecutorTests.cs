@@ -1,6 +1,6 @@
 using RunicMagic.Controller.Services;
 using RunicMagic.World;
-using RunicMagic.World.Capabilities;
+using RunicMagic.World.Entities.Capabilities;
 using RunicMagic.World.Execution;
 using RunicMagic.World.Runes.EffectRunes;
 using RunicMagic.World.Runes.EntityReferenceRunes;

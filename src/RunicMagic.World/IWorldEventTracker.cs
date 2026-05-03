@@ -1,4 +1,7 @@
-﻿namespace RunicMagic.World.Execution;
+﻿using RunicMagic.World.Entities;
+using RunicMagic.World.Execution;
+
+namespace RunicMagic.World;
 
 public interface IWorldEventTracker
 {

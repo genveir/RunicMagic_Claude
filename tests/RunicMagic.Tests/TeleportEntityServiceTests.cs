@@ -1,5 +1,5 @@
 using RunicMagic.World.Geometry;
-using RunicMagic.World.Services;
+using RunicMagic.World.Motion.Shared;
 
 namespace RunicMagic.Tests;
 

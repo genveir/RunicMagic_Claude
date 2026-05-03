@@ -1,5 +1,5 @@
 using RunicMagic.World.Execution;
-using RunicMagic.World.Motion;
+using RunicMagic.World.Motion.Engine;
 using RunicMagic.World.Runes.RuneTypes;
 
 namespace RunicMagic.World.Runes.EffectRunes;
@@ -32,7 +32,7 @@ public class CJIR : IStatement
         var totalTheta = angleDegrees / 2744.0 * 2 * Math.PI;
         var perTickTheta = totalTheta / 56.0;
 
-        var effect = new RotationMotionEffect(
+        var effect = new RotationEngineMotionEffect(
             context: context,
             toMove: ToRotate,
             origin: Origin,

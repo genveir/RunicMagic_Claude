@@ -1,6 +1,6 @@
 namespace RunicMagic.World.Geometry;
 
-using RunicMagic.World;
+using RunicMagic.World.Entities;
 
 public static class LocationExtensions
 {

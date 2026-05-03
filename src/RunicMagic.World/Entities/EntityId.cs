@@ -1,4 +1,4 @@
-namespace RunicMagic.World;
+namespace RunicMagic.World.Entities;
 
 public readonly record struct EntityId(Guid Value)
 {

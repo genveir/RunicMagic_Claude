@@ -1,3 +1,4 @@
+using RunicMagic.World.Entities;
 using RunicMagic.World.Runes.RuneTypes;
 
 namespace RunicMagic.World.Execution;

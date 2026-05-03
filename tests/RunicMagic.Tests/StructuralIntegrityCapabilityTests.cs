@@ -1,5 +1,6 @@
 using RunicMagic.World;
-using RunicMagic.World.Services;
+using RunicMagic.World.Entities;
+using RunicMagic.World.Entities.Services;
 
 namespace RunicMagic.Tests;
 

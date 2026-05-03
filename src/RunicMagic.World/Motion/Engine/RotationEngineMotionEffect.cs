@@ -1,11 +1,11 @@
 using RunicMagic.World.Execution;
 using RunicMagic.World.Geometry;
+using RunicMagic.World.Motion.Shared;
 using RunicMagic.World.Runes.RuneTypes;
-using RunicMagic.World.Services;
 
-namespace RunicMagic.World.Motion;
+namespace RunicMagic.World.Motion.Engine;
 
-public class RotationMotionEffect : IMotionEffect
+public class RotationEngineMotionEffect : IEngineMotionEffect
 {
     private readonly TemporalSpellContext _temporalContext;
     private readonly IEntitySet _entities;
@@ -17,7 +17,7 @@ public class RotationMotionEffect : IMotionEffect
 
     public bool IsComplete => _remainingTicks == 0;
 
-    public RotationMotionEffect(
+    public RotationEngineMotionEffect(
         SpellContext context,
         IEntitySet toMove,
         ILocation origin,
@@ -34,7 +34,7 @@ public class RotationMotionEffect : IMotionEffect
         _remainingTicks = 56;
     }
 
-    public MotionEffectResult TryAdvance(IWorldEventTracker eventTracker)
+    public EngineMotionEffectResult TryAdvance(IWorldEventTracker eventTracker)
     {
         var context = _temporalContext.ToSpellContext(eventTracker);
 

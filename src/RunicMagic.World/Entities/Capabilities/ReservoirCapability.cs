@@ -1,4 +1,4 @@
-﻿namespace RunicMagic.World.Capabilities;
+﻿namespace RunicMagic.World.Entities.Capabilities;
 
 public readonly record struct ReservoirDraw(long Amount, bool IsDrained);
 

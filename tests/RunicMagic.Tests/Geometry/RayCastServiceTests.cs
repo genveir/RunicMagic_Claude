@@ -1,4 +1,5 @@
 using RunicMagic.World;
+using RunicMagic.World.Entities;
 using RunicMagic.World.Geometry;
 
 namespace RunicMagic.Tests.Geometry;

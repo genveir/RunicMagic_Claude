@@ -1,8 +1,8 @@
 using Microsoft.Extensions.Hosting;
 using RunicMagic.Controller.Abstractions;
 using RunicMagic.Controller.Models;
-using RunicMagic.World;
 using RunicMagic.World.Abstractions;
+using RunicMagic.World.Entities;
 
 namespace RunicMagic.Controller.Services;
 

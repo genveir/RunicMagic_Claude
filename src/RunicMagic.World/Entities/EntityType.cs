@@ -1,4 +1,4 @@
-namespace RunicMagic.World;
+namespace RunicMagic.World.Entities;
 
 public enum EntityType : long
 {

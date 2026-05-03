@@ -1,6 +1,7 @@
-﻿using RunicMagic.World.Execution;
+﻿using RunicMagic.World.Entities;
+using RunicMagic.World.Entities.Services;
 
-namespace RunicMagic.World.Services;
+namespace RunicMagic.World.Execution;
 
 internal static class PowerService
 {

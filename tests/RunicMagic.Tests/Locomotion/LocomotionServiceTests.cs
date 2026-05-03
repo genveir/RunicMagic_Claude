@@ -1,6 +1,6 @@
 using RunicMagic.Controller.Services;
 using RunicMagic.World.Geometry;
-using RunicMagic.World.Services;
+using RunicMagic.World.Motion.Simulated;
 
 namespace RunicMagic.Tests.Locomotion;
 

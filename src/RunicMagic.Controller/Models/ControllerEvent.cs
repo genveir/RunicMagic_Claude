@@ -1,4 +1,4 @@
-﻿using RunicMagic.World;
+﻿using RunicMagic.World.Entities;
 
 namespace RunicMagic.Controller.Models;
 

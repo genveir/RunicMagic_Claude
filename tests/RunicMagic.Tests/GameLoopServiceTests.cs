@@ -4,6 +4,7 @@ using RunicMagic.Controller.RuneParsing;
 using RunicMagic.Controller.Services;
 using RunicMagic.World;
 using RunicMagic.World.Abstractions;
+using RunicMagic.World.Entities;
 using RunicMagic.World.Execution;
 using RunicMagic.World.Geometry;
 

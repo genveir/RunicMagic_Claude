@@ -1,7 +1,8 @@
-using RunicMagic.World.Execution;
+using RunicMagic.World.Entities;
 using RunicMagic.World.Geometry;
+using RunicMagic.World.Motion.Shared;
 
-namespace RunicMagic.World.Services;
+namespace RunicMagic.World.Motion.Simulated;
 
 public static class LocomotionService
 {

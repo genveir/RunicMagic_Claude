@@ -2,7 +2,8 @@ using RunicMagic.Controller.Models;
 using RunicMagic.Controller.RuneParsing;
 using RunicMagic.Controller.Services;
 using RunicMagic.World;
-using RunicMagic.World.Capabilities;
+using RunicMagic.World.Entities;
+using RunicMagic.World.Entities.Capabilities;
 using RunicMagic.World.Execution;
 
 namespace RunicMagic.Tests;

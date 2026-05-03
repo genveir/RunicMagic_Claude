@@ -1,19 +1,19 @@
 using RunicMagic.Controller.Services;
-using RunicMagic.World;
-using RunicMagic.World.Capabilities;
+using RunicMagic.World.Entities;
+using RunicMagic.World.Entities.Capabilities;
 using RunicMagic.World.Execution;
-using RunicMagic.World.Motion;
+using RunicMagic.World.Motion.Engine;
 
-namespace RunicMagic.Tests.Motion;
+namespace RunicMagic.Tests.EngineMotion;
 
-public class LinearMotionEffectTests
+public class LinearEngineMotionEffectTests
 {
-    private static LinearMotionEffect MakePushEffect(
+    private static LinearEngineMotionEffect MakePushEffect(
         SpellContext context,
         Entity entity,
         long totalDistance)
     {
-        return new LinearMotionEffect(
+        return new LinearEngineMotionEffect(
             context: context,
             toMove: new FixedEntitySet(entity),
             origin: new FixedLocation(0, 0),
@@ -99,7 +99,7 @@ public class LinearMotionEffectTests
         var context = TestFixtures.MakeContext(caster: caster);
 
         var entity = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(1000).Build();
-        var effect = new LinearMotionEffect(
+        var effect = new LinearEngineMotionEffect(
             context: context,
             toMove: new FixedEntitySet(entity),
             origin: new FixedLocation(0, 0),
@@ -127,7 +127,7 @@ public class LinearMotionEffectTests
         var context = TestFixtures.MakeContext(caster: caster);
 
         var entity = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(1000).Build();
-        var effect = new LinearMotionEffect(
+        var effect = new LinearEngineMotionEffect(
             context: context,
             toMove: new FixedEntitySet(entity),
             origin: new FixedLocation(0, 0),
@@ -162,7 +162,7 @@ public class LinearMotionEffectTests
         var context = TestFixtures.MakeContext(caster: caster);
 
         var entity = new EntityBuilder().WithLocation(x: 0, y: 0).WithWeight(1000).Build();
-        var effect = new LinearMotionEffect(
+        var effect = new LinearEngineMotionEffect(
             context: context,
             toMove: new FixedEntitySet(entity),
             origin: new FixedLocation(-1000, 0),
@@ -183,7 +183,7 @@ public class LinearMotionEffectTests
     {
         var entity = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(0).Build();
         var context = TestFixtures.MakeContext();
-        var effect = new LinearMotionEffect(
+        var effect = new LinearEngineMotionEffect(
             context: context,
             toMove: new FixedEntitySet(entity),
             origin: new FixedLocation(0, 0),
@@ -204,7 +204,7 @@ public class LinearMotionEffectTests
     {
         var entity = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(0).Build();
         var context = TestFixtures.MakeContext(); // no power sources
-        var effect = new LinearMotionEffect(
+        var effect = new LinearEngineMotionEffect(
             context: context,
             toMove: new FixedEntitySet(entity),
             origin: new FixedLocation(0, 0),
@@ -241,7 +241,7 @@ public class LinearMotionEffectTests
         var context = TestFixtures.MakeContext(caster: caster);
 
         var entity = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(1000).Build();
-        var effect = new LinearMotionEffect(
+        var effect = new LinearEngineMotionEffect(
             context: context,
             toMove: new FixedEntitySet(entity),
             origin: new FixedLocation(0, 0),

@@ -1,9 +1,10 @@
 using RunicMagic.Controller.Abstractions;
 using RunicMagic.Controller.Models;
 using RunicMagic.World;
+using RunicMagic.World.Entities;
 using RunicMagic.World.Execution;
 using RunicMagic.World.Geometry;
-using RunicMagic.World.Services;
+using RunicMagic.World.Motion.Shared;
 using System.Collections.Concurrent;
 
 namespace RunicMagic.Controller.Services;

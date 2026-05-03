@@ -1,3 +1,5 @@
+using RunicMagic.World.Entities;
+
 namespace RunicMagic.World.Execution;
 
 public abstract record WorldEvent;

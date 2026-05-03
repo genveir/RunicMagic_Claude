@@ -1,4 +1,4 @@
-using RunicMagic.World.Capabilities;
+using RunicMagic.World.Entities.Capabilities;
 using RunicMagic.World.Runes.FilterRunes;
 
 namespace RunicMagic.Tests.Execution.FilterRunes;

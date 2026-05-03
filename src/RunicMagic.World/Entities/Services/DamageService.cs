@@ -1,6 +1,6 @@
 using RunicMagic.World.Execution;
 
-namespace RunicMagic.World.Services;
+namespace RunicMagic.World.Entities.Services;
 
 internal static class DamageService
 {

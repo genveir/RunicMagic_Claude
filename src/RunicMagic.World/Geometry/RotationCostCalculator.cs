@@ -1,3 +1,5 @@
+using RunicMagic.World.Entities;
+
 namespace RunicMagic.World.Geometry;
 
 public static class RotationCostCalculator

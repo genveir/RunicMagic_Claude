@@ -1,22 +1,22 @@
 using RunicMagic.Controller.Services;
-using RunicMagic.World;
-using RunicMagic.World.Capabilities;
+using RunicMagic.World.Entities;
+using RunicMagic.World.Entities.Capabilities;
 using RunicMagic.World.Execution;
-using RunicMagic.World.Motion;
+using RunicMagic.World.Motion.Engine;
 
-namespace RunicMagic.Tests.Motion;
+namespace RunicMagic.Tests.EngineMotion;
 
-public class RotationMotionEffectTests
+public class RotationEngineMotionEffectTests
 {
     private const long QuarterTurn = 686; // 2744 / 4
 
-    private static RotationMotionEffect MakeCwEffect(
+    private static RotationEngineMotionEffect MakeCwEffect(
         SpellContext context,
         Entity entity,
         long totalRuneDegrees)
     {
         var totalTheta = totalRuneDegrees / 2744.0 * 2 * Math.PI;
-        return new RotationMotionEffect(
+        return new RotationEngineMotionEffect(
             context: context,
             toMove: new FixedEntitySet(entity),
             origin: new FixedLocation(0, 0),
@@ -129,7 +129,7 @@ public class RotationMotionEffectTests
         var context = TestFixtures.MakeContext(caster: powerSource);
 
         var totalTheta = QuarterTurn / 2744.0 * 2 * Math.PI;
-        var effect = new RotationMotionEffect(
+        var effect = new RotationEngineMotionEffect(
             context: context,
             toMove: new FixedEntitySet(entity),
             origin: new FixedLocation(0, 0),
@@ -145,7 +145,7 @@ public class RotationMotionEffectTests
 
         // Manually move the entity to a larger radius before the second tick.
         // Reset angle to 0 as well so the cost comparison is purely due to radius.
-        entity.Location = new RunicMagic.World.Geometry.Location(2000, 0);
+        entity.Location = new World.Geometry.Location(2000, 0);
         entity.Angle = 0;
 
         var result2 = new EventTracker();

@@ -1,7 +1,7 @@
 using RunicMagic.Controller.Services;
 using RunicMagic.World;
-using RunicMagic.World.AI;
-using RunicMagic.World.Execution;
+using RunicMagic.World.Entities;
+using RunicMagic.World.Entities.AI;
 
 namespace RunicMagic.Tests;
 

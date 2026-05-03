@@ -1,6 +1,4 @@
-﻿using RunicMagic.World.Execution;
-
-namespace RunicMagic.World.AI;
+﻿namespace RunicMagic.World.Entities.AI;
 
 public class AICapability
 {

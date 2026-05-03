@@ -1,4 +1,4 @@
-﻿using RunicMagic.World.Execution;
+﻿using RunicMagic.World.Entities;
 
 namespace RunicMagic.World.Abstractions;
 

@@ -1,5 +1,5 @@
 using RunicMagic.World.Execution;
-using RunicMagic.World.Motion;
+using RunicMagic.World.Motion.Engine;
 using RunicMagic.World.Runes.RuneTypes;
 
 namespace RunicMagic.World.Runes.EffectRunes;
@@ -30,7 +30,7 @@ public class VAR : IStatement
 
         double perTickDistance = distance / 56.0;
 
-        var effect = new LinearMotionEffect(
+        var effect = new LinearEngineMotionEffect(
             context: context,
             toMove: ToMove,
             origin: Origin,
