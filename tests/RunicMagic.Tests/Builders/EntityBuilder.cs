@@ -19,6 +19,7 @@ internal class EntityBuilder
     private bool _isTranslucent = false;
     private double _angle = 0;
     private double _dragCoefficient = 0.0;
+    private double _angularDragCoefficient = 0.0;
     private StructuralIntegrityCapability _structuralIntegrity = new StructuralIntegrityCapability(1000, 1000);
     private AICapability _aiCapability = new AICapability([]);
 
@@ -92,6 +93,12 @@ internal class EntityBuilder
     public EntityBuilder WithDragCoefficient(double dragCoefficient)
     {
         _dragCoefficient = dragCoefficient;
+        return this;
+    }
+
+    public EntityBuilder WithAngularDragCoefficient(double angularDragCoefficient)
+    {
+        _angularDragCoefficient = angularDragCoefficient;
         return this;
     }
 
@@ -175,7 +182,8 @@ internal class EntityBuilder
             angle: _angle,
             structuralIntegrity: _structuralIntegrity,
             aiCapability: _aiCapability,
-            dragCoefficient: _dragCoefficient)
+            dragCoefficient: _dragCoefficient,
+            angularDragCoefficient: _angularDragCoefficient)
         {
             Life = _life,
             Charge = _charge,

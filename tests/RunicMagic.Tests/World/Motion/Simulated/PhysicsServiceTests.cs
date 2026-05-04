@@ -179,4 +179,120 @@ public class PhysicsServiceTests
 
         tracker.TouchedEntities.Should().NotContain(entity);
     }
+
+    [Fact]
+    public void Tick_OffCentreImpulse_ProducesAngularVelocity()
+    {
+        // weight=12000, size=100x100 → I = 12000 * (100² + 100²) / 12 = 20,000,000
+        // force (0, 20,000,000) at offset (1, 0) → torque = 1 * 20,000,000 = 20,000,000
+        // angular accel = 20,000,000 / 20,000,000 = 1.0 rad/tick
+        var entity = new EntityBuilder()
+            .WithSize(width: 100, height: 100)
+            .WithWeight(12000)
+            .Build();
+        entity.PendingImpulses.Add(new ForceVector(Fx: 0, Fy: 20_000_000, Rx: 1, Ry: 0));
+
+        PhysicsService.Tick([entity], new EventTracker());
+
+        entity.Velocity!.Value.Omega.Should().BeApproximately(1.0, 0.001);
+    }
+
+    [Fact]
+    public void Tick_OffCentreImpulse_StillAppliesFullForceToLinearVelocity()
+    {
+        // The full force goes into linear acceleration, not split with rotation
+        // weight=12000, force (0, 12000) at offset (1, 0)
+        // linear: vy += 12000 / 12000 = 1.0 mm/tick
+        var entity = new EntityBuilder()
+            .WithSize(width: 100, height: 100)
+            .WithWeight(12000)
+            .Build();
+        entity.PendingImpulses.Add(new ForceVector(Fx: 0, Fy: 12000, Rx: 1, Ry: 0));
+
+        PhysicsService.Tick([entity], new EventTracker());
+
+        entity.Velocity!.Value.Vy.Should().BeApproximately(1.0, 0.001);
+    }
+
+    [Fact]
+    public void Tick_CentreImpulse_ProducesNoTorque()
+    {
+        // Rx=0, Ry=0 → torque = 0 → no angular velocity
+        var entity = new EntityBuilder()
+            .WithSize(width: 100, height: 100)
+            .WithWeight(12000)
+            .Build();
+        entity.PendingImpulses.Add(new ForceVector(Fx: 0, Fy: 12000, Rx: 0, Ry: 0));
+
+        PhysicsService.Tick([entity], new EventTracker());
+
+        entity.Velocity!.Value.Omega.Should().BeApproximately(0.0, 0.001);
+    }
+
+    [Fact]
+    public void Tick_WithAngularVelocity_UpdatesEntityAngle()
+    {
+        var entity = new EntityBuilder().WithAngle(0).Build();
+        entity.Velocity = new VelocityVector(Vx: 10, Vy: 0, Omega: 0.5);
+
+        PhysicsService.Tick([entity], new EventTracker());
+
+        entity.Angle.Should().BeApproximately(0.5, 0.001);
+    }
+
+    [Fact]
+    public void Tick_WithAngularDrag_ReducesAngularVelocity()
+    {
+        // weight=12000, size=100x100 → I = 20,000,000
+        // omega=1.0, angularDragCoefficient=10,000,000
+        // angularDragTorque = 10,000,000 * 1.0² = 10,000,000
+        // angularDragDecel = 10,000,000 / 20,000,000 = 0.5 → newOmega = 0.5
+        var entity = new EntityBuilder()
+            .WithSize(width: 100, height: 100)
+            .WithWeight(12000)
+            .WithAngularDragCoefficient(10_000_000)
+            .Build();
+        entity.Velocity = new VelocityVector(Vx: 10, Vy: 0, Omega: 1.0);
+
+        PhysicsService.Tick([entity], new EventTracker());
+
+        entity.Velocity!.Value.Omega.Should().BeApproximately(0.5, 0.001);
+    }
+
+    [Fact]
+    public void Tick_WhenAngularSpeedFallsBelowThreshold_ZeroesOmega()
+    {
+        // omega=0.0005 is below MinAngularSpeedRadPerTick=0.001
+        // linear velocity is above threshold so Velocity stays non-null, but Omega should be zeroed
+        var entity = new EntityBuilder().Build();
+        entity.Velocity = new VelocityVector(Vx: 10, Vy: 0, Omega: 0.0005);
+
+        PhysicsService.Tick([entity], new EventTracker());
+
+        entity.Velocity!.Value.Omega.Should().BeApproximately(0.0, 0.001);
+    }
+
+    [Fact]
+    public void Tick_WhenBothLinearAndAngularBelowThreshold_NullsVelocity()
+    {
+        var entity = new EntityBuilder().Build();
+        entity.Velocity = new VelocityVector(Vx: 0.5, Vy: 0, Omega: 0.0005);
+
+        PhysicsService.Tick([entity], new EventTracker());
+
+        entity.Velocity.Should().BeNull();
+    }
+
+    [Fact]
+    public void Tick_PureAngularVelocity_TracksEntity()
+    {
+        // Entity with only spin and no linear movement should still be tracked
+        var entity = new EntityBuilder().Build();
+        entity.Velocity = new VelocityVector(Vx: 0, Vy: 0, Omega: 0.1);
+        var tracker = new EventTracker();
+
+        PhysicsService.Tick([entity], tracker);
+
+        tracker.TouchedEntities.Should().Contain(entity);
+    }
 }

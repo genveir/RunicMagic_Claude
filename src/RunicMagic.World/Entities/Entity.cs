@@ -21,7 +21,8 @@ public class Entity
         double angle,
         StructuralIntegrityCapability structuralIntegrity,
         AICapability aiCapability,
-        double dragCoefficient)
+        double dragCoefficient,
+        double angularDragCoefficient)
     {
         Id = id;
         Label = label;
@@ -35,6 +36,7 @@ public class Entity
         StructuralIntegrity = structuralIntegrity;
         AI = aiCapability;
         DragCoefficient = dragCoefficient;
+        AngularDragCoefficient = angularDragCoefficient;
     }
 
     public EntityId Id { get; }
@@ -49,6 +51,7 @@ public class Entity
     public bool IsTranslucent { get; set; }
     public long Weight { get; set; }
     public double DragCoefficient { get; set; }
+    public double AngularDragCoefficient { get; set; }
 
     public Func<Entity[]>? Scope { get; set; }
 

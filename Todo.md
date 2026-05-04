@@ -6,9 +6,9 @@ Most tickets in this file are written by an assistant with incomplete informatio
 
 The Key column in every table uses right-padded cells. The baseline is 7 characters (RMC-NNN). When inserting a row, pad the key with trailing spaces to reach 7 characters before the closing "|"
 
-## To Do — Milestone 2
+## To Do — Milestone 3
 
-Next ticket number: RMC-108
+Next ticket number: RMC-109
 Next bugfix number: BUG-8
 
 | Key | Title | Description | Blocked By |
@@ -50,6 +50,7 @@ Next bugfix number: BUG-8
 
 | Key | Title | Description |
 |-----|-------|-------------|
+| RMC-108 | Rotational velocity and impulses in physics | Extended ForceVector with (Rx, Ry) offset; VelocityVector with Omega; Entity/EntityData with AngularDragCoefficient. PhysicsService now accumulates torque per tick, converts to angular acceleration via I = m(w²+h²)/12, applies quadratic angular drag consistent with linear drag, and updates entity angle each tick. |
 
 ## Done
 

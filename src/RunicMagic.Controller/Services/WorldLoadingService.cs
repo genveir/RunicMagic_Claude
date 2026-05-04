@@ -27,7 +27,6 @@ public class WorldLoadingService(WorldLoader loader, EntityFactory factory, Worl
         var guard = world.GetAll().FirstOrDefault(e => e.Label == "Guard");
 
         guard!.Locomotion = new LocomotionCapability();
-        guard.DragCoefficient = 0.4;
         guard.AI.AddBehavior(new RunAheadBehavior());
     }
 

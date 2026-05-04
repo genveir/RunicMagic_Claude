@@ -34,7 +34,8 @@ create table Entities (
     Angle         float            not null constraint DF_Entities_Angle default 0,
     MaxStructuralIntegrity bigint not null,
     CurrentStructuralIntegrity bigint not null,
-    DragCoefficient float not null
+    DragCoefficient        float not null,
+    AngularDragCoefficient float not null
 );
 
 create table EntityLife (
