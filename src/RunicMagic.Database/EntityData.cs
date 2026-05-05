@@ -10,6 +10,7 @@ public record EntityData(
     long Height,
     bool HasAgency,
     long Weight,
+    long Strength,
     bool IsTranslucent = false,
     double Angle = 0,
     long? MaxHitPoints = null,
@@ -21,4 +22,5 @@ public record EntityData(
     long CurrentStructuralIntegrity = 1000,
     double DragCoefficient = 0.0,
     double AngularDragCoefficient = 0.0,
-    AIData? AIData = null);
+    AIData? AIData = null,
+    double? LocomotionEfficiency = null);

@@ -17,6 +17,7 @@ public class Entity
         long height,
         bool hasAgency,
         long weight,
+        long strength,
         bool isTranslucent,
         double angle,
         StructuralIntegrityCapability structuralIntegrity,
@@ -31,6 +32,7 @@ public class Entity
         Height = height;
         HasAgency = hasAgency;
         Weight = weight;
+        Strength = strength;
         IsTranslucent = isTranslucent;
         Angle = angle;
         StructuralIntegrity = structuralIntegrity;
@@ -50,6 +52,7 @@ public class Entity
     public bool HasAgency { get; set; }
     public bool IsTranslucent { get; set; }
     public long Weight { get; set; }
+    public long Strength { get; set; }
     public double DragCoefficient { get; set; }
     public double AngularDragCoefficient { get; set; }
 

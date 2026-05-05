@@ -10,7 +10,7 @@ public class WorldLoader(string connectionString)
         await using var conn = new SqlConnection(connectionString);
 
         var entityRows = (await conn.QueryAsync<EntityRow>(
-            "select Id, EntityTypeId, Label, X, Y, Width, Height, HasAgency, Weight, IsTranslucent, Angle, MaxStructuralIntegrity, CurrentStructuralIntegrity, DragCoefficient, AngularDragCoefficient from Entities")).AsList();
+            "select Id, EntityTypeId, Label, X, Y, Width, Height, HasAgency, Weight, Strength, IsTranslucent, Angle, MaxStructuralIntegrity, CurrentStructuralIntegrity, DragCoefficient, AngularDragCoefficient from Entities")).AsList();
 
         var lifeRows = (await conn.QueryAsync<LifeRow>(
             "select EntityId, MaxHitPoints, CurrentHitPoints from EntityLife"))
@@ -18,6 +18,10 @@ public class WorldLoader(string connectionString)
 
         var chargeRows = (await conn.QueryAsync<ChargeRow>(
             "select EntityId, MaxCharge, CurrentCharge from EntityCharge"))
+            .ToDictionary(r => r.EntityId);
+
+        var locomotionRows = (await conn.QueryAsync<LocomotionRow>(
+            "select EntityId, LocomotionEfficiency from EntityLocomotion"))
             .ToDictionary(r => r.EntityId);
 
         var inscriptionGroups = (await conn.QueryAsync<InscriptionRow>(
@@ -29,6 +33,7 @@ public class WorldLoader(string connectionString)
         {
             lifeRows.TryGetValue(row.Id, out var life);
             chargeRows.TryGetValue(row.Id, out var charge);
+            locomotionRows.TryGetValue(row.Id, out var locomotion);
             inscriptionGroups.TryGetValue(row.Id, out var inscriptions);
 
             return new EntityData(
@@ -41,6 +46,7 @@ public class WorldLoader(string connectionString)
                 Height: row.Height,
                 HasAgency: row.HasAgency,
                 Weight: row.Weight,
+                Strength: row.Strength,
                 IsTranslucent: row.IsTranslucent,
                 Angle: row.Angle,
                 MaxHitPoints: life?.MaxHitPoints,
@@ -51,12 +57,14 @@ public class WorldLoader(string connectionString)
                 MaxStructuralIntegrity: row.MaxStructuralIntegrity,
                 CurrentStructuralIntegrity: row.CurrentStructuralIntegrity,
                 DragCoefficient: row.DragCoefficient,
-                AngularDragCoefficient: row.AngularDragCoefficient);
+                AngularDragCoefficient: row.AngularDragCoefficient,
+                LocomotionEfficiency: locomotion?.LocomotionEfficiency);
         });
     }
 
-    private record EntityRow(Guid Id, long EntityTypeId, string Label, long X, long Y, long Width, long Height, bool HasAgency, long Weight, bool IsTranslucent, double Angle, long MaxStructuralIntegrity, long CurrentStructuralIntegrity, double DragCoefficient, double AngularDragCoefficient);
+    private record EntityRow(Guid Id, long EntityTypeId, string Label, long X, long Y, long Width, long Height, bool HasAgency, long Weight, long Strength, bool IsTranslucent, double Angle, long MaxStructuralIntegrity, long CurrentStructuralIntegrity, double DragCoefficient, double AngularDragCoefficient);
     private record LifeRow(Guid EntityId, long MaxHitPoints, long CurrentHitPoints);
     private record ChargeRow(Guid EntityId, long MaxCharge, long CurrentCharge);
+    private record LocomotionRow(Guid EntityId, double LocomotionEfficiency);
     private record InscriptionRow(Guid EntityId, string SpellText);
 }

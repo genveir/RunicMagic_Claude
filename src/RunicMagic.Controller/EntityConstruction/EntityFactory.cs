@@ -32,6 +32,7 @@ public class EntityFactory(WorldModel world, ILogger<EntityFactory> logger)
             height: entityData.Height,
             hasAgency: entityData.HasAgency,
             weight: entityData.Weight,
+            strength: entityData.Strength,
             isTranslucent: entityData.IsTranslucent,
             angle: entityData.Angle,
             structuralIntegrity: new StructuralIntegrityCapability(entityData.MaxStructuralIntegrity, entityData.CurrentStructuralIntegrity),
@@ -44,6 +45,16 @@ public class EntityFactory(WorldModel world, ILogger<EntityFactory> logger)
 
         if (entityData.MaxCharge.HasValue && entityData.CurrentCharge.HasValue)
             entity.Charge = new ChargeCapability(entityData.MaxCharge.Value, entityData.CurrentCharge.Value);
+
+        if (entityData.LocomotionEfficiency.HasValue)
+        {
+            var legs = new List<Leg>
+            {
+                new Leg(lateralOffset: -(entity.Width / 4), forwardOffset: 0),
+                new Leg(lateralOffset: entity.Width / 4, forwardOffset: 0)
+            };
+            entity.Locomotion = new LocomotionCapability(legs, locomotionEfficiency: entityData.LocomotionEfficiency.Value);
+        }
 
         WireDelegates(type, entity);
         ParseInscriptions(entity, entityData.InscriptionTexts);

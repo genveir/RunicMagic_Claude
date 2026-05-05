@@ -19,49 +19,92 @@ public static class PhysicsService
 
     private static void TickEntity(Entity entity, IWorldEventTracker tracker)
     {
+        var (fx, fy, torque) = CalculateNetForceAndTorque(entity.PendingImpulses);
+        entity.PendingImpulses.Clear();
+
         if (entity.IsUnderEngineMotion)
         {
-            entity.PendingImpulses.Clear();
             return;
         }
 
-        if (entity.Weight == 0)
+        var initialVelocity = entity.Velocity;
+
+        if ((initialVelocity == null || initialVelocity?.Vx == 0 && initialVelocity?.Vy == 0 && initialVelocity?.Omega == 0) && fx == 0 && fy == 0 && torque == 0)
         {
-            entity.PendingImpulses.Clear();
             return;
         }
 
+        var bounds = new Rectangle(entity.Location, Width: entity.Width, Height: entity.Height, Angle: entity.Angle);
+        var (vx, vy) = CalculateLinearVelocity(
+            initialVelocity: initialVelocity,
+            weight: entity.Weight,
+            dragCoefficient: entity.DragCoefficient,
+            bounds: bounds,
+            fx: fx,
+            fy: fy);
+        var linearStopped = vx == 0.0 && vy == 0.0;
+
+        var omega = CalculateAngularVelocity(
+            initialVelocity: initialVelocity,
+            weight: entity.Weight,
+            height: entity.Height,
+            width: entity.Width,
+            angularDragCoefficient: entity.AngularDragCoefficient,
+            torque: torque);
+        var rotationStopped = omega == 0.0;
+
+        if (linearStopped && rotationStopped)
+        {
+            entity.Velocity = null;
+            return;
+        }
+
+        entity.Velocity = new VelocityVector(vx, vy, omega);
+
+        var newAngle = entity.Angle + omega;
+        var destination = new Location(
+            X: entity.Location.X + vx,
+            Y: entity.Location.Y + vy);
+        MoveEntityService.Move(entity, destination, newAngle, tracker);
+    }
+
+    public static (double fX, double fY, double torque) CalculateNetForceAndTorque(IReadOnlyList<ForceVector> pendingImpulses)
+    {
         var fx = 0.0;
         var fy = 0.0;
         var torque = 0.0;
-        foreach (var impulse in entity.PendingImpulses)
+        foreach (var impulse in pendingImpulses)
         {
             fx += impulse.Fx;
             fy += impulse.Fy;
             torque += impulse.Rx * impulse.Fy - impulse.Ry * impulse.Fx;
         }
-        entity.PendingImpulses.Clear();
 
-        var vx = entity.Velocity?.Vx ?? 0.0;
-        var vy = entity.Velocity?.Vy ?? 0.0;
-        var omega = entity.Velocity?.Omega ?? 0.0;
+        return (fx, fy, torque);
+    }
 
-        vx += fx / entity.Weight;
-        vy += fy / entity.Weight;
+    public static (double vX, double vY) CalculateLinearVelocity(VelocityVector? initialVelocity, double weight, double dragCoefficient, Rectangle bounds, double fx, double fy)
+    {
+        if (weight == 0.0)
+        {
+            weight = 0.00000000001;
+        }
 
-        var momentOfInertia = (double)entity.Weight * ((double)entity.Width * entity.Width + (double)entity.Height * entity.Height) / 12.0;
-        omega += torque / momentOfInertia;
+        var vx = initialVelocity?.Vx ?? 0.0;
+        var vy = initialVelocity?.Vy ?? 0.0;
+
+        vx += fx / weight;
+        vy += fy / weight;
 
         var speed = Math.Sqrt(vx * vx + vy * vy);
 
-        if (speed > 0.0 && entity.DragCoefficient > 0.0)
+        if (speed > 0.0 && dragCoefficient > 0.0)
         {
-            var bounds = new Rectangle(entity.Location, entity.Width, entity.Height, entity.Angle);
             var motionDirection = new Direction(vx / speed, vy / speed);
             var projectedWidth = bounds.GetProjectedWidth(motionDirection);
 
-            var dragForceMagnitude = entity.DragCoefficient * projectedWidth * speed * speed;
-            var dragDeceleration = dragForceMagnitude / entity.Weight;
+            var dragForceMagnitude = dragCoefficient * projectedWidth * speed * speed;
+            var dragDeceleration = dragForceMagnitude / weight;
             var newSpeed = Math.Max(0.0, speed - dragDeceleration);
 
             if (newSpeed > 0.0)
@@ -79,24 +122,7 @@ public static class PhysicsService
             speed = newSpeed;
         }
 
-        var absOmega = Math.Abs(omega);
-        if (absOmega > 0.0 && entity.AngularDragCoefficient > 0.0)
-        {
-            var angularDragTorque = entity.AngularDragCoefficient * absOmega * absOmega;
-            var angularDragDecel = angularDragTorque / momentOfInertia;
-            var newAbsOmega = Math.Max(0.0, absOmega - angularDragDecel);
-            omega = omega >= 0.0 ? newAbsOmega : -newAbsOmega;
-            absOmega = newAbsOmega;
-        }
-
         var linearStopped = speed < MinSpeedMmPerTick;
-        var rotationStopped = absOmega < MinAngularSpeedRadPerTick;
-
-        if (linearStopped && rotationStopped)
-        {
-            entity.Velocity = null;
-            return;
-        }
 
         if (linearStopped)
         {
@@ -104,15 +130,38 @@ public static class PhysicsService
             vy = 0.0;
         }
 
+        return (vx, vy);
+    }
+
+    public static double CalculateAngularVelocity(VelocityVector? initialVelocity, double weight, double height, double width, double angularDragCoefficient, double torque)
+    {
+        if (weight == 0.0)
+        {
+            weight = 0.00000000001;
+        }
+
+        var omega = initialVelocity?.Omega ?? 0.0;
+
+        var momentOfInertia = weight * (width * width + height * height) / 12.0;
+        omega += torque / momentOfInertia;
+
+        var absOmega = Math.Abs(omega);
+        if (absOmega > 0.0 && angularDragCoefficient > 0.0)
+        {
+            var angularDragTorque = angularDragCoefficient * absOmega * absOmega;
+            var angularDragDecel = angularDragTorque / momentOfInertia;
+            var newAbsOmega = Math.Max(0.0, absOmega - angularDragDecel);
+            omega = omega >= 0.0 ? newAbsOmega : -newAbsOmega;
+            absOmega = newAbsOmega;
+        }
+
+        var rotationStopped = absOmega < MinAngularSpeedRadPerTick;
+
         if (rotationStopped)
         {
             omega = 0.0;
         }
 
-        entity.Velocity = new VelocityVector(vx, vy, omega);
-
-        var newAngle = entity.Angle + omega;
-        var destination = new Location(entity.Location.X + vx, entity.Location.Y + vy);
-        MoveEntityService.Move(entity, destination, newAngle, tracker);
+        return omega;
     }
 }

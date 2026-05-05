@@ -6,6 +6,7 @@ end
 
 drop table if exists EntityLife;
 drop table if exists EntityCharge;
+drop table if exists EntityLocomotion;
 drop table if exists Inscription;
 drop table if exists Entities;
 drop table if exists EntityTypes;
@@ -30,12 +31,13 @@ create table Entities (
     Height        bigint           not null,
     HasAgency     bit              not null constraint DF_Entities_HasAgency default 0,
     Weight        bigint           not null,
+    Strength      bigint           not null,
     IsTranslucent bit              not null constraint DF_Entities_IsTranslucent default 0,
     Angle         float            not null constraint DF_Entities_Angle default 0,
-    MaxStructuralIntegrity bigint not null,
+    MaxStructuralIntegrity     bigint not null,
     CurrentStructuralIntegrity bigint not null,
-    DragCoefficient        float not null,
-    AngularDragCoefficient float not null
+    DragCoefficient            float  not null,
+    AngularDragCoefficient     float  not null
 );
 
 create table EntityLife (
@@ -52,10 +54,16 @@ create table EntityCharge (
     CurrentCharge bigint           not null
 );
 
+create table EntityLocomotion (
+    EntityId             uniqueidentifier not null constraint PK_EntityLocomotion primary key
+                                                  constraint FK_EntityLocomotion_Entities references Entities (Id),
+    LocomotionEfficiency float            not null
+);
+
 create table Inscription (
-    Id       bigint           not null constraint PK_Inscription primary key identity,
-    EntityId uniqueidentifier not null constraint FK_Inscription_Entities references Entities (Id),
-    SpellText nvarchar(max)   not null
+    Id        bigint           not null constraint PK_Inscription primary key identity,
+    EntityId  uniqueidentifier not null constraint FK_Inscription_Entities references Entities (Id),
+    SpellText nvarchar(max)    not null
 );
 
 set noexec off;

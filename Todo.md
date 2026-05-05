@@ -8,12 +8,12 @@ The Key column in every table uses right-padded cells. The baseline is 7 charact
 
 ## To Do — Milestone 3
 
-Next ticket number: RMC-109
-Next bugfix number: BUG-8
+Next ticket number: RMC-111
+Next bugfix number: BUG-9
 
 | Key | Title | Description | Blocked By |
 |-----|-------|-------------|------------|
-| RMC-103 | LocomotionCapability | Add `LocomotionCapability` to `Entity` (already stubbed as a nullable property). The capability carries the bio-mechanical properties that only self-propelling entities have: strength, locomotion efficiency, drag coefficient, traction coefficient, CoM/stance width ratio, and gait inertia. Each tick, it computes a drive force from the entity's current intent (desired direction and gait, set by AI or player) and submits it to the physics service. Max speed is not stored — it emerges from physics. A rock, a wall, or a plant has no `LocomotionCapability`. | RMC-105 |
+| BUG-8   | Entities keep spinning indefinitely after being pushed | After receiving a rotational impulse, entities do not come to rest — they continue spinning forever. `PhysicsService.CalculateAngularVelocity` should bleed off `omega` each tick until it falls below `MinAngularSpeedRadPerTick` and snaps to zero, but this is not happening in practice. | |
 | RMC-80  | PatrolAi behavior | First concrete AI behavior: `PatrolAiBehavior` — walks an entity back and forth along a list of waypoints. Sets locomotion intent (desired direction) each tick; the physics service and `LocomotionCapability` handle the actual motion. Needs DB schema for waypoints. | RMC-77, RMC-103, RMC-105 |
 | RMC-75  | 🏁 Milestone 3 — Have a guard walk by and get pushed | Implement a simple guard NPC that walks back and forth along a predefined path and push him away with a DAN-targeted spell. This will require the engine to have a concept of time. | RMC-83 |
 
@@ -21,6 +21,8 @@ Next bugfix number: BUG-8
 
 | Key | Title | Description | Blocked By |
 |-----|-------|-------------|------------|
+| RMC-110 | Rewrite Strength as a capability | Extract `Strength` from its current form and rewrite it as a proper capability on `Entity`, following the same pattern as `LocomotionCapability`. | |
+| RMC-109 | Split WorldModel into entity store, motion queue, and ticker | `WorldModel` currently has three responsibilities: entity storage, engine motion effect queuing, and tick orchestration. Split into: `WorldModel` (pure entity store and spatial queries), `EngineMotionQueue` (owns `_engineMotionEffects` and `AddMotionEffect`; `TickEngineMotion` moves here), and `WorldTicker` (tick orchestrator, takes the other two as dependencies and drives `TickEntities`/`TickAI`/`TickPhysics`). Retire `IGameLoopWorldModel`. | |
 | RMC-107 | Show facing direction on canvas entities | Render a facing indicator (e.g. a line or arrow) on entities in the world canvas so their current angle is visually obvious. Useful for debugging locomotion and AI behavior. | |
 | RMC-106 | Change base motion constant from 56 to 70 ticks | The base motion constant used for motion timing is currently 56 ticks. Change it to 70. Also make it a constant in the technical sense. | |
 | RMC-100 | In-game entity creation and modification | Add the ability to create new entities and modify existing ones while the game is running — without restarting or editing seed data. This is a prerequisite for conveniently populating the world during development. | |
@@ -50,7 +52,6 @@ Next bugfix number: BUG-8
 
 | Key | Title | Description |
 |-----|-------|-------------|
-| RMC-108 | Rotational velocity and impulses in physics | Extended ForceVector with (Rx, Ry) offset; VelocityVector with Omega; Entity/EntityData with AngularDragCoefficient. PhysicsService now accumulates torque per tick, converts to angular acceleration via I = m(w²+h²)/12, applies quadratic angular drag consistent with linear drag, and updates entity angle each tick. |
 
 ## Done
 
@@ -76,3 +77,5 @@ Next bugfix number: BUG-8
 | RMC-83  | Locomotion service |
 | BUG-7   | Prompt printed on every tick |
 | RMC-105 | Simulation-layer physics service |
+| RMC-108 | Rotational velocity and impulses in physics |
+| RMC-103 | LocomotionCapability |

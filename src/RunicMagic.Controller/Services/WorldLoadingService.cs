@@ -3,8 +3,6 @@ using RunicMagic.Database;
 using RunicMagic.World;
 using RunicMagic.World.Entities;
 using RunicMagic.World.Entities.AI;
-using RunicMagic.World.Entities.Capabilities;
-using RunicMagic.World.Motion.Simulated;
 
 namespace RunicMagic.Controller.Services;
 
@@ -19,24 +17,31 @@ public class WorldLoadingService(WorldLoader loader, EntityFactory factory, Worl
             world.Add(factory.Create(entityData));
         }
 
-        AddDebugHardcodedStuff(world);
+        AddDebugHardcodedStuff();
     }
 
-    private void AddDebugHardcodedStuff(WorldModel world)
+    private void AddDebugHardcodedStuff()
     {
         var guard = world.GetAll().FirstOrDefault(e => e.Label == "Guard");
+        if (guard == null)
+        {
+            return;
+        }
 
-        guard!.Locomotion = new LocomotionCapability();
-        guard.AI.AddBehavior(new RunAheadBehavior());
+        guard.AI.AddBehavior(new WalkTowardPlayerBehavior());
     }
 
-    private class RunAheadBehavior : IAIBehavior
+    private class WalkTowardPlayerBehavior : IAIBehavior
     {
         public void Execute(Entity entity, WorldModel worldModel, IWorldEventTracker eventTracker)
         {
-            var fx = 100_000 * Math.Cos(entity.Angle);
-            var fy = 100_000 * Math.Sin(entity.Angle);
-            entity.PendingImpulses.Add(new ForceVector(fx, fy));
+            var player = worldModel.GetAll().FirstOrDefault(e => e.Label == "Player");
+            if (player == null)
+            {
+                return;
+            }
+
+            entity.Locomotion!.Walk(entity, player.Location, eventTracker);
         }
     }
 }

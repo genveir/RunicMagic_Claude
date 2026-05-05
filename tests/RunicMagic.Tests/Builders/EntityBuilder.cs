@@ -16,6 +16,7 @@ internal class EntityBuilder
     private long _height = 100;
     private bool _hasAgency = false;
     private long _weight = 1000;
+    private long _strength = 0;
     private bool _isTranslucent = false;
     private double _angle = 0;
     private double _dragCoefficient = 0.0;
@@ -72,6 +73,12 @@ internal class EntityBuilder
         return this;
     }
 
+    public EntityBuilder WithStrength(long strength)
+    {
+        _strength = strength;
+        return this;
+    }
+
     public EntityBuilder WithAgency()
     {
         _hasAgency = true;
@@ -114,9 +121,9 @@ internal class EntityBuilder
         return this;
     }
 
-    public EntityBuilder WithLocomotion()
+    public EntityBuilder WithLocomotion(LocomotionCapability locomotion)
     {
-        _locomotion = new LocomotionCapability();
+        _locomotion = locomotion;
         return this;
     }
 
@@ -178,6 +185,7 @@ internal class EntityBuilder
             height: _height,
             hasAgency: _hasAgency,
             weight: _weight,
+            strength: _strength,
             isTranslucent: _isTranslucent,
             angle: _angle,
             structuralIntegrity: _structuralIntegrity,
