@@ -41,7 +41,9 @@ public static class PhysicsService
             dragCoefficient: entity.DragCoefficient,
             bounds: bounds,
             fx: fx,
-            fy: fy);
+            fy: fy,
+            groundFrictionCoefficient: entity.GroundFrictionCoefficient,
+            isGrounded: entity.IsGrounded);
         var linearStopped = vx == 0.0 && vy == 0.0;
 
         var omega = CalculateAngularVelocity(
@@ -50,7 +52,10 @@ public static class PhysicsService
             height: entity.Height,
             width: entity.Width,
             angularDragCoefficient: entity.AngularDragCoefficient,
-            torque: torque);
+            torque: torque,
+            groundFrictionCoefficient: entity.GroundFrictionCoefficient,
+            groundContactRadius: entity.GroundContactRadius,
+            isGrounded: entity.IsGrounded);
         var rotationStopped = omega == 0.0;
 
         if (linearStopped && rotationStopped)
@@ -83,7 +88,7 @@ public static class PhysicsService
         return (fx, fy, torque);
     }
 
-    public static (double vX, double vY) CalculateLinearVelocity(VelocityVector? initialVelocity, double weight, double dragCoefficient, Rectangle bounds, double fx, double fy)
+    public static (double vX, double vY) CalculateLinearVelocity(VelocityVector? initialVelocity, double weight, double dragCoefficient, Rectangle bounds, double fx, double fy, double groundFrictionCoefficient, bool isGrounded)
     {
         if (weight == 0.0)
         {
@@ -122,6 +127,24 @@ public static class PhysicsService
             speed = newSpeed;
         }
 
+        if (isGrounded && groundFrictionCoefficient > 0.0 && speed > 0.0)
+        {
+            var newSpeed = Math.Max(0.0, speed - groundFrictionCoefficient);
+            if (newSpeed > 0.0)
+            {
+                var scale = newSpeed / speed;
+                vx *= scale;
+                vy *= scale;
+            }
+            else
+            {
+                vx = 0.0;
+                vy = 0.0;
+            }
+
+            speed = newSpeed;
+        }
+
         var linearStopped = speed < MinSpeedMmPerTick;
 
         if (linearStopped)
@@ -133,7 +156,7 @@ public static class PhysicsService
         return (vx, vy);
     }
 
-    public static double CalculateAngularVelocity(VelocityVector? initialVelocity, double weight, double height, double width, double angularDragCoefficient, double torque)
+    public static double CalculateAngularVelocity(VelocityVector? initialVelocity, double weight, double height, double width, double angularDragCoefficient, double torque, double groundFrictionCoefficient, double groundContactRadius, bool isGrounded)
     {
         if (weight == 0.0)
         {
@@ -151,6 +174,15 @@ public static class PhysicsService
             var angularDragTorque = angularDragCoefficient * absOmega * absOmega;
             var angularDragDecel = angularDragTorque / momentOfInertia;
             var newAbsOmega = Math.Max(0.0, absOmega - angularDragDecel);
+            omega = omega >= 0.0 ? newAbsOmega : -newAbsOmega;
+            absOmega = newAbsOmega;
+        }
+
+        if (isGrounded && groundFrictionCoefficient > 0.0 && absOmega > 0.0)
+        {
+            var frictionTorque = groundFrictionCoefficient * weight * groundContactRadius;
+            var frictionDecel = frictionTorque / momentOfInertia;
+            var newAbsOmega = Math.Max(0.0, absOmega - frictionDecel);
             omega = omega >= 0.0 ? newAbsOmega : -newAbsOmega;
             absOmega = newAbsOmega;
         }

@@ -37,7 +37,8 @@ create table Entities (
     MaxStructuralIntegrity     bigint not null,
     CurrentStructuralIntegrity bigint not null,
     DragCoefficient            float  not null,
-    AngularDragCoefficient     float  not null
+    AngularDragCoefficient     float  not null,
+    GroundFrictionCoefficient  float  not null
 );
 
 create table EntityLife (

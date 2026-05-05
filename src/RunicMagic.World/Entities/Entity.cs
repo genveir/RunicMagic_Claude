@@ -23,7 +23,9 @@ public class Entity
         StructuralIntegrityCapability structuralIntegrity,
         AICapability aiCapability,
         double dragCoefficient,
-        double angularDragCoefficient)
+        double angularDragCoefficient,
+        double groundFrictionCoefficient,
+        double groundContactRadius)
     {
         Id = id;
         Label = label;
@@ -39,6 +41,8 @@ public class Entity
         AI = aiCapability;
         DragCoefficient = dragCoefficient;
         AngularDragCoefficient = angularDragCoefficient;
+        GroundFrictionCoefficient = groundFrictionCoefficient;
+        GroundContactRadius = groundContactRadius;
     }
 
     public EntityId Id { get; }
@@ -55,6 +59,9 @@ public class Entity
     public long Strength { get; set; }
     public double DragCoefficient { get; set; }
     public double AngularDragCoefficient { get; set; }
+    public double GroundFrictionCoefficient { get; set; }
+    public double GroundContactRadius { get; set; }
+    public bool IsGrounded { get; set; } = true;
 
     public Func<Entity[]>? Scope { get; set; }
 

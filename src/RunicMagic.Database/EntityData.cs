@@ -22,5 +22,6 @@ public record EntityData(
     long CurrentStructuralIntegrity = 1000,
     double DragCoefficient = 0.0,
     double AngularDragCoefficient = 0.0,
+    double GroundFrictionCoefficient = 0.0,
     AIData? AIData = null,
     double? LocomotionEfficiency = null);

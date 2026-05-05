@@ -10,7 +10,7 @@ public class WorldLoader(string connectionString)
         await using var conn = new SqlConnection(connectionString);
 
         var entityRows = (await conn.QueryAsync<EntityRow>(
-            "select Id, EntityTypeId, Label, X, Y, Width, Height, HasAgency, Weight, Strength, IsTranslucent, Angle, MaxStructuralIntegrity, CurrentStructuralIntegrity, DragCoefficient, AngularDragCoefficient from Entities")).AsList();
+            "select Id, EntityTypeId, Label, X, Y, Width, Height, HasAgency, Weight, Strength, IsTranslucent, Angle, MaxStructuralIntegrity, CurrentStructuralIntegrity, DragCoefficient, AngularDragCoefficient, GroundFrictionCoefficient from Entities")).AsList();
 
         var lifeRows = (await conn.QueryAsync<LifeRow>(
             "select EntityId, MaxHitPoints, CurrentHitPoints from EntityLife"))
@@ -58,11 +58,12 @@ public class WorldLoader(string connectionString)
                 CurrentStructuralIntegrity: row.CurrentStructuralIntegrity,
                 DragCoefficient: row.DragCoefficient,
                 AngularDragCoefficient: row.AngularDragCoefficient,
+                GroundFrictionCoefficient: row.GroundFrictionCoefficient,
                 LocomotionEfficiency: locomotion?.LocomotionEfficiency);
         });
     }
 
-    private record EntityRow(Guid Id, long EntityTypeId, string Label, long X, long Y, long Width, long Height, bool HasAgency, long Weight, long Strength, bool IsTranslucent, double Angle, long MaxStructuralIntegrity, long CurrentStructuralIntegrity, double DragCoefficient, double AngularDragCoefficient);
+    private record EntityRow(Guid Id, long EntityTypeId, string Label, long X, long Y, long Width, long Height, bool HasAgency, long Weight, long Strength, bool IsTranslucent, double Angle, long MaxStructuralIntegrity, long CurrentStructuralIntegrity, double DragCoefficient, double AngularDragCoefficient, double GroundFrictionCoefficient);
     private record LifeRow(Guid EntityId, long MaxHitPoints, long CurrentHitPoints);
     private record ChargeRow(Guid EntityId, long MaxCharge, long CurrentCharge);
     private record LocomotionRow(Guid EntityId, double LocomotionEfficiency);

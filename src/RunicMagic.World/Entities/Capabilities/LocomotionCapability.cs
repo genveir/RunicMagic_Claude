@@ -86,7 +86,10 @@ public class LocomotionCapability
             weight: entity.Weight,
             width: entity.Width,
             height: entity.Height,
-            angularDragCoefficient: entity.AngularDragCoefficient);
+            angularDragCoefficient: entity.AngularDragCoefficient,
+            groundFrictionCoefficient: entity.GroundFrictionCoefficient,
+            groundContactRadius: entity.GroundContactRadius,
+            isGrounded: entity.IsGrounded);
 
         var shouldBrake = brakingAngle >= Math.Abs(angularError);
         var shouldCoast = !shouldBrake && Math.Abs(omega) + brakingAngle >= Math.Abs(angularError);
@@ -109,7 +112,10 @@ public class LocomotionCapability
                 height: entity.Height,
                 width: entity.Width,
                 angularDragCoefficient: entity.AngularDragCoefficient,
-                torque: counterTorque);
+                torque: counterTorque,
+                groundFrictionCoefficient: entity.GroundFrictionCoefficient,
+                groundContactRadius: entity.GroundContactRadius,
+                isGrounded: entity.IsGrounded);
 
             if (nextOmega != 0.0 && Math.Sign(nextOmega) != Math.Sign(omega))
             {
@@ -120,7 +126,10 @@ public class LocomotionCapability
                     weight: entity.Weight,
                     width: entity.Width,
                     height: entity.Height,
-                    angularDragCoefficient: entity.AngularDragCoefficient);
+                    angularDragCoefficient: entity.AngularDragCoefficient,
+                    groundFrictionCoefficient: entity.GroundFrictionCoefficient,
+                    groundContactRadius: entity.GroundContactRadius,
+                    isGrounded: entity.IsGrounded);
             }
         }
 
@@ -146,7 +155,7 @@ public class LocomotionCapability
         return vectors;
     }
 
-    internal static double BinarySearchBrakeScale(VelocityVector currentVelocity, double counterTorque, int originalSign, double weight, double width, double height, double angularDragCoefficient)
+    internal static double BinarySearchBrakeScale(VelocityVector currentVelocity, double counterTorque, int originalSign, double weight, double width, double height, double angularDragCoefficient, double groundFrictionCoefficient, double groundContactRadius, bool isGrounded)
     {
         var lo = 0.0;
         var hi = 1.0;
@@ -160,7 +169,10 @@ public class LocomotionCapability
                 height: height,
                 width: width,
                 angularDragCoefficient: angularDragCoefficient,
-                torque: mid * counterTorque);
+                torque: mid * counterTorque,
+                groundFrictionCoefficient: groundFrictionCoefficient,
+                groundContactRadius: groundContactRadius,
+                isGrounded: isGrounded);
 
             if (newOmega == 0.0 || Math.Sign(newOmega) == originalSign)
             {
@@ -208,7 +220,9 @@ public class LocomotionCapability
             brakingFy: brakingFy,
             weight: entity.Weight,
             dragCoefficient: entity.DragCoefficient,
-            bounds: bounds);
+            bounds: bounds,
+            groundFrictionCoefficient: entity.GroundFrictionCoefficient,
+            isGrounded: entity.IsGrounded);
 
         var shouldBrake = brakingDistance >= remainingDistance || shouldStop;
         var shouldCoast = !shouldBrake && speed + brakingDistance >= remainingDistance;
@@ -230,7 +244,9 @@ public class LocomotionCapability
                 dragCoefficient: entity.DragCoefficient,
                 bounds: bounds,
                 fx: brakingFx,
-                fy: brakingFy);
+                fy: brakingFy,
+                groundFrictionCoefficient: entity.GroundFrictionCoefficient,
+                isGrounded: entity.IsGrounded);
 
             var dotProduct = nextVx * vx + nextVy * vy;
             if ((nextVx != 0.0 || nextVy != 0.0) && dotProduct < 0.0)
@@ -243,7 +259,9 @@ public class LocomotionCapability
                     originalVy: vy,
                     weight: entity.Weight,
                     dragCoefficient: entity.DragCoefficient,
-                    bounds: bounds);
+                    bounds: bounds,
+                    groundFrictionCoefficient: entity.GroundFrictionCoefficient,
+                    isGrounded: entity.IsGrounded);
             }
         }
 
@@ -258,7 +276,7 @@ public class LocomotionCapability
         }
     }
 
-    private static double BinarySearchLinearBrakeScale(VelocityVector currentVelocity, double brakingFx, double brakingFy, double originalVx, double originalVy, double weight, double dragCoefficient, Rectangle bounds)
+    private static double BinarySearchLinearBrakeScale(VelocityVector currentVelocity, double brakingFx, double brakingFy, double originalVx, double originalVy, double weight, double dragCoefficient, Rectangle bounds, double groundFrictionCoefficient, bool isGrounded)
     {
         var lo = 0.0;
         var hi = 1.0;
@@ -272,7 +290,9 @@ public class LocomotionCapability
                 dragCoefficient: dragCoefficient,
                 bounds: bounds,
                 fx: mid * brakingFx,
-                fy: mid * brakingFy);
+                fy: mid * brakingFy,
+                groundFrictionCoefficient: groundFrictionCoefficient,
+                isGrounded: isGrounded);
 
             var dotProduct = newVx * originalVx + newVy * originalVy;
             if ((newVx == 0.0 && newVy == 0.0) || dotProduct >= 0.0)
@@ -288,7 +308,7 @@ public class LocomotionCapability
         return lo;
     }
 
-    internal static double SimulateAngularBrakingAngle(double omega, double maxCounterTorque, double weight, double width, double height, double angularDragCoefficient)
+    internal static double SimulateAngularBrakingAngle(double omega, double maxCounterTorque, double weight, double width, double height, double angularDragCoefficient, double groundFrictionCoefficient, double groundContactRadius, bool isGrounded)
     {
         if (omega == 0.0)
         {
@@ -308,7 +328,10 @@ public class LocomotionCapability
                 height: height,
                 width: width,
                 angularDragCoefficient: angularDragCoefficient,
-                torque: counterTorque);
+                torque: counterTorque,
+                groundFrictionCoefficient: groundFrictionCoefficient,
+                groundContactRadius: groundContactRadius,
+                isGrounded: isGrounded);
 
             if (newOmega == 0.0)
             {
@@ -327,7 +350,7 @@ public class LocomotionCapability
         return totalAngle;
     }
 
-    internal static double SimulateLinearBrakingDistance(double vx, double vy, double brakingFx, double brakingFy, double weight, double dragCoefficient, Rectangle bounds)
+    internal static double SimulateLinearBrakingDistance(double vx, double vy, double brakingFx, double brakingFy, double weight, double dragCoefficient, Rectangle bounds, double groundFrictionCoefficient, bool isGrounded)
     {
         var speed = Math.Sqrt(vx * vx + vy * vy);
         if (speed == 0.0)
@@ -346,7 +369,9 @@ public class LocomotionCapability
                 dragCoefficient: dragCoefficient,
                 bounds: bounds,
                 fx: brakingFx,
-                fy: brakingFy);
+                fy: brakingFy,
+                groundFrictionCoefficient: groundFrictionCoefficient,
+                isGrounded: isGrounded);
 
             if (newVx == 0.0 && newVy == 0.0)
             {

@@ -24,6 +24,29 @@ public class EntityFactory(WorldModel world, ILogger<EntityFactory> logger)
 
         var aiCapability = SetupAI(entityData.AIData);
 
+        List<Leg>? legs = null;
+        double groundContactRadius;
+        if (entityData.LocomotionEfficiency.HasValue)
+        {
+            legs = new List<Leg>
+            {
+                new Leg(lateralOffset: -(entityData.Width / 4), forwardOffset: 0),
+                new Leg(lateralOffset: entityData.Width / 4, forwardOffset: 0)
+            };
+            var sumSq = 0.0;
+            foreach (var leg in legs)
+            {
+                sumSq += (double)leg.LateralOffset * leg.LateralOffset + (double)leg.ForwardOffset * leg.ForwardOffset;
+            }
+            groundContactRadius = Math.Sqrt(sumSq / legs.Count);
+        }
+        else
+        {
+            var w = (double)entityData.Width;
+            var h = (double)entityData.Height;
+            groundContactRadius = Math.Sqrt((w * w + h * h) / 12.0);
+        }
+
         var entity = new Entity(
             id: new EntityId(entityData.Id),
             label: entityData.Label,
@@ -38,7 +61,9 @@ public class EntityFactory(WorldModel world, ILogger<EntityFactory> logger)
             structuralIntegrity: new StructuralIntegrityCapability(entityData.MaxStructuralIntegrity, entityData.CurrentStructuralIntegrity),
             aiCapability: aiCapability,
             dragCoefficient: entityData.DragCoefficient,
-            angularDragCoefficient: entityData.AngularDragCoefficient);
+            angularDragCoefficient: entityData.AngularDragCoefficient,
+            groundFrictionCoefficient: entityData.GroundFrictionCoefficient,
+            groundContactRadius: groundContactRadius);
 
         if (entityData.MaxHitPoints.HasValue && entityData.CurrentHitPoints.HasValue)
             entity.Life = new LifeCapability(entityData.MaxHitPoints.Value, entityData.CurrentHitPoints.Value);
@@ -46,14 +71,9 @@ public class EntityFactory(WorldModel world, ILogger<EntityFactory> logger)
         if (entityData.MaxCharge.HasValue && entityData.CurrentCharge.HasValue)
             entity.Charge = new ChargeCapability(entityData.MaxCharge.Value, entityData.CurrentCharge.Value);
 
-        if (entityData.LocomotionEfficiency.HasValue)
+        if (legs != null)
         {
-            var legs = new List<Leg>
-            {
-                new Leg(lateralOffset: -(entity.Width / 4), forwardOffset: 0),
-                new Leg(lateralOffset: entity.Width / 4, forwardOffset: 0)
-            };
-            entity.Locomotion = new LocomotionCapability(legs, locomotionEfficiency: entityData.LocomotionEfficiency.Value);
+            entity.Locomotion = new LocomotionCapability(legs, locomotionEfficiency: entityData.LocomotionEfficiency!.Value);
         }
 
         WireDelegates(type, entity);

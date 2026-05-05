@@ -13,7 +13,6 @@ Next bugfix number: BUG-9
 
 | Key | Title | Description | Blocked By |
 |-----|-------|-------------|------------|
-| BUG-8   | Entities keep spinning indefinitely after being pushed | After receiving a rotational impulse, entities do not come to rest — they continue spinning forever. `PhysicsService.CalculateAngularVelocity` should bleed off `omega` each tick until it falls below `MinAngularSpeedRadPerTick` and snaps to zero, but this is not happening in practice. | |
 | RMC-80  | PatrolAi behavior | First concrete AI behavior: `PatrolAiBehavior` — walks an entity back and forth along a list of waypoints. Sets locomotion intent (desired direction) each tick; the physics service and `LocomotionCapability` handle the actual motion. Needs DB schema for waypoints. | RMC-77, RMC-103, RMC-105 |
 | RMC-75  | 🏁 Milestone 3 — Have a guard walk by and get pushed | Implement a simple guard NPC that walks back and forth along a predefined path and push him away with a DAN-targeted spell. This will require the engine to have a concept of time. | RMC-83 |
 
@@ -79,3 +78,4 @@ Next bugfix number: BUG-9
 | RMC-105 | Simulation-layer physics service |
 | RMC-108 | Rotational velocity and impulses in physics |
 | RMC-103 | LocomotionCapability |
+| BUG-8   | Entities keep spinning indefinitely after being pushed |

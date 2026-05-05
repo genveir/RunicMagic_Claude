@@ -133,7 +133,10 @@ public class LocomotionCapabilityTests
             weight: 1000,
             width: 200,
             height: 200,
-            angularDragCoefficient: 0);
+            angularDragCoefficient: 0,
+            groundFrictionCoefficient: 0,
+            groundContactRadius: 0,
+            isGrounded: false);
 
         result.Should().Be(0.0);
     }
@@ -147,7 +150,10 @@ public class LocomotionCapabilityTests
             weight: 1000,
             width: 200,
             height: 200,
-            angularDragCoefficient: 0);
+            angularDragCoefficient: 0,
+            groundFrictionCoefficient: 0,
+            groundContactRadius: 0,
+            isGrounded: false);
 
         result.Should().BeGreaterThan(0);
     }
@@ -161,7 +167,10 @@ public class LocomotionCapabilityTests
             weight: 1000,
             width: 200,
             height: 200,
-            angularDragCoefficient: 0);
+            angularDragCoefficient: 0,
+            groundFrictionCoefficient: 0,
+            groundContactRadius: 0,
+            isGrounded: false);
 
         result.Should().BeGreaterThan(0);
     }
@@ -175,7 +184,10 @@ public class LocomotionCapabilityTests
             weight: 1000,
             width: 200,
             height: 200,
-            angularDragCoefficient: 0);
+            angularDragCoefficient: 0,
+            groundFrictionCoefficient: 0,
+            groundContactRadius: 0,
+            isGrounded: false);
 
         var negativeResult = LocomotionCapability.SimulateAngularBrakingAngle(
             omega: -0.1,
@@ -183,7 +195,10 @@ public class LocomotionCapabilityTests
             weight: 1000,
             width: 200,
             height: 200,
-            angularDragCoefficient: 0);
+            angularDragCoefficient: 0,
+            groundFrictionCoefficient: 0,
+            groundContactRadius: 0,
+            isGrounded: false);
 
         negativeResult.Should().BeApproximately(positiveResult, 0.001);
     }
@@ -197,7 +212,10 @@ public class LocomotionCapabilityTests
             weight: 1000,
             width: 200,
             height: 200,
-            angularDragCoefficient: 0);
+            angularDragCoefficient: 0,
+            groundFrictionCoefficient: 0,
+            groundContactRadius: 0,
+            isGrounded: false);
 
         var largeResult = LocomotionCapability.SimulateAngularBrakingAngle(
             omega: 0.1,
@@ -205,7 +223,10 @@ public class LocomotionCapabilityTests
             weight: 1000,
             width: 200,
             height: 200,
-            angularDragCoefficient: 0);
+            angularDragCoefficient: 0,
+            groundFrictionCoefficient: 0,
+            groundContactRadius: 0,
+            isGrounded: false);
 
         largeResult.Should().BeGreaterThan(smallResult);
     }
@@ -221,7 +242,9 @@ public class LocomotionCapabilityTests
             brakingFx: -100, brakingFy: 0,
             weight: 1000,
             dragCoefficient: 0,
-            bounds: bounds);
+            bounds: bounds,
+            groundFrictionCoefficient: 0,
+            isGrounded: false);
 
         result.Should().Be(0.0);
     }
@@ -235,7 +258,9 @@ public class LocomotionCapabilityTests
             brakingFx: -1, brakingFy: 0,
             weight: 1000,
             dragCoefficient: 0,
-            bounds: bounds);
+            bounds: bounds,
+            groundFrictionCoefficient: 0,
+            isGrounded: false);
 
         result.Should().BeGreaterThan(0);
     }
@@ -249,14 +274,18 @@ public class LocomotionCapabilityTests
             brakingFx: -1, brakingFy: 0,
             weight: 1000,
             dragCoefficient: 0,
-            bounds: bounds);
+            bounds: bounds,
+            groundFrictionCoefficient: 0,
+            isGrounded: false);
 
         var largeResult = LocomotionCapability.SimulateLinearBrakingDistance(
             vx: 10, vy: 0,
             brakingFx: -1, brakingFy: 0,
             weight: 1000,
             dragCoefficient: 0,
-            bounds: bounds);
+            bounds: bounds,
+            groundFrictionCoefficient: 0,
+            isGrounded: false);
 
         largeResult.Should().BeGreaterThan(smallResult);
     }
@@ -274,7 +303,10 @@ public class LocomotionCapabilityTests
             weight: 1000,
             width: 200,
             height: 200,
-            angularDragCoefficient: 0);
+            angularDragCoefficient: 0,
+            groundFrictionCoefficient: 0,
+            groundContactRadius: 0,
+            isGrounded: false);
 
         result.Should().BeGreaterThanOrEqualTo(0.0);
         result.Should().BeLessThanOrEqualTo(1.0);
@@ -296,7 +328,10 @@ public class LocomotionCapabilityTests
             weight: weight,
             width: width,
             height: height,
-            angularDragCoefficient: 0);
+            angularDragCoefficient: 0,
+            groundFrictionCoefficient: 0,
+            groundContactRadius: 0,
+            isGrounded: false);
 
         var newOmega = PhysicsService.CalculateAngularVelocity(
             initialVelocity: velocity,
@@ -304,7 +339,10 @@ public class LocomotionCapabilityTests
             height: height,
             width: width,
             angularDragCoefficient: 0,
-            torque: scale * counterTorque);
+            torque: scale * counterTorque,
+            groundFrictionCoefficient: 0,
+            groundContactRadius: 0,
+            isGrounded: false);
 
         // The returned scale must not flip the sign of omega (no overshoot past zero)
         (newOmega == 0.0 || Math.Sign(newOmega) == 1).Should().BeTrue();

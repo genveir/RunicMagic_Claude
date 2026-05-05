@@ -21,6 +21,8 @@ internal class EntityBuilder
     private double _angle = 0;
     private double _dragCoefficient = 0.0;
     private double _angularDragCoefficient = 0.0;
+    private double _groundFrictionCoefficient = 0.0;
+    private double? _groundContactRadius;
     private StructuralIntegrityCapability _structuralIntegrity = new StructuralIntegrityCapability(1000, 1000);
     private AICapability _aiCapability = new AICapability([]);
 
@@ -109,6 +111,18 @@ internal class EntityBuilder
         return this;
     }
 
+    public EntityBuilder WithGroundFrictionCoefficient(double groundFrictionCoefficient)
+    {
+        _groundFrictionCoefficient = groundFrictionCoefficient;
+        return this;
+    }
+
+    public EntityBuilder WithGroundContactRadius(double groundContactRadius)
+    {
+        _groundContactRadius = groundContactRadius;
+        return this;
+    }
+
     public EntityBuilder WithStructuralIntegrity(long max, long current)
     {
         _structuralIntegrity = new StructuralIntegrityCapability(max, current);
@@ -177,6 +191,10 @@ internal class EntityBuilder
 
     public Entity Build()
     {
+        var w = (double)_width;
+        var h = (double)_height;
+        var groundContactRadius = _groundContactRadius ?? Math.Sqrt((w * w + h * h) / 12.0);
+
         return new Entity(
             id: _id,
             label: _label,
@@ -191,7 +209,9 @@ internal class EntityBuilder
             structuralIntegrity: _structuralIntegrity,
             aiCapability: _aiCapability,
             dragCoefficient: _dragCoefficient,
-            angularDragCoefficient: _angularDragCoefficient)
+            angularDragCoefficient: _angularDragCoefficient,
+            groundFrictionCoefficient: _groundFrictionCoefficient,
+            groundContactRadius: groundContactRadius)
         {
             Life = _life,
             Charge = _charge,
