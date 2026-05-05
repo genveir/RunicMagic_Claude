@@ -26,11 +26,11 @@ public class AICapability
         behaviors.RemoveAll(b => predicate(b));
     }
 
-    public void Execute(Entity entity, WorldModel worldModel, IWorldEventTracker eventTracker)
+    public void Execute(Entity entity, WorldModel worldModel, IWorldEventTracker eventTracker, long currentTick)
     {
         foreach (var behavior in behaviors)
         {
-            behavior.Execute(entity, worldModel, eventTracker);
+            behavior.Execute(entity, worldModel, eventTracker, currentTick);
         }
     }
 }

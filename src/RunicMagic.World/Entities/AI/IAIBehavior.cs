@@ -2,5 +2,5 @@
 
 public interface IAIBehavior
 {
-    void Execute(Entity entity, WorldModel worldModel, IWorldEventTracker eventTracker);
+    void Execute(Entity entity, WorldModel worldModel, IWorldEventTracker eventTracker, long currentTick);
 }

@@ -1,7 +1,5 @@
-﻿namespace RunicMagic.Database;
+namespace RunicMagic.Database;
 
-public record AIData
-(
-    Guid entityId
-// will hold behaviors
-);
+public record AIData(
+    Guid EntityId,
+    PatrolBehaviorData[]? PatrolBehaviors = null);

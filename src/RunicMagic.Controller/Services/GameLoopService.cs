@@ -12,6 +12,8 @@ internal class GameLoopService(
     IWorldRenderingService worldRendering,
     IWorldTickSink sink) : BackgroundService
 {
+    private long _currentTick = 0;
+
     protected override async Task ExecuteAsync(CancellationToken ct)
     {
         using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(1000.0 / 60));
@@ -27,7 +29,8 @@ internal class GameLoopService(
 
         playerService.DrainAndFlush(eventTracker);
 
-        world.HandleTick(eventTracker);
+        world.HandleTick(eventTracker, _currentTick);
+        _currentTick++;
 
         var casterId = playerService.GetCasterId();
 

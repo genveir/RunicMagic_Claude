@@ -65,11 +65,11 @@ public class WorldModel : IGameLoopWorldModel
         _engineMotionEffects.Add(effect);
     }
 
-    public void HandleTick(IWorldEventTracker eventTracker)
+    public void HandleTick(IWorldEventTracker eventTracker, long currentTick = 0)
     {
         var entitiesUnderMotion = TickEngineMotion(eventTracker);
 
-        TickEntities(eventTracker, entitiesUnderMotion);
+        TickEntities(eventTracker, entitiesUnderMotion, currentTick);
         TickPhysics(eventTracker);
     }
 
@@ -97,21 +97,21 @@ public class WorldModel : IGameLoopWorldModel
         return entitiesUnderEngineMotion;
     }
 
-    private void TickEntities(IWorldEventTracker eventTracker, HashSet<Entity> entitiesUnderEngineMotion)
+    private void TickEntities(IWorldEventTracker eventTracker, HashSet<Entity> entitiesUnderEngineMotion, long currentTick)
     {
         foreach (var entity in _entities.Values)
         {
             entity.IsUnderEngineMotion = entitiesUnderEngineMotion.Contains(entity);
 
-            TickAI(eventTracker, entity);
+            TickAI(eventTracker, entity, currentTick);
         }
     }
 
-    private void TickAI(IWorldEventTracker eventTracker, Entity entity)
+    private void TickAI(IWorldEventTracker eventTracker, Entity entity, long currentTick)
     {
         if (entity.AI.BehaviorCount > 0)
         {
-            entity.AI.Execute(entity, this, eventTracker);
+            entity.AI.Execute(entity, this, eventTracker, currentTick);
         }
     }
 

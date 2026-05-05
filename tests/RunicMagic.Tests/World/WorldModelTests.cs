@@ -200,7 +200,7 @@ public class WorldModelTests
         public int CallCount { get; private set; }
         public IWorldEventTracker? ReceivedTracker { get; private set; }
 
-        public void Execute(Entity entity, WorldModel worldModel, IWorldEventTracker eventTracker)
+        public void Execute(Entity entity, WorldModel worldModel, IWorldEventTracker eventTracker, long currentTick)
         {
             CallCount++;
             ReceivedTracker = eventTracker;

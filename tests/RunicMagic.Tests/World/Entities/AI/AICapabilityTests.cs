@@ -72,7 +72,7 @@ public class AICapabilityTests
         var world = new WorldModel();
         var tracker = new EventTracker();
 
-        ai.Execute(entity, world, tracker);
+        ai.Execute(entity, world, tracker, currentTick: 0);
 
         b1.CallCount.Should().Be(1);
         b2.CallCount.Should().Be(1);
@@ -90,7 +90,7 @@ public class AICapabilityTests
         var world = new WorldModel();
         var tracker = new EventTracker();
 
-        ai.Execute(entity, world, tracker);
+        ai.Execute(entity, world, tracker, currentTick: 0);
 
         behavior.CallCount.Should().Be(0);
     }
@@ -106,11 +106,12 @@ public class AICapabilityTests
         var world = new WorldModel();
         var tracker = new EventTracker();
 
-        ai.Execute(entity, world, tracker);
+        ai.Execute(entity, world, tracker, currentTick: 42);
 
         behavior.ReceivedEntity.Should().BeSameAs(entity);
         behavior.ReceivedWorld.Should().BeSameAs(world);
         behavior.ReceivedTracker.Should().BeSameAs(tracker);
+        behavior.ReceivedTick.Should().Be(42);
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────
@@ -121,13 +122,15 @@ public class AICapabilityTests
         public Entity? ReceivedEntity { get; private set; }
         public WorldModel? ReceivedWorld { get; private set; }
         public IWorldEventTracker? ReceivedTracker { get; private set; }
+        public long ReceivedTick { get; private set; }
 
-        public void Execute(Entity entity, WorldModel worldModel, IWorldEventTracker eventTracker)
+        public void Execute(Entity entity, WorldModel worldModel, IWorldEventTracker eventTracker, long currentTick)
         {
             CallCount++;
             ReceivedEntity = entity;
             ReceivedWorld = worldModel;
             ReceivedTracker = eventTracker;
+            ReceivedTick = currentTick;
         }
     }
 
@@ -135,6 +138,6 @@ public class AICapabilityTests
     {
         public string Tag { get; } = tag;
 
-        public void Execute(Entity entity, WorldModel worldModel, IWorldEventTracker eventTracker) { }
+        public void Execute(Entity entity, WorldModel worldModel, IWorldEventTracker eventTracker, long currentTick) { }
     }
 }

@@ -122,6 +122,19 @@ public class EntityFactory(WorldModel world, ILogger<EntityFactory> logger)
 
     private AICapability SetupAI(AIData? aiData)
     {
-        return new AICapability([]);
+        var behaviors = new List<IAIBehavior>();
+
+        if (aiData?.PatrolBehaviors != null)
+        {
+            foreach (var patrolData in aiData.PatrolBehaviors)
+            {
+                var waypoints = patrolData.Waypoints
+                    .Select(w => new PatrolWaypoint(new Location(w.X, w.Y), w.WaitTicks))
+                    .ToList();
+                behaviors.Add(new PatrolAIBehavior(waypoints, patrolData.Speed));
+            }
+        }
+
+        return new AICapability(behaviors);
     }
 }

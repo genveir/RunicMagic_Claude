@@ -4,6 +4,8 @@ begin
     set noexec on;
 end
 
+drop table if exists PatrolWaypoints;
+drop table if exists PatrolBehaviors;
 drop table if exists EntityLife;
 drop table if exists EntityCharge;
 drop table if exists EntityLocomotion;
@@ -59,6 +61,21 @@ create table EntityLocomotion (
     EntityId             uniqueidentifier not null constraint PK_EntityLocomotion primary key
                                                   constraint FK_EntityLocomotion_Entities references Entities (Id),
     LocomotionEfficiency float            not null
+);
+
+create table PatrolBehaviors (
+    Id       bigint           not null constraint PK_PatrolBehaviors primary key identity,
+    EntityId uniqueidentifier not null constraint FK_PatrolBehaviors_Entities references Entities (Id),
+    Speed    float            not null
+);
+
+create table PatrolWaypoints (
+    Id               bigint not null constraint PK_PatrolWaypoints primary key identity,
+    PatrolBehaviorId bigint not null constraint FK_PatrolWaypoints_PatrolBehaviors references PatrolBehaviors (Id),
+    Sequence         int    not null,
+    X                bigint not null,
+    Y                bigint not null,
+    WaitTicks        bigint not null constraint DF_PatrolWaypoints_WaitTicks default 0
 );
 
 create table Inscription (

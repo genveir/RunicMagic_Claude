@@ -8,18 +8,19 @@ The Key column in every table uses right-padded cells. The baseline is 7 charact
 
 ## To Do — Milestone 3
 
-Next ticket number: RMC-111
+Next ticket number: RMC-114
 Next bugfix number: BUG-9
 
 | Key | Title | Description | Blocked By |
 |-----|-------|-------------|------------|
-| RMC-80  | PatrolAi behavior | First concrete AI behavior: `PatrolAiBehavior` — walks an entity back and forth along a list of waypoints. Sets locomotion intent (desired direction) each tick; the physics service and `LocomotionCapability` handle the actual motion. Needs DB schema for waypoints. | RMC-77, RMC-103, RMC-105 |
-| RMC-75  | 🏁 Milestone 3 — Have a guard walk by and get pushed | Implement a simple guard NPC that walks back and forth along a predefined path and push him away with a DAN-targeted spell. This will require the engine to have a concept of time. | RMC-83 |
 
 ## To Do — Other
 
 | Key | Title | Description | Blocked By |
 |-----|-------|-------------|------------|
+| RMC-112 | Add Position type | Add a `Position` record to the geometry layer combining a `Location` and a facing `double Angle`. Represents a point in the world with an orientation — useful anywhere a destination also implies a facing direction (patrol waypoints, spawn points, etc.). | |
+| RMC-113 | Patrol waypoints use Position | Replace the `Location` in `PatrolWaypoint` with a `Position`. When the guard arrives at a waypoint, it should adopt the waypoint's facing angle in addition to reaching its location. Requires updating `PatrolWaypointData` (add `Angle float` column to `PatrolWaypoints` table), `PatrolAIBehavior`, and the locomotion/turning logic to orient the entity at the destination. | RMC-112 |
+| RMC-111 | Split movement policy out of LocomotionCapability | `LocomotionCapability` currently conflates two concerns: the physical model (legs, offsets, efficiency, how to produce `ForceVector` impulses) and movement policy (goal-seeking, braking decisions, turn-vs-walk priority). Split these so that `LocomotionCapability` exposes physical primitives only: `ApplyForwardForce(entity, fraction)`, `ApplyTurnForce(entity, direction, fraction)`, and query methods like `GetLinearBrakingDistance(entity, forceFraction)` / `GetAngularBrakingAngle(entity, forceFraction)` (which delegate to `PhysicsService` internally). The current goal-seeking logic (`ApplyLocomotion`, `ApplyWalking`, `ApplyTurning`, braking simulations) moves into AI behaviour classes in the AI layer. This allows behaviours like sneak (10% force), combined turn+accelerate (split leg allocation), or custom stopping policy without touching the capability. | RMC-103 |
 | RMC-110 | Rewrite Strength as a capability | Extract `Strength` from its current form and rewrite it as a proper capability on `Entity`, following the same pattern as `LocomotionCapability`. | |
 | RMC-109 | Split WorldModel into entity store, motion queue, and ticker | `WorldModel` currently has three responsibilities: entity storage, engine motion effect queuing, and tick orchestration. Split into: `WorldModel` (pure entity store and spatial queries), `EngineMotionQueue` (owns `_engineMotionEffects` and `AddMotionEffect`; `TickEngineMotion` moves here), and `WorldTicker` (tick orchestrator, takes the other two as dependencies and drives `TickEntities`/`TickAI`/`TickPhysics`). Retire `IGameLoopWorldModel`. | |
 | RMC-107 | Show facing direction on canvas entities | Render a facing indicator (e.g. a line or arrow) on entities in the world canvas so their current angle is visually obvious. Useful for debugging locomotion and AI behavior. | |
@@ -79,3 +80,5 @@ Next bugfix number: BUG-9
 | RMC-108 | Rotational velocity and impulses in physics |
 | RMC-103 | LocomotionCapability |
 | BUG-8   | Entities keep spinning indefinitely after being pushed |
+| RMC-80  | PatrolAi behavior |
+| RMC-75  | 🏁 Milestone 3 — Have a guard walk by and get pushed |

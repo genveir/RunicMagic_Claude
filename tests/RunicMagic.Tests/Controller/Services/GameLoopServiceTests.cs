@@ -60,7 +60,7 @@ public class GameLoopServiceTests
     {
         public Entity? FindResult { get; set; }
 
-        public void HandleTick(IWorldEventTracker eventTracker) { }
+        public void HandleTick(IWorldEventTracker eventTracker, long currentTick) { }
 
         public Entity? Find(EntityId id)
         {

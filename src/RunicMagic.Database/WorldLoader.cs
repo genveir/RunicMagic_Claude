@@ -29,12 +29,38 @@ public class WorldLoader(string connectionString)
             .GroupBy(r => r.EntityId)
             .ToDictionary(g => g.Key, g => g.Select(r => r.SpellText).ToArray());
 
+        var patrolBehaviorRows = (await conn.QueryAsync<PatrolBehaviorRow>(
+            "select Id, EntityId, Speed from PatrolBehaviors"))
+            .AsList();
+
+        var patrolWaypointsByBehavior = (await conn.QueryAsync<PatrolWaypointRow>(
+            "select PatrolBehaviorId, Sequence, X, Y, WaitTicks from PatrolWaypoints"))
+            .GroupBy(r => r.PatrolBehaviorId)
+            .ToDictionary(
+                g => g.Key,
+                g => g.OrderBy(r => r.Sequence)
+                      .Select(r => new PatrolWaypointData(r.Sequence, r.X, r.Y, r.WaitTicks))
+                      .ToArray());
+
+        var patrolBehaviorsByEntity = patrolBehaviorRows
+            .GroupBy(r => r.EntityId)
+            .ToDictionary(
+                g => g.Key,
+                g => g.Select(r =>
+                {
+                    patrolWaypointsByBehavior.TryGetValue(r.Id, out var waypoints);
+                    return new PatrolBehaviorData(r.Id, r.Speed, waypoints ?? []);
+                }).ToArray());
+
         return entityRows.Select(row =>
         {
             lifeRows.TryGetValue(row.Id, out var life);
             chargeRows.TryGetValue(row.Id, out var charge);
             locomotionRows.TryGetValue(row.Id, out var locomotion);
             inscriptionGroups.TryGetValue(row.Id, out var inscriptions);
+            patrolBehaviorsByEntity.TryGetValue(row.Id, out var patrolBehaviors);
+
+            var aiData = patrolBehaviors != null ? new AIData(row.Id, PatrolBehaviors: patrolBehaviors) : null;
 
             return new EntityData(
                 Id: row.Id,
@@ -59,7 +85,8 @@ public class WorldLoader(string connectionString)
                 DragCoefficient: row.DragCoefficient,
                 AngularDragCoefficient: row.AngularDragCoefficient,
                 GroundFrictionCoefficient: row.GroundFrictionCoefficient,
-                LocomotionEfficiency: locomotion?.LocomotionEfficiency);
+                LocomotionEfficiency: locomotion?.LocomotionEfficiency,
+                AIData: aiData);
         });
     }
 
@@ -68,4 +95,6 @@ public class WorldLoader(string connectionString)
     private record ChargeRow(Guid EntityId, long MaxCharge, long CurrentCharge);
     private record LocomotionRow(Guid EntityId, double LocomotionEfficiency);
     private record InscriptionRow(Guid EntityId, string SpellText);
+    private record PatrolBehaviorRow(long Id, Guid EntityId, double Speed);
+    private record PatrolWaypointRow(long PatrolBehaviorId, int Sequence, long X, long Y, long WaitTicks);
 }
