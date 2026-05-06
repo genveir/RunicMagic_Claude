@@ -74,22 +74,24 @@ function handleTerminalKey(key, domEvent) {
         case 'ArrowUp':
             if (historyIndex < history.length - 1) {
                 historyIndex++;
+                term.write(clearInput());
                 input = history[history.length - 1 - historyIndex];
                 cursorOffset = 0;
-                term.write(clearInput() + input);
+                term.write(input);
             }
             break;
         case 'ArrowDown':
             if (historyIndex > 0) {
                 historyIndex--;
+                term.write(clearInput());
                 input = history[history.length - 1 - historyIndex];
                 cursorOffset = 0;
-                term.write(clearInput() + input);
+                term.write(input);
             } else if (historyIndex === 0) {
                 historyIndex = -1;
+                term.write(clearInput());
                 input = '';
                 cursorOffset = 0;
-                term.write(clearInput());
             }
             break;
         case 'Enter':
