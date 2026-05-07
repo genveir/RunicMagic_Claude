@@ -23,7 +23,7 @@ public class VUN : IStatement
         var toMove = ToMove.Resolve(context);
         long distance = HowFar.Evaluate(context).Value;
 
-        if (!toMove.Entities.Any() || distance <= 0)
+        if (!toMove.Entities.Any())
         {
             return;
         }

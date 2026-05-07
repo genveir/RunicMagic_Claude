@@ -75,7 +75,29 @@ public class CJARTests
     }
 
     [Fact]
-    public void Execute_AddsEntityRotatedEvent()
+    public void Execute_WithNonZeroAngle_EnqueuesMotion()
+    {
+        var world = new WorldModel();
+        var entity = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(0).Build();
+        var cjar = new CJAR(
+            toRotate: new FixedEntitySet(entity),
+            howMuch: new FixedNumber(QuarterTurn),
+            origin: new FixedLocation(0, 0));
+        var context = TestFixtures.MakeContext(world: world);
+
+        cjar.Execute(context);
+
+        var effects = GetPrivateFieldsForTesting.GetMotionEffects(world);
+        effects.Should().ContainSingle();
+
+        var tracker = new EventTracker();
+        var result = effects[0].TryAdvance(tracker);
+
+        result.EntitiesUnderMotion.Should().ContainSingle().Which.Should().BeSameAs(entity);
+    }
+
+    [Fact]
+    public void Execute_AddsEntityRotatedEvent_OnFinalTick()
     {
         var world = new WorldModel();
         var entity = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(0).Build();
@@ -96,10 +118,10 @@ public class CJARTests
     }
 
     [Fact]
-    public void Execute_ZeroAngle_NoMotionEnqueued()
+    public void Execute_ZeroAngle_EnqueuesMotion()
     {
         var world = new WorldModel();
-        var entity = new EntityBuilder().WithLocation(x: 1000, y: 0).Build();
+        var entity = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(0).Build();
         var cjar = new CJAR(
             toRotate: new FixedEntitySet(entity),
             howMuch: new FixedNumber(0),
@@ -107,11 +129,14 @@ public class CJARTests
         var context = TestFixtures.MakeContext(world: world);
 
         cjar.Execute(context);
-        var tickResult = new EventTracker();
-        world.HandleTick(tickResult);
 
-        tickResult.WorldEvents.OfType<EntityRotatedEvent>().Should().BeEmpty();
-        entity.Location.X.Should().Be(1000);
+        var effects = GetPrivateFieldsForTesting.GetMotionEffects(world);
+        effects.Should().ContainSingle();
+
+        var tracker = new EventTracker();
+        var result = effects[0].TryAdvance(tracker);
+
+        result.EntitiesUnderMotion.Should().ContainSingle().Which.Should().BeSameAs(entity);
     }
 
     [Fact]

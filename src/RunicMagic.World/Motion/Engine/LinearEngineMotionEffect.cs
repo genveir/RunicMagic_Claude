@@ -72,7 +72,7 @@ public class LinearEngineMotionEffect : IEngineMotionEffect
 
         _remainingTicks--;
 
-        if (_remainingTicks == 0 && _totalDistanceMm > 0)
+        if (_remainingTicks == 0)
         {
             foreach (var entity in entities.Entities)
             {

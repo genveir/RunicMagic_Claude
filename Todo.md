@@ -13,7 +13,6 @@ Next bugfix number: BUG-10
 
 | Key | Title | Description | Blocked By |
 |-----|-------|-------------|------------|
-| BUG-9   | VUN(push) with distance 0 does not execute | Casting VUN(push) with a distance of 0 silently does nothing instead of executing the push at zero distance (which should be a valid no-op move or at minimum trigger execution). | |
 | RMC-84  | Partial view updates via SSE | Instead of posting the full world render on every game tick, post only the entities that changed during that tick. The client merges the delta into its current render state rather than replacing it wholesale. | RMC-78 |
 | RMC-92  | Move status rendering to View | The terminal prompt is currently rendered in the Controller assembly. Controller should instead produce a model carrying the caster's status information (e.g. power, health) and pass it to View, which is responsible for deciding how to format and display that data. | |
 | RMC-109 | Split WorldModel into entity store, motion queue, and ticker | `WorldModel` currently has three responsibilities: entity storage, engine motion effect queuing, and tick orchestration. Split into: `WorldModel` (pure entity store and spatial queries), `EngineMotionQueue` (owns `_engineMotionEffects` and `AddMotionEffect`; `TickEngineMotion` moves here), and `WorldTicker` (tick orchestrator, takes the other two as dependencies and drives `TickEntities`/`TickAI`/`TickPhysics`). Retire `IGameLoopWorldModel`. | |
@@ -58,3 +57,4 @@ Next bugfix number: BUG-10
 |-----|-------|
 | BUG-4   | Up/Down arrow in terminal doesn't reprint prompt |
 | RMC-91  | Move entry point to Controller; invert View/Controller dependency |
+| BUG-9   | VUN(push) with distance 0 does not execute |

@@ -20,6 +20,52 @@ public class VARTests
     }
 
     [Fact]
+    public void Execute_WithNonZeroDistance_EnqueuesMotion()
+    {
+        var world = new WorldModel();
+        var entity = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(0).Build();
+        var var_ = new VAR(
+            toMove: new FixedEntitySet(entity),
+            howFar: new FixedNumber(500),
+            origin: new FixedLocation(0, 0)
+        );
+        var context = TestFixtures.MakeContext(world: world);
+
+        var_.Execute(context);
+
+        var effects = GetPrivateFieldsForTesting.GetMotionEffects(world);
+        effects.Should().ContainSingle();
+
+        var tracker = new EventTracker();
+        var result = effects[0].TryAdvance(tracker);
+
+        result.EntitiesUnderMotion.Should().ContainSingle().Which.Should().BeSameAs(entity);
+    }
+
+    [Fact]
+    public void Execute_ZeroDistance_EnqueuesMotion()
+    {
+        var world = new WorldModel();
+        var entity = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(0).Build();
+        var var_ = new VAR(
+            toMove: new FixedEntitySet(entity),
+            howFar: new FixedNumber(0),
+            origin: new FixedLocation(0, 0)
+        );
+        var context = TestFixtures.MakeContext(world: world);
+
+        var_.Execute(context);
+
+        var effects = GetPrivateFieldsForTesting.GetMotionEffects(world);
+        effects.Should().ContainSingle();
+
+        var tracker = new EventTracker();
+        var result = effects[0].TryAdvance(tracker);
+
+        result.EntitiesUnderMotion.Should().ContainSingle().Which.Should().BeSameAs(entity);
+    }
+
+    [Fact]
     public void Execute_PullsEntityTowardsOrigin()
     {
         var world = new WorldModel();
@@ -142,7 +188,7 @@ public class VARTests
     }
 
     [Fact]
-    public void Execute_EmitsEntityPulledEvent_PerEntity()
+    public void Execute_EmitsEntityPulledEvent_PerEntity_OnFinalTick()
     {
         var world = new WorldModel();
         var entity1 = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(0).Build();

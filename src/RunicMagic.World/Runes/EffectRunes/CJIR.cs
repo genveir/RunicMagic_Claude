@@ -23,7 +23,7 @@ public class CJIR : IStatement
         var toRotate = ToRotate.Resolve(context);
         var angleDegrees = HowMuch.Evaluate(context).Value;
 
-        if (!toRotate.Entities.Any() || angleDegrees <= 0)
+        if (!toRotate.Entities.Any())
         {
             return;
         }
