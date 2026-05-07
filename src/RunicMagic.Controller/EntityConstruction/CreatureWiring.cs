@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using RunicMagic.World.Entities;
+﻿using RunicMagic.World.Entities;
 using RunicMagic.World.Entities.Capabilities;
 
 namespace RunicMagic.Controller.EntityConstruction;

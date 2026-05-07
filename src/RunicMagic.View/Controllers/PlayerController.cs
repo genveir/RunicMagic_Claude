@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using RunicMagic.Controller.Abstractions;
-using RunicMagic.Controller.Models;
+using RunicMagic.View.Abstractions;
+using RunicMagic.View.Models;
 
 namespace RunicMagic.View.Controllers;
 

@@ -1,5 +1,5 @@
 using RunicMagic.Controller.Mappers;
-using RunicMagic.Controller.Models;
+using RunicMagic.View.Models;
 using RunicMagic.World.Entities;
 using RunicMagic.World.Entities.Capabilities;
 

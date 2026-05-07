@@ -1,5 +1,5 @@
-using RunicMagic.Controller.Abstractions;
-using RunicMagic.Controller.Models;
+using RunicMagic.View.Abstractions;
+using RunicMagic.View.Models;
 using System.Collections.Concurrent;
 using System.Threading.Channels;
 

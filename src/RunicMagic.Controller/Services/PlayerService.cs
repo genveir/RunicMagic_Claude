@@ -1,5 +1,7 @@
 using RunicMagic.Controller.Abstractions;
 using RunicMagic.Controller.Models;
+using RunicMagic.View.Abstractions;
+using RunicMagic.View.Models;
 using RunicMagic.World;
 using RunicMagic.World.Entities;
 using RunicMagic.World.Execution;
@@ -31,7 +33,7 @@ internal class PlayerService(
     {
         _queue.Enqueue((eventTracker) =>
         {
-            var entities = world.GetEntitiesAtPoint(worldCoordinate.ToLocation())
+            var entities = world.GetEntitiesAtPoint(new Location(worldCoordinate.X, worldCoordinate.Y))
                 .Where(e => e.HasAgency)
                 .ToList();
 
@@ -87,7 +89,7 @@ internal class PlayerService(
             var caster = CheckForCaster(eventTracker, checkForDeath: true);
             if (caster == null) return;
 
-            var entities = world.GetEntitiesAtPoint(worldCoordinate.ToLocation());
+            var entities = world.GetEntitiesAtPoint(new Location(worldCoordinate.X, worldCoordinate.Y));
             if (entities.Count == 0)
             {
                 eventTracker.Add(new NothingToIndicateEvent());
@@ -101,7 +103,7 @@ internal class PlayerService(
                 return;
             }
 
-            var to = worldCoordinate.ToLocation();
+            var to = new Location(worldCoordinate.X, worldCoordinate.Y);
             var direction = Direction.FromPoints(caster.Location, to);
             var castResult = rayCast.Cast(caster.Id, caster.Location, direction, skipTranslucent: false);
 
@@ -124,7 +126,10 @@ internal class PlayerService(
         return Task.CompletedTask;
     }
 
-    public EntityId? GetCasterId() => _casterId;
+    public EntityId? GetCasterId()
+    {
+        return _casterId;
+    }
 
     public void DrainAndFlush(EventTracker eventTracker)
     {

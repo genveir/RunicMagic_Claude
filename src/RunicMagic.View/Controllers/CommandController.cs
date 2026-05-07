@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using RunicMagic.Controller.Abstractions;
+using RunicMagic.View.Abstractions;
 
 namespace RunicMagic.View.Controllers;
 

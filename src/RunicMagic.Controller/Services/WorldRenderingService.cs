@@ -1,6 +1,6 @@
-using RunicMagic.Controller.Abstractions;
 using RunicMagic.Controller.Mappers;
-using RunicMagic.Controller.Models;
+using RunicMagic.View.Abstractions;
+using RunicMagic.View.Models;
 using RunicMagic.World;
 using RunicMagic.World.Entities;
 using RunicMagic.World.Geometry;
@@ -9,12 +9,14 @@ namespace RunicMagic.Controller.Services;
 
 internal class WorldRenderingService(WorldModel world, RayCastService rayCast) : IWorldRenderingService
 {
-    public IReadOnlyList<EntityRenderingModel> GetAllRenderingModels(EntityId? casterEntityId)
+    public IReadOnlyList<EntityRenderingModel> GetAllRenderingModels(Guid? casterEntityId)
     {
+        var casterId = casterEntityId.HasValue ? new EntityId(casterEntityId.Value) : (EntityId?)null;
+
         var entities = world.GetAll();
 
-        var indicateTargetId = casterEntityId.HasValue
-            ? world.Find(casterEntityId.Value)?.IndicateTarget?.EntityId
+        var indicateTargetId = casterId.HasValue
+            ? world.Find(casterId.Value)?.IndicateTarget?.EntityId
             : null;
 
         var renderingModels = new List<EntityRenderingModel>();
@@ -24,7 +26,7 @@ internal class WorldRenderingService(WorldModel world, RayCastService rayCast) :
             if (entity.PointingDirection.HasValue)
             {
                 var castResult = rayCast.Cast(entity.Id, entity.Location, entity.PointingDirection.Value);
-                pointingEnd = WorldCoordinate.FromLocation(castResult.LocationOfIntersect);
+                pointingEnd = new WorldCoordinate(castResult.LocationOfIntersect.X, castResult.LocationOfIntersect.Y);
             }
 
             WorldCoordinate? indicateEnd = null;
@@ -42,7 +44,7 @@ internal class WorldRenderingService(WorldModel world, RayCastService rayCast) :
             }
 
             var isIndicateTarget = entity.Id == indicateTargetId;
-            var mapped = EntityRenderingMapper.ToRenderingModel(entity, entity.Id == casterEntityId, pointingEnd, isIndicateTarget, indicateEnd);
+            var mapped = EntityRenderingMapper.ToRenderingModel(entity, entity.Id == casterId, pointingEnd, isIndicateTarget, indicateEnd);
             renderingModels.Add(mapped);
         }
 

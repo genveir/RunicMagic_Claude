@@ -1,5 +1,5 @@
-using RunicMagic.Controller.Models;
 using RunicMagic.Controller.Services;
+using RunicMagic.View.Models;
 using RunicMagic.View.Services;
 using RunicMagic.World;
 using RunicMagic.World.Geometry;

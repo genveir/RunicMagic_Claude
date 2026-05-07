@@ -1,4 +1,4 @@
-namespace RunicMagic.Controller.Models;
+namespace RunicMagic.View.Models;
 
 public record CommandResult(
     IReadOnlyList<string> Text,

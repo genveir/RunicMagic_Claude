@@ -1,6 +1,6 @@
-using Microsoft.Extensions.Hosting;
 using RunicMagic.Controller.Abstractions;
-using RunicMagic.Controller.Models;
+using RunicMagic.View.Abstractions;
+using RunicMagic.View.Models;
 using RunicMagic.World.Abstractions;
 using RunicMagic.World.Entities;
 
@@ -61,7 +61,7 @@ internal class GameLoopService(
             text.Add(EventDescriber.Describe(parseEvent));
         }
 
-        var renderingModels = worldRendering.GetAllRenderingModels(casterId);
+        var renderingModels = worldRendering.GetAllRenderingModels(casterId?.Value);
 
         return new CommandResult(
             text,

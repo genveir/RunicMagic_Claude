@@ -1,5 +1,5 @@
-using RunicMagic.Controller.Models;
 using RunicMagic.Controller.Services;
+using RunicMagic.View.Models;
 using RunicMagic.World;
 using RunicMagic.World.Entities;
 using RunicMagic.World.Entities.Capabilities;
@@ -60,7 +60,7 @@ public class WorldRenderingServiceTests
         world.Add(other);
         var service = new WorldRenderingService(world, new RayCastService(world));
 
-        var result = service.GetAllRenderingModels(casterEntityId: caster.Id);
+        var result = service.GetAllRenderingModels(casterEntityId: caster.Id.Value);
 
         result.Should().Contain(m => m.Label == "caster" && m.IsCaster);
         result.Should().Contain(m => m.Label == "other" && !m.IsCaster);

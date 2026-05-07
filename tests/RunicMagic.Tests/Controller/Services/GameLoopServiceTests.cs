@@ -2,6 +2,8 @@ using RunicMagic.Controller.Abstractions;
 using RunicMagic.Controller.Models;
 using RunicMagic.Controller.RuneParsing;
 using RunicMagic.Controller.Services;
+using RunicMagic.View.Abstractions;
+using RunicMagic.View.Models;
 using RunicMagic.World;
 using RunicMagic.World.Abstractions;
 using RunicMagic.World.Entities;
@@ -70,7 +72,7 @@ public class GameLoopServiceTests
 
     private class FakeRendering : IWorldRenderingService
     {
-        public IReadOnlyList<EntityRenderingModel> GetAllRenderingModels(EntityId? casterEntityId)
+        public IReadOnlyList<EntityRenderingModel> GetAllRenderingModels(Guid? casterEntityId)
         {
             return [];
         }

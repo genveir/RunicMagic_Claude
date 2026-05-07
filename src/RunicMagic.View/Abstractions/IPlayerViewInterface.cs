@@ -1,6 +1,6 @@
-using RunicMagic.Controller.Models;
+using RunicMagic.View.Models;
 
-namespace RunicMagic.Controller.Abstractions;
+namespace RunicMagic.View.Abstractions;
 
 public interface IPlayerViewInterface
 {

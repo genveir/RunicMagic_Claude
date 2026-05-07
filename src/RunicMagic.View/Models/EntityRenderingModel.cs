@@ -1,4 +1,4 @@
-﻿namespace RunicMagic.Controller.Models;
+namespace RunicMagic.View.Models;
 
 [Flags]
 public enum EntityRenderingFlags { None = 0, HasLife = 1, HasAgency = 2, IsTranslucent = 4 }

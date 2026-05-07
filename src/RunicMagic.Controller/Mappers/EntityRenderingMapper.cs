@@ -1,4 +1,4 @@
-using RunicMagic.Controller.Models;
+using RunicMagic.View.Models;
 using RunicMagic.World.Entities;
 
 namespace RunicMagic.Controller.Mappers;

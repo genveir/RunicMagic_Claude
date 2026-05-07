@@ -1,4 +1,3 @@
-using Microsoft.Extensions.Logging;
 using RunicMagic.Controller.RuneParsing;
 using RunicMagic.Database;
 using RunicMagic.World;
