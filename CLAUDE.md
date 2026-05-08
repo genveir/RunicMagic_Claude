@@ -19,6 +19,7 @@
 
 - Everything except the terminal/UI layer must be unit testable. Design all components accordingly — no integration tests should be necessary.
 - All delivered code must be covered by tests. Tests must be run and passing before a ticket can move to Ready for Review.
+- Always run `dotnet test` without `--no-build`. The build step is required to catch compilation errors introduced by the changes.
 
 ## Communication
 

@@ -34,6 +34,7 @@ internal static class EventDescriber
             NoCasterSelectedEvent => "No caster selected.",
             CasterNotFoundEvent => "Caster not found in world.",
             CasterDeadEvent => "Caster is dead.",
+            CasterDestroyedEvent => "Caster is destroyed.",
             NoEntitiesWithAgencyFoundEvent => "No entities with agency found at that position.",
             MultipleEntitiesWithAgencyFoundEvent => "Multiple entities with agency found at that position — unable to resolve a caster.",
             CasterSetEvent e => $"Caster set to {e.Entity.Label}.",

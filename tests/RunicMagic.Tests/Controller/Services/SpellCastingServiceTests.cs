@@ -1,4 +1,3 @@
-using RunicMagic.Controller.Models;
 using RunicMagic.Controller.RuneParsing;
 using RunicMagic.Controller.Services;
 using RunicMagic.World;
@@ -12,7 +11,7 @@ public class SpellCastingServiceTests
 {
     private static SpellCastingService MakeService(WorldModel world)
     {
-        return new SpellCastingService(world, new SpellExecutor(world));
+        return new SpellCastingService(new SpellExecutor(world));
     }
 
     private static Entity AddCaster(WorldModel world)
@@ -30,7 +29,7 @@ public class SpellCastingServiceTests
         var service = MakeService(world);
         var tracker = new EventTracker();
 
-        service.Cast("", caster.Id, tracker);
+        service.Cast("", caster, tracker);
 
         tracker.ParseEvents.Should().ContainSingle().Which.Should().BeOfType<RanOutOfTokensEvent>();
     }
@@ -43,7 +42,7 @@ public class SpellCastingServiceTests
         var service = MakeService(world);
         var tracker = new EventTracker();
 
-        service.Cast("NOTARUNE", caster.Id, tracker);
+        service.Cast("NOTARUNE", caster, tracker);
 
         tracker.ParseEvents.Should().ContainSingle().Which.Should().BeOfType<UnexpectedTokenEvent>()
             .Which.Token.Should().Be("NOTARUNE");
@@ -58,33 +57,9 @@ public class SpellCastingServiceTests
         var tracker = new EventTracker();
 
         // ZU VUN A — missing Number argument for VUN
-        service.Cast("ZU VUN A", caster.Id, tracker);
+        service.Cast("ZU VUN A", caster, tracker);
 
         tracker.ParseEvents.Should().ContainSingle().Which.Should().BeOfType<RanOutOfTokensEvent>();
-    }
-
-    [Fact]
-    public void Cast_ValidSpell_NoCasterSelected_EmitsNoCasterSelectedEvent()
-    {
-        var world = new WorldModel();
-        var service = MakeService(world);
-        var tracker = new EventTracker();
-
-        service.Cast("ZU VUN LA IR HOT IR HOT HOT", casterId: null, tracker);
-
-        tracker.ControllerEvents.Should().ContainSingle().Which.Should().BeOfType<NoCasterSelectedEvent>();
-    }
-
-    [Fact]
-    public void Cast_ValidSpell_CasterIdNotInWorld_EmitsCasterNotFoundEvent()
-    {
-        var world = new WorldModel();
-        var service = MakeService(world);
-        var tracker = new EventTracker();
-
-        service.Cast("ZU VUN LA IR HOT IR HOT HOT", EntityId.New(), tracker);
-
-        tracker.ControllerEvents.Should().ContainSingle().Which.Should().BeOfType<CasterNotFoundEvent>();
     }
 
     [Fact]
@@ -107,7 +82,7 @@ public class SpellCastingServiceTests
         world.Add(target);
 
         var service = MakeService(world);
-        service.Cast("ZU VUN LA IR HOT IR HOT HOT", casterEntity.Id, new EventTracker());
+        service.Cast("ZU VUN LA IR HOT IR HOT HOT", casterEntity, new EventTracker());
 
         EventTracker finalTick = new EventTracker();
         for (var i = 0; i < 56; i++)
@@ -140,7 +115,7 @@ public class SpellCastingServiceTests
         world.Add(target);
 
         var service = MakeService(world);
-        service.Cast("ZU VUN LA IR HOT IR HOT HOT", casterEntity.Id, new EventTracker());
+        service.Cast("ZU VUN LA IR HOT IR HOT HOT", casterEntity, new EventTracker());
 
         var allWorldEvents = new List<WorldEvent>();
         for (var i = 0; i < 56; i++)

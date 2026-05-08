@@ -1,28 +1,13 @@
-using RunicMagic.Controller.Models;
 using RunicMagic.Controller.RuneParsing;
-using RunicMagic.World;
 using RunicMagic.World.Entities;
 using RunicMagic.World.Execution;
 
 namespace RunicMagic.Controller.Services;
 
-internal class SpellCastingService(WorldModel world, SpellExecutor spellExecutor)
+internal class SpellCastingService(SpellExecutor spellExecutor)
 {
-    public void Cast(string input, EntityId? casterId, EventTracker eventTracker)
+    public void Cast(string input, Entity caster, EventTracker eventTracker)
     {
-        if (casterId == null)
-        {
-            eventTracker.Add(new NoCasterSelectedEvent());
-            return;
-        }
-
-        var casterEntity = world.Find(casterId.Value);
-        if (casterEntity == null)
-        {
-            eventTracker.Add(new CasterNotFoundEvent());
-            return;
-        }
-
         var (runeCount, parseResult) = SpellParser.Parse(input);
 
         if (!parseResult.Succeeded)
@@ -31,9 +16,9 @@ internal class SpellCastingService(WorldModel world, SpellExecutor spellExecutor
             return;
         }
 
-        var caster = new EntitySet([casterEntity]);
-        var executor = new EntitySet([casterEntity]);
+        var casterSet = new EntitySet([caster]);
+        var executor = new EntitySet([caster]);
 
-        spellExecutor.Execute(parseResult.Value, eventTracker, runeCount, caster, executor);
+        spellExecutor.Execute(parseResult.Value, eventTracker, runeCount, casterSet, executor);
     }
 }

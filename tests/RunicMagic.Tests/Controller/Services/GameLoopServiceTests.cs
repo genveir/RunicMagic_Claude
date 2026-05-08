@@ -17,7 +17,7 @@ public class GameLoopServiceTests
     private static (GameLoopService loop, PlayerService playerService, CapturingSink sink) MakeComponents()
     {
         var world = new WorldModel();
-        var spellCasting = new SpellCastingService(world, new SpellExecutor(world));
+        var spellCasting = new SpellCastingService(new SpellExecutor(world));
         var playerService = new PlayerService(world, spellCasting, new RayCastService(world));
         var sink = new CapturingSink();
         var loop = new GameLoopService(playerService, new FakeWorld(), new FakeRendering(), sink);

@@ -13,7 +13,7 @@ public class PlayerServiceTests
     private static (PlayerService service, WorldModel world) MakeService()
     {
         var world = new WorldModel();
-        var spellCasting = new SpellCastingService(world, new SpellExecutor(world));
+        var spellCasting = new SpellCastingService(new SpellExecutor(world));
         var service = new PlayerService(world, spellCasting, new RayCastService(world));
         return (service, world);
     }
@@ -139,6 +139,50 @@ public class PlayerServiceTests
         service.DrainAndFlush(eventTracker);
 
         eventTracker.ControllerEvents.Should().ContainSingle().Which.Should().BeOfType<NoCasterSelectedEvent>();
+    }
+
+    [Fact]
+    public async Task RegisterInput_DeadCaster_EmitsCasterDeadEvent()
+    {
+        var (service, world) = MakeService();
+        var entity = new EntityBuilder()
+            .WithLabel("dead hero")
+            .WithLife(max: 10, current: 0)
+            .WithLocation(x: 0, y: 0)
+            .WithAgency()
+            .Build();
+        world.Add(entity);
+        await service.SetCaster(new WorldCoordinate(0, 0));
+        service.DrainAndFlush(new EventTracker());
+
+        var eventTracker = new EventTracker();
+        await service.RegisterInput("ZU VUN LA IR HOT IR HOT HOT");
+        service.DrainAndFlush(eventTracker);
+
+        eventTracker.ControllerEvents.Should().ContainSingle().Which.Should().BeOfType<CasterDeadEvent>();
+    }
+
+    [Fact]
+    public async Task RegisterInput_DestroyedCaster_EmitsCasterDestroyedEvent()
+    {
+        var (service, world) = MakeService();
+        var entity = new EntityBuilder()
+            .WithLabel("fragile hero")
+            .WithLife(max: 10, current: 10)
+            .WithStructuralIntegrity(max: 10, current: 0)
+            .WithLocation(x: 0, y: 0)
+            .WithAgency()
+            .Build();
+
+        world.Add(entity);
+        await service.SetCaster(new WorldCoordinate(0, 0));
+        service.DrainAndFlush(new EventTracker());
+
+        var eventTracker = new EventTracker();
+        await service.RegisterInput("ZU VUN LA IR HOT IR HOT HOT");
+        service.DrainAndFlush(eventTracker);
+
+        eventTracker.ControllerEvents.Should().ContainSingle().Which.Should().BeOfType<CasterDestroyedEvent>();
     }
 
     [Fact]

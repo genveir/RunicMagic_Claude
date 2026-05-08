@@ -24,7 +24,10 @@ internal class PlayerService(
     {
         _queue.Enqueue((eventTracker) =>
         {
-            spellCasting.Cast(input, _casterId, eventTracker);
+            var caster = CheckForCaster(eventTracker);
+            if (caster == null) return;
+
+            spellCasting.Cast(input, caster, eventTracker);
         });
         return Task.CompletedTask;
     }
@@ -59,7 +62,7 @@ internal class PlayerService(
     {
         _queue.Enqueue((eventTracker) =>
         {
-            var caster = CheckForCaster(eventTracker, checkForDeath: true);
+            var caster = CheckForCaster(eventTracker);
             if (caster == null) return;
 
             TeleportEntityService.Teleport(caster, new Location(worldCoordinate.X, worldCoordinate.Y));
@@ -72,7 +75,7 @@ internal class PlayerService(
     {
         _queue.Enqueue((eventTracker) =>
         {
-            var caster = CheckForCaster(eventTracker, checkForDeath: true);
+            var caster = CheckForCaster(eventTracker);
             if (caster == null) return;
 
             var to = new Location(worldCoordinate.X, worldCoordinate.Y);
@@ -86,7 +89,7 @@ internal class PlayerService(
     {
         _queue.Enqueue((eventTracker) =>
         {
-            var caster = CheckForCaster(eventTracker, checkForDeath: true);
+            var caster = CheckForCaster(eventTracker);
             if (caster == null) return;
 
             var entities = world.GetEntitiesAtPoint(new Location(worldCoordinate.X, worldCoordinate.Y));
@@ -137,7 +140,7 @@ internal class PlayerService(
             action(eventTracker);
     }
 
-    private Entity? CheckForCaster(EventTracker eventTracker, bool checkForDeath)
+    private Entity? CheckForCaster(EventTracker eventTracker)
     {
         if (_casterId == null)
         {
@@ -152,7 +155,13 @@ internal class PlayerService(
             return null;
         }
 
-        if (checkForDeath && caster.Life == null)
+        if (caster.StructuralIntegrity.CurrentIntegrity <= 0)
+        {
+            eventTracker.Add(new CasterDestroyedEvent());
+            return null;
+        }
+
+        if (caster.Life != null && caster.Life.CurrentHitPoints <= 0)
         {
             eventTracker.Add(new CasterDeadEvent());
             return null;

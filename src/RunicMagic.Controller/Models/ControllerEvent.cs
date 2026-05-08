@@ -7,6 +7,7 @@ public abstract record ControllerEvent;
 public record NoCasterSelectedEvent : ControllerEvent;
 public record CasterNotFoundEvent : ControllerEvent;
 public record CasterDeadEvent : ControllerEvent;
+public record CasterDestroyedEvent : ControllerEvent;
 
 public record NoEntitiesWithAgencyFoundEvent : ControllerEvent;
 public record MultipleEntitiesWithAgencyFoundEvent : ControllerEvent;
