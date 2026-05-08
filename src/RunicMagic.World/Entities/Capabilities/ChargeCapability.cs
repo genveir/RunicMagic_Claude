@@ -1,7 +1,13 @@
 namespace RunicMagic.World.Entities.Capabilities;
 
-public class ChargeCapability(long maxCharge, long currentCharge)
+public class ChargeCapability
 {
-    public long MaxCharge { get; } = maxCharge;
-    public long CurrentCharge { get; set; } = currentCharge;
+    public long MaxCharge { get; }
+    public long CurrentCharge { get; set; }
+
+    public ChargeCapability(long maxCharge, long currentCharge)
+    {
+        MaxCharge = maxCharge;
+        CurrentCharge = currentCharge;
+    }
 }

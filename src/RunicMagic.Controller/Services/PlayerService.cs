@@ -11,18 +11,29 @@ using System.Collections.Concurrent;
 
 namespace RunicMagic.Controller.Services;
 
-internal class PlayerService(
-        WorldModel world,
-        SpellCastingService spellCasting,
-        RayCastService rayCast) : IPlayerViewInterface, IPlayerGameLoopInterface
+internal class PlayerService : IPlayerViewInterface, IPlayerGameLoopInterface
 {
+    private readonly ConcurrentQueue<Action<EventTracker>> queue;
+    private readonly WorldModel world;
+    private readonly SpellCastingService spellCasting;
+    private readonly RayCastService rayCast;
+
     private EntityId? _casterId = null;
 
-    private readonly ConcurrentQueue<Action<EventTracker>> _queue = new();
+    public PlayerService(
+            WorldModel world,
+            SpellCastingService spellCasting,
+            RayCastService rayCast)
+    {
+        queue = new();
+        this.world = world;
+        this.spellCasting = spellCasting;
+        this.rayCast = rayCast;
+    }
 
     public Task RegisterInput(string input)
     {
-        _queue.Enqueue((eventTracker) =>
+        queue.Enqueue((eventTracker) =>
         {
             var caster = CheckForCaster(eventTracker);
             if (caster == null) return;
@@ -34,7 +45,7 @@ internal class PlayerService(
 
     public Task SetCaster(WorldCoordinate worldCoordinate)
     {
-        _queue.Enqueue((eventTracker) =>
+        queue.Enqueue((eventTracker) =>
         {
             var entities = world.GetEntitiesAtPoint(new Location(worldCoordinate.X, worldCoordinate.Y))
                 .Where(e => e.HasAgency)
@@ -60,7 +71,7 @@ internal class PlayerService(
 
     public Task MoveCaster(WorldCoordinate worldCoordinate)
     {
-        _queue.Enqueue((eventTracker) =>
+        queue.Enqueue((eventTracker) =>
         {
             var caster = CheckForCaster(eventTracker);
             if (caster == null) return;
@@ -73,7 +84,7 @@ internal class PlayerService(
 
     public Task SetPointingDirection(WorldCoordinate worldCoordinate)
     {
-        _queue.Enqueue((eventTracker) =>
+        queue.Enqueue((eventTracker) =>
         {
             var caster = CheckForCaster(eventTracker);
             if (caster == null) return;
@@ -87,7 +98,7 @@ internal class PlayerService(
 
     public Task SetIndicateTarget(WorldCoordinate worldCoordinate)
     {
-        _queue.Enqueue((eventTracker) =>
+        queue.Enqueue((eventTracker) =>
         {
             var caster = CheckForCaster(eventTracker);
             if (caster == null) return;
@@ -136,7 +147,7 @@ internal class PlayerService(
 
     public void DrainAndFlush(EventTracker eventTracker)
     {
-        while (_queue.TryDequeue(out var action))
+        while (queue.TryDequeue(out var action))
             action(eventTracker);
     }
 

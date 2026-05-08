@@ -2,9 +2,16 @@ using RunicMagic.World.Entities;
 
 namespace RunicMagic.World.Geometry;
 
-public class RayCastService(WorldModel world)
+public class RayCastService
 {
     private const long MaxRangeMillimetres = 3000;
+
+    private readonly WorldModel world;
+
+    public RayCastService(WorldModel world)
+    {
+        this.world = world;
+    }
 
     public RayCastResult Cast(EntityId sourceId, Location origin, Direction direction, bool skipTranslucent = true)
     {

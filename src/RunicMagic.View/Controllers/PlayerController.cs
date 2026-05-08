@@ -5,8 +5,15 @@ using RunicMagic.View.Models;
 namespace RunicMagic.View.Controllers;
 
 [ApiController]
-public class PlayerController(IPlayerViewInterface player) : ControllerBase
+public class PlayerController : ControllerBase
 {
+    private readonly IPlayerViewInterface player;
+
+    public PlayerController(IPlayerViewInterface player)
+    {
+        this.player = player;
+    }
+
     [HttpPost("pick-caster")]
     public async Task<IActionResult> PickCaster([FromBody] CanvasClickRequest request)
     {

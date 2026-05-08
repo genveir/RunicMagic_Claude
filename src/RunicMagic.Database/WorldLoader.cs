@@ -3,8 +3,15 @@ using Microsoft.Data.SqlClient;
 
 namespace RunicMagic.Database;
 
-public class WorldLoader(string connectionString)
+public class WorldLoader
 {
+    private readonly string connectionString;
+
+    public WorldLoader(string connectionString)
+    {
+        this.connectionString = connectionString;
+    }
+
     public async Task<IEnumerable<EntityData>> LoadAsync()
     {
         await using var conn = new SqlConnection(connectionString);

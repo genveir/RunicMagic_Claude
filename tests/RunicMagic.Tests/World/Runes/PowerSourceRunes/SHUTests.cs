@@ -122,8 +122,15 @@ public class SHUTests
         drawOrder.Should().Equal("source", "executor", "caster");
     }
 
-    private class DrawingStatement(long amount) : IStatement
+    private class DrawingStatement : IStatement
     {
+        private readonly long amount;
+
+        public DrawingStatement(long amount)
+        {
+            this.amount = amount;
+        }
+
         public void Execute(SpellContext context)
         {
             context.DrawPower(amount);

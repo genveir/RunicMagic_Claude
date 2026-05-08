@@ -5,9 +5,16 @@ using System.Threading.Channels;
 
 namespace RunicMagic.View.Services;
 
-public class SseConnectionManager(IWorldRenderingService worldRendering)
+public class SseConnectionManager
 {
-    private readonly ConcurrentDictionary<Guid, Channel<ViewUpdateModel>> _connections = new();
+    private readonly ConcurrentDictionary<Guid, Channel<ViewUpdateModel>> _connections;
+    private readonly IWorldRenderingService worldRendering;
+
+    public SseConnectionManager(IWorldRenderingService worldRendering)
+    {
+        _connections = new();
+        this.worldRendering = worldRendering;
+    }
 
     public (Guid Id, Channel<ViewUpdateModel> Channel) AddConnection()
     {

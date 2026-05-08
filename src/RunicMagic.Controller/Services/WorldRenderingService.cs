@@ -7,8 +7,17 @@ using RunicMagic.World.Geometry;
 
 namespace RunicMagic.Controller.Services;
 
-internal class WorldRenderingService(WorldModel world, RayCastService rayCast) : IWorldRenderingService
+internal class WorldRenderingService : IWorldRenderingService
 {
+    private readonly WorldModel world;
+    private readonly RayCastService rayCast;
+
+    public WorldRenderingService(WorldModel world, RayCastService rayCast)
+    {
+        this.world = world;
+        this.rayCast = rayCast;
+    }
+
     public IReadOnlyList<EntityRenderingModel> GetAllRenderingModels(Guid? casterEntityId)
     {
         var casterId = casterEntityId.HasValue ? new EntityId(casterEntityId.Value) : (EntityId?)null;

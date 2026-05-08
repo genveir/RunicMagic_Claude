@@ -6,14 +6,29 @@ using RunicMagic.World.Entities;
 
 namespace RunicMagic.Controller.Services;
 
-internal class GameLoopService(
-    IPlayerGameLoopInterface playerService,
-    IGameLoopWorldModel world,
-    IWorldTicker worldTicker,
-    IWorldRenderingService worldRendering,
-    IWorldTickSink sink) : BackgroundService
+internal class GameLoopService : BackgroundService
 {
+    private readonly IPlayerGameLoopInterface playerService;
+    private readonly IGameLoopWorldModel world;
+    private readonly IWorldTicker worldTicker;
+    private readonly IWorldRenderingService worldRendering;
+    private readonly IWorldTickSink sink;
+
     private long _currentTick = 0;
+
+    public GameLoopService(
+        IPlayerGameLoopInterface playerService,
+        IGameLoopWorldModel world,
+        IWorldTicker worldTicker,
+        IWorldRenderingService worldRendering,
+        IWorldTickSink sink)
+    {
+        this.playerService = playerService;
+        this.world = world;
+        this.worldTicker = worldTicker;
+        this.worldRendering = worldRendering;
+        this.sink = sink;
+    }
 
     protected override async Task ExecuteAsync(CancellationToken ct)
     {

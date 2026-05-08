@@ -4,8 +4,15 @@ using RunicMagic.World.Execution;
 
 namespace RunicMagic.Controller.Services;
 
-internal class SpellCastingService(SpellExecutor spellExecutor)
+internal class SpellCastingService
 {
+    private readonly SpellExecutor spellExecutor;
+
+    public SpellCastingService(SpellExecutor spellExecutor)
+    {
+        this.spellExecutor = spellExecutor;
+    }
+
     public void Cast(string input, Entity caster, EventTracker eventTracker)
     {
         var (runeCount, parseResult) = SpellParser.Parse(input);

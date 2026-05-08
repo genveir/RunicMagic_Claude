@@ -1,7 +1,13 @@
 namespace RunicMagic.World.Entities.Capabilities;
 
-public class LifeCapability(long maxHitPoints, long currentHitPoints)
+public class LifeCapability
 {
-    public long MaxHitPoints { get; } = maxHitPoints;
-    public long CurrentHitPoints { get; set; } = currentHitPoints;
+    public long MaxHitPoints { get; }
+    public long CurrentHitPoints { get; set; }
+
+    public LifeCapability(long maxHitPoints, long currentHitPoints)
+    {
+        MaxHitPoints = maxHitPoints;
+        CurrentHitPoints = currentHitPoints;
+    }
 }

@@ -9,8 +9,17 @@ using RunicMagic.World.Runes.RuneTypes;
 
 namespace RunicMagic.Controller.EntityConstruction;
 
-public class EntityFactory(WorldModel world, ILogger<EntityFactory> logger)
+public class EntityFactory
 {
+    private readonly WorldModel world;
+    private readonly ILogger<EntityFactory> logger;
+
+    public EntityFactory(WorldModel world, ILogger<EntityFactory> logger)
+    {
+        this.world = world;
+        this.logger = logger;
+    }
+
     public Entity Create(EntityData entityData)
     {
         var type = entityData.TypeId switch

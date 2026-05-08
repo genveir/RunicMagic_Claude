@@ -7,12 +7,19 @@ namespace RunicMagic.View.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class EventsController(SseConnectionManager sseManager) : ControllerBase
+public class EventsController : ControllerBase
 {
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase
     };
+
+    private readonly SseConnectionManager sseManager;
+
+    public EventsController(SseConnectionManager sseManager)
+    {
+        this.sseManager = sseManager;
+    }
 
     [HttpGet]
     public async Task Get(CancellationToken ct)

@@ -144,40 +144,81 @@ public class GWYAHTests
 
     // ── Test doubles ──────────────────────────────────────────────────────────
 
-    private class CaptureExecutorStatement(Action<Entity> capture) : IStatement
+    private class CaptureExecutorStatement : IStatement
     {
+        private readonly Action<Entity> capture;
+
+        public CaptureExecutorStatement(Action<Entity> capture)
+        {
+            this.capture = capture;
+        }
+
         public void Execute(SpellContext context)
         {
             capture(context.Executor.Entities.Single());
         }
     }
 
-    private class CaptureCasterStatement(Action<EntitySet> capture) : IStatement
+    private class CaptureCasterStatement : IStatement
     {
+        private readonly Action<EntitySet> capture;
+
+        public CaptureCasterStatement(Action<EntitySet> capture)
+        {
+            this.capture = capture;
+        }
+
         public void Execute(SpellContext context)
         {
             capture(context.Caster);
         }
     }
 
-    private class RecordOrderStatement(List<int> log, int index) : IStatement
+    private class RecordOrderStatement : IStatement
     {
+        private readonly List<int> log;
+        private readonly int index;
+
+        public RecordOrderStatement(List<int> log, int index)
+        {
+            this.log = log;
+            this.index = index;
+        }
+
         public void Execute(SpellContext context)
         {
             log.Add(index);
         }
     }
 
-    private class RecordLabelStatement(List<string> log, string label) : IStatement
+    private class RecordLabelStatement : IStatement
     {
+        private readonly List<string> log;
+        private readonly string label;
+
+        public RecordLabelStatement(List<string> log, string label)
+        {
+            this.log = log;
+            this.label = label;
+        }
+
         public void Execute(SpellContext context)
         {
             log.Add(label);
         }
     }
 
-    private class DrawPowerStatement(long amount, Action<long> onDrawn) : IStatement
+    private class DrawPowerStatement : IStatement
     {
+        private readonly long amount;
+        private readonly Action<long> onDrawn;
+
+        public DrawPowerStatement(long amount, Action<long> onDrawn)
+        {
+            this.amount = amount;
+            this.onDrawn = onDrawn;
+        }
+
         public void Execute(SpellContext context)
         {
             var drawn = context.DrawPower(amount);

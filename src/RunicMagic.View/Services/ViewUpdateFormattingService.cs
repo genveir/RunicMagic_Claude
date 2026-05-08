@@ -4,8 +4,15 @@ using System.Text;
 
 namespace RunicMagic.View.Services;
 
-public class ViewUpdateFormattingService(SseConnectionManager sseConnectionManager) : IWorldTickSink
+public class ViewUpdateFormattingService : IWorldTickSink
 {
+    private readonly SseConnectionManager sseConnectionManager;
+
+    public ViewUpdateFormattingService(SseConnectionManager sseConnectionManager)
+    {
+        this.sseConnectionManager = sseConnectionManager;
+    }
+
     public void Push(TickResult result)
     {
         var prompt = FormatPrompt(result.CasterData);

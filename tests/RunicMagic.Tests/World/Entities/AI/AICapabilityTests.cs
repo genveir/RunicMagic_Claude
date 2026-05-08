@@ -134,9 +134,14 @@ public class AICapabilityTests
         }
     }
 
-    private class TaggedBehavior(string tag) : IAIBehavior
+    private class TaggedBehavior : IAIBehavior
     {
-        public string Tag { get; } = tag;
+        public string Tag { get; }
+
+        public TaggedBehavior(string tag)
+        {
+            Tag = tag;
+        }
 
         public void Execute(Entity entity, WorldModel worldModel, IWorldEventTracker eventTracker, long currentTick) { }
     }
