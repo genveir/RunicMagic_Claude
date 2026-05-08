@@ -16,7 +16,7 @@ public class SseConnectionManager(IWorldRenderingService worldRendering)
         _connections[id] = channel;
 
         var entities = worldRendering.GetAllRenderingModels(casterEntityId: null);
-        var initial = new ViewUpdateModel([], entities, string.Empty);
+        var initial = new ViewUpdateModel([], entities, string.Empty, Bars: null);
         channel.Writer.TryWrite(initial);
 
         return (id, channel);

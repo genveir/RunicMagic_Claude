@@ -161,6 +161,7 @@ eventSource.onmessage = (e) => {
     if (result.entities?.length) {
         latestEntities = result.entities;
     }
+    updateBars(result.bars);
 };
 
 (function renderLoop() {
@@ -170,6 +171,20 @@ eventSource.onmessage = (e) => {
     }
     requestAnimationFrame(renderLoop);
 })();
+
+
+// ── Caster bars ───────────────────────────────────────────────────────────────
+
+function updateBars(bars) {
+    updateBar('hp',    bars?.currentHitPoints, bars?.maxHitPoints);
+    updateBar('power', bars?.currentPower,     bars?.maxPower);
+}
+
+function updateBar(name, current, max) {
+    const pct = (current != null && max > 0) ? (current / max * 100) : 0;
+    document.getElementById(`${name}-fill`).style.width = pct + '%';
+    document.getElementById(`${name}-value`).textContent = current != null ? `${current}/${max}` : '';
+}
 
 
 // ── Canvas ────────────────────────────────────────────────────────────────────

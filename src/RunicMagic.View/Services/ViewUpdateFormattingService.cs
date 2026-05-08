@@ -9,8 +9,22 @@ public class ViewUpdateFormattingService(SseConnectionManager sseConnectionManag
     public void Push(TickResult result)
     {
         var prompt = FormatPrompt(result.CasterData);
-        var viewUpdate = new ViewUpdateModel(result.Text, result.Entities, prompt);
+        var bars = FormatBars(result.CasterData);
+        var viewUpdate = new ViewUpdateModel(result.Text, result.Entities, prompt, bars);
         sseConnectionManager.Push(viewUpdate);
+    }
+
+    private static CasterBarsModel? FormatBars(CasterDataModel? casterData)
+    {
+        if (casterData == null)
+            return null;
+
+        var bars = new CasterBarsModel(
+            casterData.CurrentHitPoints,
+            casterData.MaxHitPoints,
+            casterData.CurrentPower,
+            casterData.MaxPower);
+        return bars;
     }
 
     private static string FormatPrompt(CasterDataModel? casterData)

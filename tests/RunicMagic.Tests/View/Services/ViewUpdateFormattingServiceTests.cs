@@ -17,7 +17,7 @@ public class ViewUpdateFormattingServiceTests
         return (service, manager);
     }
 
-    private static string PushAndReadPrompt(ViewUpdateFormattingService service, SseConnectionManager manager, CasterDataModel? casterData)
+    private static ViewUpdateModel PushAndRead(ViewUpdateFormattingService service, SseConnectionManager manager, CasterDataModel? casterData)
     {
         var (_, channel) = manager.AddConnection();
         channel.Reader.TryRead(out _);
@@ -25,7 +25,12 @@ public class ViewUpdateFormattingServiceTests
         service.Push(new TickResult([], [], casterData));
 
         channel.Reader.TryRead(out var received);
-        return received!.Prompt;
+        return received!;
+    }
+
+    private static string PushAndReadPrompt(ViewUpdateFormattingService service, SseConnectionManager manager, CasterDataModel? casterData)
+    {
+        return PushAndRead(service, manager, casterData).Prompt;
     }
 
     [Fact]
@@ -117,5 +122,90 @@ public class ViewUpdateFormattingServiceTests
 
         channel.Reader.TryRead(out var received);
         received!.Text.Should().BeEquivalentTo(["line one", "line two"]);
+    }
+
+    [Fact]
+    public void Push_NoCasterData_BarsIsNull()
+    {
+        var (service, manager) = MakeComponents();
+
+        var update = PushAndRead(service, manager, casterData: null);
+
+        update.Bars.Should().BeNull();
+    }
+
+    [Fact]
+    public void Push_DeadCaster_BarsShowsZeroHitPoints()
+    {
+        var (service, manager) = MakeComponents();
+        var casterData = new CasterDataModel(
+            CurrentHitPoints: 0,
+            MaxHitPoints: 20,
+            CurrentIntegrity: 1000,
+            MaxIntegrity: 1000,
+            CurrentPower: null,
+            MaxPower: null);
+
+        var update = PushAndRead(service, manager, casterData);
+
+        update.Bars!.CurrentHitPoints.Should().Be(0);
+        update.Bars.MaxHitPoints.Should().Be(20);
+    }
+
+    [Fact]
+    public void Push_AliveCasterWithLifeAndPower_BarsHasAllValues()
+    {
+        var (service, manager) = MakeComponents();
+        var casterData = new CasterDataModel(
+            CurrentHitPoints: 15,
+            MaxHitPoints: 20,
+            CurrentIntegrity: 1000,
+            MaxIntegrity: 1000,
+            CurrentPower: 30,
+            MaxPower: 100);
+
+        var update = PushAndRead(service, manager, casterData);
+
+        update.Bars.Should().BeEquivalentTo(new CasterBarsModel(
+            CurrentHitPoints: 15,
+            MaxHitPoints: 20,
+            CurrentPower: 30,
+            MaxPower: 100));
+    }
+
+    [Fact]
+    public void Push_CasterWithNoLife_BarsHasNullHitPoints()
+    {
+        var (service, manager) = MakeComponents();
+        var casterData = new CasterDataModel(
+            CurrentHitPoints: null,
+            MaxHitPoints: null,
+            CurrentIntegrity: 1000,
+            MaxIntegrity: 1000,
+            CurrentPower: null,
+            MaxPower: null);
+
+        var update = PushAndRead(service, manager, casterData);
+
+        update.Bars!.CurrentHitPoints.Should().BeNull();
+        update.Bars.MaxHitPoints.Should().BeNull();
+    }
+
+    [Fact]
+    public void Push_CasterWithNoPower_BarsHasNullPower()
+    {
+        var (service, manager) = MakeComponents();
+        var casterData = new CasterDataModel(
+            CurrentHitPoints: 15,
+            MaxHitPoints: 20,
+            CurrentIntegrity: 1000,
+            MaxIntegrity: 1000,
+            CurrentPower: null,
+            MaxPower: null);
+
+        var update = PushAndRead(service, manager, casterData);
+
+        update.Bars!.CurrentPower.Should().BeNull();
+        update.Bars.MaxPower.Should().BeNull();
     }
 }
