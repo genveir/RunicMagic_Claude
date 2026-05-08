@@ -9,7 +9,7 @@ public static class ViewModule
     public static IServiceCollection RegisterViewModule(this IServiceCollection services)
     {
         services.AddSingleton<SseConnectionManager>();
-        services.AddSingleton<IWorldTickSink>(svc => svc.GetRequiredService<SseConnectionManager>());
+        services.AddSingleton<IWorldTickSink, ViewUpdateFormattingService>();
 
         services.AddControllers();
 

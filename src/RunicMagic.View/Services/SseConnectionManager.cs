@@ -5,18 +5,18 @@ using System.Threading.Channels;
 
 namespace RunicMagic.View.Services;
 
-public class SseConnectionManager(IWorldRenderingService worldRendering) : IWorldTickSink
+public class SseConnectionManager(IWorldRenderingService worldRendering)
 {
-    private readonly ConcurrentDictionary<Guid, Channel<CommandResult>> _connections = new();
+    private readonly ConcurrentDictionary<Guid, Channel<ViewUpdateModel>> _connections = new();
 
-    public (Guid Id, Channel<CommandResult> Channel) AddConnection()
+    public (Guid Id, Channel<ViewUpdateModel> Channel) AddConnection()
     {
         var id = Guid.NewGuid();
-        var channel = Channel.CreateUnbounded<CommandResult>();
+        var channel = Channel.CreateUnbounded<ViewUpdateModel>();
         _connections[id] = channel;
 
         var entities = worldRendering.GetAllRenderingModels(casterEntityId: null);
-        var initial = new CommandResult([], entities, string.Empty);
+        var initial = new ViewUpdateModel([], entities, string.Empty);
         channel.Writer.TryWrite(initial);
 
         return (id, channel);
@@ -28,9 +28,9 @@ public class SseConnectionManager(IWorldRenderingService worldRendering) : IWorl
             channel.Writer.TryComplete();
     }
 
-    public void Push(CommandResult result)
+    public void Push(ViewUpdateModel viewUpdate)
     {
         foreach (var channel in _connections.Values)
-            channel.Writer.TryWrite(result);
+            channel.Writer.TryWrite(viewUpdate);
     }
 }

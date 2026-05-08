@@ -11,21 +11,30 @@ The canvas is driven by a `requestAnimationFrame` loop that consumes the latest 
 
 ## Player interface
 
-Two interfaces split the concerns:
+**`IPlayerViewInterface`** — called by the View layer. Methods: `RegisterInput(string)`, `SetCaster`, `MoveCaster`, `SetPointingDirection`, `SetIndicateTarget` — all return `Task` (fire-and-forget; results are delivered via SSE).
 
-**`IPlayerViewInterface`** — called by the View layer. Methods: `RegisterInput(string)`, `SetCaster`, `MoveCaster`, `SetPointingDirection`, `SetIndicateTarget` — all return `Task` (fire-and-forget; results are delivered via SSE). Also exposes `Prompt` for the current terminal prompt string.
+Player actions are enqueued rather than executed immediately. The game loop drains the queue each tick, collects any text produced, and pushes output via SSE.
 
-**`IPlayerOutputSink`** — called by internal services during command processing to accumulate output: `SendText(string)`.
+## Output models
 
-Player actions are enqueued rather than executed immediately. The game loop drains the queue each tick, collects any text produced, and pushes a `CommandResult` via SSE.
+Two models flow through the output pipeline:
 
-`CommandResult` bundles everything produced during one drain into two lists plus a prompt: `Text` (terminal lines), `Entities` (canvas snapshot), and `Prompt` (current prompt string). It is pushed via SSE — there is no HTTP response body for player actions.
+**`CommandResult`** — the internal game-loop product, passed from `GameLoopService` to `IWorldTickSink`: `Text` (terminal lines), `Entities` (canvas snapshot), `CasterData` (caster stats used to derive the prompt string).
+
+**`ViewUpdateModel`** — the SSE payload, produced by `ViewUpdateFormattingService` from a `CommandResult`: `Text`, `Entities`, and `Prompt` (the formatted prompt string derived from `CasterData`). This is what the client receives.
+
+`ViewUpdateFormattingService` implements `IWorldTickSink` and is the bridge between the two: it formats `CasterData` into the prompt string and writes a `ViewUpdateModel` to `SseConnectionManager`.
 
 `EntityRenderingModel` carries everything the canvas needs and nothing else:
 
 - `X`, `Y`, `Width`, `Height` — position and dimensions in world coordinates
+- `Angle` — rotation in radians
 - `Label` — display name
-- `Flags` — flags (e.g. `HasLife`, `HasAgency`) used for visual styling; the canvas has no knowledge of what these mean to the magic system
+- `Flags` — `HasLife`, `HasAgency`, `IsTranslucent` — used for visual styling; the canvas has no knowledge of what these mean to the magic system
+- `IsCaster` — whether this entity is the current caster (highlighted on canvas)
+- `PointingEndX`, `PointingEndY` — endpoint of the caster's pointing direction arrow (null if not pointing)
+- `IsIndicateTarget` — whether this entity is the current indicate target
+- `IndicateEndX`, `IndicateEndY` — endpoint of the indicate arrow (null if not set)
 
 The canvas is responsible for mapping world coordinates to screen coordinates. The game logic never knows or cares about screen size.
 
@@ -34,10 +43,11 @@ The canvas is responsible for mapping world coordinates to screen coordinates. T
 All output flows through the game loop:
 
 1. Player submits a command or canvas action → HTTP POST → 204 (no body) → action enqueued in `PlayerService`
-2. Game loop (60 FPS) drains the queue each tick → executes actions → collects text via `IPlayerOutputSink` → packages into `CommandResult`
-3. `GameLoopService` pushes the result to `IWorldTickSink` (`SseConnectionManager`)
-4. `SseConnectionManager` writes the result to all connected clients' SSE channels
-5. Client `EventSource` receives the event → writes text to terminal, updates prompt, stores entities for next `requestAnimationFrame`
+2. Game loop (60 FPS) drains the queue each tick → executes actions → collects events via `EventTracker` → packages into `CommandResult`
+3. `GameLoopService` pushes `CommandResult` to `IWorldTickSink` (`ViewUpdateFormattingService`)
+4. `ViewUpdateFormattingService` derives the prompt string from `CasterData`, produces a `ViewUpdateModel`, and passes it to `SseConnectionManager`
+5. `SseConnectionManager` writes the `ViewUpdateModel` to all connected clients' SSE channels
+6. Client `EventSource` receives the event → writes text to terminal, updates prompt, stores entities for next `requestAnimationFrame`
 
 The game loop only pushes when the queue was non-empty or when motion effects advanced world state. Idle ticks produce no SSE traffic.
 

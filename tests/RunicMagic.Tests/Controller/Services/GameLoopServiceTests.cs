@@ -24,14 +24,6 @@ public class GameLoopServiceTests
         return (loop, playerService, sink);
     }
 
-    private static (GameLoopService loop, FakeWorld world) MakeLoopWithFakeWorld()
-    {
-        var world = new FakeWorld();
-        var sink = new CapturingSink();
-        var loop = new GameLoopService(new FakePlayerService(_ => { }), world, new FakeRendering(), sink);
-        return (loop, world);
-    }
-
     private class CapturingSink : IWorldTickSink
     {
         public List<CommandResult> Pushed { get; } = [];
@@ -217,52 +209,4 @@ public class GameLoopServiceTests
         sink.Pushed[0].Text.Should().HaveCount(3);
     }
 
-    [Fact]
-    public void GetPrompt_NoCasterSelected_ReturnsNoCasterPrompt()
-    {
-        var (loop, _) = MakeLoopWithFakeWorld();
-
-        var prompt = loop.GetPrompt(casterId: null);
-
-        prompt.Should().Be("[no caster] >");
-    }
-
-    [Fact]
-    public void GetPrompt_CasterNotInWorld_ReturnsDeadCasterPrompt()
-    {
-        var (loop, _) = MakeLoopWithFakeWorld();
-
-        var prompt = loop.GetPrompt(EntityId.New());
-
-        prompt.Should().Be("[dead caster] >");
-    }
-
-    [Fact]
-    public void GetPrompt_CasterWithoutLife_ReturnsDeadCasterPrompt()
-    {
-        var (loop, world) = MakeLoopWithFakeWorld();
-        world.FindResult = new EntityBuilder()
-            .WithLocation(x: 0, y: 0)
-            .WithAgency()
-            .Build();
-
-        var prompt = loop.GetPrompt(EntityId.New());
-
-        prompt.Should().Be("[dead caster] >");
-    }
-
-    [Fact]
-    public void GetPrompt_CasterWithLife_ShowsHitPointsAndIntegrity()
-    {
-        var (loop, world) = MakeLoopWithFakeWorld();
-        world.FindResult = new EntityBuilder()
-            .WithLocation(x: 0, y: 0)
-            .WithAgency()
-            .WithLife(max: 20, current: 15)
-            .Build();
-
-        var prompt = loop.GetPrompt(EntityId.New());
-
-        prompt.Should().Be("(15/20H) (1000/1000I) >");
-    }
 }

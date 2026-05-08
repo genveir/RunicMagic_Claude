@@ -62,27 +62,31 @@ internal class GameLoopService(
         }
 
         var renderingModels = worldRendering.GetAllRenderingModels(casterId?.Value);
+        var casterData = BuildCasterData(casterId);
 
-        return new CommandResult(
-            text,
-            renderingModels,
-            GetPrompt(casterId));
+        return new CommandResult(text, renderingModels, casterData);
     }
 
-    public string GetPrompt(EntityId? casterId)
+    private CasterDataModel? BuildCasterData(EntityId? casterId)
     {
         if (casterId == null)
-        {
-            return "[no caster] >";
-        }
+            return null;
 
         var caster = world.Find(casterId.Value);
-        if (caster?.Life == null)
-        {
-            return "[dead caster] >";
-        }
+        if (caster == null)
+            return null;
 
-        var prompt = $"({caster.Life.CurrentHitPoints}/{caster.Life.MaxHitPoints}H) ({caster.StructuralIntegrity.CurrentIntegrity}/{caster.StructuralIntegrity.MaxIntegrity}I) >";
-        return prompt;
+        var currentHitPoints = caster.Life?.CurrentHitPoints;
+        var maxHitPoints = caster.Life?.MaxHitPoints;
+        var currentPower = caster.Reservoir?.GetCurrentIncludingScope(caster);
+        var maxPower = caster.Reservoir?.GetMaxIncludingScope(caster);
+
+        return new CasterDataModel(
+            currentHitPoints,
+            maxHitPoints,
+            caster.StructuralIntegrity.CurrentIntegrity,
+            caster.StructuralIntegrity.MaxIntegrity,
+            currentPower,
+            maxPower);
     }
 }

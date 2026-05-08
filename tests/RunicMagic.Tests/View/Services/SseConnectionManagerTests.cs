@@ -34,11 +34,11 @@ public class SseConnectionManagerTests
         var (_, channel) = manager.AddConnection();
         channel.Reader.TryRead(out _);
 
-        var pushed = new CommandResult(["hello"], [], "prompt");
+        var pushed = new ViewUpdateModel(["hello"], [], "prompt");
         manager.Push(pushed);
 
         channel.Reader.TryRead(out var received).Should().BeTrue();
-        received.Should().Be(pushed);
+        received.Should().BeEquivalentTo(pushed);
     }
 
     [Fact]
@@ -50,13 +50,13 @@ public class SseConnectionManagerTests
         channel1.Reader.TryRead(out _);
         channel2.Reader.TryRead(out _);
 
-        var pushed = new CommandResult(["hello"], [], "prompt");
+        var pushed = new ViewUpdateModel(["hello"], [], "prompt");
         manager.Push(pushed);
 
         channel1.Reader.TryRead(out var r1).Should().BeTrue();
         channel2.Reader.TryRead(out var r2).Should().BeTrue();
-        r1.Should().Be(pushed);
-        r2.Should().Be(pushed);
+        r1.Should().BeEquivalentTo(pushed);
+        r2.Should().BeEquivalentTo(pushed);
     }
 
     [Fact]
@@ -79,7 +79,7 @@ public class SseConnectionManagerTests
         channel.Reader.TryRead(out _);
         manager.RemoveConnection(id);
 
-        manager.Push(new CommandResult(["hello"], [], "prompt"));
+        manager.Push(new ViewUpdateModel(["hello"], [], "prompt"));
 
         channel.Reader.TryRead(out _).Should().BeFalse();
     }

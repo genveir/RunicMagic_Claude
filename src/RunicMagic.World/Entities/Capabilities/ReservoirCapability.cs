@@ -22,6 +22,20 @@ public class ReservoirCapability
     public Func<long> Max { get; init; }
     public Func<long> Current { get; init; }
 
+    public long GetMaxIncludingScope(Entity entity)
+    {
+        var entitiesInScope = entity.Scope?.Invoke() ?? [];
+
+        return Max() + entitiesInScope.Sum(e => e.Reservoir?.Max.Invoke() ?? 0);
+    }
+
+    public long GetCurrentIncludingScope(Entity entity)
+    {
+        var entitiesInScope = entity.Scope?.Invoke() ?? [];
+
+        return Current() + entitiesInScope.Sum(e => e.Reservoir?.Current.Invoke() ?? 0);
+    }
+
     public Func<long, ReservoirDraw> Draw { get; init; }
     public Func<long, ReservoirFill> Fill { get; init; }
 
