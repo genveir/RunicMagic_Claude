@@ -14,27 +14,68 @@ public class EntityFactoryTests
 
     private static EntityFactory Factory(WorldModel world) => new(world, Logger);
 
-    private static EntityData CreatureData(long maxHp, long currentHp) => new(
-        Id: Guid.NewGuid(),
-        TypeId: (long)EntityType.Creature,
-        Label: "creature",
-        X: 0, Y: 0, Width: 10, Height: 10,
-        HasAgency: false,
-        Weight: 0,
-        Strength: 0,
-        MaxHitPoints: maxHp,
-        CurrentHitPoints: currentHp);
+    private static EntityData DefaultEntityData()
+    {
+        var data = new EntityData(
+            Id: Guid.NewGuid(),
+            TypeId: (long)EntityType.Object,
+            Label: "entity",
+            X: 0, Y: 0, Width: 10, Height: 10,
+            HasAgency: false,
+            Weight: 0,
+            Strength: 0,
+            IsTranslucent: false,
+            Angle: 0,
+            MaxHitPoints: null,
+            CurrentHitPoints: null,
+            MaxCharge: null,
+            CurrentCharge: null,
+            InscriptionTexts: null,
+            MaxStructuralIntegrity: 1000,
+            CurrentStructuralIntegrity: 1000,
+            DragCoefficient: 0.0,
+            AngularDragCoefficient: 0.0,
+            GroundFrictionCoefficient: 0.0,
+            AIData: null,
+            LocomotionEfficiency: null);
+        return data;
+    }
 
-    private static EntityData ManaSourceData(long maxCharge, long currentCharge) => new(
-        Id: Guid.NewGuid(),
-        TypeId: (long)EntityType.ManaSource,
-        Label: "mana source",
-        X: 0, Y: 0, Width: 10, Height: 10,
-        HasAgency: false,
-        Weight: 0,
-        Strength: 0,
-        MaxCharge: maxCharge,
-        CurrentCharge: currentCharge);
+    private static EntityData CreatureData(long maxHp, long currentHp)
+    {
+        var data = DefaultEntityData() with
+        {
+            TypeId = (long)EntityType.Creature,
+            Label = "creature",
+            MaxHitPoints = maxHp,
+            CurrentHitPoints = currentHp
+        };
+        return data;
+    }
+
+    private static EntityData ManaSourceData(long maxCharge, long currentCharge)
+    {
+        var data = DefaultEntityData() with
+        {
+            TypeId = (long)EntityType.ManaSource,
+            Label = "mana source",
+            MaxCharge = maxCharge,
+            CurrentCharge = currentCharge
+        };
+        return data;
+    }
+
+    private static EntityData MinimalData(long typeId, string label, long width = 10, long height = 10)
+    {
+        var data = DefaultEntityData() with
+        {
+            TypeId = typeId,
+            Label = label,
+            Width = width,
+            Height = height
+        };
+        return data;
+    }
 
     // ── Creature reservoir — Draw ─────────────────────────────────────────────
 
@@ -167,9 +208,7 @@ public class EntityFactoryTests
     public void Creature_Reservoir_IsNull_WhenNoLifeCapability()
     {
         var world = new WorldModelBuilder().Build();
-        var entity = Factory(world).Create(new EntityData(
-            Guid.NewGuid(), (long)EntityType.Creature, "lifeless",
-            X: 0, Y: 0, Width: 10, Height: 10, HasAgency: false, Weight: 0, Strength: 0));
+        var entity = Factory(world).Create(MinimalData((long)EntityType.Creature, "lifeless"));
 
         entity.Reservoir.Should().BeNull();
     }
@@ -292,9 +331,7 @@ public class EntityFactoryTests
     public void ManaSource_Reservoir_IsNull_WhenNoChargeCapability()
     {
         var world = new WorldModelBuilder().Build();
-        var entity = Factory(world).Create(new EntityData(
-            Guid.NewGuid(), (long)EntityType.ManaSource, "uncharged",
-            X: 0, Y: 0, Width: 10, Height: 5, HasAgency: false, Weight: 0, Strength: 0));
+        var entity = Factory(world).Create(MinimalData((long)EntityType.ManaSource, "uncharged", height: 5));
 
         entity.Reservoir.Should().BeNull();
     }
@@ -305,9 +342,7 @@ public class EntityFactoryTests
     public void Create_EntityHasAICapability_WithZeroBehaviors()
     {
         var world = new WorldModelBuilder().Build();
-        var entity = Factory(world).Create(new EntityData(
-            Guid.NewGuid(), (long)EntityType.Object, "rock",
-            X: 0, Y: 0, Width: 5, Height: 5, HasAgency: false, Weight: 0, Strength: 0));
+        var entity = Factory(world).Create(MinimalData((long)EntityType.Object, "rock", width: 5, height: 5));
 
         entity.AI.Should().NotBeNull();
         entity.AI.BehaviorCount.Should().Be(0);
@@ -319,9 +354,7 @@ public class EntityFactoryTests
     public void Object_HasNoReservoir()
     {
         var world = new WorldModelBuilder().Build();
-        var entity = Factory(world).Create(new EntityData(
-            Guid.NewGuid(), (long)EntityType.Object, "rock",
-            X: 0, Y: 0, Width: 5, Height: 5, HasAgency: false, Weight: 0, Strength: 0));
+        var entity = Factory(world).Create(MinimalData((long)EntityType.Object, "rock", width: 5, height: 5));
 
         entity.Reservoir.Should().BeNull();
     }
@@ -334,8 +367,7 @@ public class EntityFactoryTests
         var world = new WorldModelBuilder().Build();
         // Caster centre at (0,0); nearby bbox x:[495,505],y:[-5,5] → nearest point (495,0) → gap=495 < 500
         var caster = Factory(world).Create(CreatureData(maxHp: 100, currentHp: 100) with { X = 0, Y = 0, Width = 10, Height = 10 });
-        var nearby = Factory(world).Create(new EntityData(Guid.NewGuid(), (long)EntityType.Object, "nearby",
-            X: 500, Y: 0, Width: 10, Height: 10, HasAgency: false, Weight: 0, Strength: 0));
+        var nearby = Factory(world).Create(MinimalData((long)EntityType.Object, "nearby") with { X = 500 });
         world.Add(caster);
         world.Add(nearby);
 
@@ -350,8 +382,7 @@ public class EntityFactoryTests
         var world = new WorldModelBuilder().Build();
         // Caster centre at (0,0); distant bbox x:[1005,1015],y:[-5,5] → nearest point (1005,0) → gap=1005 > 500
         var caster = Factory(world).Create(CreatureData(maxHp: 100, currentHp: 100) with { X = 0, Y = 0, Width = 10, Height = 10 });
-        var distant = Factory(world).Create(new EntityData(Guid.NewGuid(), (long)EntityType.Object, "distant",
-            X: 1010, Y: 0, Width: 10, Height: 10, HasAgency: false, Weight: 0, Strength: 0));
+        var distant = Factory(world).Create(MinimalData((long)EntityType.Object, "distant") with { X = 1010 });
         world.Add(caster);
         world.Add(distant);
 
@@ -366,9 +397,7 @@ public class EntityFactoryTests
     public void ParsedInscriptions_EmptyArray_WhenNoInscriptionTexts()
     {
         var world = new WorldModelBuilder().Build();
-        var entity = Factory(world).Create(new EntityData(
-            Guid.NewGuid(), (long)EntityType.Object, "rock",
-            X: 0, Y: 0, Width: 5, Height: 5, HasAgency: false, Weight: 0, Strength: 0));
+        var entity = Factory(world).Create(MinimalData((long)EntityType.Object, "rock", width: 5, height: 5));
 
         entity.ParsedInscriptions.Should().BeEmpty();
     }
@@ -377,10 +406,7 @@ public class EntityFactoryTests
     public void ParsedInscriptions_ContainsParsedStatement_WhenValidInscription()
     {
         var world = new WorldModelBuilder().Build();
-        var entity = Factory(world).Create(new EntityData(
-            Guid.NewGuid(), (long)EntityType.Object, "rock",
-            X: 0, Y: 0, Width: 5, Height: 5, HasAgency: false, Weight: 0, Strength: 0,
-            InscriptionTexts: ["VUN A HET"]));
+        var entity = Factory(world).Create(MinimalData((long)EntityType.Object, "rock", width: 5, height: 5) with { InscriptionTexts = ["VUN A HET"] });
 
         entity.ParsedInscriptions.Should().HaveCount(1);
         entity.ParsedInscriptions[0].Should().BeOfType<VUN>();
@@ -390,10 +416,7 @@ public class EntityFactoryTests
     public void ParsedInscriptions_SilentlyDropsInvalidInscription()
     {
         var world = new WorldModelBuilder().Build();
-        var entity = Factory(world).Create(new EntityData(
-            Guid.NewGuid(), (long)EntityType.Object, "rock",
-            X: 0, Y: 0, Width: 5, Height: 5, HasAgency: false, Weight: 0, Strength: 0,
-            InscriptionTexts: ["NOTARUNE"]));
+        var entity = Factory(world).Create(MinimalData((long)EntityType.Object, "rock", width: 5, height: 5) with { InscriptionTexts = ["NOTARUNE"] });
 
         entity.ParsedInscriptions.Should().BeEmpty();
     }
@@ -402,10 +425,7 @@ public class EntityFactoryTests
     public void ParsedInscriptions_SupportsMultipleInscriptions()
     {
         var world = new WorldModelBuilder().Build();
-        var entity = Factory(world).Create(new EntityData(
-            Guid.NewGuid(), (long)EntityType.Object, "rock",
-            X: 0, Y: 0, Width: 5, Height: 5, HasAgency: false, Weight: 0, Strength: 0,
-            InscriptionTexts: ["VUN A HET", "VAR A HET"]));
+        var entity = Factory(world).Create(MinimalData((long)EntityType.Object, "rock", width: 5, height: 5) with { InscriptionTexts = ["VUN A HET", "VAR A HET"] });
 
         entity.ParsedInscriptions.Should().HaveCount(2);
     }
@@ -414,10 +434,7 @@ public class EntityFactoryTests
     public void ParsedInscriptions_SkipsInvalidAndKeepsValidInscriptions()
     {
         var world = new WorldModelBuilder().Build();
-        var entity = Factory(world).Create(new EntityData(
-            Guid.NewGuid(), (long)EntityType.Object, "rock",
-            X: 0, Y: 0, Width: 5, Height: 5, HasAgency: false, Weight: 0, Strength: 0,
-            InscriptionTexts: ["NOTARUNE", "VUN A HET"]));
+        var entity = Factory(world).Create(MinimalData((long)EntityType.Object, "rock", width: 5, height: 5) with { InscriptionTexts = ["NOTARUNE", "VUN A HET"] });
 
         entity.ParsedInscriptions.Should().HaveCount(1);
         entity.ParsedInscriptions[0].Should().BeOfType<VUN>();
@@ -443,9 +460,7 @@ public class EntityFactoryTests
     public void RawInscriptions_EmptyArray_WhenNoInscriptionTexts()
     {
         var world = new WorldModelBuilder().Build();
-        var entity = Factory(world).Create(new EntityData(
-            Guid.NewGuid(), (long)EntityType.Object, "rock",
-            X: 0, Y: 0, Width: 5, Height: 5, HasAgency: false, Weight: 0, Strength: 0));
+        var entity = Factory(world).Create(MinimalData((long)EntityType.Object, "rock", width: 5, height: 5));
 
         entity.RawInscriptions.Should().BeEmpty();
     }
@@ -454,10 +469,7 @@ public class EntityFactoryTests
     public void RawInscriptions_ContainsOriginalText_WhenValidInscription()
     {
         var world = new WorldModelBuilder().Build();
-        var entity = Factory(world).Create(new EntityData(
-            Guid.NewGuid(), (long)EntityType.Object, "rock",
-            X: 0, Y: 0, Width: 5, Height: 5, HasAgency: false, Weight: 0, Strength: 0,
-            InscriptionTexts: ["VUN A HET"]));
+        var entity = Factory(world).Create(MinimalData((long)EntityType.Object, "rock", width: 5, height: 5) with { InscriptionTexts = ["VUN A HET"] });
 
         entity.RawInscriptions.Should().Equal("VUN A HET");
     }
@@ -466,10 +478,7 @@ public class EntityFactoryTests
     public void RawInscriptions_ContainsOriginalText_WhenInvalidInscription()
     {
         var world = new WorldModelBuilder().Build();
-        var entity = Factory(world).Create(new EntityData(
-            Guid.NewGuid(), (long)EntityType.Object, "rock",
-            X: 0, Y: 0, Width: 5, Height: 5, HasAgency: false, Weight: 0, Strength: 0,
-            InscriptionTexts: ["NOTARUNE"]));
+        var entity = Factory(world).Create(MinimalData((long)EntityType.Object, "rock", width: 5, height: 5) with { InscriptionTexts = ["NOTARUNE"] });
 
         entity.RawInscriptions.Should().Equal("NOTARUNE");
     }
@@ -478,10 +487,7 @@ public class EntityFactoryTests
     public void RawInscriptions_ContainsAllTexts_WhenMixedValidAndInvalid()
     {
         var world = new WorldModelBuilder().Build();
-        var entity = Factory(world).Create(new EntityData(
-            Guid.NewGuid(), (long)EntityType.Object, "rock",
-            X: 0, Y: 0, Width: 5, Height: 5, HasAgency: false, Weight: 0, Strength: 0,
-            InscriptionTexts: ["NOTARUNE", "VUN A HET"]));
+        var entity = Factory(world).Create(MinimalData((long)EntityType.Object, "rock", width: 5, height: 5) with { InscriptionTexts = ["NOTARUNE", "VUN A HET"] });
 
         entity.RawInscriptions.Should().Equal("NOTARUNE", "VUN A HET");
         entity.ParsedInscriptions.Should().HaveCount(1);
