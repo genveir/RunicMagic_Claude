@@ -22,7 +22,7 @@ public class ViewUpdateFormattingServiceTests
         var (_, channel) = manager.AddConnection();
         channel.Reader.TryRead(out _);
 
-        service.Push(new CommandResult([], [], casterData));
+        service.Push(new TickResult([], [], casterData));
 
         channel.Reader.TryRead(out var received);
         return received!.Prompt;
@@ -113,7 +113,7 @@ public class ViewUpdateFormattingServiceTests
         var (_, channel) = manager.AddConnection();
         channel.Reader.TryRead(out _);
 
-        service.Push(new CommandResult(["line one", "line two"], [], CasterData: null));
+        service.Push(new TickResult(["line one", "line two"], [], CasterData: null));
 
         channel.Reader.TryRead(out var received);
         received!.Text.Should().BeEquivalentTo(["line one", "line two"]);

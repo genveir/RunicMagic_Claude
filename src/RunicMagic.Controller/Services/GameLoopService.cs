@@ -34,13 +34,13 @@ internal class GameLoopService(
 
         var casterId = playerService.GetCasterId();
 
-        var result = ToCommandResult(eventTracker, casterId);
+        var result = ToTickResult(eventTracker, casterId);
 
         if (result != null)
             sink.Push(result);
     }
 
-    private CommandResult? ToCommandResult(EventTracker eventTracker, EntityId? casterId)
+    private TickResult? ToTickResult(EventTracker eventTracker, EntityId? casterId)
     {
         if (!eventTracker.HasTrackedChanges)
             return null;
@@ -64,7 +64,7 @@ internal class GameLoopService(
         var renderingModels = worldRendering.GetAllRenderingModels(casterId?.Value);
         var casterData = BuildCasterData(casterId);
 
-        return new CommandResult(text, renderingModels, casterData);
+        return new TickResult(text, renderingModels, casterData);
     }
 
     private CasterDataModel? BuildCasterData(EntityId? casterId)

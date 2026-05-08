@@ -19,9 +19,9 @@ Player actions are enqueued rather than executed immediately. The game loop drai
 
 Two models flow through the output pipeline:
 
-**`CommandResult`** — the internal game-loop product, passed from `GameLoopService` to `IWorldTickSink`: `Text` (terminal lines), `Entities` (canvas snapshot), `CasterData` (caster stats used to derive the prompt string).
+**`TickResult`** — the internal game-loop product, passed from `GameLoopService` to `IWorldTickSink`: `Text` (terminal lines), `Entities` (canvas snapshot), `CasterData` (caster stats used to derive the prompt string).
 
-**`ViewUpdateModel`** — the SSE payload, produced by `ViewUpdateFormattingService` from a `CommandResult`: `Text`, `Entities`, and `Prompt` (the formatted prompt string derived from `CasterData`). This is what the client receives.
+**`ViewUpdateModel`** — the SSE payload, produced by `ViewUpdateFormattingService` from a `TickResult`: `Text`, `Entities`, and `Prompt` (the formatted prompt string derived from `CasterData`). This is what the client receives.
 
 `ViewUpdateFormattingService` implements `IWorldTickSink` and is the bridge between the two: it formats `CasterData` into the prompt string and writes a `ViewUpdateModel` to `SseConnectionManager`.
 
@@ -43,8 +43,8 @@ The canvas is responsible for mapping world coordinates to screen coordinates. T
 All output flows through the game loop:
 
 1. Player submits a command or canvas action → HTTP POST → 204 (no body) → action enqueued in `PlayerService`
-2. Game loop (60 FPS) drains the queue each tick → executes actions → collects events via `EventTracker` → packages into `CommandResult`
-3. `GameLoopService` pushes `CommandResult` to `IWorldTickSink` (`ViewUpdateFormattingService`)
+2. Game loop (60 FPS) drains the queue each tick → executes actions → collects events via `EventTracker` → packages into `TickResult`
+3. `GameLoopService` pushes `TickResult` to `IWorldTickSink` (`ViewUpdateFormattingService`)
 4. `ViewUpdateFormattingService` derives the prompt string from `CasterData`, produces a `ViewUpdateModel`, and passes it to `SseConnectionManager`
 5. `SseConnectionManager` writes the `ViewUpdateModel` to all connected clients' SSE channels
 6. Client `EventSource` receives the event → writes text to terminal, updates prompt, stores entities for next `requestAnimationFrame`
@@ -57,7 +57,7 @@ On initial SSE connection, the server immediately sends the current world state 
 
 - ASP.NET Core Web API backend + static HTML/JS frontend.
 - Terminal is xterm.js. Canvas is an inline SVG element.
-- `GET /events` — SSE endpoint; client subscribes on page load. Each event is a JSON-serialised `CommandResult`.
+- `GET /events` — SSE endpoint; client subscribes on page load. Each event is a JSON-serialised `ViewUpdateModel`.
 - `POST /command`, `POST /pick-caster`, etc. — all return 204 with no body.
 - Canvas SVG is rebuilt on each `requestAnimationFrame` tick when new entity data has arrived.
 - Canvas is SVG for the prototype (DOM hit-testing comes for free, sufficient for a small number of entities).

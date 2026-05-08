@@ -4,5 +4,5 @@ namespace RunicMagic.View.Abstractions;
 
 public interface IWorldTickSink
 {
-    void Push(CommandResult result);
+    void Push(TickResult result);
 }

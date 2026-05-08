@@ -6,7 +6,7 @@ namespace RunicMagic.View.Services;
 
 public class ViewUpdateFormattingService(SseConnectionManager sseConnectionManager) : IWorldTickSink
 {
-    public void Push(CommandResult result)
+    public void Push(TickResult result)
     {
         var prompt = FormatPrompt(result.CasterData);
         var viewUpdate = new ViewUpdateModel(result.Text, result.Entities, prompt);

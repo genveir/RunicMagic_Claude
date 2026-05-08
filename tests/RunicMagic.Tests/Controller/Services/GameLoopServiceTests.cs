@@ -26,8 +26,8 @@ public class GameLoopServiceTests
 
     private class CapturingSink : IWorldTickSink
     {
-        public List<CommandResult> Pushed { get; } = [];
-        public void Push(CommandResult result) { Pushed.Add(result); }
+        public List<TickResult> Pushed { get; } = [];
+        public void Push(TickResult result) { Pushed.Add(result); }
     }
 
     private class FakePlayerService : IPlayerGameLoopInterface
