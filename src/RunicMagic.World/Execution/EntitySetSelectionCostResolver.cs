@@ -7,8 +7,8 @@ public class EntitySetSelectionCostResolver : IEntitySet
 {
     public IEntitySet Inner { get; }
 
-    private readonly HashSet<EntityId> _previouslySelectedEntities = new();
-    private readonly HashSet<EntityId> _previouslySeenInBreadth = new();
+    private readonly HashSet<EntityId> previouslySelectedEntities = new();
+    private readonly HashSet<EntityId> previouslySeenInBreadth = new();
 
     public EntitySetSelectionCostResolver(IEntitySet inner)
     {
@@ -34,12 +34,12 @@ public class EntitySetSelectionCostResolver : IEntitySet
 
         foreach (var id in newBreadthIds)
         {
-            _previouslySeenInBreadth.Add(id);
+            previouslySeenInBreadth.Add(id);
         }
 
         foreach (var entity in resolved.Entities)
         {
-            _previouslySelectedEntities.Add(entity.Id);
+            previouslySelectedEntities.Add(entity.Id);
         }
 
         return resolved;
@@ -51,7 +51,7 @@ public class EntitySetSelectionCostResolver : IEntitySet
         var newIds = new HashSet<EntityId>();
         foreach (var id in allSeen)
         {
-            if (!_previouslySeenInBreadth.Contains(id))
+            if (!previouslySeenInBreadth.Contains(id))
             {
                 newIds.Add(id);
             }
@@ -81,7 +81,7 @@ public class EntitySetSelectionCostResolver : IEntitySet
             {
                 continue;
             }
-            if (_previouslySelectedEntities.Contains(entity.Id))
+            if (previouslySelectedEntities.Contains(entity.Id))
             {
                 continue;
             }

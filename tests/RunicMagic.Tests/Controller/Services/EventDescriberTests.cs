@@ -8,14 +8,14 @@ namespace RunicMagic.Tests.Controller.Services;
 
 public class EventDescriberTests
 {
-    private static readonly Entity _entity = new EntityBuilder().WithLabel("Wick").Build();
+    private static readonly Entity entity = new EntityBuilder().WithLabel("Wick").Build();
 
     // WorldEvent
 
     [Fact]
     public void Describe_EntityPushedEvent_IncludesLabelAndDistance()
     {
-        var result = EventDescriber.Describe(new EntityPushedEvent(_entity, 300));
+        var result = EventDescriber.Describe(new EntityPushedEvent(entity, 300));
 
         result.Should().Be("Wick pushed 300mm.");
     }
@@ -23,7 +23,7 @@ public class EventDescriberTests
     [Fact]
     public void Describe_EntityPulledEvent_IncludesLabelAndDistance()
     {
-        var result = EventDescriber.Describe(new EntityPulledEvent(_entity, 150));
+        var result = EventDescriber.Describe(new EntityPulledEvent(entity, 150));
 
         result.Should().Be("Wick pulled 150mm.");
     }
@@ -31,7 +31,7 @@ public class EventDescriberTests
     [Fact]
     public void Describe_PowerDrawnEvent_IncludesLabelAndAmount()
     {
-        var result = EventDescriber.Describe(new PowerDrawnEvent(_entity, 42));
+        var result = EventDescriber.Describe(new PowerDrawnEvent(entity, 42));
 
         result.Should().Be("Wick lost 42 power.");
     }
@@ -39,7 +39,7 @@ public class EventDescriberTests
     [Fact]
     public void Describe_EntityDrainedEvent_IncludesLabel()
     {
-        var result = EventDescriber.Describe(new EntityDrainedEvent(_entity));
+        var result = EventDescriber.Describe(new EntityDrainedEvent(entity));
 
         result.Should().Be("Wick was drained.");
     }
@@ -47,7 +47,7 @@ public class EventDescriberTests
     [Fact]
     public void Describe_PowerFilledEvent_IncludesLabelAndAmount()
     {
-        var result = EventDescriber.Describe(new PowerFilledEvent(_entity, 10));
+        var result = EventDescriber.Describe(new PowerFilledEvent(entity, 10));
 
         result.Should().Be("Wick gained 10 power.");
     }
@@ -55,7 +55,7 @@ public class EventDescriberTests
     [Fact]
     public void Describe_EntityFullEvent_IncludesLabel()
     {
-        var result = EventDescriber.Describe(new EntityFullEvent(_entity));
+        var result = EventDescriber.Describe(new EntityFullEvent(entity));
 
         result.Should().Be("Wick is full.");
     }
@@ -71,7 +71,7 @@ public class EventDescriberTests
     [Fact]
     public void Describe_EntityDisintegratedEvent_IncludesLabel()
     {
-        var result = EventDescriber.Describe(new EntityDisintegratedEvent(_entity));
+        var result = EventDescriber.Describe(new EntityDisintegratedEvent(entity));
 
         result.Should().Be("Wick disintegrated.");
     }
@@ -87,7 +87,7 @@ public class EventDescriberTests
     [Fact]
     public void Describe_InscriptionReadEvent_IncludesLabelAndText()
     {
-        var result = EventDescriber.Describe(new InscriptionReadEvent(_entity, "ZU VUN"));
+        var result = EventDescriber.Describe(new InscriptionReadEvent(entity, "ZU VUN"));
 
         result.Should().Be("Wick: ZU VUN");
     }
@@ -95,7 +95,7 @@ public class EventDescriberTests
     [Fact]
     public void Describe_EntityRotatedEvent_IncludesLabelAndAngle()
     {
-        var result = EventDescriber.Describe(new EntityRotatedEvent(_entity, 90));
+        var result = EventDescriber.Describe(new EntityRotatedEvent(entity, 90));
 
         result.Should().Be("Wick rotated 90 degrees.");
     }
@@ -153,7 +153,7 @@ public class EventDescriberTests
     [Fact]
     public void Describe_CasterSetEvent_IncludesLabel()
     {
-        var result = EventDescriber.Describe(new CasterSetEvent(_entity));
+        var result = EventDescriber.Describe(new CasterSetEvent(entity));
 
         result.Should().Be("Caster set to Wick.");
     }
@@ -185,7 +185,7 @@ public class EventDescriberTests
     [Fact]
     public void Describe_IndicatingEvent_IncludesLabel()
     {
-        var result = EventDescriber.Describe(new IndicatingEvent(_entity));
+        var result = EventDescriber.Describe(new IndicatingEvent(entity));
 
         result.Should().Be("Indicating Wick.");
     }
@@ -201,7 +201,7 @@ public class EventDescriberTests
     [Fact]
     public void Describe_IndicateTargetOutOfReachEvent_IncludesLabel()
     {
-        var result = EventDescriber.Describe(new IndicateTargetOutOfReachEvent(_entity));
+        var result = EventDescriber.Describe(new IndicateTargetOutOfReachEvent(entity));
 
         result.Should().Be("Wick is out of reach.");
     }

@@ -7,7 +7,7 @@ namespace RunicMagic.World;
 
 public class WorldModel : IGameLoopWorldModel
 {
-    private readonly Dictionary<EntityId, Entity> _entities = new();
+    private readonly Dictionary<EntityId, Entity> entities = new();
     private readonly EngineMotionCollection engineMotionCollection;
 
     internal WorldModel(EngineMotionCollection engineMotionCollection)
@@ -17,51 +17,47 @@ public class WorldModel : IGameLoopWorldModel
 
     public void Add(Entity entity)
     {
-        _entities[entity.Id] = entity;
+        entities[entity.Id] = entity;
     }
 
     public void Remove(EntityId id)
     {
-        var entity = _entities.GetValueOrDefault(id);
+        var entity = entities.GetValueOrDefault(id);
 
         if (entity != null)
         {
-            _entities.Remove(id);
+            entities.Remove(id);
         }
     }
 
     public Entity? Find(EntityId id)
     {
-        var entity = _entities.GetValueOrDefault(id);
+        var entity = entities.GetValueOrDefault(id);
         return entity;
     }
 
     public IReadOnlyList<Entity> GetAll()
     {
-        var entities = _entities.Values.ToList();
-        return entities;
+        return entities.Values.ToList();
     }
 
     public IReadOnlyList<Entity> GetEntitiesAtPoint(Location location)
     {
-        var entities = _entities.Values.Where(e => Bounds(e).Contains(location)).ToList();
-        return entities;
+        return entities.Values.Where(e => Bounds(e).Contains(location)).ToList();
     }
 
     public IReadOnlyList<Entity> GetEntitiesWithinDistance(Entity source, double distance)
     {
         var sourceBounds = Bounds(source);
-        var entities = _entities.Values
+        return entities.Values
             .Where(e => e.Id != source.Id)
             .Where(e => Bounds(e).IsWithinDistanceFromRectangle(sourceBounds, distance))
             .ToList();
-        return entities;
     }
 
     public IReadOnlyList<Entity> GetContainedEntities(Entity container)
     {
-        var entities = _entities.Values.Where(e => e.Id != container.Id && Bounds(container).Contains(Bounds(e))).ToList();
-        return entities;
+        return entities.Values.Where(e => e.Id != container.Id && Bounds(container).Contains(Bounds(e))).ToList();
     }
 
     public void AddMotionEffect(IEngineMotionEffect effect)

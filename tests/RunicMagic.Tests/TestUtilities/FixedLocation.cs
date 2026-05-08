@@ -9,20 +9,20 @@ namespace RunicMagic.Tests.TestUtilities;
 // In production code, use CalcifiedLocation instead.
 public class FixedLocation : ILocation
 {
-    private readonly Location _location;
+    private readonly Location location;
 
     public FixedLocation(Location location)
     {
-        _location = location;
+        this.location = location;
     }
 
     public FixedLocation(double x, double y)
     {
-        _location = new Location(x, y);
+        location = new Location(x, y);
     }
 
     public Location Evaluate(SpellContext context)
     {
-        return _location;
+        return location;
     }
 }

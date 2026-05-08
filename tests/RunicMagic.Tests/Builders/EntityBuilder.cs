@@ -9,147 +9,147 @@ namespace RunicMagic.Tests.Builders;
 
 internal class EntityBuilder
 {
-    private EntityId _id = new EntityId(Guid.NewGuid());
-    private string _label = "Test Entity";
-    private Location _location = new Location(0, 0);
-    private long _width = 100;
-    private long _height = 100;
-    private bool _hasAgency = false;
-    private long _weight = 1000;
-    private long _strength = 0;
-    private bool _isTranslucent = false;
-    private double _angle = 0;
-    private double _dragCoefficient = 0.0;
-    private double _angularDragCoefficient = 0.0;
-    private double _groundFrictionCoefficient = 0.0;
-    private double? _groundContactRadius;
-    private StructuralIntegrityCapability _structuralIntegrity = new StructuralIntegrityCapability(1000, 1000);
-    private AICapability _aiCapability = new AICapability([]);
+    private EntityId id = new EntityId(Guid.NewGuid());
+    private string label = "Test Entity";
+    private Location location = new Location(0, 0);
+    private long width = 100;
+    private long height = 100;
+    private bool hasAgency = false;
+    private long weight = 1000;
+    private long strength = 0;
+    private bool isTranslucent = false;
+    private double angle = 0;
+    private double dragCoefficient = 0.0;
+    private double angularDragCoefficient = 0.0;
+    private double groundFrictionCoefficient = 0.0;
+    private double? groundContactRadius = 0.0;
+    private StructuralIntegrityCapability structuralIntegrity = new StructuralIntegrityCapability(1000, 1000);
+    private AICapability aiCapability = new AICapability([]);
 
-    private LifeCapability? _life;
-    private ChargeCapability? _charge;
-    private LocomotionCapability? _locomotion;
-    private Func<Entity[]>? _scope;
-    private ReservoirCapability? _reservoir;
-    private Direction? _pointingDirection;
-    private IndicateTarget? _indicateTarget;
-    private string[] _rawInscriptions = [];
-    private IStatement[] _parsedInscriptions = [];
+    private LifeCapability? life;
+    private ChargeCapability? charge;
+    private LocomotionCapability? locomotion;
+    private Func<Entity[]>? scope;
+    private ReservoirCapability? reservoir;
+    private Direction? pointingDirection;
+    private IndicateTarget? indicateTarget;
+    private string[] rawInscriptions = [];
+    private IStatement[] parsedInscriptions = [];
 
     public EntityBuilder() { }
 
     public EntityBuilder WithId(EntityId id)
     {
-        _id = id;
+        this.id = id;
         return this;
     }
 
     public EntityBuilder WithLabel(string label)
     {
-        _label = label;
+        this.label = label;
         return this;
     }
 
     public EntityBuilder WithLocation(long x, long y)
     {
-        _location = new Location(x, y);
+        location = new Location(x, y);
         return this;
     }
 
     public EntityBuilder WithLocation(Location location)
     {
-        _location = location;
+        this.location = location;
         return this;
     }
 
     public EntityBuilder WithSize(long width, long height)
     {
-        _width = width;
-        _height = height;
+        this.width = width;
+        this.height = height;
         return this;
     }
 
     public EntityBuilder WithWeight(long weight)
     {
-        _weight = weight;
+        this.weight = weight;
         return this;
     }
 
     public EntityBuilder WithStrength(long strength)
     {
-        _strength = strength;
+        this.strength = strength;
         return this;
     }
 
     public EntityBuilder WithAgency()
     {
-        _hasAgency = true;
+        hasAgency = true;
         return this;
     }
 
     public EntityBuilder WithTranslucency()
     {
-        _isTranslucent = true;
+        isTranslucent = true;
         return this;
     }
 
     public EntityBuilder WithAngle(double angle)
     {
-        _angle = angle;
+        this.angle = angle;
         return this;
     }
 
     public EntityBuilder WithDragCoefficient(double dragCoefficient)
     {
-        _dragCoefficient = dragCoefficient;
+        this.dragCoefficient = dragCoefficient;
         return this;
     }
 
     public EntityBuilder WithAngularDragCoefficient(double angularDragCoefficient)
     {
-        _angularDragCoefficient = angularDragCoefficient;
+        this.angularDragCoefficient = angularDragCoefficient;
         return this;
     }
 
     public EntityBuilder WithGroundFrictionCoefficient(double groundFrictionCoefficient)
     {
-        _groundFrictionCoefficient = groundFrictionCoefficient;
+        this.groundFrictionCoefficient = groundFrictionCoefficient;
         return this;
     }
 
     public EntityBuilder WithGroundContactRadius(double groundContactRadius)
     {
-        _groundContactRadius = groundContactRadius;
+        this.groundContactRadius = groundContactRadius;
         return this;
     }
 
     public EntityBuilder WithStructuralIntegrity(long max, long current)
     {
-        _structuralIntegrity = new StructuralIntegrityCapability(max, current);
+        structuralIntegrity = new StructuralIntegrityCapability(max, current);
         return this;
     }
 
     public EntityBuilder WithAICapability(AICapability aiCapability)
     {
-        _aiCapability = aiCapability;
+        this.aiCapability = aiCapability;
         return this;
     }
 
     public EntityBuilder WithLocomotion(LocomotionCapability locomotion)
     {
-        _locomotion = locomotion;
+        this.locomotion = locomotion;
         return this;
     }
 
     public EntityBuilder WithLife(long max, long current)
     {
-        _life = new LifeCapability(max, current);
+        life = new LifeCapability(max, current);
         return this;
     }
 
     public EntityBuilder WithCharge(long max, long current)
     {
-        _charge = new ChargeCapability(max, current);
+        charge = new ChargeCapability(max, current);
         return this;
     }
 
@@ -160,68 +160,68 @@ internal class EntityBuilder
         if (draw == null) draw = amount => new ReservoirDraw(amount, false);
         if (fill == null) fill = amount => new ReservoirFill(amount, false);
 
-        _reservoir = new ReservoirCapability(max, current, draw, fill);
+        reservoir = new ReservoirCapability(max, current, draw, fill);
         return this;
     }
 
     public EntityBuilder WithScope(Func<Entity[]> scope)
     {
-        _scope = scope;
+        this.scope = scope;
         return this;
     }
 
     public EntityBuilder WithPointingDirection(Direction direction)
     {
-        _pointingDirection = direction;
+        pointingDirection = direction;
         return this;
     }
 
     public EntityBuilder WithIndicateTarget(IndicateTarget target)
     {
-        _indicateTarget = target;
+        indicateTarget = target;
         return this;
     }
 
     public EntityBuilder WithInscriptions(string[] rawInscriptions, IStatement[] parsedInscriptions)
     {
-        _rawInscriptions = rawInscriptions;
-        _parsedInscriptions = parsedInscriptions;
+        this.rawInscriptions = rawInscriptions;
+        this.parsedInscriptions = parsedInscriptions;
         return this;
     }
 
     public Entity Build()
     {
-        var w = (double)_width;
-        var h = (double)_height;
-        var groundContactRadius = _groundContactRadius ?? Math.Sqrt((w * w + h * h) / 12.0);
+        var w = (double)width;
+        var h = (double)height;
+        var groundContactRadius = this.groundContactRadius ?? Math.Sqrt((w * w + h * h) / 12.0);
 
         return new Entity(
-            id: _id,
-            label: _label,
-            location: _location,
-            width: _width,
-            height: _height,
-            hasAgency: _hasAgency,
-            weight: _weight,
-            strength: _strength,
-            isTranslucent: _isTranslucent,
-            angle: _angle,
-            structuralIntegrity: _structuralIntegrity,
-            aiCapability: _aiCapability,
-            dragCoefficient: _dragCoefficient,
-            angularDragCoefficient: _angularDragCoefficient,
-            groundFrictionCoefficient: _groundFrictionCoefficient,
+            id: id,
+            label: label,
+            location: location,
+            width: width,
+            height: height,
+            hasAgency: hasAgency,
+            weight: weight,
+            strength: strength,
+            isTranslucent: isTranslucent,
+            angle: angle,
+            structuralIntegrity: structuralIntegrity,
+            aiCapability: aiCapability,
+            dragCoefficient: dragCoefficient,
+            angularDragCoefficient: angularDragCoefficient,
+            groundFrictionCoefficient: groundFrictionCoefficient,
             groundContactRadius: groundContactRadius)
         {
-            Life = _life,
-            Charge = _charge,
-            Locomotion = _locomotion,
-            Scope = _scope,
-            Reservoir = _reservoir,
-            PointingDirection = _pointingDirection,
-            IndicateTarget = _indicateTarget,
-            RawInscriptions = _rawInscriptions,
-            ParsedInscriptions = _parsedInscriptions,
+            Life = life,
+            Charge = charge,
+            Locomotion = locomotion,
+            Scope = scope,
+            Reservoir = reservoir,
+            PointingDirection = pointingDirection,
+            IndicateTarget = indicateTarget,
+            RawInscriptions = rawInscriptions,
+            ParsedInscriptions = parsedInscriptions,
         };
     }
 }

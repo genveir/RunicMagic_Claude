@@ -18,7 +18,7 @@ internal class PlayerService : IPlayerViewInterface, IPlayerGameLoopInterface
     private readonly SpellCastingService spellCasting;
     private readonly RayCastService rayCast;
 
-    private EntityId? _casterId = null;
+    private EntityId? casterId = null;
 
     public PlayerService(
             WorldModel world,
@@ -62,7 +62,7 @@ internal class PlayerService : IPlayerViewInterface, IPlayerGameLoopInterface
             else
             {
                 var casterEntity = entities[0];
-                _casterId = casterEntity.Id;
+                casterId = casterEntity.Id;
                 eventTracker.Add(new CasterSetEvent(casterEntity));
             }
         });
@@ -142,7 +142,7 @@ internal class PlayerService : IPlayerViewInterface, IPlayerGameLoopInterface
 
     public EntityId? GetCasterId()
     {
-        return _casterId;
+        return casterId;
     }
 
     public void DrainAndFlush(EventTracker eventTracker)
@@ -153,13 +153,13 @@ internal class PlayerService : IPlayerViewInterface, IPlayerGameLoopInterface
 
     private Entity? CheckForCaster(EventTracker eventTracker)
     {
-        if (_casterId == null)
+        if (casterId == null)
         {
             eventTracker.Add(new NoCasterSelectedEvent());
             return null;
         }
 
-        var caster = world.Find(_casterId.Value);
+        var caster = world.Find(casterId.Value);
         if (caster == null)
         {
             eventTracker.Add(new CasterNotFoundEvent());

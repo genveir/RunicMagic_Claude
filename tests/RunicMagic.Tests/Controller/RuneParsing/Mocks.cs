@@ -27,30 +27,30 @@ internal class MockStatement : IStatement
 
 internal class MockParser<T> : IRuneParser<T>
 {
-    private readonly T _value;
+    private readonly T value;
 
     internal MockParser(T value)
     {
-        _value = value;
+        this.value = value;
     }
 
     public ParsingResult<T> Parse(TokenStream tokenStream)
     {
-        return ParsingResult<T>.Succeed(_value);
+        return ParsingResult<T>.Succeed(value);
     }
 }
 
 internal class MockFailingParser<T> : IRuneParser<T>
 {
-    private readonly ParseEvent _error;
+    private readonly ParseEvent error;
 
     internal MockFailingParser(ParseEvent error)
     {
-        _error = error;
+        this.error = error;
     }
 
     public ParsingResult<T> Parse(TokenStream tokenStream)
     {
-        return ParsingResult<T>.Fail(_error);
+        return ParsingResult<T>.Fail(error);
     }
 }

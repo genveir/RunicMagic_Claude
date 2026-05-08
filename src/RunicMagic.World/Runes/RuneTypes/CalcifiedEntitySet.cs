@@ -6,7 +6,7 @@ public class CalcifiedEntitySet : IEntitySet
 {
     public IEntitySet Inner { get; }
 
-    private EntitySet? _cached;
+    private EntitySet? cached;
 
     public CalcifiedEntitySet(IEntitySet inner)
     {
@@ -15,10 +15,10 @@ public class CalcifiedEntitySet : IEntitySet
 
     public EntitySet Resolve(SpellContext context)
     {
-        if (_cached == null)
+        if (cached == null)
         {
-            _cached = Inner.Resolve(context);
+            cached = Inner.Resolve(context);
         }
-        return _cached;
+        return cached;
     }
 }

@@ -10,11 +10,11 @@ public class LocomotionCapability
     private const double ArrivalThresholdMm = 100.0;
     private const int BrakeSearchSteps = 4;
 
-    private readonly IReadOnlyList<Leg> _legs;
+    private readonly IReadOnlyList<Leg> legs;
 
     public LocomotionCapability(IReadOnlyList<Leg> legs, double locomotionEfficiency)
     {
-        _legs = legs;
+        this.legs = legs;
         LocomotionEfficiency = locomotionEfficiency;
     }
 
@@ -63,7 +63,7 @@ public class LocomotionCapability
     internal void ApplyTurning(Entity entity, double angularError, double perLegForce, double cosA, double sinA, IWorldEventTracker tracker)
     {
         var maxTurnForce = GetLegVectors(
-            legs: _legs,
+            legs: legs,
             perLegForce: perLegForce,
             turnDirection: 1,
             entityAngle: entity.Angle,
@@ -132,7 +132,7 @@ public class LocomotionCapability
             }
         }
 
-        var legVectors = GetLegVectors(_legs, perLegForce, turnDirection, entity.Angle, scale, cosA, sinA);
+        var legVectors = GetLegVectors(legs, perLegForce, turnDirection, entity.Angle, scale, cosA, sinA);
 
         entity.PendingImpulses.AddRange(legVectors);
     }
@@ -207,7 +207,7 @@ public class LocomotionCapability
             shouldStop = true;
         }
 
-        var totalBrakingForce = _legs.Count * perLegForce;
+        var totalBrakingForce = legs.Count * perLegForce;
         var bounds = new Rectangle(entity.Location, Width: entity.Width, Height: entity.Height, Angle: entity.Angle);
         var brakingFx = -cosA * totalBrakingForce;
         var brakingFy = -sinA * totalBrakingForce;
@@ -264,7 +264,7 @@ public class LocomotionCapability
             }
         }
 
-        foreach (var leg in _legs)
+        foreach (var leg in legs)
         {
             var (rx, ry) = leg.GetWorldOffset(entity.Angle);
             entity.PendingImpulses.Add(new ForceVector(

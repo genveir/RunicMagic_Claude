@@ -7,12 +7,12 @@ namespace RunicMagic.View.Services;
 
 public class SseConnectionManager
 {
-    private readonly ConcurrentDictionary<Guid, Channel<ViewUpdateModel>> _connections;
+    private readonly ConcurrentDictionary<Guid, Channel<ViewUpdateModel>> connections;
     private readonly IWorldRenderingService worldRendering;
 
     public SseConnectionManager(IWorldRenderingService worldRendering)
     {
-        _connections = new();
+        connections = new();
         this.worldRendering = worldRendering;
     }
 
@@ -20,7 +20,7 @@ public class SseConnectionManager
     {
         var id = Guid.NewGuid();
         var channel = Channel.CreateUnbounded<ViewUpdateModel>();
-        _connections[id] = channel;
+        connections[id] = channel;
 
         var entities = worldRendering.GetAllRenderingModels(casterEntityId: null);
         var initial = new ViewUpdateModel([], entities, string.Empty, Bars: null);
@@ -31,13 +31,13 @@ public class SseConnectionManager
 
     public void RemoveConnection(Guid id)
     {
-        if (_connections.TryRemove(id, out var channel))
+        if (connections.TryRemove(id, out var channel))
             channel.Writer.TryComplete();
     }
 
     public void Push(ViewUpdateModel viewUpdate)
     {
-        foreach (var channel in _connections.Values)
+        foreach (var channel in connections.Values)
             channel.Writer.TryWrite(viewUpdate);
     }
 }

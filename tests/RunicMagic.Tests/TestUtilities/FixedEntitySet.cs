@@ -9,21 +9,21 @@ namespace RunicMagic.Tests.TestUtilities;
 // In production code, use CalcifiedEntitySet instead.
 public class FixedEntitySet : IEntitySet
 {
-    private readonly EntitySet _resolved;
+    private readonly EntitySet resolved;
 
     public FixedEntitySet(EntitySet resolved)
     {
-        _resolved = resolved;
+        this.resolved = resolved;
     }
 
     public FixedEntitySet(params Entity[] entities)
     {
-        _resolved = new EntitySet(entities);
+        resolved = new EntitySet(entities);
     }
 
     public EntitySet Resolve(SpellContext context)
     {
-        context.EntityResolutionCount?.UnionWith(_resolved.Entities.Select(e => e.Id));
-        return _resolved;
+        context.EntityResolutionCount?.UnionWith(resolved.Entities.Select(e => e.Id));
+        return resolved;
     }
 }

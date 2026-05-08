@@ -4,7 +4,13 @@ namespace RunicMagic.World.Execution;
 
 public class SpellContext
 {
-    private readonly Stack<EntitySet> _sourceStack = new();
+    private readonly Stack<EntitySet> sourceStack = new();
+    private readonly Stack<HashSet<EntityId>> resolutionStack = new();
+
+    public EntitySet Caster { get; }
+    public EntitySet Executor { get; }
+    public WorldModel World { get; }
+    public IWorldEventTracker EventTracker { get; internal set; }
 
     public SpellContext(EntitySet caster, EntitySet executor, WorldModel world, IWorldEventTracker eventTracker)
     {
@@ -14,46 +20,39 @@ public class SpellContext
         EventTracker = eventTracker;
     }
 
-    public EntitySet Caster { get; }
-    public EntitySet Executor { get; }
-    public WorldModel World { get; }
-    public IWorldEventTracker EventTracker { get; internal set; }
-
     public void PushPowerSource(EntitySet source)
     {
-        _sourceStack.Push(source);
+        sourceStack.Push(source);
     }
 
     public void PopPowerSource()
     {
-        _sourceStack.Pop();
+        sourceStack.Pop();
     }
 
-    private readonly Stack<HashSet<EntityId>> _resolutionStack = new();
-
     public HashSet<EntityId>? EntityResolutionCount =>
-        _resolutionStack.TryPeek(out var top) ? top : null;
+        resolutionStack.TryPeek(out var top) ? top : null;
 
     public void OpenResolutionWindow()
     {
-        _resolutionStack.Push(new HashSet<EntityId>());
+        resolutionStack.Push(new HashSet<EntityId>());
     }
 
     public void CloseResolutionWindow()
     {
-        _resolutionStack.Pop();
+        resolutionStack.Pop();
     }
 
     public SpellContext ForkWithNewExecutor(EntitySet newExecutor)
     {
         var forked = new SpellContext(Caster, newExecutor, World, EventTracker);
-        foreach (var source in _sourceStack.Reverse())
+        foreach (var source in sourceStack.Reverse())
         {
-            forked._sourceStack.Push(source);
+            forked.sourceStack.Push(source);
         }
-        foreach (var set in _resolutionStack.Reverse())
+        foreach (var set in resolutionStack.Reverse())
         {
-            forked._resolutionStack.Push(new HashSet<EntityId>(set));
+            forked.resolutionStack.Push(new HashSet<EntityId>(set));
         }
         return forked;
     }
@@ -61,7 +60,7 @@ public class SpellContext
     public long DrawPower(long amount)
     {
         var remaining = amount;
-        var sources = _sourceStack.Concat([Executor.GetScope(), Executor, Caster.GetScope(), Caster]);
+        var sources = sourceStack.Concat([Executor.GetScope(), Executor, Caster.GetScope(), Caster]);
         foreach (var source in sources)
         {
             if (remaining == 0)

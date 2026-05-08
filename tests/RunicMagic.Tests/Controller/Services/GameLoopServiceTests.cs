@@ -32,11 +32,11 @@ public class GameLoopServiceTests
 
     private class FakePlayerService : IPlayerGameLoopInterface
     {
-        private readonly Action<EventTracker> _drain;
+        private readonly Action<EventTracker> drain;
 
         public FakePlayerService(Action<EventTracker> drain)
         {
-            _drain = drain;
+            this.drain = drain;
         }
 
         public EntityId? GetCasterId()
@@ -46,7 +46,7 @@ public class GameLoopServiceTests
 
         public void DrainAndFlush(EventTracker eventTracker)
         {
-            _drain(eventTracker);
+            drain(eventTracker);
         }
     }
 

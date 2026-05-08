@@ -9,17 +9,17 @@ public class CalcifiedLocationTests
     private class CountingLocation : ILocation
     {
         public int EvaluateCallCount { get; private set; }
-        private readonly Location _result;
+        private readonly Location result;
 
         public CountingLocation(Location result)
         {
-            _result = result;
+            this.result = result;
         }
 
         public Location Evaluate(SpellContext context)
         {
             EvaluateCallCount++;
-            return _result;
+            return result;
         }
     }
 

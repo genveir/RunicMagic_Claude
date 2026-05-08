@@ -6,7 +6,7 @@ public class CalcifiedNumber : INumber
 {
     public INumber Inner { get; }
 
-    private Number? _cached;
+    private Number? cached;
 
     public CalcifiedNumber(INumber inner)
     {
@@ -15,10 +15,10 @@ public class CalcifiedNumber : INumber
 
     public Number Evaluate(SpellContext context)
     {
-        if (_cached == null)
+        if (cached == null)
         {
-            _cached = Inner.Evaluate(context);
+            cached = Inner.Evaluate(context);
         }
-        return _cached.Value;
+        return cached.Value;
     }
 }

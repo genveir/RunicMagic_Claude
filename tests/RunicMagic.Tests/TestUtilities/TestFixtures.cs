@@ -25,32 +25,32 @@ internal static class TestFixtures
 
 internal class FixedNumber : INumber
 {
-    private readonly long _value;
+    private readonly long value;
 
     internal FixedNumber(long value)
     {
-        _value = value;
+        this.value = value;
     }
 
     public Number Evaluate(SpellContext context)
     {
-        return new Number(_value);
+        return new Number(value);
     }
 }
 
 internal class FixedPointEntitySet : IEntitySet
 {
-    private readonly Location _location;
+    private readonly Location location;
 
     internal FixedPointEntitySet(long x, long y)
     {
-        _location = new Location(x, y);
+        location = new Location(x, y);
     }
 
     public EntitySet Resolve(SpellContext context)
     {
         var entity = new EntityBuilder()
-            .WithLocation(_location)
+            .WithLocation(location)
             .WithSize(1, 1)
             .Build();
         return new EntitySet([entity]);

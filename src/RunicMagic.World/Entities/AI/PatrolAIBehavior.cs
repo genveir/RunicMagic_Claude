@@ -4,17 +4,17 @@ public class PatrolAIBehavior : IAIBehavior
 {
     private const double ArrivalThresholdMm = 500.0;
 
-    private readonly IReadOnlyList<PatrolWaypoint> _waypoints;
-    private readonly double _speed;
-    private int _currentWaypointIndex;
-    private long? _arrivedAtTick;
+    private readonly IReadOnlyList<PatrolWaypoint> waypoints;
+    private readonly double speed;
+    private int currentWaypointIndex;
+    private long? arrivedAtTick;
 
     public PatrolAIBehavior(IReadOnlyList<PatrolWaypoint> waypoints, double speed)
     {
-        _waypoints = waypoints;
-        _speed = speed;
-        _currentWaypointIndex = 0;
-        _arrivedAtTick = null;
+        this.waypoints = waypoints;
+        this.speed = speed;
+        this.currentWaypointIndex = 0;
+        this.arrivedAtTick = null;
     }
 
     public void Execute(Entity entity, WorldModel worldModel, IWorldEventTracker eventTracker, long currentTick)
@@ -24,24 +24,24 @@ public class PatrolAIBehavior : IAIBehavior
             return;
         }
 
-        if (_waypoints.Count == 0)
+        if (waypoints.Count == 0)
         {
             return;
         }
 
-        if (_arrivedAtTick.HasValue)
+        if (arrivedAtTick.HasValue)
         {
-            var waitTicks = _waypoints[_currentWaypointIndex].WaitTicks;
-            if (currentTick - _arrivedAtTick.Value < waitTicks)
+            var waitTicks = waypoints[currentWaypointIndex].WaitTicks;
+            if (currentTick - arrivedAtTick.Value < waitTicks)
             {
                 return;
             }
 
-            _arrivedAtTick = null;
-            _currentWaypointIndex = (_currentWaypointIndex + 1) % _waypoints.Count;
+            arrivedAtTick = null;
+            currentWaypointIndex = (currentWaypointIndex + 1) % waypoints.Count;
         }
 
-        var waypoint = _waypoints[_currentWaypointIndex];
+        var waypoint = waypoints[currentWaypointIndex];
         var dx = waypoint.Location.X - entity.Location.X;
         var dy = waypoint.Location.Y - entity.Location.Y;
         var distance = Math.Sqrt(dx * dx + dy * dy);
@@ -50,15 +50,15 @@ public class PatrolAIBehavior : IAIBehavior
         {
             if (waypoint.WaitTicks > 0)
             {
-                _arrivedAtTick = currentTick;
+                arrivedAtTick = currentTick;
                 return;
             }
 
-            _currentWaypointIndex = (_currentWaypointIndex + 1) % _waypoints.Count;
-            waypoint = _waypoints[_currentWaypointIndex];
+            currentWaypointIndex = (currentWaypointIndex + 1) % waypoints.Count;
+            waypoint = waypoints[currentWaypointIndex];
         }
 
-        if (_speed >= 1.0)
+        if (speed >= 1.0)
         {
             entity.Locomotion.Run(entity, waypoint.Location, eventTracker);
         }

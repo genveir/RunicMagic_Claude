@@ -16,7 +16,6 @@ public class EventTracker : IWorldEventTracker
     public IReadOnlyList<WorldEvent> WorldEvents => _worldEvents;
     public IReadOnlyList<ControllerEvent> ControllerEvents => _controllerEvents;
     public IReadOnlyList<ParseEvent> ParseEvents => _parseEvents;
-
     public IReadOnlySet<Entity> TouchedEntities => _touchedEntities;
 
     public void Add(WorldEvent worldEvent)

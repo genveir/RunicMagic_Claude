@@ -14,7 +14,6 @@ Next bugfix number: BUG-11
 | Key | Title | Description | Blocked By |
 |-----|-------|-------------|------------|
 | RMC-111 | Split movement policy out of LocomotionCapability | `LocomotionCapability` currently conflates two concerns: the physical model (legs, offsets, efficiency, how to produce `ForceVector` impulses) and movement policy (goal-seeking, braking decisions, turn-vs-walk priority). Split these so that `LocomotionCapability` exposes physical primitives only: `ApplyForwardForce(entity, fraction)`, `ApplyTurnForce(entity, direction, fraction)`, and query methods like `GetLinearBrakingDistance(entity, forceFraction)` / `GetAngularBrakingAngle(entity, forceFraction)` (which delegate to `PhysicsService` internally). The current goal-seeking logic (`ApplyLocomotion`, `ApplyWalking`, `ApplyTurning`, braking simulations) moves into AI behaviour classes in the AI layer. This allows behaviours like sneak (10% force), combined turn+accelerate (split leg allocation), or custom stopping policy without touching the capability. | RMC-103 |
-| RMC-116 | Remove underscore prefixes from private fields | Audit all non-record classes and structs for private fields with underscore prefixes (`_name`) and rename them to plain `camelCase`. Update all references. Records are exempt. | |
 | RMC-102 | Remove defaults from EntityData; add test builder | `EntityData` properties currently have default values, which lets tests construct incomplete objects silently. Remove the defaults so the compiler enforces full initialisation, and introduce an `EntityDataBuilder` (or similar) in the test project to make constructing valid test instances convenient. | |
 | RMC-104 | Normalise current/max parameter order | Audit all methods that take both a `current` and a `max` value of the same type and ensure `current` comes before `max` consistently across the codebase. | |
 | RMC-106 | Change base motion constant from 56 to 70 ticks | The base motion constant used for motion timing is currently 56 ticks. Change it to 70. Also make it a constant in the technical sense. | |
@@ -61,3 +60,4 @@ Next bugfix number: BUG-11
 | BUG-10  | Dead casters can cast spells |
 | RMC-109 | Split WorldModel into entity store, motion queue, and ticker |
 | RMC-96  | Remove primary constructors |
+| RMC-116 | Remove underscore prefixes from private fields |

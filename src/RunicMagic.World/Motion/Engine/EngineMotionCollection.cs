@@ -2,20 +2,20 @@
 
 internal class EngineMotionCollection
 {
-    private readonly List<IEngineMotionEffect> _engineMotionEffects = new();
+    private readonly List<IEngineMotionEffect> engineMotionEffects = new();
 
     public IEnumerable<IEngineMotionEffect> GetAll()
     {
-        return _engineMotionEffects;
+        return engineMotionEffects;
     }
 
     public void AddMotionEffect(IEngineMotionEffect effect)
     {
-        _engineMotionEffects.Add(effect);
+        engineMotionEffects.Add(effect);
     }
 
     public void RemoveAll(Func<IEngineMotionEffect, bool> predicate)
     {
-        _engineMotionEffects.RemoveAll(new Predicate<IEngineMotionEffect>(predicate));
+        engineMotionEffects.RemoveAll(new Predicate<IEngineMotionEffect>(predicate));
     }
 }

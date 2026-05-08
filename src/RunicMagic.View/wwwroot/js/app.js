@@ -352,15 +352,15 @@ document.addEventListener('contextmenu', e => {
     setMode(null);
 });
 
-let _svgMousedownX = 0, _svgMousedownY = 0;
+let svgMousedownX = 0, svgMousedownY = 0;
 
-svg.addEventListener('mousedown', e => { _svgMousedownX = e.clientX; _svgMousedownY = e.clientY; });
+svg.addEventListener('mousedown', e => { svgMousedownX = e.clientX; svgMousedownY = e.clientY; });
 
 svg.addEventListener('mouseup', async e => {
     if (!currentMode) return;
 
-    const dx = e.clientX - _svgMousedownX;
-    const dy = e.clientY - _svgMousedownY;
+    const dx = e.clientX - svgMousedownX;
+    const dy = e.clientY - svgMousedownY;
     if (Math.sqrt(dx * dx + dy * dy) > 5) return;
 
     const pt = svg.createSVGPoint();

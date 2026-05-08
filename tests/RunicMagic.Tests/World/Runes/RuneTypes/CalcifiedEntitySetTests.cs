@@ -8,17 +8,17 @@ public class CalcifiedEntitySetTests
     private class CountingEntitySet : IEntitySet
     {
         public int ResolveCallCount { get; private set; }
-        private readonly EntitySet _result;
+        private readonly EntitySet result;
 
         public CountingEntitySet(EntitySet result)
         {
-            _result = result;
+            this.result = result;
         }
 
         public EntitySet Resolve(SpellContext context)
         {
             ResolveCallCount++;
-            return _result;
+            return result;
         }
     }
 

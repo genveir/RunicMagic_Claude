@@ -8,17 +8,17 @@ public class CalcifiedNumberTests
     private class CountingNumber : INumber
     {
         public int EvaluateCallCount { get; private set; }
-        private readonly Number _result;
+        private readonly Number result;
 
         public CountingNumber(Number result)
         {
-            _result = result;
+            this.result = result;
         }
 
         public Number Evaluate(SpellContext context)
         {
             EvaluateCallCount++;
-            return _result;
+            return result;
         }
     }
 

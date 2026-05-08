@@ -65,12 +65,12 @@
 - Do not use expression-bodied methods (`=> expression`). Always use block bodies, assign the result to a named local variable, and return that variable. This makes every intermediate value visible in the debugger's Locals/Watch windows:
   ```csharp
   // wrong
-  public Entity? Find(EntityId id) => _entities.GetValueOrDefault(id);
+  public Entity? Find(EntityId id) => entities.GetValueOrDefault(id);
 
   // right
   public Entity? Find(EntityId id)
   {
-      var entity = _entities.GetValueOrDefault(id);
+      var entity = entities.GetValueOrDefault(id);
       return entity;
   }
   ```
@@ -78,7 +78,7 @@
 
 - Do not use primary constructors except in records. Always use an explicit constructor body so fields are declared separately and remain navigable and debuggable.
 
-- Do not use underscore prefixes for private fields. Name them in plain `camelCase`, the same as local variables. The type system and IDE tooling distinguish fields from locals without the prefix.
+- Do not use underscore prefixes for private fields. Name them in plain `camelCase`, the same as local variables. The type system and IDE tooling distinguish fields from locals without the prefix. Exception: explicit backing fields for properties use the `_camelCase` prefix to distinguish them from the property they back.
 
 - Use named arguments when the purpose of an argument isn't obvious from the call site:
   - Always for inline lambdas (you can't tell from the lambda body alone which parameter it maps to)

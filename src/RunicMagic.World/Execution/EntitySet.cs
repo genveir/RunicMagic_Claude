@@ -4,18 +4,18 @@ namespace RunicMagic.World.Execution;
 
 public class EntitySet
 {
-    private readonly IReadOnlyList<Entity> _entities;
+    private readonly IReadOnlyList<Entity> entities;
 
     public EntitySet(IReadOnlyList<Entity> entities)
     {
-        _entities = entities;
+        this.entities = entities;
     }
 
     public IReadOnlyList<Entity> Entities
     {
         get
         {
-            return _entities
+            return entities
                 .Where(e => e.StructuralIntegrity.CurrentIntegrity > 0)
                 .ToList();
         }
@@ -25,7 +25,7 @@ public class EntitySet
     {
         var seen = new HashSet<EntityId>();
         var scopeEntities = new List<Entity>();
-        foreach (var entity in _entities)
+        foreach (var entity in entities)
         {
             var scope = entity.Scope?.Invoke() ?? [];
             foreach (var member in scope)
@@ -41,6 +41,6 @@ public class EntitySet
 
     public override string ToString()
     {
-        return $"EntitySet({string.Join(", ", _entities.Select(e => e.Label))})";
+        return $"EntitySet({string.Join(", ", entities.Select(e => e.Label))})";
     }
 }

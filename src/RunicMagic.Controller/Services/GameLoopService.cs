@@ -14,7 +14,7 @@ internal class GameLoopService : BackgroundService
     private readonly IWorldRenderingService worldRendering;
     private readonly IWorldTickSink sink;
 
-    private long _currentTick = 0;
+    private long currentTick = 0;
 
     public GameLoopService(
         IPlayerGameLoopInterface playerService,
@@ -45,8 +45,8 @@ internal class GameLoopService : BackgroundService
 
         playerService.DrainAndFlush(eventTracker);
 
-        worldTicker.HandleTick(eventTracker, _currentTick);
-        _currentTick++;
+        worldTicker.HandleTick(eventTracker, currentTick);
+        currentTick++;
 
         var casterId = playerService.GetCasterId();
 

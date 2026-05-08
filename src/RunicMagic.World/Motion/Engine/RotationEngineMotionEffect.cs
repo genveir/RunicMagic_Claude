@@ -7,15 +7,15 @@ namespace RunicMagic.World.Motion.Engine;
 
 public class RotationEngineMotionEffect : IEngineMotionEffect
 {
-    private readonly TemporalSpellContext _temporalContext;
-    private readonly IEntitySet _entities;
-    private readonly ILocation _origin;
-    private readonly double _perTickTheta;
-    private readonly long _totalRuneDegrees;
-    private readonly string _effectName;
-    private int _remainingTicks;
+    private readonly TemporalSpellContext temporalContext;
+    private readonly IEntitySet entities;
+    private readonly ILocation origin;
+    private readonly double perTickTheta;
+    private readonly long totalRuneDegrees;
+    private readonly string effectName;
+    private int remainingTicks;
 
-    public bool IsComplete => _remainingTicks == 0;
+    public bool IsComplete => remainingTicks == 0;
 
     public RotationEngineMotionEffect(
         SpellContext context,
@@ -25,37 +25,37 @@ public class RotationEngineMotionEffect : IEngineMotionEffect
         long totalRuneDegrees,
         string effectName)
     {
-        _temporalContext = new(context);
-        _entities = toMove;
-        _origin = origin;
-        _perTickTheta = perTickTheta;
-        _totalRuneDegrees = totalRuneDegrees;
-        _effectName = effectName;
-        _remainingTicks = 56;
+        temporalContext = new(context);
+        entities = toMove;
+        this.origin = origin;
+        this.perTickTheta = perTickTheta;
+        this.totalRuneDegrees = totalRuneDegrees;
+        this.effectName = effectName;
+        remainingTicks = 56;
     }
 
     public EngineMotionEffectResult TryAdvance(IWorldEventTracker eventTracker)
     {
-        var context = _temporalContext.ToSpellContext(eventTracker);
+        var context = temporalContext.ToSpellContext(eventTracker);
 
-        var entities = _entities.Resolve(context);
-        var origin = _origin.Evaluate(context);
+        var entities = this.entities.Resolve(context);
+        var origin = this.origin.Evaluate(context);
 
         var totalCost = 0L;
         foreach (var entity in entities.Entities)
         {
-            totalCost += RotationCostCalculator.ComputeEntityCost(entity, origin, Math.Abs(_perTickTheta));
+            totalCost += RotationCostCalculator.ComputeEntityCost(entity, origin, Math.Abs(perTickTheta));
         }
 
         var drawn = context.DrawPower(totalCost);
         if (drawn < totalCost)
         {
-            eventTracker.Add(new EffectNotFiredEvent(_effectName, $"Insufficient power: needed {totalCost}, drew {drawn}"));
+            eventTracker.Add(new EffectNotFiredEvent(effectName, $"Insufficient power: needed {totalCost}, drew {drawn}"));
             return new(Advanced: false, EntitiesUnderMotion: []);
         }
 
-        var cos = Math.Cos(_perTickTheta);
-        var sin = Math.Sin(_perTickTheta);
+        var cos = Math.Cos(perTickTheta);
+        var sin = Math.Sin(perTickTheta);
 
         foreach (var entity in entities.Entities)
         {
@@ -65,17 +65,17 @@ public class RotationEngineMotionEffect : IEngineMotionEffect
                 origin.X + dx * cos - dy * sin,
                 origin.Y + dx * sin + dy * cos
             );
-            var newAngle = entity.Angle + _perTickTheta;
+            var newAngle = entity.Angle + perTickTheta;
             MoveEntityService.Move(entity, newLocation, newAngle, eventTracker);
         }
 
-        _remainingTicks--;
+        remainingTicks--;
 
-        if (_remainingTicks == 0)
+        if (remainingTicks == 0)
         {
             foreach (var entity in entities.Entities)
             {
-                eventTracker.Add(new EntityRotatedEvent(entity, _totalRuneDegrees));
+                eventTracker.Add(new EntityRotatedEvent(entity, totalRuneDegrees));
             }
         }
 
