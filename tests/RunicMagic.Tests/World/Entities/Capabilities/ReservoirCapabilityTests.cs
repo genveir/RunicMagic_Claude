@@ -4,14 +4,14 @@ namespace RunicMagic.Tests.World.Entities.Capabilities;
 
 public class ReservoirCapabilityTests
 {
-    private static Entity MakeEntityWithReservoir(long max, long current)
+    private static Entity MakeEntityWithReservoir(long current, long max)
     {
         return new EntityBuilder()
             .WithReservoir(max: () => max, current: () => current)
             .Build();
     }
 
-    private static Entity MakeEntityWithReservoirAndScope(long max, long current, Func<Entity[]> scope)
+    private static Entity MakeEntityWithReservoirAndScope(long current, long max, Func<Entity[]> scope)
     {
         return new EntityBuilder()
             .WithReservoir(max: () => max, current: () => current)

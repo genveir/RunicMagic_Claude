@@ -66,7 +66,7 @@ public class EntityFactory
             strength: entityData.Strength,
             isTranslucent: entityData.IsTranslucent,
             angle: entityData.Angle,
-            structuralIntegrity: new StructuralIntegrityCapability(entityData.MaxStructuralIntegrity, entityData.CurrentStructuralIntegrity),
+            structuralIntegrity: new StructuralIntegrityCapability(currentIntegrity: entityData.CurrentStructuralIntegrity, maxIntegrity: entityData.MaxStructuralIntegrity),
             aiCapability: aiCapability,
             dragCoefficient: entityData.DragCoefficient,
             angularDragCoefficient: entityData.AngularDragCoefficient,
@@ -74,10 +74,10 @@ public class EntityFactory
             groundContactRadius: groundContactRadius);
 
         if (entityData.MaxHitPoints.HasValue && entityData.CurrentHitPoints.HasValue)
-            entity.Life = new LifeCapability(entityData.MaxHitPoints.Value, entityData.CurrentHitPoints.Value);
+            entity.Life = new LifeCapability(currentHitPoints: entityData.CurrentHitPoints.Value, maxHitPoints: entityData.MaxHitPoints.Value);
 
         if (entityData.MaxCharge.HasValue && entityData.CurrentCharge.HasValue)
-            entity.Charge = new ChargeCapability(entityData.MaxCharge.Value, entityData.CurrentCharge.Value);
+            entity.Charge = new ChargeCapability(currentCharge: entityData.CurrentCharge.Value, maxCharge: entityData.MaxCharge.Value);
 
         if (legs != null)
         {

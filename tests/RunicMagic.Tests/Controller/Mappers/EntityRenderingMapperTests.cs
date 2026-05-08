@@ -46,7 +46,7 @@ public class EntityRenderingMapperTests
     public void Entity_WithLife_HasLifeFlag()
     {
         var model = EntityRenderingMapper.ToRenderingModel(
-            MakeEntity(life: new LifeCapability(100, 100)), isCaster: false);
+            MakeEntity(life: new LifeCapability(currentHitPoints: 100, maxHitPoints: 100)), isCaster: false);
 
         model.Flags.Should().HaveFlag(EntityRenderingFlags.HasLife);
         model.Flags.Should().NotHaveFlag(EntityRenderingFlags.HasAgency);
@@ -99,7 +99,7 @@ public class EntityRenderingMapperTests
     public void Entity_WithLifeAndAgency_HasBothFlags()
     {
         var model = EntityRenderingMapper.ToRenderingModel(
-            MakeEntity(hasAgency: true, life: new LifeCapability(100, 100)), isCaster: false);
+            MakeEntity(hasAgency: true, life: new LifeCapability(currentHitPoints: 100, maxHitPoints: 100)), isCaster: false);
 
         model.Flags.Should().HaveFlag(EntityRenderingFlags.HasLife);
         model.Flags.Should().HaveFlag(EntityRenderingFlags.HasAgency);

@@ -10,9 +10,9 @@ public class DamageServiceTests
     [Fact]
     public void Damage_EntitySet_DistributesWithCeilingRounding()
     {
-        var entity1 = new EntityBuilder().WithStructuralIntegrity(1000, 1000).Build();
-        var entity2 = new EntityBuilder().WithStructuralIntegrity(1000, 1000).Build();
-        var entity3 = new EntityBuilder().WithStructuralIntegrity(1000, 1000).Build();
+        var entity1 = new EntityBuilder().WithStructuralIntegrity(current: 1000, max: 1000).Build();
+        var entity2 = new EntityBuilder().WithStructuralIntegrity(current: 1000, max: 1000).Build();
+        var entity3 = new EntityBuilder().WithStructuralIntegrity(current: 1000, max: 1000).Build();
 
         var set = new EntitySet([entity1, entity2, entity3]);
         DamageService.Damage(set, 10, TestFixtures.MakeContext());
@@ -34,8 +34,8 @@ public class DamageServiceTests
     [Fact]
     public void Damage_EntitySet_EvenAmount_DistributesExactly()
     {
-        var entity1 = new EntityBuilder().WithStructuralIntegrity(1000, 1000).Build();
-        var entity2 = new EntityBuilder().WithStructuralIntegrity(1000, 1000).Build();
+        var entity1 = new EntityBuilder().WithStructuralIntegrity(current: 1000, max: 1000).Build();
+        var entity2 = new EntityBuilder().WithStructuralIntegrity(current: 1000, max: 1000).Build();
 
         var set = new EntitySet([entity1, entity2]);
         DamageService.Damage(set, 20, TestFixtures.MakeContext());
@@ -47,8 +47,8 @@ public class DamageServiceTests
     [Fact]
     public void Damage_EntitySet_EmitsEntityDamagedEvent_PerEntity()
     {
-        var entity1 = new EntityBuilder().WithStructuralIntegrity(1000, 1000).Build();
-        var entity2 = new EntityBuilder().WithStructuralIntegrity(1000, 1000).Build();
+        var entity1 = new EntityBuilder().WithStructuralIntegrity(current: 1000, max: 1000).Build();
+        var entity2 = new EntityBuilder().WithStructuralIntegrity(current: 1000, max: 1000).Build();
 
         var set = new EntitySet([entity1, entity2]);
         var result = new EventTracker();
@@ -60,7 +60,7 @@ public class DamageServiceTests
     [Fact]
     public void Damage_EntitySet_EmitsEntityDisintegratedEvent_WhenEntityDies()
     {
-        var entity = new EntityBuilder().WithStructuralIntegrity(100, 10).Build();
+        var entity = new EntityBuilder().WithStructuralIntegrity(current: 10, max: 100).Build();
 
         var set = new EntitySet([entity]);
         var result = new EventTracker();
@@ -73,7 +73,7 @@ public class DamageServiceTests
     [Fact]
     public void Damage_EntitySet_ReturnsActualAmountDealt()
     {
-        var entity = new EntityBuilder().WithStructuralIntegrity(100, 10).Build();
+        var entity = new EntityBuilder().WithStructuralIntegrity(current: 10, max: 100).Build();
 
         var set = new EntitySet([entity]);
         var totalDealt = DamageService.Damage(set, 100, TestFixtures.MakeContext());
@@ -84,8 +84,8 @@ public class DamageServiceTests
     [Fact]
     public void Damage_EntitySet_SpillsToSurvivorsWhenEntityDies()
     {
-        var fragile = new EntityBuilder().WithStructuralIntegrity(1000, 5).Build();
-        var sturdy = new EntityBuilder().WithStructuralIntegrity(1000, 1000).Build();
+        var fragile = new EntityBuilder().WithStructuralIntegrity(current: 5, max: 1000).Build();
+        var sturdy = new EntityBuilder().WithStructuralIntegrity(current: 1000, max: 1000).Build();
 
         var set = new EntitySet([fragile, sturdy]);
         var result = new EventTracker();
@@ -100,8 +100,8 @@ public class DamageServiceTests
     [Fact]
     public void Damage_EntitySet_StopsWhenAllEntitiesDie()
     {
-        var entity1 = new EntityBuilder().WithStructuralIntegrity(100, 10).Build();
-        var entity2 = new EntityBuilder().WithStructuralIntegrity(100, 10).Build();
+        var entity1 = new EntityBuilder().WithStructuralIntegrity(current: 10, max: 100).Build();
+        var entity2 = new EntityBuilder().WithStructuralIntegrity(current: 10, max: 100).Build();
 
         var set = new EntitySet([entity1, entity2]);
         var result = new EventTracker();
@@ -114,8 +114,8 @@ public class DamageServiceTests
     [Fact]
     public void Damage_EntitySet_ReturnsPartialAmountWhenCapacityInsufficient()
     {
-        var entity1 = new EntityBuilder().WithStructuralIntegrity(100, 30).Build();
-        var entity2 = new EntityBuilder().WithStructuralIntegrity(100, 30).Build();
+        var entity1 = new EntityBuilder().WithStructuralIntegrity(current: 30, max: 100).Build();
+        var entity2 = new EntityBuilder().WithStructuralIntegrity(current: 30, max: 100).Build();
 
         var set = new EntitySet([entity1, entity2]);
         var totalDealt = DamageService.Damage(set, 1000, TestFixtures.MakeContext());
@@ -126,7 +126,7 @@ public class DamageServiceTests
     [Fact]
     public void Damage_Entity_ReducesCurrentIntegrity()
     {
-        var entity = new EntityBuilder().WithStructuralIntegrity(1000, 1000).Build();
+        var entity = new EntityBuilder().WithStructuralIntegrity(current: 1000, max: 1000).Build();
 
         DamageService.Damage(entity, 300, TestFixtures.MakeContext());
 
@@ -136,7 +136,7 @@ public class DamageServiceTests
     [Fact]
     public void Damage_Entity_CapsAtCurrentIntegrity()
     {
-        var entity = new EntityBuilder().WithStructuralIntegrity(1000, 50).Build();
+        var entity = new EntityBuilder().WithStructuralIntegrity(current: 50, max: 1000).Build();
 
         var actual = DamageService.Damage(entity, 500, TestFixtures.MakeContext());
 
@@ -147,7 +147,7 @@ public class DamageServiceTests
     [Fact]
     public void Damage_Entity_ReturnsActualAmountDealt()
     {
-        var entity = new EntityBuilder().WithStructuralIntegrity(1000, 1000).Build();
+        var entity = new EntityBuilder().WithStructuralIntegrity(current: 1000, max: 1000).Build();
 
         var actual = DamageService.Damage(entity, 400, TestFixtures.MakeContext());
 
@@ -157,7 +157,7 @@ public class DamageServiceTests
     [Fact]
     public void Damage_Entity_EmitsEntityDamagedEvent()
     {
-        var entity = new EntityBuilder().WithStructuralIntegrity(1000, 1000).Build();
+        var entity = new EntityBuilder().WithStructuralIntegrity(current: 1000, max: 1000).Build();
 
         var result = new EventTracker();
         DamageService.Damage(entity, 100, TestFixtures.MakeContext(result: result));
@@ -169,7 +169,7 @@ public class DamageServiceTests
     [Fact]
     public void Damage_Entity_EmitsEntityDisintegratedEvent_WhenIntegrityReachesZero()
     {
-        var entity = new EntityBuilder().WithStructuralIntegrity(1000, 100).Build();
+        var entity = new EntityBuilder().WithStructuralIntegrity(current: 100, max: 1000).Build();
 
         var result = new EventTracker();
         DamageService.Damage(entity, 100, TestFixtures.MakeContext(result: result));
@@ -181,7 +181,7 @@ public class DamageServiceTests
     [Fact]
     public void Damage_Entity_DoesNotEmitEntityDamagedEvent_WhenIntegrityReachesZero()
     {
-        var entity = new EntityBuilder().WithStructuralIntegrity(1000, 100).Build();
+        var entity = new EntityBuilder().WithStructuralIntegrity(current: 100, max: 1000).Build();
 
         var result = new EventTracker();
         DamageService.Damage(entity, 100, TestFixtures.MakeContext(result: result));
@@ -192,7 +192,7 @@ public class DamageServiceTests
     [Fact]
     public void Damage_Entity_DoesNotEmitAnyEvent_WhenZeroDamageDealt()
     {
-        var entity = new EntityBuilder().WithStructuralIntegrity(1000, 1000).Build();
+        var entity = new EntityBuilder().WithStructuralIntegrity(current: 1000, max: 1000).Build();
 
         var result = new EventTracker();
         DamageService.Damage(entity, 0, TestFixtures.MakeContext(result: result));
@@ -204,7 +204,7 @@ public class DamageServiceTests
     public void Damage_Entity_ClampsHitPointsToIntegrity_WhenLifeExceedsNewIntegrity()
     {
         var entity = new EntityBuilder()
-            .WithStructuralIntegrity(1000, 1000)
+            .WithStructuralIntegrity(current: 1000, max: 1000)
             .WithLife(max: 500, current: 500)
             .Build();
 
@@ -217,7 +217,7 @@ public class DamageServiceTests
     public void Damage_Entity_DoesNotChangeHitPoints_WhenHitPointsAlreadyBelowNewIntegrity()
     {
         var entity = new EntityBuilder()
-            .WithStructuralIntegrity(1000, 1000)
+            .WithStructuralIntegrity(current: 1000, max: 1000)
             .WithLife(max: 500, current: 100)
             .Build();
 
@@ -230,7 +230,7 @@ public class DamageServiceTests
     public void Damage_Entity_RemovesEntityFromWorld_WhenIntegrityReachesZero()
     {
         var world = new WorldModelBuilder().Build();
-        var entity = new EntityBuilder().WithStructuralIntegrity(1000, 100).Build();
+        var entity = new EntityBuilder().WithStructuralIntegrity(current: 100, max: 1000).Build();
         world.Add(entity);
 
         DamageService.Damage(entity, 100, TestFixtures.MakeContext(world: world));

@@ -8,8 +8,8 @@ public class DamageServiceTests
 {
     private static Entity MakeEntity(long maxIntegrity, long currentIntegrity, long? maxHp = null, long? currentHp = null)
     {
-        var builder = new EntityBuilder().WithStructuralIntegrity(maxIntegrity, currentIntegrity);
-        if (maxHp.HasValue && currentHp.HasValue) builder.WithLife(maxHp.Value, currentHp.Value);
+        var builder = new EntityBuilder().WithStructuralIntegrity(current: currentIntegrity, max: maxIntegrity);
+        if (maxHp.HasValue && currentHp.HasValue) builder.WithLife(current: currentHp.Value, max: maxHp.Value);
         return builder.Build();
     }
 

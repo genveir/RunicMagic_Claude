@@ -38,7 +38,7 @@ public class WorldRenderingServiceTests
         var world = new WorldModelBuilder().Build();
         world.Add(MakeEntity("rock", x: 0, y: 0, width: 10, height: 10));
         world.Add(MakeEntity("caster", x: 50, y: 50, width: 20, height: 20,
-            hasAgency: true, life: new LifeCapability(100, 100)));
+            hasAgency: true, life: new LifeCapability(currentHitPoints: 100, maxHitPoints: 100)));
         var service = new WorldRenderingService(world, new RayCastService(world));
 
         var result = service.GetAllRenderingModels(casterEntityId: null);

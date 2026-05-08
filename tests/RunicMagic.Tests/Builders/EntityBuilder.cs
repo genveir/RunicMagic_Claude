@@ -23,7 +23,7 @@ internal class EntityBuilder
     private double angularDragCoefficient = 0.0;
     private double groundFrictionCoefficient = 0.0;
     private double? groundContactRadius = 0.0;
-    private StructuralIntegrityCapability structuralIntegrity = new StructuralIntegrityCapability(1000, 1000);
+    private StructuralIntegrityCapability structuralIntegrity = new StructuralIntegrityCapability(currentIntegrity: 1000, maxIntegrity: 1000);
     private AICapability aiCapability = new AICapability([]);
 
     private LifeCapability? life;
@@ -123,9 +123,9 @@ internal class EntityBuilder
         return this;
     }
 
-    public EntityBuilder WithStructuralIntegrity(long max, long current)
+    public EntityBuilder WithStructuralIntegrity(long current, long max)
     {
-        structuralIntegrity = new StructuralIntegrityCapability(max, current);
+        structuralIntegrity = new StructuralIntegrityCapability(currentIntegrity: current, maxIntegrity: max);
         return this;
     }
 
@@ -141,26 +141,26 @@ internal class EntityBuilder
         return this;
     }
 
-    public EntityBuilder WithLife(long max, long current)
+    public EntityBuilder WithLife(long current, long max)
     {
-        life = new LifeCapability(max, current);
+        life = new LifeCapability(currentHitPoints: current, maxHitPoints: max);
         return this;
     }
 
-    public EntityBuilder WithCharge(long max, long current)
+    public EntityBuilder WithCharge(long current, long max)
     {
-        charge = new ChargeCapability(max, current);
+        charge = new ChargeCapability(currentCharge: current, maxCharge: max);
         return this;
     }
 
-    public EntityBuilder WithReservoir(Func<long>? max = null, Func<long>? current = null, Func<long, ReservoirDraw>? draw = null, Func<long, ReservoirFill>? fill = null)
+    public EntityBuilder WithReservoir(Func<long>? current = null, Func<long>? max = null, Func<long, ReservoirDraw>? draw = null, Func<long, ReservoirFill>? fill = null)
     {
-        if (max == null) max = () => 1000000000;
         if (current == null) current = () => 1000000000;
+        if (max == null) max = () => 1000000000;
         if (draw == null) draw = amount => new ReservoirDraw(amount, false);
         if (fill == null) fill = amount => new ReservoirFill(amount, false);
 
-        reservoir = new ReservoirCapability(max, current, draw, fill);
+        reservoir = new ReservoirCapability(current: current, max: max, draw: draw, fill: fill);
         return this;
     }
 

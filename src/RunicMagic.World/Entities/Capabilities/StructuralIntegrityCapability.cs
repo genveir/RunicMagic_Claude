@@ -2,12 +2,12 @@ namespace RunicMagic.World.Entities.Capabilities;
 
 public class StructuralIntegrityCapability
 {
-    public long MaxIntegrity { get; }
     public long CurrentIntegrity { get; set; }
+    public long MaxIntegrity { get; }
 
-    public StructuralIntegrityCapability(long maxIntegrity, long currentIntegrity)
+    public StructuralIntegrityCapability(long currentIntegrity, long maxIntegrity)
     {
-        MaxIntegrity = maxIntegrity;
         CurrentIntegrity = currentIntegrity;
+        MaxIntegrity = maxIntegrity;
     }
 }
