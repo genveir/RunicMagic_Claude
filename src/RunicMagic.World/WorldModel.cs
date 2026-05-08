@@ -2,14 +2,18 @@ using RunicMagic.World.Abstractions;
 using RunicMagic.World.Entities;
 using RunicMagic.World.Geometry;
 using RunicMagic.World.Motion.Engine;
-using RunicMagic.World.Motion.Simulated;
 
 namespace RunicMagic.World;
 
 public class WorldModel : IGameLoopWorldModel
 {
     private readonly Dictionary<EntityId, Entity> _entities = new();
-    private readonly List<IEngineMotionEffect> _engineMotionEffects = new();
+    private readonly EngineMotionCollection engineMotionCollection;
+
+    internal WorldModel(EngineMotionCollection engineMotionCollection)
+    {
+        this.engineMotionCollection = engineMotionCollection;
+    }
 
     public void Add(Entity entity)
     {
@@ -62,62 +66,7 @@ public class WorldModel : IGameLoopWorldModel
 
     public void AddMotionEffect(IEngineMotionEffect effect)
     {
-        _engineMotionEffects.Add(effect);
-    }
-
-    public void HandleTick(IWorldEventTracker eventTracker, long currentTick = 0)
-    {
-        var entitiesUnderMotion = TickEngineMotion(eventTracker);
-
-        TickEntities(eventTracker, entitiesUnderMotion, currentTick);
-        TickPhysics(eventTracker);
-    }
-
-    private HashSet<Entity> TickEngineMotion(IWorldEventTracker eventTracker)
-    {
-        HashSet<Entity> entitiesUnderEngineMotion = [];
-
-        List<IEngineMotionEffect> effectsToRemove = new();
-        foreach (var engineMotionEffect in _engineMotionEffects)
-        {
-            var (advanced, entities) = engineMotionEffect.TryAdvance(eventTracker);
-
-            if (!advanced || engineMotionEffect.IsComplete)
-            {
-                effectsToRemove.Add(engineMotionEffect);
-            }
-
-            foreach (var entity in entities)
-            {
-                entitiesUnderEngineMotion.Add(entity);
-            }
-        }
-        _engineMotionEffects.RemoveAll(effectsToRemove.Contains);
-
-        return entitiesUnderEngineMotion;
-    }
-
-    private void TickEntities(IWorldEventTracker eventTracker, HashSet<Entity> entitiesUnderEngineMotion, long currentTick)
-    {
-        foreach (var entity in _entities.Values)
-        {
-            entity.IsUnderEngineMotion = entitiesUnderEngineMotion.Contains(entity);
-
-            TickAI(eventTracker, entity, currentTick);
-        }
-    }
-
-    private void TickAI(IWorldEventTracker eventTracker, Entity entity, long currentTick)
-    {
-        if (entity.AI.BehaviorCount > 0)
-        {
-            entity.AI.Execute(entity, this, eventTracker, currentTick);
-        }
-    }
-
-    private void TickPhysics(IWorldEventTracker eventTracker)
-    {
-        PhysicsService.Tick(_entities.Values.ToList(), eventTracker);
+        engineMotionCollection.AddMotionEffect(effect);
     }
 
     private static Rectangle Bounds(Entity e)

@@ -15,7 +15,7 @@ public class DamageServiceTests
 
     private static WorldModel MakeWorldWithEntity(Entity entity)
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         world.Add(entity);
         return world;
     }

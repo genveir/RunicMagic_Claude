@@ -13,7 +13,7 @@ public class HOROTests
 
     private static WorldModel WorldWith(params Entity[] entities)
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         foreach (var e in entities)
             world.Add(e);
         return world;
@@ -96,7 +96,7 @@ public class HOROTests
     public void Resolve_EmptyWorld_ReturnsEmpty()
     {
         var horo = new HORO(howFar: new FixedNumber(1000), origin: new FixedEntitySet(Origin));
-        var context = TestFixtures.MakeContext(world: new WorldModel());
+        var context = TestFixtures.MakeContext(world: new WorldModelBuilder().Build());
 
         var result = horo.Resolve(context);
 

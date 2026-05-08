@@ -41,7 +41,7 @@ public class EntityFactoryTests
     [Fact]
     public void Creature_Reservoir_DrawsFromLife()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var entity = Factory(world).Create(CreatureData(maxHp: 100, currentHp: 100));
         world.Add(entity);
 
@@ -55,7 +55,7 @@ public class EntityFactoryTests
     [Fact]
     public void Creature_Reservoir_CapsAtCurrentHp()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var entity = Factory(world).Create(CreatureData(maxHp: 100, currentHp: 30));
         world.Add(entity);
 
@@ -69,7 +69,7 @@ public class EntityFactoryTests
     [Fact]
     public void Creature_Reservoir_DrawsZeroWhenDead()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var entity = Factory(world).Create(CreatureData(maxHp: 100, currentHp: 0));
         world.Add(entity);
 
@@ -84,7 +84,7 @@ public class EntityFactoryTests
     [Fact]
     public void Creature_Reservoir_Current_ReturnsCurrentHp()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var entity = Factory(world).Create(CreatureData(maxHp: 100, currentHp: 60));
         world.Add(entity);
 
@@ -96,7 +96,7 @@ public class EntityFactoryTests
     [Fact]
     public void Creature_Reservoir_Current_TracksHpChanges()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var entity = Factory(world).Create(CreatureData(maxHp: 100, currentHp: 100));
         world.Add(entity);
 
@@ -109,7 +109,7 @@ public class EntityFactoryTests
     [Fact]
     public void Creature_MaxReservoir_ReturnsMaxHitPoints()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var entity = Factory(world).Create(CreatureData(maxHp: 500, currentHp: 200));
         world.Add(entity);
 
@@ -123,7 +123,7 @@ public class EntityFactoryTests
     [Fact]
     public void Creature_Reservoir_Fill_AddsToHp()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var entity = Factory(world).Create(CreatureData(maxHp: 100, currentHp: 40));
         world.Add(entity);
 
@@ -137,7 +137,7 @@ public class EntityFactoryTests
     [Fact]
     public void Creature_Reservoir_Fill_CapsAtMaxHp()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var entity = Factory(world).Create(CreatureData(maxHp: 100, currentHp: 80));
         world.Add(entity);
 
@@ -151,7 +151,7 @@ public class EntityFactoryTests
     [Fact]
     public void Creature_Reservoir_Fill_ReturnsZero_WhenAlreadyFull()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var entity = Factory(world).Create(CreatureData(maxHp: 100, currentHp: 100));
         world.Add(entity);
 
@@ -166,7 +166,7 @@ public class EntityFactoryTests
     [Fact]
     public void Creature_Reservoir_IsNull_WhenNoLifeCapability()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var entity = Factory(world).Create(new EntityData(
             Guid.NewGuid(), (long)EntityType.Creature, "lifeless",
             X: 0, Y: 0, Width: 10, Height: 10, HasAgency: false, Weight: 0, Strength: 0));
@@ -179,7 +179,7 @@ public class EntityFactoryTests
     [Fact]
     public void ManaSource_Reservoir_DrawsFromCharge()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var entity = Factory(world).Create(ManaSourceData(maxCharge: 200, currentCharge: 200));
         world.Add(entity);
 
@@ -193,7 +193,7 @@ public class EntityFactoryTests
     [Fact]
     public void ManaSource_Reservoir_CapsAtCurrentCharge()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var entity = Factory(world).Create(ManaSourceData(maxCharge: 200, currentCharge: 40));
         world.Add(entity);
 
@@ -209,7 +209,7 @@ public class EntityFactoryTests
     [Fact]
     public void ManaSource_Reservoir_Current_ReturnsCurrentCharge()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var entity = Factory(world).Create(ManaSourceData(maxCharge: 200, currentCharge: 120));
         world.Add(entity);
 
@@ -221,7 +221,7 @@ public class EntityFactoryTests
     [Fact]
     public void ManaSource_Reservoir_Current_TracksChargeChanges()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var entity = Factory(world).Create(ManaSourceData(maxCharge: 200, currentCharge: 200));
         world.Add(entity);
 
@@ -234,7 +234,7 @@ public class EntityFactoryTests
     [Fact]
     public void ManaSource_Reservoir_ReturnsMaxCharge()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var entity = Factory(world).Create(ManaSourceData(maxCharge: 800, currentCharge: 100));
         world.Add(entity);
 
@@ -248,7 +248,7 @@ public class EntityFactoryTests
     [Fact]
     public void ManaSource_Reservoir_Fill_AddsToCharge()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var entity = Factory(world).Create(ManaSourceData(maxCharge: 200, currentCharge: 50));
         world.Add(entity);
 
@@ -262,7 +262,7 @@ public class EntityFactoryTests
     [Fact]
     public void ManaSource_Reservoir_Fill_CapsAtMaxCharge()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var entity = Factory(world).Create(ManaSourceData(maxCharge: 200, currentCharge: 170));
         world.Add(entity);
 
@@ -276,7 +276,7 @@ public class EntityFactoryTests
     [Fact]
     public void ManaSource_Reservoir_Fill_ReturnsZero_WhenAlreadyFull()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var entity = Factory(world).Create(ManaSourceData(maxCharge: 200, currentCharge: 200));
         world.Add(entity);
 
@@ -291,7 +291,7 @@ public class EntityFactoryTests
     [Fact]
     public void ManaSource_Reservoir_IsNull_WhenNoChargeCapability()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var entity = Factory(world).Create(new EntityData(
             Guid.NewGuid(), (long)EntityType.ManaSource, "uncharged",
             X: 0, Y: 0, Width: 10, Height: 5, HasAgency: false, Weight: 0, Strength: 0));
@@ -304,7 +304,7 @@ public class EntityFactoryTests
     [Fact]
     public void Create_EntityHasAICapability_WithZeroBehaviors()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var entity = Factory(world).Create(new EntityData(
             Guid.NewGuid(), (long)EntityType.Object, "rock",
             X: 0, Y: 0, Width: 5, Height: 5, HasAgency: false, Weight: 0, Strength: 0));
@@ -318,7 +318,7 @@ public class EntityFactoryTests
     [Fact]
     public void Object_HasNoReservoir()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var entity = Factory(world).Create(new EntityData(
             Guid.NewGuid(), (long)EntityType.Object, "rock",
             X: 0, Y: 0, Width: 5, Height: 5, HasAgency: false, Weight: 0, Strength: 0));
@@ -331,7 +331,7 @@ public class EntityFactoryTests
     [Fact]
     public void Creature_Scope_ReturnsEntityWithin500mm()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         // Caster centre at (0,0); nearby bbox x:[495,505],y:[-5,5] → nearest point (495,0) → gap=495 < 500
         var caster = Factory(world).Create(CreatureData(maxHp: 100, currentHp: 100) with { X = 0, Y = 0, Width = 10, Height = 10 });
         var nearby = Factory(world).Create(new EntityData(Guid.NewGuid(), (long)EntityType.Object, "nearby",
@@ -347,7 +347,7 @@ public class EntityFactoryTests
     [Fact]
     public void Creature_Scope_DoesNotReturnEntityBeyond500mm()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         // Caster centre at (0,0); distant bbox x:[1005,1015],y:[-5,5] → nearest point (1005,0) → gap=1005 > 500
         var caster = Factory(world).Create(CreatureData(maxHp: 100, currentHp: 100) with { X = 0, Y = 0, Width = 10, Height = 10 });
         var distant = Factory(world).Create(new EntityData(Guid.NewGuid(), (long)EntityType.Object, "distant",
@@ -365,7 +365,7 @@ public class EntityFactoryTests
     [Fact]
     public void ParsedInscriptions_EmptyArray_WhenNoInscriptionTexts()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var entity = Factory(world).Create(new EntityData(
             Guid.NewGuid(), (long)EntityType.Object, "rock",
             X: 0, Y: 0, Width: 5, Height: 5, HasAgency: false, Weight: 0, Strength: 0));
@@ -376,7 +376,7 @@ public class EntityFactoryTests
     [Fact]
     public void ParsedInscriptions_ContainsParsedStatement_WhenValidInscription()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var entity = Factory(world).Create(new EntityData(
             Guid.NewGuid(), (long)EntityType.Object, "rock",
             X: 0, Y: 0, Width: 5, Height: 5, HasAgency: false, Weight: 0, Strength: 0,
@@ -389,7 +389,7 @@ public class EntityFactoryTests
     [Fact]
     public void ParsedInscriptions_SilentlyDropsInvalidInscription()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var entity = Factory(world).Create(new EntityData(
             Guid.NewGuid(), (long)EntityType.Object, "rock",
             X: 0, Y: 0, Width: 5, Height: 5, HasAgency: false, Weight: 0, Strength: 0,
@@ -401,7 +401,7 @@ public class EntityFactoryTests
     [Fact]
     public void ParsedInscriptions_SupportsMultipleInscriptions()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var entity = Factory(world).Create(new EntityData(
             Guid.NewGuid(), (long)EntityType.Object, "rock",
             X: 0, Y: 0, Width: 5, Height: 5, HasAgency: false, Weight: 0, Strength: 0,
@@ -413,7 +413,7 @@ public class EntityFactoryTests
     [Fact]
     public void ParsedInscriptions_SkipsInvalidAndKeepsValidInscriptions()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var entity = Factory(world).Create(new EntityData(
             Guid.NewGuid(), (long)EntityType.Object, "rock",
             X: 0, Y: 0, Width: 5, Height: 5, HasAgency: false, Weight: 0, Strength: 0,
@@ -426,7 +426,7 @@ public class EntityFactoryTests
     [Fact]
     public void ParsedInscriptions_WorksOnCreature()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var entity = Factory(world).Create(
             CreatureData(maxHp: 100, currentHp: 100) with
             {
@@ -442,7 +442,7 @@ public class EntityFactoryTests
     [Fact]
     public void RawInscriptions_EmptyArray_WhenNoInscriptionTexts()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var entity = Factory(world).Create(new EntityData(
             Guid.NewGuid(), (long)EntityType.Object, "rock",
             X: 0, Y: 0, Width: 5, Height: 5, HasAgency: false, Weight: 0, Strength: 0));
@@ -453,7 +453,7 @@ public class EntityFactoryTests
     [Fact]
     public void RawInscriptions_ContainsOriginalText_WhenValidInscription()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var entity = Factory(world).Create(new EntityData(
             Guid.NewGuid(), (long)EntityType.Object, "rock",
             X: 0, Y: 0, Width: 5, Height: 5, HasAgency: false, Weight: 0, Strength: 0,
@@ -465,7 +465,7 @@ public class EntityFactoryTests
     [Fact]
     public void RawInscriptions_ContainsOriginalText_WhenInvalidInscription()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var entity = Factory(world).Create(new EntityData(
             Guid.NewGuid(), (long)EntityType.Object, "rock",
             X: 0, Y: 0, Width: 5, Height: 5, HasAgency: false, Weight: 0, Strength: 0,
@@ -477,7 +477,7 @@ public class EntityFactoryTests
     [Fact]
     public void RawInscriptions_ContainsAllTexts_WhenMixedValidAndInvalid()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var entity = Factory(world).Create(new EntityData(
             Guid.NewGuid(), (long)EntityType.Object, "rock",
             X: 0, Y: 0, Width: 5, Height: 5, HasAgency: false, Weight: 0, Strength: 0,

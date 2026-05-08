@@ -78,7 +78,7 @@ public class DETAILSTests
     [Fact]
     public void Execute_CasterPointingAtEntity_EmitsRayCastHitEvent()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var casterEntity = MakeEntity(x: 0, y: 0, label: "caster");
         casterEntity.PointingDirection = Right;
         var target = MakeEntity(x: 500, y: 0, label: "wall");
@@ -99,7 +99,7 @@ public class DETAILSTests
     [Fact]
     public void Execute_CasterPointingAtNothing_EmitsRayCastMissEvent()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var casterEntity = MakeEntity(x: 0, y: 0);
         casterEntity.PointingDirection = Right;
         world.Add(casterEntity);

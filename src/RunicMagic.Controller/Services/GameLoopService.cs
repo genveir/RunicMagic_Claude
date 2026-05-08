@@ -9,6 +9,7 @@ namespace RunicMagic.Controller.Services;
 internal class GameLoopService(
     IPlayerGameLoopInterface playerService,
     IGameLoopWorldModel world,
+    IWorldTicker worldTicker,
     IWorldRenderingService worldRendering,
     IWorldTickSink sink) : BackgroundService
 {
@@ -29,7 +30,7 @@ internal class GameLoopService(
 
         playerService.DrainAndFlush(eventTracker);
 
-        world.HandleTick(eventTracker, _currentTick);
+        worldTicker.HandleTick(eventTracker, _currentTick);
         _currentTick++;
 
         var casterId = playerService.GetCasterId();

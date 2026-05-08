@@ -17,7 +17,7 @@ internal static class TestFixtures
         return new SpellContext(
             caster ?? new EntitySet([]),
             executor ?? new EntitySet([]),
-            world ?? new WorldModel(),
+            world ?? new WorldModelBuilder().Build(),
             result ?? new EventTracker()
         );
     }

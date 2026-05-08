@@ -11,7 +11,7 @@ public class GATests
     [Fact]
     public void Resolve_ReturnsAllWorldEntities()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var entity1 = new EntityBuilder().Build();
         var entity2 = new EntityBuilder().WithLocation(x: 100, y: 0).Build();
         world.Add(entity1);
@@ -26,7 +26,7 @@ public class GATests
     [Fact]
     public void Resolve_WithNoResolutionWindow_DoesNotEmitDebugEvent()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         world.Add(new EntityBuilder().Build());
         var spellResult = new EventTracker();
         var context = TestFixtures.MakeContext(world: world, result: spellResult);
@@ -43,7 +43,7 @@ public class GATests
         var casterEntity = new EntityBuilder()
             .WithReservoir(draw: amount => { drawn.Add(amount); return new ReservoirDraw(amount, false); })
             .Build();
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         world.Add(new EntityBuilder().Build());
         var context = TestFixtures.MakeContext(
             caster: new EntitySet([casterEntity]),
@@ -57,7 +57,7 @@ public class GATests
     [Fact]
     public void Resolve_WithOpenResolutionWindow_EmitsDebugEvent()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var spellResult = new EventTracker();
         var context = TestFixtures.MakeContext(world: world, result: spellResult);
         context.OpenResolutionWindow();
@@ -75,7 +75,7 @@ public class GATests
         var casterEntity = new EntityBuilder()
             .WithReservoir(draw: amount => { drawn.Add(amount); return new ReservoirDraw(amount, false); })
             .Build();
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var context = TestFixtures.MakeContext(
             caster: new EntitySet([casterEntity]),
             world: world);
@@ -89,7 +89,7 @@ public class GATests
     [Fact]
     public void Resolve_WithOpenResolutionWindow_StillReturnsAllWorldEntities()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var entity = new EntityBuilder().Build();
         world.Add(entity);
         var context = TestFixtures.MakeContext(world: world);

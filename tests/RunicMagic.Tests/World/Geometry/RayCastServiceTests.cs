@@ -18,7 +18,7 @@ public class RayCastServiceTests
     [Fact]
     public void Cast_NoEntities_ReturnsFallbackPoint()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var service = new RayCastService(world);
         var sourceId = EntityId.New();
 
@@ -32,7 +32,7 @@ public class RayCastServiceTests
     [Fact]
     public void Cast_SkipsSourceEntity()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var source = MakeEntity(x: 0, y: 0);
         world.Add(source);
         var service = new RayCastService(world);
@@ -47,7 +47,7 @@ public class RayCastServiceTests
     [Fact]
     public void Cast_TranslucentEntityInPath_IsIgnored()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var source = MakeEntity(x: 0, y: 0);
         var ice = MakeEntity(x: 500, y: 0, isTranslucent: true);
         world.Add(source);
@@ -63,7 +63,7 @@ public class RayCastServiceTests
     [Fact]
     public void Cast_NonTranslucentEntityInPath_ReturnsEntryPoint()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var source = MakeEntity(x: 0, y: 0);
         var wall = MakeEntity(x: 500, y: 0);
         world.Add(source);
@@ -79,7 +79,7 @@ public class RayCastServiceTests
     [Fact]
     public void Cast_MultipleEntities_ReturnsClosestHit()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var source = MakeEntity(x: 0, y: 0);
         var near = MakeEntity(x: 500, y: 0);
         var far = MakeEntity(x: 1000, y: 0);
@@ -97,7 +97,7 @@ public class RayCastServiceTests
     [Fact]
     public void Cast_TranslucentBeforeNonTranslucent_ReturnsNonTranslucentHit()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var source = MakeEntity(x: 0, y: 0);
         var ice = MakeEntity(x: 300, y: 0, isTranslucent: true);
         var wall = MakeEntity(x: 700, y: 0);

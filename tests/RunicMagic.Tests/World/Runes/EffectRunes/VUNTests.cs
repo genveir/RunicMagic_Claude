@@ -10,11 +10,12 @@ public class VUNTests
 {
     private static EventTracker RunTicks(WorldModel world, int count)
     {
+        var ticker = WorldTickerBuilder.ForWorldModel(world).Build();
         var last = new EventTracker();
         for (var i = 0; i < count; i++)
         {
             last = new EventTracker();
-            world.HandleTick(last);
+            ticker.HandleTick(last, i);
         }
         return last;
     }
@@ -22,7 +23,7 @@ public class VUNTests
     [Fact]
     public void Execute_WithNonZeroDistance_EnqueuesMotion()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var entity = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(0).Build();
         var vun = new VUN(
             toMove: new FixedEntitySet(entity),
@@ -33,11 +34,11 @@ public class VUNTests
 
         vun.Execute(context);
 
-        var effects = GetPrivateFieldsForTesting.GetMotionEffects(world);
+        var effects = GetPrivateFieldsForTesting.GetEngineMotionCollection(world).GetAll();
         effects.Should().ContainSingle();
 
         var tracker = new EventTracker();
-        var result = effects[0].TryAdvance(tracker);
+        var result = effects.Single().TryAdvance(tracker);
 
         result.EntitiesUnderMotion.Should().ContainSingle().Which.Should().BeSameAs(entity);
     }
@@ -45,7 +46,7 @@ public class VUNTests
     [Fact]
     public void Execute_ZeroDistance_EnqueuesMotion()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var entity = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(0).Build();
         var vun = new VUN(
             toMove: new FixedEntitySet(entity),
@@ -56,11 +57,11 @@ public class VUNTests
 
         vun.Execute(context);
 
-        var effects = GetPrivateFieldsForTesting.GetMotionEffects(world);
+        var effects = GetPrivateFieldsForTesting.GetEngineMotionCollection(world).GetAll();
         effects.Should().ContainSingle();
 
         var tracker = new EventTracker();
-        var result = effects[0].TryAdvance(tracker);
+        var result = effects.Single().TryAdvance(tracker);
 
         result.EntitiesUnderMotion.Should().ContainSingle().Which.Should().BeSameAs(entity);
     }
@@ -68,7 +69,7 @@ public class VUNTests
     [Fact]
     public void Execute_PushesEntityAwayFromOrigin()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var entity = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(0).Build();
         var vun = new VUN(
             toMove: new FixedEntitySet(entity),
@@ -87,7 +88,7 @@ public class VUNTests
     [Fact]
     public void Execute_NullVector_EntityStillMoves()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var entity = new EntityBuilder().WithLocation(x: 0, y: 0).WithWeight(0).Build();
         var vun = new VUN(
             toMove: new FixedEntitySet(entity),
@@ -113,7 +114,7 @@ public class VUNTests
         var caster = new EntitySet([casterEntity]);
 
         // 56mm × 1g = 56 total cost; 56 / 56 = 1 per tick
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var target = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(1).Build();
         var vun = new VUN(
             toMove: new FixedEntitySet(target),
@@ -147,7 +148,7 @@ public class VUNTests
 
         // 112mm × 1g = 112 total cost; 112 / 56 = 2 per tick
         // executor provides 1 per tick (amount/2), caster covers remaining 1
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var target = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(1).Build();
         var vun = new VUN(
             toMove: new FixedEntitySet(target),
@@ -168,7 +169,7 @@ public class VUNTests
     [Fact]
     public void Execute_MultipleEntities_AllMoveAwayFromOrigin()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var entity1 = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(0).Build();
         var entity2 = new EntityBuilder().WithLocation(x: 0, y: 1000).WithWeight(0).Build();
         var vun = new VUN(
@@ -190,7 +191,7 @@ public class VUNTests
     [Fact]
     public void Execute_EmitsEntityPushedEvent_PerEntity_OnFinalTick()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var entity1 = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(0).Build();
         var entity2 = new EntityBuilder().WithLocation(x: 0, y: 1000).WithWeight(0).Build();
         var vun = new VUN(
@@ -210,7 +211,7 @@ public class VUNTests
     public void Execute_InsufficientPower_DoesNotMoveAndEmitsEvent()
     {
         // 1000mm × 1_000_000g = 1,000,000,000 total cost
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var entity = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(1_000_000).Build();
         var originalX = entity.Location.X;
 
@@ -227,8 +228,9 @@ public class VUNTests
         var context = TestFixtures.MakeContext(caster: caster, world: world);
 
         vun.Execute(context);
+        var ticker = WorldTickerBuilder.ForWorldModel(world).Build();
         var tickResult = new EventTracker();
-        world.HandleTick(tickResult);
+        ticker.HandleTick(tickResult, 0);
 
         entity.Location.X.Should().Be(originalX);
         tickResult.WorldEvents.OfType<EffectNotFiredEvent>().Should().ContainSingle()
@@ -241,7 +243,7 @@ public class VUNTests
         // 1000mm × 56000g = 56,000,000 total cost; 1,000,000 per tick
         // Give the caster power for exactly 2 ticks
         var ticksDrawn = 0;
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var entity = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(56000).Build();
         var casterEntity = new EntityBuilder()
             .WithReservoir(draw: amount =>
@@ -264,7 +266,8 @@ public class VUNTests
         var context = TestFixtures.MakeContext(caster: caster, world: world);
 
         vun.Execute(context);
-        for (var i = 0; i < 10; i++) world.HandleTick(new EventTracker());
+        var ticker = WorldTickerBuilder.ForWorldModel(world).Build();
+        for (var i = 0; i < 10; i++) ticker.HandleTick(new EventTracker(), i);
 
         // Moved 2/56 of the total distance; entity should not be at full destination
         entity.Location.X.Should().BeGreaterThan(1000);
@@ -280,7 +283,7 @@ public class VUNTests
             .Build();
         var caster = new EntitySet([casterEntity]);
 
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var vun = new VUN(
             toMove: new FixedEntitySet(),
             howFar: new FixedNumber(500),
@@ -289,7 +292,8 @@ public class VUNTests
         var context = TestFixtures.MakeContext(caster: caster, world: world);
 
         vun.Execute(context);
-        world.HandleTick(new EventTracker());
+        var ticker = WorldTickerBuilder.ForWorldModel(world).Build();
+        ticker.HandleTick(new EventTracker(), 0);
 
         drawn.Should().BeEmpty();
     }

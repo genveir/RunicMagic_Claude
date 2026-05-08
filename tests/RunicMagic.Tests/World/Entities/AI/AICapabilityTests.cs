@@ -69,7 +69,7 @@ public class AICapabilityTests
         ai.AddBehavior(b2);
 
         var entity = new EntityBuilder().Build();
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var tracker = new EventTracker();
 
         ai.Execute(entity, world, tracker, currentTick: 0);
@@ -87,7 +87,7 @@ public class AICapabilityTests
         ai.RemoveBehavior(behavior);
 
         var entity = new EntityBuilder().Build();
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var tracker = new EventTracker();
 
         ai.Execute(entity, world, tracker, currentTick: 0);
@@ -103,7 +103,7 @@ public class AICapabilityTests
         ai.AddBehavior(behavior);
 
         var entity = new EntityBuilder().Build();
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var tracker = new EventTracker();
 
         ai.Execute(entity, world, tracker, currentTick: 42);

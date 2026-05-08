@@ -1,4 +1,3 @@
-using RunicMagic.World;
 using RunicMagic.World.Entities;
 using RunicMagic.World.Execution;
 using RunicMagic.World.Geometry;
@@ -31,7 +30,7 @@ public class DANTests
         var casterEntity = MakeEntity(x: 0, y: 0);
         var context = TestFixtures.MakeContext(
             caster: new EntitySet([casterEntity]),
-            world: new WorldModel());
+            world: new WorldModelBuilder().Build());
 
         var result = new DAN().Resolve(context);
 
@@ -41,7 +40,7 @@ public class DANTests
     [Fact]
     public void Resolve_CasterPointingAtNothing_ReturnsEmptySet()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var casterEntity = MakeEntity(x: 0, y: 0);
         casterEntity.PointingDirection = Right;
         world.Add(casterEntity);
@@ -57,7 +56,7 @@ public class DANTests
     [Fact]
     public void Resolve_CasterPointingAtEntity_ReturnsSingletonWithThatEntity()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var casterEntity = MakeEntity(x: 0, y: 0);
         casterEntity.PointingDirection = Right;
         var target = MakeEntity(x: 500, y: 0);
@@ -75,7 +74,7 @@ public class DANTests
     [Fact]
     public void Resolve_TranslucentEntityInPath_IsNotReturned()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var casterEntity = MakeEntity(x: 0, y: 0);
         casterEntity.PointingDirection = Right;
         var glass = new EntityBuilder().WithLabel("glass").WithLocation(300, 0).WithTranslucency().Build();
@@ -93,7 +92,7 @@ public class DANTests
     [Fact]
     public void Resolve_WindowOpen_EntityHit_AddsEntityIdToResolutionCount()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var casterEntity = MakeEntity(x: 0, y: 0);
         casterEntity.PointingDirection = Right;
         var target = MakeEntity(x: 500, y: 0);
@@ -110,7 +109,7 @@ public class DANTests
     [Fact]
     public void Resolve_WindowOpen_NoEntityHit_ResolutionCountEmpty()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var casterEntity = MakeEntity(x: 0, y: 0);
         casterEntity.PointingDirection = Right;
         world.Add(casterEntity);

@@ -78,6 +78,8 @@
 
 - Do not use primary constructors except in records. Always use an explicit constructor body so fields are declared separately and remain navigable and debuggable.
 
+- Do not use underscore prefixes for private fields. Name them in plain `camelCase`, the same as local variables. The type system and IDE tooling distinguish fields from locals without the prefix.
+
 - Use named arguments when the purpose of an argument isn't obvious from the call site:
   - Always for inline lambdas (you can't tell from the lambda body alone which parameter it maps to)
   - Always for literals (bools, strings, numbers) where the meaning isn't self-evident from the method name

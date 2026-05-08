@@ -9,7 +9,7 @@ public static class PhysicsService
     private const double MinSpeedMmPerTick = 1.0;
     private const double MinAngularSpeedRadPerTick = 0.001;
 
-    public static void Tick(IReadOnlyList<Entity> entities, IWorldEventTracker tracker)
+    public static void Tick(IEnumerable<Entity> entities, IWorldEventTracker tracker)
     {
         foreach (var entity in entities)
         {

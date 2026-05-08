@@ -33,7 +33,7 @@ public class PatrolAIBehaviorTests
             .WithStrength(10000)
             .Build();
         var behavior = new PatrolAIBehavior([Waypoint(10000, 0)], speed: 0.7);
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var tracker = new EventTracker();
 
         behavior.Execute(entity, world, tracker, currentTick: 0);
@@ -50,7 +50,7 @@ public class PatrolAIBehaviorTests
             .WithLocomotion(MakeLocomotion())
             .Build();
         var behavior = new PatrolAIBehavior([], speed: 0.7);
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var tracker = new EventTracker();
 
         behavior.Execute(entity, world, tracker, currentTick: 0);
@@ -69,7 +69,7 @@ public class PatrolAIBehaviorTests
             .WithLocomotion(MakeLocomotion())
             .Build();
         var behavior = new PatrolAIBehavior([Waypoint(10000, 0)], speed: 0.7);
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var tracker = new EventTracker();
 
         behavior.Execute(entity, world, tracker, currentTick: 0);
@@ -87,7 +87,7 @@ public class PatrolAIBehaviorTests
             .Build();
         var behaviorWalk = new PatrolAIBehavior([Waypoint(10000, 0)], speed: 0.7);
         var behaviorRun = new PatrolAIBehavior([Waypoint(10000, 0)], speed: 1.0);
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var tracker = new EventTracker();
 
         behaviorWalk.Execute(entity, world, tracker, currentTick: 0);
@@ -115,7 +115,7 @@ public class PatrolAIBehaviorTests
         var behavior = new PatrolAIBehavior(
             [new PatrolWaypoint(waypointA, WaitTicks: 0), new PatrolWaypoint(waypointB, WaitTicks: 0)],
             speed: 0.7);
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var tracker = new EventTracker();
 
         behavior.Execute(entity, world, tracker, currentTick: 0);
@@ -137,7 +137,7 @@ public class PatrolAIBehaviorTests
         var behavior = new PatrolAIBehavior(
             [new PatrolWaypoint(waypointA, WaitTicks: 0), new PatrolWaypoint(waypointB, WaitTicks: 0)],
             speed: 0.7);
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var tracker = new EventTracker();
 
         behavior.Execute(entity, world, tracker, currentTick: 0);
@@ -164,7 +164,7 @@ public class PatrolAIBehaviorTests
         var behavior = new PatrolAIBehavior(
             [new PatrolWaypoint(waypointA, WaitTicks: 60), new PatrolWaypoint(waypointB, WaitTicks: 0)],
             speed: 0.7);
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var tracker = new EventTracker();
 
         behavior.Execute(entity, world, tracker, currentTick: 0);
@@ -188,7 +188,7 @@ public class PatrolAIBehaviorTests
         var behavior = new PatrolAIBehavior(
             [new PatrolWaypoint(waypointA, WaitTicks: 10), new PatrolWaypoint(waypointB, WaitTicks: 0)],
             speed: 0.7);
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var tracker = new EventTracker();
 
         behavior.Execute(entity, world, tracker, currentTick: 0);

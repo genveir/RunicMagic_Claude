@@ -12,7 +12,7 @@ public class PlayerServiceTests
 {
     private static (PlayerService service, WorldModel world) MakeService()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var spellCasting = new SpellCastingService(new SpellExecutor(world));
         var service = new PlayerService(world, spellCasting, new RayCastService(world));
         return (service, world);

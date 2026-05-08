@@ -5,12 +5,13 @@ namespace RunicMagic.Tests.TestUtilities;
 
 internal static class GetPrivateFieldsForTesting
 {
-    internal static List<IEngineMotionEffect> GetMotionEffects(WorldModel world)
+    internal static EngineMotionCollection GetEngineMotionCollection(WorldModel world)
     {
-        var effects = typeof(WorldModel)
-            .GetField("_engineMotionEffects", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!
-            .GetValue(world) as List<IEngineMotionEffect>;
+        var engineMotionCollectionField = typeof(WorldModel)
+            .GetField("engineMotionCollection", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
 
-        return effects!;
+        var engineMotionCollection = engineMotionCollectionField?.GetValue(world) as EngineMotionCollection;
+
+        return engineMotionCollection ?? throw new InvalidOperationException("Could not extract EngineMotionCollection from WorldModel.");
     }
 }

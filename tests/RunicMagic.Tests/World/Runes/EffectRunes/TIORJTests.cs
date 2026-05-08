@@ -88,7 +88,7 @@ public class TIORJTests
                 fill: amount => { sourceFilled.Add(amount); return new ReservoirFill(amount, false); })
             .Build();
 
-        var world = new RunicMagic.World.WorldModel();
+        var world = new WorldModelBuilder().Build();
         // target has 1 hp: absorbs nothing, 1 damage, ceil(1/2)=1 consumed, 9 returned to source
         var target = new EntityBuilder()
             .WithStructuralIntegrity(max: 1, current: 1)

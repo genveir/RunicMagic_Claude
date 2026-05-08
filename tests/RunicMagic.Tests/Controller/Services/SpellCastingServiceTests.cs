@@ -24,7 +24,7 @@ public class SpellCastingServiceTests
     [Fact]
     public void Cast_EmptyInput_EmitsRanOutOfTokensEvent()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var caster = AddCaster(world);
         var service = MakeService(world);
         var tracker = new EventTracker();
@@ -37,7 +37,7 @@ public class SpellCastingServiceTests
     [Fact]
     public void Cast_UnrecognisedRune_EmitsUnexpectedTokenEvent()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var caster = AddCaster(world);
         var service = MakeService(world);
         var tracker = new EventTracker();
@@ -51,7 +51,7 @@ public class SpellCastingServiceTests
     [Fact]
     public void Cast_IncompleteSpell_EmitsRanOutOfTokensEvent()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var caster = AddCaster(world);
         var service = MakeService(world);
         var tracker = new EventTracker();
@@ -65,7 +65,8 @@ public class SpellCastingServiceTests
     [Fact]
     public void Cast_MilestoneSpell_EmitsEntityPushedEventOnFinalTick()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
+        var ticker = WorldTickerBuilder.ForWorldModel(world).Build();
 
         var casterEntity = new EntityBuilder()
             .WithLocation(x: 0, y: 0)
@@ -88,7 +89,7 @@ public class SpellCastingServiceTests
         for (var i = 0; i < 56; i++)
         {
             finalTick = new EventTracker();
-            world.HandleTick(finalTick);
+            ticker.HandleTick(finalTick, i);
         }
 
         finalTick.WorldEvents.OfType<EntityPushedEvent>().Should().ContainSingle()
@@ -98,7 +99,8 @@ public class SpellCastingServiceTests
     [Fact]
     public void Cast_MilestoneSpell_EmitsPowerDrawnEvents()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
+        var ticker = WorldTickerBuilder.ForWorldModel(world).Build();
 
         var casterEntity = new EntityBuilder()
             .WithLocation(x: 0, y: 0)
@@ -121,7 +123,7 @@ public class SpellCastingServiceTests
         for (var i = 0; i < 56; i++)
         {
             var tickTracker = new EventTracker();
-            world.HandleTick(tickTracker);
+            ticker.HandleTick(tickTracker, i);
             allWorldEvents.AddRange(tickTracker.WorldEvents);
         }
 

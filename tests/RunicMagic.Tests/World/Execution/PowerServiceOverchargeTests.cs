@@ -41,7 +41,7 @@ public class PowerServiceOverchargeTests
     {
         // Target has 1 hp so it can only absorb 1 damage even though 2 are owed per power.
         // 1 damage dealt → ceil(1/2) = 1 power consumed. With 1 power in, nothing should cascade.
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var target = new EntityBuilder()
             .WithStructuralIntegrity(max: 1, current: 1)
             .WithReservoir(fill: _ => new ReservoirFill(0, true))
@@ -120,7 +120,7 @@ public class PowerServiceOverchargeTests
         // target absorbs nothing, has 1 hp → 2 damage dealt from 10 remaining → ceil(2/2)=1 consumed → 9 remaining
         // wait, target has 1 hp: damage = min(2*10, 1) = 1 → ceil(1/2)=1 consumed → 9 remaining
         // then scope gets 9 power
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var target = new EntityBuilder()
             .WithStructuralIntegrity(max: 1, current: 1)
             .WithReservoir(fill: _ => new ReservoirFill(0, true))
@@ -137,7 +137,7 @@ public class PowerServiceOverchargeTests
     [Fact]
     public void FillWithOvercharge_ExhaustedScope_DamagesExecutor()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var executorEntity = new EntityBuilder()
             .WithStructuralIntegrity(max: 100, current: 100)
             .Build();
@@ -161,7 +161,7 @@ public class PowerServiceOverchargeTests
     [Fact]
     public void FillWithOvercharge_ExecutorAndScopeExhausted_DamagesCaster()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var casterEntity = new EntityBuilder()
             .WithStructuralIntegrity(max: 100, current: 100)
             .Build();
@@ -195,7 +195,7 @@ public class PowerServiceOverchargeTests
             .WithStructuralIntegrity(max: 1, current: 1)
             .WithReservoir(fill: _ => new ReservoirFill(0, true))
             .Build();
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         world.Add(target);
         var targetSet = new EntitySet([target]);
 
@@ -210,7 +210,7 @@ public class PowerServiceOverchargeTests
     [Fact]
     public void FillWithOvercharge_NullSource_RemainingDissipates()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var target = new EntityBuilder()
             .WithStructuralIntegrity(max: 1, current: 1)
             .WithReservoir(fill: _ => new ReservoirFill(0, true))
@@ -235,7 +235,7 @@ public class PowerServiceOverchargeTests
             .WithReservoir(fill: amount => { withReservoirFilled.Add(amount); return new ReservoirFill(amount, false); })
             .Build();
 
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var target = new EntityBuilder()
             .WithStructuralIntegrity(max: 1, current: 1)
             .WithReservoir(fill: _ => new ReservoirFill(0, true))

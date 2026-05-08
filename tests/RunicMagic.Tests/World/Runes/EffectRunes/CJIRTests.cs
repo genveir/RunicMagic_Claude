@@ -13,11 +13,12 @@ public class CJIRTests
 
     private static EventTracker RunTicks(WorldModel world, int count)
     {
+        var ticker = WorldTickerBuilder.ForWorldModel(world).Build();
         var last = new EventTracker();
         for (var i = 0; i < count; i++)
         {
             last = new EventTracker();
-            world.HandleTick(last);
+            ticker.HandleTick(last, i);
         }
         return last;
     }
@@ -25,7 +26,7 @@ public class CJIRTests
     [Fact]
     public void Execute_WithNonZeroAngle_EnqueuesMotion()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var entity = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(0).Build();
         var cjir = new CJIR(
             toRotate: new FixedEntitySet(entity),
@@ -35,11 +36,11 @@ public class CJIRTests
 
         cjir.Execute(context);
 
-        var effects = GetPrivateFieldsForTesting.GetMotionEffects(world);
+        var effects = GetPrivateFieldsForTesting.GetEngineMotionCollection(world).GetAll();
         effects.Should().ContainSingle();
 
         var tracker = new EventTracker();
-        var result = effects[0].TryAdvance(tracker);
+        var result = effects.Single().TryAdvance(tracker);
 
         result.EntitiesUnderMotion.Should().ContainSingle().Which.Should().BeSameAs(entity);
     }
@@ -48,7 +49,7 @@ public class CJIRTests
     public void Execute_RotatesEntityClockwise()
     {
         // Entity at (1000, 0). 90° CW around (0, 0) with Y-down puts it at (0, 1000).
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var entity = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(0).Build();
         var cjir = new CJIR(
             toRotate: new FixedEntitySet(entity),
@@ -66,7 +67,7 @@ public class CJIRTests
     [Fact]
     public void Execute_UpdatesEntityAngle()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var entity = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(0).Build();
         var expectedAngle = QuarterTurn / 2744.0 * 2 * Math.PI;
         var cjir = new CJIR(
@@ -84,7 +85,7 @@ public class CJIRTests
     [Fact]
     public void Execute_RotationAroundOwnCenter_LocationUnchanged()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var entity = new EntityBuilder().WithLocation(x: 500, y: 300).Build();
         var cjir = new CJIR(
             toRotate: new FixedEntitySet(entity),
@@ -102,7 +103,7 @@ public class CJIRTests
     [Fact]
     public void Execute_AddsEntityRotatedEvent_OnFinalTick()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var entity = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(0).Build();
         var cjir = new CJIR(
             toRotate: new FixedEntitySet(entity),
@@ -121,7 +122,7 @@ public class CJIRTests
     [Fact]
     public void Execute_ZeroAngle_EnqueuesMotion()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var entity = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(0).Build();
         var cjir = new CJIR(
             toRotate: new FixedEntitySet(entity),
@@ -131,11 +132,11 @@ public class CJIRTests
 
         cjir.Execute(context);
 
-        var effects = GetPrivateFieldsForTesting.GetMotionEffects(world);
+        var effects = GetPrivateFieldsForTesting.GetEngineMotionCollection(world).GetAll();
         effects.Should().ContainSingle();
 
         var tracker = new EventTracker();
-        var result = effects[0].TryAdvance(tracker);
+        var result = effects.Single().TryAdvance(tracker);
 
         result.EntitiesUnderMotion.Should().ContainSingle().Which.Should().BeSameAs(entity);
     }
@@ -144,7 +145,7 @@ public class CJIRTests
     public void Execute_PartialPower_StopsAfterAffordableTicks()
     {
         var ticksDrawn = 0;
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var entity = new EntityBuilder().WithLocation(x: 1000, y: 0).Build();
         entity.Weight = 1_000_000;
         var casterEntity = new EntityBuilder()
@@ -166,7 +167,8 @@ public class CJIRTests
         var context = TestFixtures.MakeContext(caster: caster, world: world);
 
         cjir.Execute(context);
-        for (var i = 0; i < 10; i++) world.HandleTick(new EventTracker());
+        var ticker = WorldTickerBuilder.ForWorldModel(world).Build();
+        for (var i = 0; i < 10; i++) ticker.HandleTick(new EventTracker(), i);
 
         // Rotated only 2/56 of the quarter turn; entity should not have reached destination
         entity.Location.X.Should().BeLessThan(1000);
@@ -176,7 +178,7 @@ public class CJIRTests
     [Fact]
     public void Execute_EmptySet_NoEvents()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var cjir = new CJIR(
             toRotate: new FixedEntitySet(),
             howMuch: new FixedNumber(QuarterTurn),
@@ -184,8 +186,9 @@ public class CJIRTests
         var context = TestFixtures.MakeContext(world: world);
 
         cjir.Execute(context);
+        var ticker = WorldTickerBuilder.ForWorldModel(world).Build();
         var tickResult = new EventTracker();
-        world.HandleTick(tickResult);
+        ticker.HandleTick(tickResult, 0);
 
         tickResult.WorldEvents.Should().BeEmpty();
     }
@@ -193,7 +196,7 @@ public class CJIRTests
     [Fact]
     public void Execute_InsufficientPower_DoesNotRotate()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var entity = new EntityBuilder().WithLocation(x: 1000, y: 0).Build();
         entity.Weight = 1_000_000;
         var originalX = entity.Location.X;
@@ -205,8 +208,9 @@ public class CJIRTests
         var context = TestFixtures.MakeContext(world: world); // no power sources
 
         cjir.Execute(context);
+        var ticker = WorldTickerBuilder.ForWorldModel(world).Build();
         var tickResult = new EventTracker();
-        world.HandleTick(tickResult);
+        ticker.HandleTick(tickResult, 0);
 
         entity.Location.X.Should().Be(originalX);
         entity.Location.Y.Should().Be(originalY);
@@ -217,7 +221,7 @@ public class CJIRTests
     [Fact]
     public void Execute_DrawsPower_WhenEntityHasWeight()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var entity = new EntityBuilder()
             .WithLocation(x: 1000, y: 0)
             .WithReservoir(draw: amount => new ReservoirDraw(amount, false))
@@ -231,12 +235,13 @@ public class CJIRTests
         var context = TestFixtures.MakeContext(executor: executor, world: world);
 
         cjir.Execute(context);
+        var ticker = WorldTickerBuilder.ForWorldModel(world).Build();
         var allEvents = new List<WorldEvent>();
         EventTracker finalTick = new EventTracker();
         for (var i = 0; i < 56; i++)
         {
             finalTick = new EventTracker();
-            world.HandleTick(finalTick);
+            ticker.HandleTick(finalTick, i);
             allEvents.AddRange(finalTick.WorldEvents);
         }
 

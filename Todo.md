@@ -8,14 +8,14 @@ The Key column in every table uses right-padded cells. The baseline is 7 charact
 
 ## To Do — Milestone 3.5 — Maintenance
 
-Next ticket number: RMC-115
+Next ticket number: RMC-117
 Next bugfix number: BUG-11
 
 | Key | Title | Description | Blocked By |
 |-----|-------|-------------|------------|
-| RMC-109 | Split WorldModel into entity store, motion queue, and ticker | `WorldModel` currently has three responsibilities: entity storage, engine motion effect queuing, and tick orchestration. Split into: `WorldModel` (pure entity store and spatial queries), `EngineMotionQueue` (owns `_engineMotionEffects` and `AddMotionEffect`; `TickEngineMotion` moves here), and `WorldTicker` (tick orchestrator, takes the other two as dependencies and drives `TickEntities`/`TickAI`/`TickPhysics`). Retire `IGameLoopWorldModel`. | |
 | RMC-111 | Split movement policy out of LocomotionCapability | `LocomotionCapability` currently conflates two concerns: the physical model (legs, offsets, efficiency, how to produce `ForceVector` impulses) and movement policy (goal-seeking, braking decisions, turn-vs-walk priority). Split these so that `LocomotionCapability` exposes physical primitives only: `ApplyForwardForce(entity, fraction)`, `ApplyTurnForce(entity, direction, fraction)`, and query methods like `GetLinearBrakingDistance(entity, forceFraction)` / `GetAngularBrakingAngle(entity, forceFraction)` (which delegate to `PhysicsService` internally). The current goal-seeking logic (`ApplyLocomotion`, `ApplyWalking`, `ApplyTurning`, braking simulations) moves into AI behaviour classes in the AI layer. This allows behaviours like sneak (10% force), combined turn+accelerate (split leg allocation), or custom stopping policy without touching the capability. | RMC-103 |
 | RMC-96  | Remove primary constructors | Find all non-record classes and structs that use primary constructors and replace them with explicit constructor bodies. Fields should be declared separately. Records may keep primary constructors. | |
+| RMC-116 | Remove underscore prefixes from private fields | Audit all non-record classes and structs for private fields with underscore prefixes (`_name`) and rename them to plain `camelCase`. Update all references. Records are exempt. | |
 | RMC-102 | Remove defaults from EntityData; add test builder | `EntityData` properties currently have default values, which lets tests construct incomplete objects silently. Remove the defaults so the compiler enforces full initialisation, and introduce an `EntityDataBuilder` (or similar) in the test project to make constructing valid test instances convenient. | |
 | RMC-104 | Normalise current/max parameter order | Audit all methods that take both a `current` and a `max` value of the same type and ensure `current` comes before `max` consistently across the codebase. | |
 | RMC-106 | Change base motion constant from 56 to 70 ticks | The base motion constant used for motion timing is currently 56 ticks. Change it to 70. Also make it a constant in the technical sense. | |
@@ -32,8 +32,9 @@ Next bugfix number: BUG-11
 | RMC-100 | In-game entity creation and modification | Add the ability to create new entities and modify existing ones while the game is running — without restarting or editing seed data. This is a prerequisite for conveniently populating the world during development. | |
 | RMC-101 | Save game state to database | Persist current world state (entities and their properties) to the database. | |
 | RMC-60  | Design small items | Define the world model for small items — portable objects a creature can carry (e.g. a mana gem in the caster's pocket). Covers how items are represented, how carrying/inventory works, and how items interact with spells and power sourcing. | |
-| RMC-37  | Kill creatures when they run out of life | At any point during spell execution, living entities may run out of hitpoints. In this case the game should register that they're dead and remove their living and agency properties | |
-| RMC-38  | Register entity destruction | It should be possible to destroy entities. When this happens, the game should register that the entity is destroyed | |
+| RMC-115 | Encapsulate life and structural integrity mutation on Entity | Life and structural integrity must only be altered through dedicated methods on `Entity` — never by directly setting the backing field or property. Audit all sites that currently write these values and replace them with method calls. | |
+| RMC-37  | Kill creatures when they run out of life | At any point during spell execution, living entities may run out of hitpoints. In this case the game should register that they're dead and remove their living and agency properties | RMC-115 |
+| RMC-38  | Register entity destruction | It should be possible to destroy entities. When this happens, the game should register that the entity is destroyed | RMC-115 |
 | RMC-39  | Stop spell execution on caster or executor death or destruction | When the caster or executor of a spell cease to be in an active state the spell should stop executing | RMC-37 RMC-38 |
 | RMC-14  | Design channeling and persistent effects | Written runes stay active while power is channeled. Define what "channeling" means mechanically — what keeps a spell alive, how it is terminated, and how the executor tracks ongoing effects. | |
 | RMC-48  | Formalize movement with collision | VUN currently moves entities to their destination clipping through everything in its path. Replace this with movement through space: the entity travels along the push vector and collides when it hits an entity (a wall, door, etc.) rather than passing through it. | |
@@ -59,3 +60,4 @@ Next bugfix number: BUG-11
 | RMC-92  | Move status rendering to View |
 | RMC-114 | Add life and power bars to the caster HUD |
 | BUG-10  | Dead casters can cast spells |
+| RMC-109 | Split WorldModel into entity store, motion queue, and ticker |

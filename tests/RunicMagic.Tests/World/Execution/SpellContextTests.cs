@@ -207,7 +207,7 @@ public class SpellContextTests
     [Fact]
     public void ForkWithNewExecutor_WorldIsShared()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var original = TestFixtures.MakeContext(world: world);
 
         var forked = original.ForkWithNewExecutor(new EntitySet([]));

@@ -1,4 +1,3 @@
-using RunicMagic.World;
 using RunicMagic.World.Entities;
 using RunicMagic.World.Execution;
 using RunicMagic.World.Geometry;
@@ -31,7 +30,7 @@ public class KALTests
         var casterEntity = MakeEntity(x: 0, y: 0);
         var context = TestFixtures.MakeContext(
             caster: new EntitySet([casterEntity]),
-            world: new WorldModel());
+            world: new WorldModelBuilder().Build());
 
         var result = new KAL().Resolve(context);
 
@@ -41,7 +40,7 @@ public class KALTests
     [Fact]
     public void Resolve_SelfIndicate_ReturnsCaster()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var casterEntity = MakeEntity(x: 0, y: 0);
         casterEntity.IndicateTarget = new IndicateTarget(casterEntity.Id, Direction: null);
         world.Add(casterEntity);
@@ -57,7 +56,7 @@ public class KALTests
     [Fact]
     public void Resolve_IndicateTargetInRange_ReturnsSingletonWithThatEntity()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var casterEntity = MakeEntity(x: 0, y: 0);
         var target = MakeEntity(x: 500, y: 0);
         casterEntity.IndicateTarget = new IndicateTarget(target.Id, Right);
@@ -75,7 +74,7 @@ public class KALTests
     [Fact]
     public void Resolve_TranslucentEntityBlocksPath_ReturnsEmptySet()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var casterEntity = MakeEntity(x: 0, y: 0);
         var glass = new EntityBuilder().WithLabel("glass").WithLocation(300, 0).WithTranslucency().Build();
         var target = MakeEntity(x: 600, y: 0);
@@ -95,7 +94,7 @@ public class KALTests
     [Fact]
     public void Resolve_IndicateTargetEntityDestroyed_ReturnsEmptySet()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var casterEntity = MakeEntity(x: 0, y: 0);
         var destroyedId = EntityId.New();
         casterEntity.IndicateTarget = new IndicateTarget(destroyedId, Right);
@@ -112,7 +111,7 @@ public class KALTests
     [Fact]
     public void Resolve_TargetMovedOutOfRange_ReturnsEmptySet()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var casterEntity = MakeEntity(x: 0, y: 0);
         var target = MakeEntity(x: 1200, y: 0);
         casterEntity.IndicateTarget = new IndicateTarget(target.Id, Right);
@@ -130,7 +129,7 @@ public class KALTests
     [Fact]
     public void Resolve_OpaqueEntityBlocksPath_ReturnsEmptySet()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var casterEntity = MakeEntity(x: 0, y: 0);
         var wall = MakeEntity(x: 300, y: 0);
         var target = MakeEntity(x: 600, y: 0);
@@ -150,7 +149,7 @@ public class KALTests
     [Fact]
     public void Resolve_WindowOpen_TargetResolved_AddsTargetIdToResolutionCount()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var casterEntity = MakeEntity(x: 0, y: 0);
         var target = MakeEntity(x: 500, y: 0);
         casterEntity.IndicateTarget = new IndicateTarget(target.Id, Right);

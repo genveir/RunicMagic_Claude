@@ -16,11 +16,11 @@ public class GameLoopServiceTests
 {
     private static (GameLoopService loop, PlayerService playerService, CapturingSink sink) MakeComponents()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var spellCasting = new SpellCastingService(new SpellExecutor(world));
         var playerService = new PlayerService(world, spellCasting, new RayCastService(world));
         var sink = new CapturingSink();
-        var loop = new GameLoopService(playerService, new FakeWorld(), new FakeRendering(), sink);
+        var loop = new GameLoopService(playerService, new FakeWorld(), new FakeWorldTicker(), new FakeRendering(), sink);
         return (loop, playerService, sink);
     }
 
@@ -54,12 +54,15 @@ public class GameLoopServiceTests
     {
         public Entity? FindResult { get; set; }
 
-        public void HandleTick(IWorldEventTracker eventTracker, long currentTick) { }
-
         public Entity? Find(EntityId id)
         {
             return FindResult;
         }
+    }
+
+    private class FakeWorldTicker : IWorldTicker
+    {
+        public void HandleTick(IWorldEventTracker eventTracker, long currentTick) { }
     }
 
     private class FakeRendering : IWorldRenderingService
@@ -73,7 +76,7 @@ public class GameLoopServiceTests
     private static (GameLoopService loop, CapturingSink sink) MakeLoopWithFake(Action<EventTracker> drain)
     {
         var sink = new CapturingSink();
-        var loop = new GameLoopService(new FakePlayerService(drain), new FakeWorld(), new FakeRendering(), sink);
+        var loop = new GameLoopService(new FakePlayerService(drain), new FakeWorld(), new FakeWorldTicker(), new FakeRendering(), sink);
         return (loop, sink);
     }
 

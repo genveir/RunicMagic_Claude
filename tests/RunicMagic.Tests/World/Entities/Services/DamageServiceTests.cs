@@ -229,7 +229,7 @@ public class DamageServiceTests
     [Fact]
     public void Damage_Entity_RemovesEntityFromWorld_WhenIntegrityReachesZero()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
         var entity = new EntityBuilder().WithStructuralIntegrity(1000, 100).Build();
         world.Add(entity);
 

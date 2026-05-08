@@ -1,5 +1,4 @@
 using RunicMagic.Controller.Services;
-using RunicMagic.World;
 using RunicMagic.World.Entities.Capabilities;
 using RunicMagic.World.Execution;
 using RunicMagic.World.Runes.EffectRunes;
@@ -16,7 +15,7 @@ public class SpellExecutorTests
     [Fact]
     public void Execute_MilestoneSpell_PushesEntitiesInScope()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
 
         var casterEntity = new EntityBuilder()
             .WithLocation(x: 0, y: 0)
@@ -27,6 +26,7 @@ public class SpellExecutorTests
         casterEntity.Scope = () => [target];
         world.Add(casterEntity);
         world.Add(target);
+        var ticker = WorldTickerBuilder.ForWorldModel(world).Build();
 
         var caster = new EntitySet([casterEntity]);
         var executor = new EntitySet([casterEntity]);
@@ -47,7 +47,7 @@ public class SpellExecutorTests
         for (var i = 0; i < 56; i++)
         {
             finalTickResult = new EventTracker();
-            world.HandleTick(finalTickResult);
+            ticker.HandleTick(finalTickResult, i);
         }
 
         target.Location.X.Should().BeApproximately(3744, 0.001);
@@ -60,7 +60,7 @@ public class SpellExecutorTests
     public void Execute_DrawsEvaluationCostFromCasterBeforeExecution()
     {
         var drawn = new List<long>();
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
 
         var casterEntity = new EntityBuilder()
             .WithReservoir(draw: amount => { drawn.Add(amount); return new ReservoirDraw(amount, false); })
@@ -91,7 +91,7 @@ public class SpellExecutorTests
     {
         var executorDrawn = new List<long>();
         var casterDrawn = new List<long>();
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
 
         var executorEntity = new EntityBuilder()
             .WithReservoir(draw: amount => { executorDrawn.Add(amount); return new ReservoirDraw(amount / 2, false); })
@@ -119,7 +119,7 @@ public class SpellExecutorTests
     [Fact]
     public void Execute_EvaluationCostCannotBeMet_ExecutorDisintegratesAndSpellAborts()
     {
-        var world = new WorldModel();
+        var world = new WorldModelBuilder().Build();
 
         var executorEntity = new EntityBuilder().WithLocation(x: 0, y: 0).Build();
         world.Add(executorEntity);
