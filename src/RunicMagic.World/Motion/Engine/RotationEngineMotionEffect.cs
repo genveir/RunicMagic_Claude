@@ -21,17 +21,20 @@ public class RotationEngineMotionEffect : IEngineMotionEffect
         SpellContext context,
         IEntitySet toMove,
         ILocation origin,
-        double perTickTheta,
         long totalRuneDegrees,
+        int tickCount,
+        bool isClockwise,
         string effectName)
     {
         temporalContext = new(context);
         entities = toMove;
         this.origin = origin;
-        this.perTickTheta = perTickTheta;
         this.totalRuneDegrees = totalRuneDegrees;
         this.effectName = effectName;
-        remainingTicks = 56;
+        var sign = isClockwise ? 1.0 : -1.0;
+        var totalTheta = sign * totalRuneDegrees / 2744.0 * 2 * Math.PI;
+        perTickTheta = totalTheta / tickCount;
+        remainingTicks = tickCount;
     }
 
     public EngineMotionEffectResult TryAdvance(IWorldEventTracker eventTracker)

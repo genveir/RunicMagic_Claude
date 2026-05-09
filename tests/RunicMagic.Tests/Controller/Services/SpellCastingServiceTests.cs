@@ -4,6 +4,7 @@ using RunicMagic.World;
 using RunicMagic.World.Entities;
 using RunicMagic.World.Entities.Capabilities;
 using RunicMagic.World.Execution;
+using RunicMagic.World.Motion.Engine;
 
 namespace RunicMagic.Tests.Controller.Services;
 
@@ -86,7 +87,7 @@ public class SpellCastingServiceTests
         service.Cast("ZU VUN LA IR HOT IR HOT HOT", casterEntity, new EventTracker());
 
         EventTracker finalTick = new EventTracker();
-        for (var i = 0; i < 56; i++)
+        for (var i = 0; i < Constants.DefaultEffectLength; i++)
         {
             finalTick = new EventTracker();
             ticker.HandleTick(finalTick, i);
@@ -120,7 +121,7 @@ public class SpellCastingServiceTests
         service.Cast("ZU VUN LA IR HOT IR HOT HOT", casterEntity, new EventTracker());
 
         var allWorldEvents = new List<WorldEvent>();
-        for (var i = 0; i < 56; i++)
+        for (var i = 0; i < Constants.DefaultEffectLength; i++)
         {
             var tickTracker = new EventTracker();
             ticker.HandleTick(tickTracker, i);

@@ -13,7 +13,6 @@ Next bugfix number: BUG-11
 
 | Key | Title | Description | Blocked By |
 |-----|-------|-------------|------------|
-| RMC-106 | Change base motion constant from 56 to 70 ticks | The base motion constant used for motion timing is currently 56 ticks. Change it to 70. Also make it a constant in the technical sense. | |
 | RMC-112 | Add Position type | Add a `Position` record to the geometry layer combining a `Location` and a facing `double Angle`. Represents a point in the world with an orientation — useful anywhere a destination also implies a facing direction (patrol waypoints, spawn points, etc.). | |
 | RMC-113 | Patrol waypoints use Position | Replace the `Location` in `PatrolWaypoint` with a `Position`. When the guard arrives at a waypoint, it should adopt the waypoint's facing angle in addition to reaching its location. Requires updating `PatrolWaypointData` (add `Angle float` column to `PatrolWaypoints` table), `PatrolAIBehavior`, and the locomotion/turning logic to orient the entity at the destination. | RMC-112 |
 | RMC-110 | Rewrite Strength as a capability | Extract `Strength` from its current form and rewrite it as a proper capability on `Entity`, following the same pattern as `LocomotionCapability`. | |
@@ -63,3 +62,4 @@ Next bugfix number: BUG-11
 | RMC-111 | Split movement policy out of LocomotionCapability |
 | RMC-107 | Show facing direction on canvas entities |
 | RMC-118 | Refactor app.js SVG rendering |
+| RMC-106 | Change base motion constant from 56 to 98 ticks |

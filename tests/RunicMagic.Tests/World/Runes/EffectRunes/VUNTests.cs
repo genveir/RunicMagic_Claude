@@ -2,6 +2,7 @@ using RunicMagic.Controller.Services;
 using RunicMagic.World;
 using RunicMagic.World.Entities.Capabilities;
 using RunicMagic.World.Execution;
+using RunicMagic.World.Motion.Engine;
 using RunicMagic.World.Runes.EffectRunes;
 
 namespace RunicMagic.Tests.World.Runes.EffectRunes;
@@ -79,7 +80,7 @@ public class VUNTests
         var context = TestFixtures.MakeContext(world: world);
 
         vun.Execute(context);
-        RunTicks(world, 56);
+        RunTicks(world, Constants.DefaultEffectLength);
 
         entity.Location.X.Should().BeApproximately(1500, 0.001);
         entity.Location.Y.Should().BeApproximately(0, 0.001);
@@ -98,7 +99,7 @@ public class VUNTests
         var context = TestFixtures.MakeContext(world: world);
 
         vun.Execute(context);
-        RunTicks(world, 56);
+        RunTicks(world, Constants.DefaultEffectLength);
 
         var displaced = entity.Location.X != 0 || entity.Location.Y != 0;
         displaced.Should().BeTrue();
@@ -113,21 +114,21 @@ public class VUNTests
             .Build();
         var caster = new EntitySet([casterEntity]);
 
-        // 56mm × 1g = 56 total cost; 56 / 56 = 1 per tick
+        // N mm × 1g = N total cost; 1 per tick
         var world = new WorldModelBuilder().Build();
         var target = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(1).Build();
         var vun = new VUN(
             toMove: new FixedEntitySet(target),
-            howFar: new FixedNumber(56),
+            howFar: new FixedNumber(Constants.DefaultEffectLength),
             origin: new FixedLocation(0, 0)
         );
         var context = TestFixtures.MakeContext(caster: caster, world: world);
 
         vun.Execute(context);
-        RunTicks(world, 56);
+        RunTicks(world, Constants.DefaultEffectLength);
 
-        drawn.Should().HaveCount(56);
-        drawn.Sum().Should().Be(56);
+        drawn.Should().HaveCount(Constants.DefaultEffectLength);
+        drawn.Sum().Should().Be(Constants.DefaultEffectLength);
     }
 
     [Fact]
@@ -146,23 +147,23 @@ public class VUNTests
             .Build();
         var caster = new EntitySet([casterEntity]);
 
-        // 112mm × 1g = 112 total cost; 112 / 56 = 2 per tick
+        // 2N mm × 1g = 2N total cost; 2 per tick
         // executor provides 1 per tick (amount/2), caster covers remaining 1
         var world = new WorldModelBuilder().Build();
         var target = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(1).Build();
         var vun = new VUN(
             toMove: new FixedEntitySet(target),
-            howFar: new FixedNumber(112),
+            howFar: new FixedNumber(Constants.DefaultEffectLength * 2),
             origin: new FixedLocation(0, 0)
         );
         var context = TestFixtures.MakeContext(caster: caster, executor: executor, world: world);
 
         vun.Execute(context);
-        RunTicks(world, 56);
+        RunTicks(world, Constants.DefaultEffectLength);
 
-        executorDrawn.Should().HaveCount(56);
+        executorDrawn.Should().HaveCount(Constants.DefaultEffectLength);
         executorDrawn.All(x => x == 2).Should().BeTrue();
-        casterDrawn.Should().HaveCount(56);
+        casterDrawn.Should().HaveCount(Constants.DefaultEffectLength);
         casterDrawn.All(x => x == 1).Should().BeTrue();
     }
 
@@ -180,7 +181,7 @@ public class VUNTests
         var context = TestFixtures.MakeContext(world: world);
 
         vun.Execute(context);
-        RunTicks(world, 56);
+        RunTicks(world, Constants.DefaultEffectLength);
 
         entity1.Location.X.Should().BeApproximately(1200, 0.001);
         entity1.Location.Y.Should().BeApproximately(0, 0.001);
@@ -202,7 +203,7 @@ public class VUNTests
         var context = TestFixtures.MakeContext(world: world);
 
         vun.Execute(context);
-        var finalTickResult = RunTicks(world, 56);
+        var finalTickResult = RunTicks(world, Constants.DefaultEffectLength);
 
         finalTickResult.WorldEvents.OfType<EntityPushedEvent>().Should().HaveCount(2);
     }
@@ -240,11 +241,10 @@ public class VUNTests
     [Fact]
     public void Execute_PartialPower_StopsAfterAffordableTicks()
     {
-        // 1000mm × 56000g = 56,000,000 total cost; 1,000,000 per tick
         // Give the caster power for exactly 2 ticks
         var ticksDrawn = 0;
         var world = new WorldModelBuilder().Build();
-        var entity = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(56000).Build();
+        var entity = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(Constants.DefaultEffectLength * 1000).Build();
         var casterEntity = new EntityBuilder()
             .WithReservoir(draw: amount =>
             {
@@ -269,7 +269,7 @@ public class VUNTests
         var ticker = WorldTickerBuilder.ForWorldModel(world).Build();
         for (var i = 0; i < 10; i++) ticker.HandleTick(new EventTracker(), i);
 
-        // Moved 2/56 of the total distance; entity should not be at full destination
+        // Moved only 2 ticks worth; entity should not be at full destination
         entity.Location.X.Should().BeGreaterThan(1000);
         entity.Location.X.Should().BeLessThan(2000);
     }

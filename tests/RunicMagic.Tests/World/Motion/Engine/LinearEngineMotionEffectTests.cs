@@ -17,32 +17,32 @@ public class LinearEngineMotionEffectTests
             context: context,
             toMove: new FixedEntitySet(entity),
             origin: new FixedLocation(0, 0),
-            perTickDistance: totalDistance / 56.0,
             totalDistanceMm: totalDistance,
+            tickCount: Constants.DefaultEffectLength,
             isAway: true,
             effectName: "VUN"
         );
     }
 
     [Fact]
-    public void TryAdvance_After56Ticks_EntityReachesDestination()
+    public void TryAdvance_AfterNTicks_EntityReachesDestination()
     {
         var entity = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(0).Build();
         var context = TestFixtures.MakeContext();
-        var effect = MakePushEffect(context, entity, totalDistance: 560);
+        var effect = MakePushEffect(context, entity, totalDistance: Constants.DefaultEffectLength * 10);
 
-        for (var i = 0; i < 56; i++)
+        for (var i = 0; i < Constants.DefaultEffectLength; i++)
         {
             effect.TryAdvance(new EventTracker());
         }
 
-        entity.Location.X.Should().BeApproximately(1560, 0.001);
+        entity.Location.X.Should().BeApproximately(1000 + Constants.DefaultEffectLength * 10, 0.001);
         entity.Location.Y.Should().BeApproximately(0, 0.001);
         effect.IsComplete.Should().BeTrue();
     }
 
     [Fact]
-    public void TryAdvance_IsCompleteAfter56Ticks()
+    public void TryAdvance_IsCompleteAfterNTicks()
     {
         var entity = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(0).Build();
         var context = TestFixtures.MakeContext();
@@ -50,7 +50,7 @@ public class LinearEngineMotionEffectTests
 
         effect.IsComplete.Should().BeFalse();
 
-        for (var i = 0; i < 55; i++) effect.TryAdvance(new EventTracker());
+        for (var i = 0; i < Constants.DefaultEffectLength - 1; i++) effect.TryAdvance(new EventTracker());
         effect.IsComplete.Should().BeFalse();
 
         effect.TryAdvance(new EventTracker());
@@ -65,7 +65,7 @@ public class LinearEngineMotionEffectTests
         var effect = MakePushEffect(context, entity, totalDistance: 100);
 
         EventTracker lastResult = new EventTracker();
-        for (var i = 0; i < 56; i++)
+        for (var i = 0; i < Constants.DefaultEffectLength; i++)
         {
             lastResult = new EventTracker();
             effect.TryAdvance(lastResult);
@@ -91,7 +91,6 @@ public class LinearEngineMotionEffectTests
     [Fact]
     public void TryAdvance_InsufficientPower_ReturnsFalse()
     {
-        // 56000mm × 1000g / 1_000_000 = 56 total cost; 1 per tick
         var casterEntity = new EntityBuilder()
             .WithReservoir(draw: amount => new ReservoirDraw(0, false))
             .Build();
@@ -103,8 +102,8 @@ public class LinearEngineMotionEffectTests
             context: context,
             toMove: new FixedEntitySet(entity),
             origin: new FixedLocation(0, 0),
-            perTickDistance: 1000,
-            totalDistanceMm: 56000,
+            totalDistanceMm: Constants.DefaultEffectLength * 1000,
+            tickCount: Constants.DefaultEffectLength,
             isAway: true,
             effectName: "VUN"
         );
@@ -131,8 +130,8 @@ public class LinearEngineMotionEffectTests
             context: context,
             toMove: new FixedEntitySet(entity),
             origin: new FixedLocation(0, 0),
-            perTickDistance: 1000,
-            totalDistanceMm: 56000,
+            totalDistanceMm: Constants.DefaultEffectLength * 1000,
+            tickCount: Constants.DefaultEffectLength,
             isAway: true,
             effectName: "VUN"
         );
@@ -166,13 +165,13 @@ public class LinearEngineMotionEffectTests
             context: context,
             toMove: new FixedEntitySet(entity),
             origin: new FixedLocation(-1000, 0),
-            perTickDistance: 100,
-            totalDistanceMm: 5600,
+            totalDistanceMm: Constants.DefaultEffectLength * 100,
+            tickCount: Constants.DefaultEffectLength,
             isAway: true,
             effectName: "VUN"
         );
 
-        for (var i = 0; i < 56; i++) effect.TryAdvance(new EventTracker());
+        for (var i = 0; i < Constants.DefaultEffectLength; i++) effect.TryAdvance(new EventTracker());
 
         // 3 successful ticks × 100mm/tick = 300mm total
         entity.Location.X.Should().BeApproximately(300, 0.001);
@@ -187,13 +186,13 @@ public class LinearEngineMotionEffectTests
             context: context,
             toMove: new FixedEntitySet(entity),
             origin: new FixedLocation(0, 0),
-            perTickDistance: 500 / 56.0,
             totalDistanceMm: 500,
+            tickCount: Constants.DefaultEffectLength,
             isAway: false,
             effectName: "VAR"
         );
 
-        for (var i = 0; i < 56; i++) effect.TryAdvance(new EventTracker());
+        for (var i = 0; i < Constants.DefaultEffectLength; i++) effect.TryAdvance(new EventTracker());
 
         entity.Location.X.Should().BeApproximately(500, 0.001);
         entity.Location.Y.Should().BeApproximately(0, 0.001);
@@ -208,15 +207,15 @@ public class LinearEngineMotionEffectTests
             context: context,
             toMove: new FixedEntitySet(entity),
             origin: new FixedLocation(0, 0),
-            perTickDistance: 10,
-            totalDistanceMm: 560,
+            totalDistanceMm: Constants.DefaultEffectLength * 10,
+            tickCount: Constants.DefaultEffectLength,
             isAway: true,
             effectName: "VUN"
         );
 
-        for (var i = 0; i < 56; i++) effect.TryAdvance(new EventTracker());
+        for (var i = 0; i < Constants.DefaultEffectLength; i++) effect.TryAdvance(new EventTracker());
 
-        entity.Location.X.Should().BeApproximately(1560, 0.001);
+        entity.Location.X.Should().BeApproximately(1000 + Constants.DefaultEffectLength * 10, 0.001);
     }
 
     [Fact]
@@ -224,7 +223,7 @@ public class LinearEngineMotionEffectTests
     {
         var entity = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(0).Build();
         var context = TestFixtures.MakeContext();
-        var effect = MakePushEffect(context, entity, totalDistance: 560);
+        var effect = MakePushEffect(context, entity, totalDistance: Constants.DefaultEffectLength * 10);
 
         var (_, entitiesUnderMotion) = effect.TryAdvance(new EventTracker());
 
@@ -245,8 +244,8 @@ public class LinearEngineMotionEffectTests
             context: context,
             toMove: new FixedEntitySet(entity),
             origin: new FixedLocation(0, 0),
-            perTickDistance: 1000,
-            totalDistanceMm: 56000,
+            totalDistanceMm: Constants.DefaultEffectLength * 1000,
+            tickCount: Constants.DefaultEffectLength,
             isAway: true,
             effectName: "VUN"
         );

@@ -18,8 +18,8 @@ public class WorldModel_TickMotionTests
             context: context,
             toMove: new FixedEntitySet(entity),
             origin: new FixedLocation(-1000, 0),
-            perTickDistance: 10,
-            totalDistanceMm: 560,
+            totalDistanceMm: Constants.DefaultEffectLength * 10,
+            tickCount: Constants.DefaultEffectLength,
             isAway: true,
             effectName: "VUN"
         );
@@ -44,19 +44,19 @@ public class WorldModel_TickMotionTests
             context: context,
             toMove: new FixedEntitySet(entity),
             origin: new FixedLocation(-1000, 0),
-            perTickDistance: 10,
-            totalDistanceMm: 560,
+            totalDistanceMm: Constants.DefaultEffectLength * 10,
+            tickCount: Constants.DefaultEffectLength,
             isAway: true,
             effectName: "VUN"
         );
         world.AddMotionEffect(effect);
         var ticker = WorldTickerBuilder.ForWorldModel(world).Build();
 
-        for (var i = 0; i < 56; i++) ticker.HandleTick(new EventTracker(), i);
+        for (var i = 0; i < Constants.DefaultEffectLength; i++) ticker.HandleTick(new EventTracker(), i);
 
         // After completion, further ticks should not advance the entity
         var xAfterCompletion = entity.Location.X;
-        ticker.HandleTick(new EventTracker(), 56);
+        ticker.HandleTick(new EventTracker(), Constants.DefaultEffectLength);
         entity.Location.X.Should().Be(xAfterCompletion);
     }
 
@@ -76,8 +76,8 @@ public class WorldModel_TickMotionTests
             context: context,
             toMove: new FixedEntitySet(entity),
             origin: new FixedLocation(-1000, 0),
-            perTickDistance: 10,
-            totalDistanceMm: 560,
+            totalDistanceMm: Constants.DefaultEffectLength * 10,
+            tickCount: Constants.DefaultEffectLength,
             isAway: true,
             effectName: "VUN"
         );
@@ -101,13 +101,13 @@ public class WorldModel_TickMotionTests
         var world = new WorldModelBuilder().Build();
         var context = TestFixtures.MakeContext(world: world);
 
-        // Two separate effects — each completes in 56 ticks, emitting one EntityPushedEvent
+        // Two separate effects — each completes in N ticks, emitting one EntityPushedEvent
         var effect1 = new LinearEngineMotionEffect(
             context: context,
             toMove: new FixedEntitySet(entity1),
             origin: new FixedLocation(-1000, 0),
-            perTickDistance: 10,
-            totalDistanceMm: 560,
+            totalDistanceMm: Constants.DefaultEffectLength * 10,
+            tickCount: Constants.DefaultEffectLength,
             isAway: true,
             effectName: "VUN"
         );
@@ -115,8 +115,8 @@ public class WorldModel_TickMotionTests
             context: context,
             toMove: new FixedEntitySet(entity2),
             origin: new FixedLocation(-1000, 0),
-            perTickDistance: 10,
-            totalDistanceMm: 560,
+            totalDistanceMm: Constants.DefaultEffectLength * 10,
+            tickCount: Constants.DefaultEffectLength,
             isAway: true,
             effectName: "VUN"
         );
@@ -125,7 +125,7 @@ public class WorldModel_TickMotionTests
         var ticker = WorldTickerBuilder.ForWorldModel(world).Build();
 
         EventTracker finalResult = new EventTracker();
-        for (var i = 0; i < 56; i++)
+        for (var i = 0; i < Constants.DefaultEffectLength; i++)
         {
             finalResult = new EventTracker();
             ticker.HandleTick(finalResult, i);
@@ -158,8 +158,8 @@ public class WorldModel_TickMotionTests
             context: context,
             toMove: new FixedEntitySet(entity),
             origin: new FixedLocation(-1000, 0),
-            perTickDistance: 10,
-            totalDistanceMm: 560,
+            totalDistanceMm: Constants.DefaultEffectLength * 10,
+            tickCount: Constants.DefaultEffectLength,
             isAway: true,
             effectName: "VUN"
         );
@@ -196,18 +196,18 @@ public class WorldModel_TickMotionTests
             context: context,
             toMove: new FixedEntitySet(entity),
             origin: new FixedLocation(-1000, 0),
-            perTickDistance: 10,
-            totalDistanceMm: 560,
+            totalDistanceMm: Constants.DefaultEffectLength * 10,
+            tickCount: Constants.DefaultEffectLength,
             isAway: true,
             effectName: "VUN"
         );
         world.AddMotionEffect(effect);
         var ticker = WorldTickerBuilder.ForWorldModel(world).Build();
 
-        for (var i = 0; i < 56; i++) ticker.HandleTick(new EventTracker(), i);
+        for (var i = 0; i < Constants.DefaultEffectLength; i++) ticker.HandleTick(new EventTracker(), i);
 
         // Effect is complete and removed; next tick should clear the flag
-        ticker.HandleTick(new EventTracker(), 56);
+        ticker.HandleTick(new EventTracker(), Constants.DefaultEffectLength);
 
         entity.IsUnderEngineMotion.Should().BeFalse();
     }

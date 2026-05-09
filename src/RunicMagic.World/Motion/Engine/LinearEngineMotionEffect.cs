@@ -22,19 +22,19 @@ public class LinearEngineMotionEffect : IEngineMotionEffect
         SpellContext context,
         IEntitySet toMove,
         ILocation origin,
-        double perTickDistance,
         long totalDistanceMm,
+        int tickCount,
         bool isAway,
         string effectName)
     {
         temporalContext = new(context);
         this.toMove = toMove;
         this.origin = origin;
-        this.perTickDistance = perTickDistance;
+        perTickDistance = totalDistanceMm / (double)tickCount;
         this.totalDistanceMm = totalDistanceMm;
         this.isAway = isAway;
         this.effectName = effectName;
-        remainingTicks = 56;
+        remainingTicks = tickCount;
     }
 
     public EngineMotionEffectResult TryAdvance(IWorldEventTracker eventTracker)

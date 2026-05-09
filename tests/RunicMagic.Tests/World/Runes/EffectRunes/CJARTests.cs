@@ -2,6 +2,7 @@ using RunicMagic.Controller.Services;
 using RunicMagic.World;
 using RunicMagic.World.Entities.Capabilities;
 using RunicMagic.World.Execution;
+using RunicMagic.World.Motion.Engine;
 using RunicMagic.World.Runes.EffectRunes;
 
 namespace RunicMagic.Tests.World.Runes.EffectRunes;
@@ -33,7 +34,7 @@ public class CJARTests
         var context = TestFixtures.MakeContext(world: world);
 
         cjar.Execute(context);
-        RunTicks(world, 56, context.EventTracker);
+        RunTicks(world, Constants.DefaultEffectLength, context.EventTracker);
 
         entity.Location.X.Should().BeApproximately(0, 0.001);
         entity.Location.Y.Should().BeApproximately(-1000, 0.001);
@@ -52,7 +53,7 @@ public class CJARTests
         var context = TestFixtures.MakeContext(world: world);
 
         cjar.Execute(context);
-        RunTicks(world, 56, new EventTracker());
+        RunTicks(world, Constants.DefaultEffectLength, new EventTracker());
 
         entity.FacingAngle.Should().BeApproximately(expectedAngle, 0.001);
     }
@@ -69,7 +70,7 @@ public class CJARTests
         var context = TestFixtures.MakeContext(world: world);
 
         cjar.Execute(context);
-        RunTicks(world, 56, new EventTracker());
+        RunTicks(world, Constants.DefaultEffectLength, new EventTracker());
 
         entity.Location.X.Should().BeApproximately(500, 0.001);
         entity.Location.Y.Should().BeApproximately(300, 0.001);
@@ -110,9 +111,9 @@ public class CJARTests
 
         cjar.Execute(context);
         var ticker = WorldTickerBuilder.ForWorldModel(world).Build();
-        for (var i = 0; i < 55; i++) ticker.HandleTick(new EventTracker(), i);
+        for (var i = 0; i < Constants.DefaultEffectLength - 1; i++) ticker.HandleTick(new EventTracker(), i);
         var finalTickResult = new EventTracker();
-        ticker.HandleTick(finalTickResult, 55);
+        ticker.HandleTick(finalTickResult, Constants.DefaultEffectLength - 1);
 
         var rotatedEvent = finalTickResult.WorldEvents.OfType<EntityRotatedEvent>().Should().ContainSingle().Subject;
         rotatedEvent.Entity.Should().BeSameAs(entity);
@@ -170,7 +171,7 @@ public class CJARTests
         var ticker = WorldTickerBuilder.ForWorldModel(world).Build();
         for (var i = 0; i < 10; i++) ticker.HandleTick(new EventTracker(), i);
 
-        // Rotated only 2/56 of the quarter turn; entity should not have reached destination
+        // Rotated only 2 ticks worth; entity should not have reached destination
         entity.Location.X.Should().BeLessThan(1000);
         entity.Location.X.Should().BeGreaterThan(0);
     }
@@ -238,7 +239,7 @@ public class CJARTests
         var ticker = WorldTickerBuilder.ForWorldModel(world).Build();
         var allEvents = new List<WorldEvent>();
         EventTracker finalTick = new EventTracker();
-        for (var i = 0; i < 56; i++)
+        for (var i = 0; i < Constants.DefaultEffectLength; i++)
         {
             finalTick = new EventTracker();
             ticker.HandleTick(finalTick, i);
@@ -284,8 +285,8 @@ public class CJARTests
 
         var tickerA = WorldTickerBuilder.ForWorldModel(worldA).Build();
         var tickerB = WorldTickerBuilder.ForWorldModel(worldB).Build();
-        for (var i = 0; i < 56; i++) tickerA.HandleTick(new EventTracker(), i);
-        for (var i = 0; i < 56; i++) tickerB.HandleTick(new EventTracker(), i);
+        for (var i = 0; i < Constants.DefaultEffectLength; i++) tickerA.HandleTick(new EventTracker(), i);
+        for (var i = 0; i < Constants.DefaultEffectLength; i++) tickerB.HandleTick(new EventTracker(), i);
 
         totalDrawnByCJIR.Should().Be(totalDrawnByCJAR);
     }

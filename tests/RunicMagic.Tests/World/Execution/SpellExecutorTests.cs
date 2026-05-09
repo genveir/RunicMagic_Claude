@@ -1,6 +1,7 @@
 using RunicMagic.Controller.Services;
 using RunicMagic.World.Entities.Capabilities;
 using RunicMagic.World.Execution;
+using RunicMagic.World.Motion.Engine;
 using RunicMagic.World.Runes.EffectRunes;
 using RunicMagic.World.Runes.EntityReferenceRunes;
 using RunicMagic.World.Runes.EntitySetRunes;
@@ -44,7 +45,7 @@ public class SpellExecutorTests
         spellExecutor.Execute(spell, new EventTracker(), 11, caster, executor);
 
         EventTracker finalTickResult = new EventTracker();
-        for (var i = 0; i < 56; i++)
+        for (var i = 0; i < Constants.DefaultEffectLength; i++)
         {
             finalTickResult = new EventTracker();
             ticker.HandleTick(finalTickResult, i);

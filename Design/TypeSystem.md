@@ -37,7 +37,7 @@ Example: `VUN(push)`'s third argument defaults to `PAR(OH)`. If no Location-prod
 
 All value types — Set, Location, Number — carry an implicit evaluation policy:
 
-- **Calcified** (default): the expression is evaluated once, on first execution, and the result is cached for the duration of the effect. Motion effects that run for 56 ticks evaluate a calcified set only on tick 1 and reuse the snapshot on ticks 2–56.
+- **Calcified** (default): the expression is evaluated once, on first execution, and the result is cached for the duration of the effect. A motion effect evaluates a calcified set only on tick 1 and reuses the snapshot for all remaining ticks.
 - **Live** (opt-in via `SA`): the expression is re-evaluated on every tick. The result may differ from tick to tick as world state changes.
 
 Liveness is declared at parse time using the `SA(activate)` and `YI(calcify)` decorator runes. These are transparent to the runes that consume the expressions: a rune that receives a Set does not know or care whether it is calcified or live.

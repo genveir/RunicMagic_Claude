@@ -131,7 +131,7 @@ Motion in the world has two orthogonal axes. See `Design/Fiction.md` for the des
 
 ### Engine vs Simulated
 
-**Engine motion** is the magic system directly rewriting an entity's position. It does not negotiate with physics. The effect runes `VUN(push)`, `VAR(pull)`, `CJIR(rotate clockwise)`, and `CJAR(rotate counterclockwise)` produce engine motion effects that advance over 56 ticks.
+**Engine motion** is the magic system directly rewriting an entity's position. It does not negotiate with physics. The effect runes `VUN(push)`, `VAR(pull)`, `CJIR(rotate clockwise)`, and `CJAR(rotate counterclockwise)` produce engine motion effects that advance over `Constants.DefaultEffectLength` ticks.
 
 **Simulated motion** is an entity moving under its own agency — a creature walking, a projectile in flight. It participates in the physics simulation and is subject to drag and other environmental forces. `PhysicsService` drives this layer.
 

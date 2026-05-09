@@ -118,11 +118,11 @@ A novice and an expert can write the same effect. The expert's version costs les
 
 ## Motion Effects
 
-Some effect runes (VUN, VAR, CJIR, CJAR) do not apply their effect instantaneously. When executed, they register a **motion effect** — a persistent world object that advances over 56 ticks (~one second at 60 FPS). The game loop advances all active motion effects each frame, interleaved with player input.
+Some effect runes (VUN, VAR, CJIR, CJAR) do not apply their effect instantaneously. When executed, they register a **motion effect** — a persistent world object that advances over 98 ticks (~1.6 seconds at 60 FPS). The game loop advances all active motion effects each frame, interleaved with player input.
 
 Execution cost for motion effects is paid incrementally: one draw per tick, sized to cover that tick's share of the total. If a tick's draw cannot be met in full, the effect stops immediately and permanently.
 
-The 56-tick duration is fixed. A motion effect always runs for exactly 56 ticks unless stopped early by power failure.
+The default duration is 98 ticks (`Constants.DefaultEffectLength`). A motion effect always runs for exactly that many ticks unless stopped early by power failure.
 
 ---
 

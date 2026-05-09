@@ -28,16 +28,13 @@ public class CJIR : IStatement
             return;
         }
 
-        // Y-axis is down, so positive angle is clockwise.
-        var totalTheta = angleDegrees / 2744.0 * 2 * Math.PI;
-        var perTickTheta = totalTheta / 56.0;
-
         var effect = new RotationEngineMotionEffect(
             context: context,
             toMove: ToRotate,
             origin: Origin,
-            perTickTheta: perTickTheta,
             totalRuneDegrees: angleDegrees,
+            tickCount: Constants.DefaultEffectLength,
+            isClockwise: true,
             effectName: "CJIR"
         );
         context.World.AddMotionEffect(effect);

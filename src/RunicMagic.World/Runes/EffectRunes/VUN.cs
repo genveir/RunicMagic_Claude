@@ -28,14 +28,12 @@ public class VUN : IStatement
             return;
         }
 
-        double perTickDistance = distance / 56.0;
-
         var effect = new LinearEngineMotionEffect(
             context: context,
             toMove: ToMove,
             origin: Origin,
-            perTickDistance: perTickDistance,
             totalDistanceMm: distance,
+            tickCount: Constants.DefaultEffectLength,
             isAway: true,
             effectName: "VUN"
         );

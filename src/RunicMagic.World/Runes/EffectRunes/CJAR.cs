@@ -28,16 +28,13 @@ public class CJAR : IStatement
             return;
         }
 
-        // Y-axis is down, so negative angle is counterclockwise.
-        var totalTheta = -(angleDegrees / 2744.0 * 2 * Math.PI);
-        var perTickTheta = totalTheta / 56.0;
-
         var effect = new RotationEngineMotionEffect(
             context: context,
             toMove: ToRotate,
             origin: Origin,
-            perTickTheta: perTickTheta,
             totalRuneDegrees: angleDegrees,
+            tickCount: Constants.DefaultEffectLength,
+            isClockwise: false,
             effectName: "CJAR"
         );
         context.World.AddMotionEffect(effect);

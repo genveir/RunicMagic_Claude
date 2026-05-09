@@ -2,6 +2,7 @@ using RunicMagic.Controller.Services;
 using RunicMagic.World;
 using RunicMagic.World.Entities.Capabilities;
 using RunicMagic.World.Execution;
+using RunicMagic.World.Motion.Engine;
 using RunicMagic.World.Runes.EffectRunes;
 
 namespace RunicMagic.Tests.World.Runes.EffectRunes;
@@ -58,7 +59,7 @@ public class CJIRTests
         var context = TestFixtures.MakeContext(world: world);
 
         cjir.Execute(context);
-        RunTicks(world, 56);
+        RunTicks(world, Constants.DefaultEffectLength);
 
         entity.Location.X.Should().BeApproximately(0, 0.001);
         entity.Location.Y.Should().BeApproximately(1000, 0.001);
@@ -77,7 +78,7 @@ public class CJIRTests
         var context = TestFixtures.MakeContext(world: world);
 
         cjir.Execute(context);
-        RunTicks(world, 56);
+        RunTicks(world, Constants.DefaultEffectLength);
 
         entity.FacingAngle.Should().BeApproximately(expectedAngle, 0.001);
     }
@@ -94,7 +95,7 @@ public class CJIRTests
         var context = TestFixtures.MakeContext(world: world);
 
         cjir.Execute(context);
-        RunTicks(world, 56);
+        RunTicks(world, Constants.DefaultEffectLength);
 
         entity.Location.X.Should().BeApproximately(500, 0.001);
         entity.Location.Y.Should().BeApproximately(300, 0.001);
@@ -112,7 +113,7 @@ public class CJIRTests
         var context = TestFixtures.MakeContext(world: world);
 
         cjir.Execute(context);
-        var finalTickResult = RunTicks(world, 56);
+        var finalTickResult = RunTicks(world, Constants.DefaultEffectLength);
 
         var rotatedEvent = finalTickResult.WorldEvents.OfType<EntityRotatedEvent>().Should().ContainSingle().Subject;
         rotatedEvent.Entity.Should().BeSameAs(entity);
@@ -170,7 +171,7 @@ public class CJIRTests
         var ticker = WorldTickerBuilder.ForWorldModel(world).Build();
         for (var i = 0; i < 10; i++) ticker.HandleTick(new EventTracker(), i);
 
-        // Rotated only 2/56 of the quarter turn; entity should not have reached destination
+        // Rotated only 2 ticks worth; entity should not have reached destination
         entity.Location.X.Should().BeLessThan(1000);
         entity.Location.X.Should().BeGreaterThan(0);
     }
@@ -238,7 +239,7 @@ public class CJIRTests
         var ticker = WorldTickerBuilder.ForWorldModel(world).Build();
         var allEvents = new List<WorldEvent>();
         EventTracker finalTick = new EventTracker();
-        for (var i = 0; i < 56; i++)
+        for (var i = 0; i < Constants.DefaultEffectLength; i++)
         {
             finalTick = new EventTracker();
             ticker.HandleTick(finalTick, i);

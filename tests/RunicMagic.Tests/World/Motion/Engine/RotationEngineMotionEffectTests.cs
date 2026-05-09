@@ -16,26 +16,26 @@ public class RotationEngineMotionEffectTests
         Entity entity,
         long totalRuneDegrees)
     {
-        var totalTheta = totalRuneDegrees / 2744.0 * 2 * Math.PI;
         return new RotationEngineMotionEffect(
             context: context,
             toMove: new FixedEntitySet(entity),
             origin: new FixedLocation(0, 0),
-            perTickTheta: totalTheta / 56.0,
             totalRuneDegrees: totalRuneDegrees,
+            tickCount: Constants.DefaultEffectLength,
+            isClockwise: true,
             effectName: "CJIR"
         );
     }
 
     [Fact]
-    public void TryAdvance_After56Ticks_EntityCompletesFullRotation()
+    public void TryAdvance_AfterNTicks_EntityCompletesFullRotation()
     {
         // Entity at (1000, 0). Full 90° CW rotation puts it at (0, 1000).
         var entity = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(0).Build();
         var context = TestFixtures.MakeContext();
         var effect = MakeCwEffect(context, entity, totalRuneDegrees: QuarterTurn);
 
-        for (var i = 0; i < 56; i++) effect.TryAdvance(new EventTracker());
+        for (var i = 0; i < Constants.DefaultEffectLength; i++) effect.TryAdvance(new EventTracker());
 
         entity.Location.X.Should().BeApproximately(0, 0.001);
         entity.Location.Y.Should().BeApproximately(1000, 0.001);
@@ -50,7 +50,7 @@ public class RotationEngineMotionEffectTests
         var effect = MakeCwEffect(context, entity, totalRuneDegrees: QuarterTurn);
 
         EventTracker lastResult = new EventTracker();
-        for (var i = 0; i < 56; i++)
+        for (var i = 0; i < Constants.DefaultEffectLength; i++)
         {
             lastResult = new EventTracker();
             effect.TryAdvance(lastResult);
@@ -129,13 +129,13 @@ public class RotationEngineMotionEffectTests
         var powerSource = new EntitySet([entity]);
         var context = TestFixtures.MakeContext(caster: powerSource);
 
-        var totalTheta = QuarterTurn / 2744.0 * 2 * Math.PI;
         var effect = new RotationEngineMotionEffect(
             context: context,
             toMove: new FixedEntitySet(entity),
             origin: new FixedLocation(0, 0),
-            perTickTheta: totalTheta / 56.0,
             totalRuneDegrees: QuarterTurn,
+            tickCount: Constants.DefaultEffectLength,
+            isClockwise: true,
             effectName: "CJIR"
         );
 
