@@ -199,12 +199,12 @@ const FLAGS_IS_TRANSLUCENT = 4;
 function entityClass(entity) {
     let cls;
     if ((entity.flags & FLAGS_HAS_LIFE) && (entity.flags & FLAGS_HAS_AGENCY)) cls = 'entity entity-creature';
-    else if (entity.flags & FLAGS_HAS_LIFE)                                    cls = 'entity entity-life';
-    else if (entity.flags & FLAGS_HAS_AGENCY)                                  cls = 'entity entity-agency';
-    else                                                                        cls = 'entity entity-object';
-    if (entity.isCaster)                        cls += ' entity-caster';
-    if (entity.flags & FLAGS_IS_TRANSLUCENT)    cls += ' entity-translucent';
-    if (entity.isIndicateTarget)                cls += ' entity-indicate-target';
+    else if (entity.flags & FLAGS_HAS_LIFE) cls = 'entity entity-life';
+    else if (entity.flags & FLAGS_HAS_AGENCY) cls = 'entity entity-agency';
+    else cls = 'entity entity-object';
+    if (entity.isCaster) cls += ' entity-caster';
+    if (entity.flags & FLAGS_IS_TRANSLUCENT) cls += ' entity-translucent';
+    if (entity.isIndicateTarget) cls += ' entity-indicate-target';
     return cls;
 }
 
@@ -215,30 +215,42 @@ function svgEl(tag, attrs) {
 }
 
 function updateCanvas(entities) {
-    while (svg.firstChild) svg.removeChild(svg.firstChild);
+    while (svg.firstChild) {
+        svg.removeChild(svg.firstChild);
+    }
 
     if (!entities.length) {
         svg.setAttribute('viewBox', '0 0 1000 1000');
-        svg.appendChild(svgEl('text', {
-            x: 500, y: 500,
+        const text = svgEl('text', {
+            x: 500,
+            y: 500,
             'dominant-baseline': 'middle',
-            'text-anchor':       'middle',
-            class:               'canvas-placeholder',
-        })).textContent = 'no world loaded';
+            'text-anchor': 'middle',
+            class: 'canvas-placeholder',
+        });
+        text.textContent = 'no world loaded';
+        svg.appendChild(text);
         return;
     }
 
-    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+    let minX = Infinity;
+    let minY = Infinity;
+    let maxX = -Infinity;
+    let maxY = -Infinity;
+
     for (const e of entities) {
-        const hw = e.width / 2, hh = e.height / 2;
-        const cos = Math.abs(Math.cos(e.facing)), sin = Math.abs(Math.sin(e.facing));
+        const hw = e.width / 2;
+        const hh = e.height / 2;
+        const cos = Math.abs(Math.cos(e.facing));
+        const sin = Math.abs(Math.sin(e.facing));
         const extX = hw * cos + hh * sin;
         const extY = hw * sin + hh * cos;
-        minX = Math.min(minX,  e.x - extX);
+        minX = Math.min(minX, e.x - extX);
         minY = Math.min(minY, -e.y - extY);
-        maxX = Math.max(maxX,  e.x + extX);
+        maxX = Math.max(maxX, e.x + extX);
         maxY = Math.max(maxY, -e.y + extY);
     }
+
     const pad = 100;
     const vbWidth = maxX - minX + pad * 2;
     const vbHeight = maxY - minY + pad * 2;
@@ -250,109 +262,102 @@ function updateCanvas(entities) {
 
     for (const e of entities) {
         const g = svgEl('g', e.isCaster ? { class: 'caster-group' } : {});
-
         const angleDeg = e.facing * 180 / Math.PI;
+        const hw = e.width / 2;
+        const hh = e.height / 2;
+
         g.appendChild(svgEl('rect', {
-            x: e.x - e.width / 2, y: -e.y - e.height / 2, width: e.width, height: e.height,
+            x: e.x - hw,
+            y: -e.y - hh,
+            width: e.width,
+            height: e.height,
             class: entityClass(e),
             transform: `rotate(${-angleDeg}, ${e.x}, ${-e.y})`,
         }));
 
-        const hw = e.width / 2;
-        const hh = e.height / 2;
         const spread = Math.min(hw, hh) * 0.3;
         const depth = Math.min(hw, hh) * 0.3;
+
         const tx = e.x + hw;
         const ty = -e.y;
         const ax = e.x + hw - depth;
-        const a1y = -e.y - spread;
-        const a2y = -e.y + spread;
+        const ay1 = -e.y - spread;
+        const ay2 = -e.y + spread;
+
         const facingClass = (e.flags & FLAGS_HAS_AGENCY)
             ? 'entity-facing'
             : 'entity-facing entity-facing-hover';
+
         g.appendChild(svgEl('path', {
-            d: `M ${ax},${a1y} L ${tx},${ty} L ${ax},${a2y}`,
+            d: `M ${ax},${ay1} L ${tx},${ty} L ${ax},${ay2}`,
             class: facingClass,
             transform: `rotate(${-angleDeg}, ${e.x}, ${-e.y})`,
         }));
 
         const sinF = Math.sin(e.facing);
         const cosF = Math.cos(e.facing);
+
         const tipRY = -e.y - hw * sinF;
         const arm1RY = -e.y - (hw - depth) * sinF - spread * cosF;
         const arm2RY = -e.y - (hw - depth) * sinF + spread * cosF;
+
         const chevronTop = Math.min(tipRY, arm1RY, arm2RY);
         const chevronBottom = Math.max(tipRY, arm1RY, arm2RY);
-        const halfLabelH = labelSize * 0.5;
-        const defaultLabelY = -e.y;
-        const labelY = (defaultLabelY - halfLabelH < chevronBottom && defaultLabelY + halfLabelH > chevronTop)
-            ? chevronBottom + halfLabelH + labelSize * 0.2
-            : defaultLabelY;
 
-        const labelClass = (e.flags & FLAGS_HAS_AGENCY)
-            ? 'entity-label'
-            : 'entity-label entity-label-hover';
+        const halfLabelH = labelSize * 0.5;
+        const labelY = (-e.y - halfLabelH < chevronBottom && -e.y + halfLabelH > chevronTop)
+            ? chevronBottom + halfLabelH + (labelSize * 0.2)
+            : -e.y;
+
         const label = svgEl('text', {
             x: e.x,
             y: labelY,
             'dominant-baseline': 'middle',
             'text-anchor': 'middle',
             'font-size': labelSize,
-            class: labelClass,
+            class: (e.flags & FLAGS_HAS_AGENCY) ? 'entity-label' : 'entity-label entity-label-hover',
         });
         label.textContent = e.label;
         g.appendChild(label);
 
         if (e.indicateEndX != null) {
-            const sx = e.x,           sy = -e.y;
-            const ex = e.indicateEndX, ey = -e.indicateEndY;
-
-            g.appendChild(svgEl('line', {
-                x1: sx, y1: sy, x2: ex, y2: ey,
-                class: 'entity-indicate',
-            }));
-
-            const dx = ex - sx, dy = ey - sy;
-            const len = Math.sqrt(dx * dx + dy * dy);
-            if (len > 0) {
-                const ux = dx / len, uy = dy / len;
-                const px = -uy,      py = ux;
-                const cLen = 150;
-                g.appendChild(svgEl('path', {
-                    d: `M ${ex - ux * cLen + px * cLen * 0.5},${ey - uy * cLen + py * cLen * 0.5}` +
-                       ` L ${ex},${ey}` +
-                       ` L ${ex - ux * cLen - px * cLen * 0.5},${ey - uy * cLen - py * cLen * 0.5}`,
-                    class: 'entity-indicate',
-                }));
-            }
+            appendVector(g, e.x, -e.y, e.indicateEndX, -e.indicateEndY, 'entity-indicate', 150);
         }
-
         if (e.pointingEndX != null) {
-            const sx = e.x,          sy = -e.y;
-            const ex = e.pointingEndX, ey = -e.pointingEndY;
-
-            g.appendChild(svgEl('line', {
-                x1: sx, y1: sy, x2: ex, y2: ey,
-                class: 'entity-direction',
-            }));
-
-            const dx = ex - sx, dy = ey - sy;
-            const len = Math.sqrt(dx * dx + dy * dy);
-            if (len > 0) {
-                const ux = dx / len, uy = dy / len;
-                const px = -uy,      py = ux;
-                const cLen = 250;
-                g.appendChild(svgEl('path', {
-                    d: `M ${ex - ux * cLen + px * cLen * 0.5},${ey - uy * cLen + py * cLen * 0.5}` +
-                       ` L ${ex},${ey}` +
-                       ` L ${ex - ux * cLen - px * cLen * 0.5},${ey - uy * cLen - py * cLen * 0.5}`,
-                    class: 'entity-direction',
-                }));
-            }
+            appendVector(g, e.x, -e.y, e.pointingEndX, -e.pointingEndY, 'entity-direction', 250);
         }
 
         svg.appendChild(g);
     }
+}
+
+function appendVector(parent, sx, sy, ex, ey, cls, arrowLen) {
+    const dx = ex - sx;
+    const dy = ey - sy;
+    const len = Math.sqrt(dx * dx + dy * dy);
+
+    if (len <= 0) return;
+
+    const ux = dx / len;
+    const uy = dy / len;
+    const px = -uy;
+    const py = ux;
+    const halfArrow = arrowLen * 0.5;
+
+    parent.appendChild(svgEl('line', {
+        x1: sx,
+        y1: sy,
+        x2: ex,
+        y2: ey,
+        class: cls,
+    }));
+
+    parent.appendChild(svgEl('path', {
+        d: `M ${ex - ux * arrowLen + px * halfArrow},${ey - uy * arrowLen + py * halfArrow}` +
+            ` L ${ex},${ey}` +
+            ` L ${ex - ux * arrowLen - px * halfArrow},${ey - uy * arrowLen - py * halfArrow}`,
+        class: cls,
+    }));
 }
 
 

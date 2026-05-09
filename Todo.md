@@ -8,7 +8,7 @@ The Key column in every table uses right-padded cells. The baseline is 7 charact
 
 ## To Do — Milestone 3.5 — Maintenance
 
-Next ticket number: RMC-118
+Next ticket number: RMC-119
 Next bugfix number: BUG-11
 
 | Key | Title | Description | Blocked By |
@@ -62,3 +62,4 @@ Next bugfix number: BUG-11
 | RMC-102 | Remove defaults from EntityData |
 | RMC-111 | Split movement policy out of LocomotionCapability |
 | RMC-107 | Show facing direction on canvas entities |
+| RMC-118 | Refactor app.js SVG rendering |
