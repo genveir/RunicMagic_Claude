@@ -160,15 +160,32 @@ body {
     vector-effect: non-scaling-stroke;
 }
 
+.entity-facing {
+    stroke: #111;
+    stroke-width: 2;
+    fill: none;
+    vector-effect: non-scaling-stroke;
+}
+
+.entity-facing-hover {
+    visibility: hidden;
+}
+
+g:hover .entity-facing-hover {
+    visibility: visible;
+}
+
 .entity-label {
     fill: #111;
     font-family: monospace;
     cursor: default;
+}
+
+.entity-label-hover {
     visibility: hidden;
 }
 
-g:hover .entity-label,
-.caster-group .entity-label {
+g:hover .entity-label-hover {
     visibility: visible;
 }
 

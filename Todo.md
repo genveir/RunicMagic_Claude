@@ -8,7 +8,7 @@ The Key column in every table uses right-padded cells. The baseline is 7 charact
 
 ## To Do — Milestone 3.5 — Maintenance
 
-Next ticket number: RMC-117
+Next ticket number: RMC-118
 Next bugfix number: BUG-11
 
 | Key | Title | Description | Blocked By |
@@ -17,7 +17,6 @@ Next bugfix number: BUG-11
 | RMC-112 | Add Position type | Add a `Position` record to the geometry layer combining a `Location` and a facing `double Angle`. Represents a point in the world with an orientation — useful anywhere a destination also implies a facing direction (patrol waypoints, spawn points, etc.). | |
 | RMC-113 | Patrol waypoints use Position | Replace the `Location` in `PatrolWaypoint` with a `Position`. When the guard arrives at a waypoint, it should adopt the waypoint's facing angle in addition to reaching its location. Requires updating `PatrolWaypointData` (add `Angle float` column to `PatrolWaypoints` table), `PatrolAIBehavior`, and the locomotion/turning logic to orient the entity at the destination. | RMC-112 |
 | RMC-110 | Rewrite Strength as a capability | Extract `Strength` from its current form and rewrite it as a proper capability on `Entity`, following the same pattern as `LocomotionCapability`. | |
-| RMC-107 | Show facing direction on canvas entities | Render a facing indicator (e.g. a line or arrow) on entities in the world canvas so their current angle is visually obvious. Useful for debugging locomotion and AI behavior. | |
 | RMC-99  | Camera controls on the canvas | Replace the auto-fit viewBox (currently recalculated from the entity bounding box on every tick) with a persistent camera state. Scroll wheel zooms; click-and-drag pans. The keyboard stays reserved for spell input, so no WASD/arrow controls. Initial view on first entity load can still auto-fit, but after that the camera is user-controlled. | |
 
 ## To Do — Other
@@ -35,6 +34,7 @@ Next bugfix number: BUG-11
 | RMC-48  | Formalize movement with collision | VUN currently moves entities to their destination clipping through everything in its path. Replace this with movement through space: the entity travels along the push vector and collides when it hits an entity (a wall, door, etc.) rather than passing through it. | |
 | RMC-74  | Cone selection rune | A spatial selector that selects all entities within a cone projected from an origin entity in its pointing direction. Parametrised by angle (half-width) and range. | |
 | RMC-98  | Design velocity-imparting runes | Design runes that impart velocity and hand an entity off to the simulation layer, rather than directly rewriting its position (engine-layer). The key use case is battlefield shrapnel — objects flung into motion that then collide under physics rules, dealing damage. Contrast with VUN/VAR/CJIR/CJAR which are engine-layer instructions that bypass physics. | |
+| RMC-117 | Right-click move on canvas | Right-clicking a position on the canvas should move the caster to that location. | |
 
 ## In Progress
 | Key | Title | Description | Remarks |
@@ -61,3 +61,4 @@ Next bugfix number: BUG-11
 | RMC-104 | Normalise current/max parameter order |
 | RMC-102 | Remove defaults from EntityData |
 | RMC-111 | Split movement policy out of LocomotionCapability |
+| RMC-107 | Show facing direction on canvas entities |

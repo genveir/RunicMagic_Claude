@@ -8,7 +8,7 @@ public record EntityRenderingModel(
     double Y,
     double Width,
     double Height,
-    double Angle,
+    double Facing,
     string Label,
     EntityRenderingFlags Flags,
     bool IsCaster,

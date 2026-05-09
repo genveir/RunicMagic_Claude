@@ -231,7 +231,7 @@ function updateCanvas(entities) {
     let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
     for (const e of entities) {
         const hw = e.width / 2, hh = e.height / 2;
-        const cos = Math.abs(Math.cos(e.angle)), sin = Math.abs(Math.sin(e.angle));
+        const cos = Math.abs(Math.cos(e.facing)), sin = Math.abs(Math.sin(e.facing));
         const extX = hw * cos + hh * sin;
         const extY = hw * sin + hh * cos;
         minX = Math.min(minX,  e.x - extX);
@@ -251,20 +251,54 @@ function updateCanvas(entities) {
     for (const e of entities) {
         const g = svgEl('g', e.isCaster ? { class: 'caster-group' } : {});
 
-        const angleDeg = e.angle * 180 / Math.PI;
+        const angleDeg = e.facing * 180 / Math.PI;
         g.appendChild(svgEl('rect', {
             x: e.x - e.width / 2, y: -e.y - e.height / 2, width: e.width, height: e.height,
             class: entityClass(e),
             transform: `rotate(${-angleDeg}, ${e.x}, ${-e.y})`,
         }));
 
+        const hw = e.width / 2;
+        const hh = e.height / 2;
+        const spread = Math.min(hw, hh) * 0.3;
+        const depth = Math.min(hw, hh) * 0.3;
+        const tx = e.x + hw;
+        const ty = -e.y;
+        const ax = e.x + hw - depth;
+        const a1y = -e.y - spread;
+        const a2y = -e.y + spread;
+        const facingClass = (e.flags & FLAGS_HAS_AGENCY)
+            ? 'entity-facing'
+            : 'entity-facing entity-facing-hover';
+        g.appendChild(svgEl('path', {
+            d: `M ${ax},${a1y} L ${tx},${ty} L ${ax},${a2y}`,
+            class: facingClass,
+            transform: `rotate(${-angleDeg}, ${e.x}, ${-e.y})`,
+        }));
+
+        const sinF = Math.sin(e.facing);
+        const cosF = Math.cos(e.facing);
+        const tipRY = -e.y - hw * sinF;
+        const arm1RY = -e.y - (hw - depth) * sinF - spread * cosF;
+        const arm2RY = -e.y - (hw - depth) * sinF + spread * cosF;
+        const chevronTop = Math.min(tipRY, arm1RY, arm2RY);
+        const chevronBottom = Math.max(tipRY, arm1RY, arm2RY);
+        const halfLabelH = labelSize * 0.5;
+        const defaultLabelY = -e.y;
+        const labelY = (defaultLabelY - halfLabelH < chevronBottom && defaultLabelY + halfLabelH > chevronTop)
+            ? chevronBottom + halfLabelH + labelSize * 0.2
+            : defaultLabelY;
+
+        const labelClass = (e.flags & FLAGS_HAS_AGENCY)
+            ? 'entity-label'
+            : 'entity-label entity-label-hover';
         const label = svgEl('text', {
-            x:                   e.x,
-            y:                   -e.y,
+            x: e.x,
+            y: labelY,
             'dominant-baseline': 'middle',
-            'text-anchor':       'middle',
-            'font-size':         labelSize,
-            class:               'entity-label',
+            'text-anchor': 'middle',
+            'font-size': labelSize,
+            class: labelClass,
         });
         label.textContent = e.label;
         g.appendChild(label);
