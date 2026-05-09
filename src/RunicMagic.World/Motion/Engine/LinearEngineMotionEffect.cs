@@ -67,7 +67,7 @@ public class LinearEngineMotionEffect : IEngineMotionEffect
             }
 
             var destination = entity.Location.Translate(direction, perTickDistance);
-            MoveEntityService.Move(entity, destination, entity.Angle, eventTracker);
+            MoveEntityService.Move(entity, destination, entity.FacingAngle, eventTracker);
         }
 
         remainingTicks--;

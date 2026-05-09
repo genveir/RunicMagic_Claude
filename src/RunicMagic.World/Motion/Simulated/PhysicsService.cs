@@ -29,12 +29,12 @@ public static class PhysicsService
 
         var initialVelocity = entity.Velocity;
 
-        if ((initialVelocity == null || initialVelocity?.Vx == 0 && initialVelocity?.Vy == 0 && initialVelocity?.Omega == 0) && fx == 0 && fy == 0 && torque == 0)
+        if ((initialVelocity.Vx == 0 && initialVelocity.Vy == 0 && initialVelocity.Omega == 0) && fx == 0 && fy == 0 && torque == 0)
         {
             return;
         }
 
-        var bounds = new Rectangle(entity.Location, Width: entity.Width, Height: entity.Height, Angle: entity.Angle);
+        var bounds = new Rectangle(entity.Location, Width: entity.Width, Height: entity.Height, Angle: entity.FacingAngle);
         var (vx, vy) = CalculateLinearVelocity(
             initialVelocity: initialVelocity,
             weight: entity.Weight,
@@ -60,13 +60,13 @@ public static class PhysicsService
 
         if (linearStopped && rotationStopped)
         {
-            entity.Velocity = null;
+            entity.Velocity = VelocityVector.Zero;
             return;
         }
 
         entity.Velocity = new VelocityVector(vx, vy, omega);
 
-        var newAngle = entity.Angle + omega;
+        var newAngle = entity.FacingAngle + omega;
         var destination = new Location(
             X: entity.Location.X + vx,
             Y: entity.Location.Y + vy);

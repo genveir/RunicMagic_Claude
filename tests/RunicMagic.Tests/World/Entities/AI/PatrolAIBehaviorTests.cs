@@ -12,8 +12,8 @@ public class PatrolAIBehaviorTests
     {
         var legs = new List<Leg>
         {
-            new Leg(lateralOffset: -50, forwardOffset: 0),
-            new Leg(lateralOffset: 50, forwardOffset: 0)
+            new Leg(name: "Left", lateralOffset: -50, forwardOffset: 0),
+            new Leg(name: "Right", lateralOffset: 50, forwardOffset: 0)
         };
         return new LocomotionCapability(legs, locomotionEfficiency: 0.8);
     }
@@ -78,7 +78,7 @@ public class PatrolAIBehaviorTests
     }
 
     [Fact]
-    public void Execute_UsesRun_WhenSpeedIsOne()
+    public void Execute_HigherSpeed_ProducesMoreForce()
     {
         var entity = new EntityBuilder()
             .WithLocation(x: 0, y: 0)

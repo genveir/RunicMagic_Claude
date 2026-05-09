@@ -17,7 +17,7 @@ public static class EntityRenderingMapper
             Y: entity.Location.Y,
             Width: entity.Width,
             Height: entity.Height,
-            Angle: entity.Angle,
+            Angle: entity.FacingAngle,
             Label: entity.Label,
             Flags: flags,
             IsCaster: isCaster,

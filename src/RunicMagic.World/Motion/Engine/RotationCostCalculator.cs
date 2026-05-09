@@ -17,8 +17,8 @@ public static class RotationCostCalculator
 
         var worldDx = entity.Location.X - origin.X;
         var worldDy = entity.Location.Y - origin.Y;
-        var cos = Math.Cos(entity.Angle);
-        var sin = Math.Sin(entity.Angle);
+        var cos = Math.Cos(entity.FacingAngle);
+        var sin = Math.Sin(entity.FacingAngle);
         var a = worldDx * cos + worldDy * sin;
         var b = -worldDx * sin + worldDy * cos;
 

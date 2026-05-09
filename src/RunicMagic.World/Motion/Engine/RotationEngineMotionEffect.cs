@@ -65,7 +65,7 @@ public class RotationEngineMotionEffect : IEngineMotionEffect
                 origin.X + dx * cos - dy * sin,
                 origin.Y + dx * sin + dy * cos
             );
-            var newAngle = entity.Angle + perTickTheta;
+            var newAngle = entity.FacingAngle + perTickTheta;
             MoveEntityService.Move(entity, newLocation, newAngle, eventTracker);
         }
 

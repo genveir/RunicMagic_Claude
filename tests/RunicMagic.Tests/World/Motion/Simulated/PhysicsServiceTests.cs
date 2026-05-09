@@ -15,7 +15,8 @@ public class PhysicsServiceTests
 
         entity.Location.X.Should().BeApproximately(0, 0.001);
         entity.Location.Y.Should().BeApproximately(0, 0.001);
-        entity.Velocity.Should().BeNull();
+
+        entity.Velocity.Should().BeEquivalentTo(VelocityVector.Zero);
     }
 
     [Fact]
@@ -39,8 +40,8 @@ public class PhysicsServiceTests
 
         PhysicsService.Tick([entity], new EventTracker());
 
-        entity.Velocity!.Value.Vx.Should().BeApproximately(1, 0.001);
-        entity.Velocity!.Value.Vy.Should().BeApproximately(0, 0.001);
+        entity.Velocity.Vx.Should().BeApproximately(1, 0.001);
+        entity.Velocity.Vy.Should().BeApproximately(0, 0.001);
         entity.Location.X.Should().BeApproximately(1, 0.001);
     }
 
@@ -54,7 +55,7 @@ public class PhysicsServiceTests
 
         PhysicsService.Tick([entity], new EventTracker());
 
-        entity.Velocity!.Value.Vx.Should().BeApproximately(1, 0.001);
+        entity.Velocity.Vx.Should().BeApproximately(1, 0.001);
     }
 
     [Fact]
@@ -109,12 +110,12 @@ public class PhysicsServiceTests
 
         PhysicsService.Tick([entity], new EventTracker());
 
-        entity.Velocity!.Value.Vx.Should().BeApproximately(90, 0.001);
+        entity.Velocity.Vx.Should().BeApproximately(90, 0.001);
         entity.Location.X.Should().BeApproximately(90, 0.001);
     }
 
     [Fact]
-    public void Tick_WhenSpeedFallsBelowThreshold_NullsVelocity()
+    public void Tick_WhenSpeedFallsBelowThreshold_SetsVelocityToZero()
     {
         // velocity (0.5, 0) is below the 1mm/tick minimum
         var entity = new EntityBuilder().WithLocation(x: 0, y: 0).Build();
@@ -122,12 +123,13 @@ public class PhysicsServiceTests
 
         PhysicsService.Tick([entity], new EventTracker());
 
-        entity.Velocity.Should().BeNull();
+        entity.Velocity.Should().BeEquivalentTo(VelocityVector.Zero);
+
         entity.Location.X.Should().BeApproximately(0, 0.001);
     }
 
     [Fact]
-    public void Tick_WhenDragBringsSpeedBelowThreshold_NullsVelocity()
+    public void Tick_WhenDragBringsSpeedBelowThreshold_SetsVelocityToZero()
     {
         // velocity (1.0, 0), drag large enough to kill it in one tick
         // weight=1000, size=100x100, drag=1.0
@@ -141,7 +143,7 @@ public class PhysicsServiceTests
 
         PhysicsService.Tick([entity], new EventTracker());
 
-        entity.Velocity.Should().BeNull();
+        entity.Velocity.Should().BeEquivalentTo(VelocityVector.Zero);
     }
 
     [Fact]
@@ -154,7 +156,7 @@ public class PhysicsServiceTests
 
         PhysicsService.Tick([entity], new EventTracker());
 
-        entity.Velocity!.Value.Vx.Should().BeApproximately(6, 0.001);
+        entity.Velocity.Vx.Should().BeApproximately(6, 0.001);
     }
 
     [Fact]
@@ -194,7 +196,7 @@ public class PhysicsServiceTests
 
         PhysicsService.Tick([entity], new EventTracker());
 
-        entity.Velocity!.Value.Omega.Should().BeApproximately(1.0, 0.001);
+        entity.Velocity.Omega.Should().BeApproximately(1.0, 0.001);
     }
 
     [Fact]
@@ -211,7 +213,7 @@ public class PhysicsServiceTests
 
         PhysicsService.Tick([entity], new EventTracker());
 
-        entity.Velocity!.Value.Vy.Should().BeApproximately(1.0, 0.001);
+        entity.Velocity.Vy.Should().BeApproximately(1.0, 0.001);
     }
 
     [Fact]
@@ -226,7 +228,7 @@ public class PhysicsServiceTests
 
         PhysicsService.Tick([entity], new EventTracker());
 
-        entity.Velocity!.Value.Omega.Should().BeApproximately(0.0, 0.001);
+        entity.Velocity.Omega.Should().BeApproximately(0.0, 0.001);
     }
 
     [Fact]
@@ -237,7 +239,7 @@ public class PhysicsServiceTests
 
         PhysicsService.Tick([entity], new EventTracker());
 
-        entity.Angle.Should().BeApproximately(0.5, 0.001);
+        entity.FacingAngle.Should().BeApproximately(0.5, 0.001);
     }
 
     [Fact]
@@ -256,7 +258,7 @@ public class PhysicsServiceTests
 
         PhysicsService.Tick([entity], new EventTracker());
 
-        entity.Velocity!.Value.Omega.Should().BeApproximately(0.5, 0.001);
+        entity.Velocity.Omega.Should().BeApproximately(0.5, 0.001);
     }
 
     [Fact]
@@ -269,18 +271,18 @@ public class PhysicsServiceTests
 
         PhysicsService.Tick([entity], new EventTracker());
 
-        entity.Velocity!.Value.Omega.Should().BeApproximately(0.0, 0.001);
+        entity.Velocity.Omega.Should().BeApproximately(0.0, 0.001);
     }
 
     [Fact]
-    public void Tick_WhenBothLinearAndAngularBelowThreshold_NullsVelocity()
+    public void Tick_WhenBothLinearAndAngularBelowThreshold_SetsVelocityToZero()
     {
         var entity = new EntityBuilder().Build();
         entity.Velocity = new VelocityVector(Vx: 0.5, Vy: 0, Omega: 0.0005);
 
         PhysicsService.Tick([entity], new EventTracker());
 
-        entity.Velocity.Should().BeNull();
+        entity.Velocity.Should().BeEquivalentTo(VelocityVector.Zero);
     }
 
     [Fact]

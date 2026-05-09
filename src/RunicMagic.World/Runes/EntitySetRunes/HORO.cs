@@ -32,7 +32,7 @@ public class HORO : IEntitySet
 
     private static Rectangle Bounds(Entity e)
     {
-        var bounds = new Rectangle(e.Location, e.Width, e.Height, e.Angle);
+        var bounds = new Rectangle(e.Location, e.Width, e.Height, e.FacingAngle);
         return bounds;
     }
 

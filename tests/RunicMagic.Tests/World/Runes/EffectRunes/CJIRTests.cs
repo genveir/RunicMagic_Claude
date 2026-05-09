@@ -79,7 +79,7 @@ public class CJIRTests
         cjir.Execute(context);
         RunTicks(world, 56);
 
-        entity.Angle.Should().BeApproximately(expectedAngle, 0.001);
+        entity.FacingAngle.Should().BeApproximately(expectedAngle, 0.001);
     }
 
     [Fact]

@@ -9,9 +9,8 @@ namespace RunicMagic.Tests.World.Entities.Capabilities;
 
 public class LocomotionCapabilityTests
 {
-    private static readonly Leg LeftLeg = new Leg(lateralOffset: -100, forwardOffset: 0);
-    private static readonly Leg RightLeg = new Leg(lateralOffset: 100, forwardOffset: 0);
-    private static readonly IWorldEventTracker Tracker = new NullTracker();
+    private static readonly Leg LeftLeg = new Leg(name: "Left", lateralOffset: -100, forwardOffset: 0);
+    private static readonly Leg RightLeg = new Leg(name: "Right", lateralOffset: 100, forwardOffset: 0);
 
     private static LocomotionCapability MakeLocomotion(double efficiency = 1.0)
     {
@@ -39,555 +38,348 @@ public class LocomotionCapabilityTests
             .Build();
     }
 
-    private sealed class NullTracker : IWorldEventTracker
-    {
-        public void Add(WorldEvent @event) { }
-        public void Track(Entity entity) { }
-    }
-
-    // --- LocomotionEfficiency ---
+    // --- LegNames ---
 
     [Fact]
-    public void LocomotionEfficiency_IsStoredCorrectly()
+    public void LegNames_ReturnsNamesOfAllLegs()
     {
-        var legs = new List<Leg> { RightLeg };
-        var locomotion = new LocomotionCapability(legs, locomotionEfficiency: 0.75);
+        var locomotion = MakeLocomotion();
 
-        locomotion.LocomotionEfficiency.Should().Be(0.75);
+        var names = locomotion.LegNames;
+
+        names.Should().BeEquivalentTo(new[] { "Left", "Right" });
     }
 
-    // --- GetLegVectors ---
+    // --- ApplyLinearForce ---
 
     [Fact]
-    public void GetLegVectors_TurnDirectionPositive_PositiveLateralLegGoesForward()
+    public void ApplyLinearForce_PositiveFraction_AddsForwardImpulses()
     {
-        var legs = new List<Leg> { LeftLeg, RightLeg };
-        var result = LocomotionCapability.GetLegVectors(
-            legs: legs,
-            perLegForce: 100,
-            turnDirection: 1,
-            entityAngle: 0,
-            scale: 1,
-            cosA: 1,
-            sinA: 0);
+        var locomotion = MakeLocomotion();
+        var entity = MakeEntity(angle: 0);
 
-        // LateralOffset < 0 (left) → backward; LateralOffset > 0 (right) → forward
-        result[0].Fx.Should().BeApproximately(-100, 0.001);
-        result[1].Fx.Should().BeApproximately(100, 0.001);
+        locomotion.ApplyLinearForce(entity, forceFraction: 1.0);
+
+        entity.PendingImpulses.Sum(v => v.Fx).Should().BeGreaterThan(0);
     }
 
     [Fact]
-    public void GetLegVectors_TurnDirectionNegative_NegativeLateralLegGoesForward()
+    public void ApplyLinearForce_NegativeFraction_AddsBackwardImpulses()
     {
-        var legs = new List<Leg> { LeftLeg, RightLeg };
-        var result = LocomotionCapability.GetLegVectors(
-            legs: legs,
-            perLegForce: 100,
-            turnDirection: -1,
-            entityAngle: 0,
-            scale: 1,
-            cosA: 1,
-            sinA: 0);
+        var locomotion = MakeLocomotion();
+        var entity = MakeEntity(angle: 0);
 
-        // LateralOffset < 0 (left) → forward; LateralOffset > 0 (right) → backward
-        result[0].Fx.Should().BeApproximately(100, 0.001);
-        result[1].Fx.Should().BeApproximately(-100, 0.001);
+        locomotion.ApplyLinearForce(entity, forceFraction: -1.0);
+
+        entity.PendingImpulses.Sum(v => v.Fx).Should().BeLessThan(0);
     }
 
     [Fact]
-    public void GetLegVectors_ScaleHalf_ForceMagnitudeHalved()
-    {
-        var legs = new List<Leg> { RightLeg };
-        var full = LocomotionCapability.GetLegVectors(
-            legs: legs, perLegForce: 100, turnDirection: 1, entityAngle: 0, scale: 1, cosA: 1, sinA: 0);
-        var half = LocomotionCapability.GetLegVectors(
-            legs: legs, perLegForce: 100, turnDirection: 1, entityAngle: 0, scale: 0.5, cosA: 1, sinA: 0);
-
-        half[0].Fx.Should().BeApproximately(full[0].Fx / 2, 0.001);
-    }
-
-    [Fact]
-    public void GetLegVectors_LegWorldOffset_RotatesWithEntityAngle()
-    {
-        var legs = new List<Leg> { RightLeg };
-        var angle = Math.PI / 2;
-        var cosA = Math.Cos(angle);
-        var sinA = Math.Sin(angle);
-
-        var result = LocomotionCapability.GetLegVectors(
-            legs: legs, perLegForce: 100, turnDirection: 1, entityAngle: angle, scale: 1, cosA: cosA, sinA: sinA);
-
-        // RightLeg at 90°: rx = 100*sin(90°) = 100, ry = -100*cos(90°) = 0
-        result[0].Rx.Should().BeApproximately(100, 0.001);
-        result[0].Ry.Should().BeApproximately(0, 0.001);
-    }
-
-    // --- SimulateAngularBrakingAngle ---
-
-    [Fact]
-    public void SimulateAngularBrakingAngle_ZeroOmega_ReturnsZero()
-    {
-        var result = LocomotionCapability.SimulateAngularBrakingAngle(
-            omega: 0,
-            maxCounterTorque: 1000,
-            weight: 1000,
-            width: 200,
-            height: 200,
-            angularDragCoefficient: 0,
-            groundFrictionCoefficient: 0,
-            groundContactRadius: 0,
-            isGrounded: false);
-
-        result.Should().Be(0.0);
-    }
-
-    [Fact]
-    public void SimulateAngularBrakingAngle_PositiveOmega_ReturnsPositiveValue()
-    {
-        var result = LocomotionCapability.SimulateAngularBrakingAngle(
-            omega: 0.1,
-            maxCounterTorque: 100,
-            weight: 1000,
-            width: 200,
-            height: 200,
-            angularDragCoefficient: 0,
-            groundFrictionCoefficient: 0,
-            groundContactRadius: 0,
-            isGrounded: false);
-
-        result.Should().BeGreaterThan(0);
-    }
-
-    [Fact]
-    public void SimulateAngularBrakingAngle_NegativeOmega_ReturnsPositiveValue()
-    {
-        var result = LocomotionCapability.SimulateAngularBrakingAngle(
-            omega: -0.1,
-            maxCounterTorque: 100,
-            weight: 1000,
-            width: 200,
-            height: 200,
-            angularDragCoefficient: 0,
-            groundFrictionCoefficient: 0,
-            groundContactRadius: 0,
-            isGrounded: false);
-
-        result.Should().BeGreaterThan(0);
-    }
-
-    [Fact]
-    public void SimulateAngularBrakingAngle_SymmetricPositiveAndNegativeOmega()
-    {
-        var positiveResult = LocomotionCapability.SimulateAngularBrakingAngle(
-            omega: 0.1,
-            maxCounterTorque: 100,
-            weight: 1000,
-            width: 200,
-            height: 200,
-            angularDragCoefficient: 0,
-            groundFrictionCoefficient: 0,
-            groundContactRadius: 0,
-            isGrounded: false);
-
-        var negativeResult = LocomotionCapability.SimulateAngularBrakingAngle(
-            omega: -0.1,
-            maxCounterTorque: 100,
-            weight: 1000,
-            width: 200,
-            height: 200,
-            angularDragCoefficient: 0,
-            groundFrictionCoefficient: 0,
-            groundContactRadius: 0,
-            isGrounded: false);
-
-        negativeResult.Should().BeApproximately(positiveResult, 0.001);
-    }
-
-    [Fact]
-    public void SimulateAngularBrakingAngle_LargerOmega_RequiresMoreAngle()
-    {
-        var smallResult = LocomotionCapability.SimulateAngularBrakingAngle(
-            omega: 0.05,
-            maxCounterTorque: 100,
-            weight: 1000,
-            width: 200,
-            height: 200,
-            angularDragCoefficient: 0,
-            groundFrictionCoefficient: 0,
-            groundContactRadius: 0,
-            isGrounded: false);
-
-        var largeResult = LocomotionCapability.SimulateAngularBrakingAngle(
-            omega: 0.1,
-            maxCounterTorque: 100,
-            weight: 1000,
-            width: 200,
-            height: 200,
-            angularDragCoefficient: 0,
-            groundFrictionCoefficient: 0,
-            groundContactRadius: 0,
-            isGrounded: false);
-
-        largeResult.Should().BeGreaterThan(smallResult);
-    }
-
-    // --- SimulateLinearBrakingDistance ---
-
-    [Fact]
-    public void SimulateLinearBrakingDistance_ZeroVelocity_ReturnsZero()
-    {
-        var bounds = new Rectangle(new Location(0, 0), Width: 200, Height: 200, Angle: 0);
-        var result = LocomotionCapability.SimulateLinearBrakingDistance(
-            vx: 0, vy: 0,
-            brakingFx: -100, brakingFy: 0,
-            weight: 1000,
-            dragCoefficient: 0,
-            bounds: bounds,
-            groundFrictionCoefficient: 0,
-            isGrounded: false);
-
-        result.Should().Be(0.0);
-    }
-
-    [Fact]
-    public void SimulateLinearBrakingDistance_NonZeroVelocity_ReturnsPositiveValue()
-    {
-        var bounds = new Rectangle(new Location(0, 0), Width: 200, Height: 200, Angle: 0);
-        var result = LocomotionCapability.SimulateLinearBrakingDistance(
-            vx: 10, vy: 0,
-            brakingFx: -1, brakingFy: 0,
-            weight: 1000,
-            dragCoefficient: 0,
-            bounds: bounds,
-            groundFrictionCoefficient: 0,
-            isGrounded: false);
-
-        result.Should().BeGreaterThan(0);
-    }
-
-    [Fact]
-    public void SimulateLinearBrakingDistance_LargerVelocity_RequiresMoreDistance()
-    {
-        var bounds = new Rectangle(new Location(0, 0), Width: 200, Height: 200, Angle: 0);
-        var smallResult = LocomotionCapability.SimulateLinearBrakingDistance(
-            vx: 5, vy: 0,
-            brakingFx: -1, brakingFy: 0,
-            weight: 1000,
-            dragCoefficient: 0,
-            bounds: bounds,
-            groundFrictionCoefficient: 0,
-            isGrounded: false);
-
-        var largeResult = LocomotionCapability.SimulateLinearBrakingDistance(
-            vx: 10, vy: 0,
-            brakingFx: -1, brakingFy: 0,
-            weight: 1000,
-            dragCoefficient: 0,
-            bounds: bounds,
-            groundFrictionCoefficient: 0,
-            isGrounded: false);
-
-        largeResult.Should().BeGreaterThan(smallResult);
-    }
-
-    // --- BinarySearchBrakeScale ---
-
-    [Fact]
-    public void BinarySearchBrakeScale_ResultIsBetweenZeroAndOne()
-    {
-        var velocity = new VelocityVector(0, 0, Omega: 0.5);
-        var result = LocomotionCapability.BinarySearchBrakeScale(
-            currentVelocity: velocity,
-            counterTorque: -100000,
-            originalSign: 1,
-            weight: 1000,
-            width: 200,
-            height: 200,
-            angularDragCoefficient: 0,
-            groundFrictionCoefficient: 0,
-            groundContactRadius: 0,
-            isGrounded: false);
-
-        result.Should().BeGreaterThanOrEqualTo(0.0);
-        result.Should().BeLessThanOrEqualTo(1.0);
-    }
-
-    [Fact]
-    public void BinarySearchBrakeScale_AtReturnedScale_OmegaDoesNotOvershoottZero()
-    {
-        var velocity = new VelocityVector(0, 0, Omega: 0.5);
-        const double counterTorque = -100000;
-        const double weight = 1000;
-        const double width = 200;
-        const double height = 200;
-
-        var scale = LocomotionCapability.BinarySearchBrakeScale(
-            currentVelocity: velocity,
-            counterTorque: counterTorque,
-            originalSign: 1,
-            weight: weight,
-            width: width,
-            height: height,
-            angularDragCoefficient: 0,
-            groundFrictionCoefficient: 0,
-            groundContactRadius: 0,
-            isGrounded: false);
-
-        var newOmega = PhysicsService.CalculateAngularVelocity(
-            initialVelocity: velocity,
-            weight: weight,
-            height: height,
-            width: width,
-            angularDragCoefficient: 0,
-            torque: scale * counterTorque,
-            groundFrictionCoefficient: 0,
-            groundContactRadius: 0,
-            isGrounded: false);
-
-        // The returned scale must not flip the sign of omega (no overshoot past zero)
-        (newOmega == 0.0 || Math.Sign(newOmega) == 1).Should().BeTrue();
-    }
-
-    // --- ApplyTurning ---
-
-    [Fact]
-    public void ApplyTurning_AddsImpulses_WhenAngularErrorIsSignificant()
+    public void ApplyLinearForce_AddsOneImpulsePerLeg()
     {
         var locomotion = MakeLocomotion();
         var entity = MakeEntity();
 
-        locomotion.ApplyTurning(
-            entity: entity,
-            angularError: 1.0,
-            perLegForce: 100,
-            cosA: 1,
-            sinA: 0,
-            tracker: Tracker);
+        locomotion.ApplyLinearForce(entity, forceFraction: 1.0);
 
         entity.PendingImpulses.Should().HaveCount(2);
     }
 
     [Fact]
-    public void ApplyTurning_DoesNotAddImpulses_WhenLegsProduceNoTorque()
+    public void ApplyLinearForce_ForceMagnitudeScalesByFraction()
     {
-        // Legs on the body centerline produce no torque; the capability has nothing to work with
-        var legs = new List<Leg> { new Leg(lateralOffset: 0, forwardOffset: 0) };
-        var locomotion = new LocomotionCapability(legs, locomotionEfficiency: 1.0);
+        var locomotion = MakeLocomotion();
+        var fullEntity = MakeEntity();
+        var halfEntity = MakeEntity();
+
+        locomotion.ApplyLinearForce(fullEntity, forceFraction: 1.0);
+        locomotion.ApplyLinearForce(halfEntity, forceFraction: 0.5);
+
+        var fullFx = fullEntity.PendingImpulses.Sum(v => v.Fx);
+        var halfFx = halfEntity.PendingImpulses.Sum(v => v.Fx);
+        (halfFx / fullFx).Should().BeApproximately(0.5, 0.001);
+    }
+
+    // --- ApplyTurnForce ---
+
+    [Fact]
+    public void ApplyTurnForce_PositiveFraction_PositiveLateralLegGoesForward()
+    {
+        var locomotion = MakeLocomotion();
+        var entity = MakeEntity(angle: 0);
+
+        locomotion.ApplyTurnForce(entity, forceFraction: 1.0);
+
+        // At angle=0: right leg (lateralOffset=+100) has Ry=-100, left leg (lateralOffset=-100) has Ry=+100.
+        // Positive turn fraction: right leg (positive lateral) pushes forward, left leg pushes backward.
+        var rightImpulse = entity.PendingImpulses.First(v => v.Ry < 0);
+        var leftImpulse = entity.PendingImpulses.First(v => v.Ry > 0);
+        rightImpulse.Fx.Should().BeGreaterThan(0);
+        leftImpulse.Fx.Should().BeLessThan(0);
+    }
+
+    [Fact]
+    public void ApplyTurnForce_NegativeFraction_NegativeLateralLegGoesForward()
+    {
+        var locomotion = MakeLocomotion();
+        var entity = MakeEntity(angle: 0);
+
+        locomotion.ApplyTurnForce(entity, forceFraction: -1.0);
+
+        // At angle=0: right leg (lateralOffset=+100) has Ry=-100, left leg (lateralOffset=-100) has Ry=+100.
+        // Negative turn fraction: left leg (negative lateral) pushes forward, right leg pushes backward.
+        var rightImpulse = entity.PendingImpulses.First(v => v.Ry < 0);
+        var leftImpulse = entity.PendingImpulses.First(v => v.Ry > 0);
+        leftImpulse.Fx.Should().BeGreaterThan(0);
+        rightImpulse.Fx.Should().BeLessThan(0);
+    }
+
+    [Fact]
+    public void ApplyTurnForce_ZeroFraction_AddsNoImpulses()
+    {
+        var locomotion = MakeLocomotion();
         var entity = MakeEntity();
 
-        locomotion.ApplyTurning(
-            entity: entity,
-            angularError: 1.0,
-            perLegForce: 100,
-            cosA: 1,
-            sinA: 0,
-            tracker: Tracker);
+        locomotion.ApplyTurnForce(entity, forceFraction: 0.0);
 
         entity.PendingImpulses.Should().BeEmpty();
     }
 
     [Fact]
-    public void ApplyTurning_Coasts_WhenCurrentOmegaAloneReachesTarget()
+    public void ApplyTurnForce_MagnitudeScalesByAbsoluteFraction()
     {
-        // Oversized legs on a near-weightless entity: braking is instantaneous (brakingAngle ≈ 0).
-        // omega (0.1) already exceeds the angular error (0.05), so no further impulse is needed.
+        var locomotion = MakeLocomotion();
+        var fullEntity = MakeEntity();
+        var halfEntity = MakeEntity();
+
+        locomotion.ApplyTurnForce(fullEntity, forceFraction: 1.0);
+        locomotion.ApplyTurnForce(halfEntity, forceFraction: 0.5);
+
+        var fullMag = fullEntity.PendingImpulses.Sum(v => Math.Abs(v.Fx));
+        var halfMag = halfEntity.PendingImpulses.Sum(v => Math.Abs(v.Fx));
+        (halfMag / fullMag).Should().BeApproximately(0.5, 0.001);
+    }
+
+    // --- ApplyLegForce ---
+
+    [Fact]
+    public void ApplyLegForce_NamedLeg_AddsOneImpulse()
+    {
+        var locomotion = MakeLocomotion();
+        var entity = MakeEntity(angle: 0);
+
+        locomotion.ApplyLegForce(entity, legName: "Right", forceFraction: 1.0);
+
+        entity.PendingImpulses.Should().HaveCount(1);
+    }
+
+    [Fact]
+    public void ApplyLegForce_PositiveFraction_AddsForwardImpulse()
+    {
+        var locomotion = MakeLocomotion();
+        var entity = MakeEntity(angle: 0);
+
+        locomotion.ApplyLegForce(entity, legName: "Left", forceFraction: 1.0);
+
+        entity.PendingImpulses[0].Fx.Should().BeGreaterThan(0);
+    }
+
+    [Fact]
+    public void ApplyLegForce_UnknownName_AddsNoImpulse()
+    {
+        var locomotion = MakeLocomotion();
+        var entity = MakeEntity();
+
+        locomotion.ApplyLegForce(entity, legName: "BackLeft", forceFraction: 1.0);
+
+        entity.PendingImpulses.Should().BeEmpty();
+    }
+
+    // --- ApplyLinearBrake ---
+
+    [Fact]
+    public void ApplyLinearBrake_NoVelocity_AddsNoImpulses()
+    {
+        var locomotion = MakeLocomotion();
+        var entity = MakeEntity();
+
+        locomotion.ApplyLinearBrake(entity, forceFraction: 1.0);
+
+        entity.PendingImpulses.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void ApplyLinearBrake_WithForwardVelocity_AddsBackwardImpulses()
+    {
+        var locomotion = MakeLocomotion();
+        var entity = MakeEntity(angle: 0);
+        entity.Velocity = new VelocityVector(Vx: 100, Vy: 0, Omega: 0);
+
+        locomotion.ApplyLinearBrake(entity, forceFraction: 1.0);
+
+        entity.PendingImpulses.Should().NotBeEmpty();
+        entity.PendingImpulses.Sum(v => v.Fx).Should().BeLessThan(0);
+    }
+
+    [Fact]
+    public void ApplyLinearBrake_DoesNotOvershoottZero()
+    {
+        // Very strong brake on a slow entity: without overshoot prevention the velocity would flip sign
         var legs = new List<Leg>
         {
-            new Leg(lateralOffset: -500, forwardOffset: 0),
-            new Leg(lateralOffset: 500, forwardOffset: 0),
+            new Leg(name: "Left", lateralOffset: -100, forwardOffset: 0),
+            new Leg(name: "Right", lateralOffset: 100, forwardOffset: 0),
         };
         var locomotion = new LocomotionCapability(legs, locomotionEfficiency: 1.0);
         var entity = new EntityBuilder()
             .WithStrength(100000)
-            .WithWeight(1)
+            .WithWeight(1000)
             .WithSize(200, 200)
             .Build();
-        entity.Velocity = new VelocityVector(0, 0, Omega: 0.1);
+        entity.Velocity = new VelocityVector(Vx: 1, Vy: 0, Omega: 0);
 
-        locomotion.ApplyTurning(
-            entity: entity,
-            angularError: 0.05,
-            perLegForce: 100000,
-            cosA: 1,
-            sinA: 0,
-            tracker: Tracker);
+        locomotion.ApplyLinearBrake(entity, forceFraction: 1.0);
+
+        // After applying the impulses, check the next velocity would not reverse direction.
+        // We verify indirectly: total braking Fx must not exceed what would zero out the velocity.
+        var totalFx = entity.PendingImpulses.Sum(v => v.Fx);
+        var bounds = new Rectangle(new Location(0, 0), Width: 200, Height: 200, Angle: 0);
+        var (nextVx, _) = PhysicsService.CalculateLinearVelocity(
+            initialVelocity: new VelocityVector(Vx: 1, Vy: 0, Omega: 0),
+            weight: 1000,
+            dragCoefficient: 0,
+            bounds: bounds,
+            fx: totalFx,
+            fy: 0,
+            groundFrictionCoefficient: 0,
+            isGrounded: false);
+
+        (nextVx == 0.0 || Math.Sign(nextVx) == Math.Sign(1.0)).Should().BeTrue();
+    }
+
+    // --- ApplyAngularBrake ---
+
+    [Fact]
+    public void ApplyAngularBrake_NoOmega_AddsNoImpulses()
+    {
+        var locomotion = MakeLocomotion();
+        var entity = MakeEntity();
+
+        locomotion.ApplyAngularBrake(entity, forceFraction: 1.0);
 
         entity.PendingImpulses.Should().BeEmpty();
     }
 
     [Fact]
-    public void ApplyTurning_AddsBrakingImpulses_WhenOmegaWouldOvershoottTarget()
+    public void ApplyAngularBrake_WithOmega_AddsImpulses()
     {
-        // Large omega, tiny angular error: the entity would overshoot without braking.
         var locomotion = MakeLocomotion();
-        var entity = MakeEntity(strength: 1000, weight: 1000, width: 200, height: 200);
-        entity.Velocity = new VelocityVector(0, 0, Omega: 2.0);
+        var entity = MakeEntity();
+        entity.Velocity = new VelocityVector(Vx: 0, Vy: 0, Omega: 0.5);
 
-        locomotion.ApplyTurning(
-            entity: entity,
-            angularError: 0.01,
-            perLegForce: 1000,
-            cosA: 1,
-            sinA: 0,
-            tracker: Tracker);
+        locomotion.ApplyAngularBrake(entity, forceFraction: 1.0);
 
         entity.PendingImpulses.Should().NotBeEmpty();
     }
 
-    // --- ApplyWalking ---
+    // --- GetLinearStopInfo ---
 
     [Fact]
-    public void ApplyWalking_NoImpulses_WhenAtDestinationAndStopped()
+    public void GetLinearStopInfo_ZeroVelocity_ReturnsZeroTicksAndDistance()
     {
         var locomotion = MakeLocomotion();
         var entity = MakeEntity();
 
-        locomotion.ApplyWalking(
-            entity: entity,
-            desiredDestination: new Location(0, 0),
-            perLegForce: 100,
-            cosA: 1,
-            sinA: 0,
-            tracker: Tracker);
+        var (ticks, distance) = locomotion.GetLinearStopInfo(entity, forceFraction: 1.0);
 
-        entity.PendingImpulses.Should().BeEmpty();
+        ticks.Should().Be(0L);
+        distance.Should().Be(0.0);
     }
 
     [Fact]
-    public void ApplyWalking_AddsBrakingImpulses_WhenAtDestinationButMoving()
+    public void GetLinearStopInfo_WithVelocity_ReturnsPositiveTicksAndDistance()
     {
         var locomotion = MakeLocomotion();
         var entity = MakeEntity();
-        entity.Velocity = new VelocityVector(Vx: 10, Vy: 0, Omega: 0);
+        entity.Velocity = new VelocityVector(Vx: 100, Vy: 0, Omega: 0);
 
-        locomotion.ApplyWalking(
-            entity: entity,
-            desiredDestination: new Location(0, 0),
-            perLegForce: 100,
-            cosA: 1,
-            sinA: 0,
-            tracker: Tracker);
+        var (ticks, distance) = locomotion.GetLinearStopInfo(entity, forceFraction: 1.0);
 
-        entity.PendingImpulses.Should().NotBeEmpty();
-        entity.PendingImpulses.Sum(v => v.Fx).Should().BeLessThan(0);
+        ticks.Should().BeGreaterThan(0L);
+        distance.Should().BeGreaterThan(0.0);
     }
 
     [Fact]
-    public void ApplyWalking_AddsForwardImpulses_WhenFarFromDestination()
+    public void GetLinearStopInfo_LargerVelocity_RequiresMoreTicksAndDistance()
     {
         var locomotion = MakeLocomotion();
-        var entity = MakeEntity();
+        var slowEntity = MakeEntity();
+        slowEntity.Velocity = new VelocityVector(Vx: 50, Vy: 0, Omega: 0);
+        var fastEntity = MakeEntity();
+        fastEntity.Velocity = new VelocityVector(Vx: 200, Vy: 0, Omega: 0);
 
-        locomotion.ApplyWalking(
-            entity: entity,
-            desiredDestination: new Location(10000, 0),
-            perLegForce: 100,
-            cosA: 1,
-            sinA: 0,
-            tracker: Tracker);
+        var (slowTicks, slowDistance) = locomotion.GetLinearStopInfo(slowEntity, forceFraction: 1.0);
+        var (fastTicks, fastDistance) = locomotion.GetLinearStopInfo(fastEntity, forceFraction: 1.0);
 
-        entity.PendingImpulses.Should().HaveCount(2);
-        entity.PendingImpulses.Sum(v => v.Fx).Should().BeGreaterThan(0);
+        fastTicks.Should().BeGreaterThanOrEqualTo(slowTicks);
+        fastDistance.Should().BeGreaterThan(slowDistance);
     }
 
-    [Fact]
-    public void ApplyWalking_AddsBrakingImpulses_WhenTooFastToStop()
-    {
-        // Entity moving at 5000 mm/tick with perLegForce=100; braking distance >> 200 mm
-        var locomotion = MakeLocomotion();
-        var entity = MakeEntity();
-        entity.Velocity = new VelocityVector(Vx: 5000, Vy: 0, Omega: 0);
-
-        locomotion.ApplyWalking(
-            entity: entity,
-            desiredDestination: new Location(200, 0),
-            perLegForce: 100,
-            cosA: 1,
-            sinA: 0,
-            tracker: Tracker);
-
-        entity.PendingImpulses.Should().NotBeEmpty();
-        entity.PendingImpulses.Sum(v => v.Fx).Should().BeLessThan(0);
-    }
+    // --- GetAngularStopInfo ---
 
     [Fact]
-    public void ApplyWalking_NoImpulses_WhenCoastingToDestination()
-    {
-        // Near-weightless entity: braking is instantaneous (brakingDistance = 0).
-        // Speed (150 mm/tick) equals remaining distance (150 mm) → coast condition fires.
-        var locomotion = MakeLocomotion();
-        var entity = new EntityBuilder()
-            .WithLocation(0, 0)
-            .WithWeight(1)
-            .WithSize(200, 200)
-            .Build();
-        entity.Velocity = new VelocityVector(Vx: 150, Vy: 0, Omega: 0);
-
-        locomotion.ApplyWalking(
-            entity: entity,
-            desiredDestination: new Location(150, 0),
-            perLegForce: 5000,
-            cosA: 1,
-            sinA: 0,
-            tracker: Tracker);
-
-        entity.PendingImpulses.Should().BeEmpty();
-    }
-
-    // --- Walk and Run ---
-
-    [Fact]
-    public void Walk_ProducesSeventyPercentForce_ComparedToRun()
-    {
-        var locomotion = MakeLocomotion();
-        var walkEntity = MakeEntity(strength: 1000);
-        var runEntity = MakeEntity(strength: 1000);
-        var destination = new Location(10000, 0);
-
-        locomotion.Walk(walkEntity, destination, Tracker);
-        locomotion.Run(runEntity, destination, Tracker);
-
-        var walkFx = walkEntity.PendingImpulses.Sum(v => v.Fx);
-        var runFx = runEntity.PendingImpulses.Sum(v => v.Fx);
-
-        (walkFx / runFx).Should().BeApproximately(0.7, 0.001);
-    }
-
-    // --- ApplyLocomotion (dispatch) ---
-
-    [Fact]
-    public void ApplyLocomotion_WhenAlignedAndFarAway_AddsForwardImpulses()
-    {
-        var locomotion = MakeLocomotion();
-        var entity = MakeEntity(strength: 1000);
-
-        locomotion.ApplyLocomotion(entity, new Location(10000, 0), forceFraction: 1.0, tracker: Tracker);
-
-        entity.PendingImpulses.Should().NotBeEmpty();
-        entity.PendingImpulses.Sum(v => v.Fx).Should().BeGreaterThan(0);
-    }
-
-    [Fact]
-    public void ApplyLocomotion_WhenMisaligned_AddsTurningImpulses()
-    {
-        var locomotion = MakeLocomotion();
-        var entity = MakeEntity(strength: 1000); // facing right (angle = 0)
-
-        // 90° off to the side: forces turning, not walking
-        locomotion.ApplyLocomotion(entity, new Location(0, 10000), forceFraction: 1.0, tracker: Tracker);
-
-        entity.PendingImpulses.Should().NotBeEmpty();
-    }
-
-    [Fact]
-    public void ApplyLocomotion_WithinArrivalThresholdAndStopped_AddsNoImpulses()
+    public void GetAngularStopInfo_ZeroOmega_ReturnsZeroTicksAndAngle()
     {
         var locomotion = MakeLocomotion();
         var entity = MakeEntity();
 
-        // 50 mm away is below the 100 mm arrival threshold; entity is already stopped
-        locomotion.ApplyLocomotion(entity, new Location(50, 0), forceFraction: 1.0, tracker: Tracker);
+        var (ticks, angle) = locomotion.GetAngularStopInfo(entity, forceFraction: 1.0);
 
-        entity.PendingImpulses.Should().BeEmpty();
+        ticks.Should().Be(0L);
+        angle.Should().Be(0.0);
+    }
+
+    [Fact]
+    public void GetAngularStopInfo_WithOmega_ReturnsPositiveTicksAndAngle()
+    {
+        var locomotion = MakeLocomotion();
+        var entity = MakeEntity();
+        entity.Velocity = new VelocityVector(Vx: 0, Vy: 0, Omega: 0.1);
+
+        var (ticks, angle) = locomotion.GetAngularStopInfo(entity, forceFraction: 1.0);
+
+        ticks.Should().BeGreaterThan(0L);
+        angle.Should().BeGreaterThan(0.0);
+    }
+
+    [Fact]
+    public void GetAngularStopInfo_LargerOmega_RequiresMoreTicksAndAngle()
+    {
+        var locomotion = MakeLocomotion();
+        var slowEntity = MakeEntity();
+        slowEntity.Velocity = new VelocityVector(Vx: 0, Vy: 0, Omega: 0.05);
+        var fastEntity = MakeEntity();
+        fastEntity.Velocity = new VelocityVector(Vx: 0, Vy: 0, Omega: 0.2);
+
+        var (slowTicks, slowAngle) = locomotion.GetAngularStopInfo(slowEntity, forceFraction: 1.0);
+        var (fastTicks, fastAngle) = locomotion.GetAngularStopInfo(fastEntity, forceFraction: 1.0);
+
+        fastTicks.Should().BeGreaterThanOrEqualTo(slowTicks);
+        fastAngle.Should().BeGreaterThan(slowAngle);
+    }
+
+    [Fact]
+    public void GetAngularStopInfo_LegsOnCenterline_ReturnsZero()
+    {
+        // Legs at lateralOffset=0 produce no torque, so braking is impossible
+        var legs = new List<Leg> { new Leg(name: "Center", lateralOffset: 0, forwardOffset: 0) };
+        var locomotion = new LocomotionCapability(legs, locomotionEfficiency: 1.0);
+        var entity = MakeEntity();
+        entity.Velocity = new VelocityVector(Vx: 0, Vy: 0, Omega: 0.1);
+
+        var (ticks, angle) = locomotion.GetAngularStopInfo(entity, forceFraction: 1.0);
+
+        ticks.Should().Be(0L);
+        angle.Should().Be(0.0);
     }
 }

@@ -36,13 +36,15 @@ public class Entity
         Weight = weight;
         Strength = strength;
         IsTranslucent = isTranslucent;
-        Angle = angle;
+        FacingAngle = angle;
         StructuralIntegrity = structuralIntegrity;
         AI = aiCapability;
         DragCoefficient = dragCoefficient;
         AngularDragCoefficient = angularDragCoefficient;
         GroundFrictionCoefficient = groundFrictionCoefficient;
         GroundContactRadius = groundContactRadius;
+
+        Velocity = new VelocityVector(0, 0, 0);
     }
 
     public EntityId Id { get; }
@@ -51,7 +53,7 @@ public class Entity
     public Location Location { get; set; }
     public long Width { get; set; }
     public long Height { get; set; }
-    public double Angle { get; set; }
+    public double FacingAngle { get; set; }
 
     public bool HasAgency { get; set; }
     public bool IsTranslucent { get; set; }
@@ -81,7 +83,7 @@ public class Entity
 
     public bool IsUnderEngineMotion { get; set; } = false;
 
-    public VelocityVector? Velocity { get; set; }
+    public VelocityVector Velocity { get; set; }
     public List<ForceVector> PendingImpulses { get; } = [];
 
     public override string ToString()

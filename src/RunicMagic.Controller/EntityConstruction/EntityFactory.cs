@@ -38,8 +38,8 @@ public class EntityFactory
         {
             legs = new List<Leg>
             {
-                new Leg(lateralOffset: -(entityData.Width / 4), forwardOffset: 0),
-                new Leg(lateralOffset: entityData.Width / 4, forwardOffset: 0)
+                new Leg("Left", lateralOffset: -(entityData.Width / 4), forwardOffset: 0),
+                new Leg("Right", lateralOffset: entityData.Width / 4, forwardOffset: 0)
             };
             var sumSq = 0.0;
             foreach (var leg in legs)

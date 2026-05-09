@@ -2,12 +2,14 @@ namespace RunicMagic.World.Entities.Capabilities;
 
 public class Leg
 {
-    public Leg(long lateralOffset, long forwardOffset)
+    public Leg(string name, long lateralOffset, long forwardOffset)
     {
+        Name = name;
         LateralOffset = lateralOffset;
         ForwardOffset = forwardOffset;
     }
 
+    public string Name { get; }
     public long LateralOffset { get; }
     public long ForwardOffset { get; }
 

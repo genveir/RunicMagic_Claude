@@ -147,7 +147,7 @@ public class RotationEngineMotionEffectTests
         // Manually move the entity to a larger radius before the second tick.
         // Reset angle to 0 as well so the cost comparison is purely due to radius.
         entity.Location = new Location(2000, 0);
-        entity.Angle = 0;
+        entity.FacingAngle = 0;
 
         var result2 = new EventTracker();
         effect.TryAdvance(result2);

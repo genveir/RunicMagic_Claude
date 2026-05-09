@@ -1,3 +1,6 @@
+using RunicMagic.World.Entities.AI.Strategies;
+using RunicMagic.World.Geometry;
+
 namespace RunicMagic.World.Entities.AI;
 
 public class PatrolAIBehavior : IAIBehavior
@@ -58,13 +61,6 @@ public class PatrolAIBehavior : IAIBehavior
             waypoint = waypoints[currentWaypointIndex];
         }
 
-        if (speed >= 1.0)
-        {
-            entity.Locomotion.Run(entity, waypoint.Location, eventTracker);
-        }
-        else
-        {
-            entity.Locomotion.Walk(entity, waypoint.Location, eventTracker);
-        }
+        TurnThenWalkLocomotionStrategy.Execute(entity, entity.Locomotion, waypoint.Location, speed, eventTracker);
     }
 }

@@ -13,7 +13,6 @@ Next bugfix number: BUG-11
 
 | Key | Title | Description | Blocked By |
 |-----|-------|-------------|------------|
-| RMC-111 | Split movement policy out of LocomotionCapability | `LocomotionCapability` currently conflates two concerns: the physical model (legs, offsets, efficiency, how to produce `ForceVector` impulses) and movement policy (goal-seeking, braking decisions, turn-vs-walk priority). Split these so that `LocomotionCapability` exposes physical primitives only: `ApplyForwardForce(entity, fraction)`, `ApplyTurnForce(entity, direction, fraction)`, and query methods like `GetLinearBrakingDistance(entity, forceFraction)` / `GetAngularBrakingAngle(entity, forceFraction)` (which delegate to `PhysicsService` internally). The current goal-seeking logic (`ApplyLocomotion`, `ApplyWalking`, `ApplyTurning`, braking simulations) moves into AI behaviour classes in the AI layer. This allows behaviours like sneak (10% force), combined turn+accelerate (split leg allocation), or custom stopping policy without touching the capability. | RMC-103 |
 | RMC-106 | Change base motion constant from 56 to 70 ticks | The base motion constant used for motion timing is currently 56 ticks. Change it to 70. Also make it a constant in the technical sense. | |
 | RMC-112 | Add Position type | Add a `Position` record to the geometry layer combining a `Location` and a facing `double Angle`. Represents a point in the world with an orientation — useful anywhere a destination also implies a facing direction (patrol waypoints, spawn points, etc.). | |
 | RMC-113 | Patrol waypoints use Position | Replace the `Location` in `PatrolWaypoint` with a `Position`. When the guard arrives at a waypoint, it should adopt the waypoint's facing angle in addition to reaching its location. Requires updating `PatrolWaypointData` (add `Angle float` column to `PatrolWaypoints` table), `PatrolAIBehavior`, and the locomotion/turning logic to orient the entity at the destination. | RMC-112 |
@@ -61,3 +60,4 @@ Next bugfix number: BUG-11
 | RMC-116 | Remove underscore prefixes from private fields |
 | RMC-104 | Normalise current/max parameter order |
 | RMC-102 | Remove defaults from EntityData |
+| RMC-111 | Split movement policy out of LocomotionCapability |

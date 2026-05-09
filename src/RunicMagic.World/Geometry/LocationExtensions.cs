@@ -23,7 +23,7 @@ public static class LocationExtensions
 
     public static double GetDistance(this Entity entity, Location origin)
     {
-        var result = new Rectangle(entity.Location, entity.Width, entity.Height, entity.Angle)
+        var result = new Rectangle(entity.Location, entity.Width, entity.Height, entity.FacingAngle)
             .GetDistanceFromPoint(origin);
         return result;
     }
@@ -31,7 +31,7 @@ public static class LocationExtensions
     public static IEnumerable<Entity> WithinDistance(this IEnumerable<Entity> entities, Location origin, double distance)
     {
         var result = entities.Where(e =>
-            new Rectangle(e.Location, e.Width, e.Height, e.Angle)
+            new Rectangle(e.Location, e.Width, e.Height, e.FacingAngle)
                 .IsWithinDistanceFromPoint(origin, distance));
         return result;
     }
@@ -42,7 +42,7 @@ public static class LocationExtensions
         {
             return double.PositiveInfinity;
         }
-        var entityBounds = new Rectangle(entity.Location, entity.Width, entity.Height, entity.Angle);
+        var entityBounds = new Rectangle(entity.Location, entity.Width, entity.Height, entity.FacingAngle);
         var minDistance = originRects.Min(r => entityBounds.GetDistanceFromRectangle(r));
         return minDistance;
     }

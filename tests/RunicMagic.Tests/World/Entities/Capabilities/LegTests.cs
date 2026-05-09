@@ -9,7 +9,7 @@ public class LegTests
     [Fact]
     public void GetWorldOffset_RightLeg_FacingEast_IsDirectlySouth()
     {
-        var leg = new Leg(lateralOffset: 100, forwardOffset: 0);
+        var leg = new Leg(name: "Right", lateralOffset: 100, forwardOffset: 0);
 
         var (rx, ry) = leg.GetWorldOffset(entityAngle: 0.0);
 
@@ -20,7 +20,7 @@ public class LegTests
     [Fact]
     public void GetWorldOffset_LeftLeg_FacingEast_IsDirectlyNorth()
     {
-        var leg = new Leg(lateralOffset: -100, forwardOffset: 0);
+        var leg = new Leg(name: "Left", lateralOffset: -100, forwardOffset: 0);
 
         var (rx, ry) = leg.GetWorldOffset(entityAngle: 0.0);
 
@@ -33,7 +33,7 @@ public class LegTests
     [Fact]
     public void GetWorldOffset_RightLeg_FacingNorth_IsDirectlyEast()
     {
-        var leg = new Leg(lateralOffset: 100, forwardOffset: 0);
+        var leg = new Leg(name: "Right", lateralOffset: 100, forwardOffset: 0);
 
         var (rx, ry) = leg.GetWorldOffset(entityAngle: Math.PI / 2);
 
@@ -46,7 +46,7 @@ public class LegTests
     [Fact]
     public void GetWorldOffset_RightLeg_FacingSouth_IsDirectlyWest()
     {
-        var leg = new Leg(lateralOffset: 100, forwardOffset: 0);
+        var leg = new Leg(name: "Right", lateralOffset: 100, forwardOffset: 0);
 
         var (rx, ry) = leg.GetWorldOffset(entityAngle: 3 * Math.PI / 2);
 
@@ -59,7 +59,7 @@ public class LegTests
     [Fact]
     public void GetWorldOffset_ForwardOffset_FacingEast_IsDirectlyEast()
     {
-        var leg = new Leg(lateralOffset: 0, forwardOffset: 50);
+        var leg = new Leg(name: "Front", lateralOffset: 0, forwardOffset: 50);
 
         var (rx, ry) = leg.GetWorldOffset(entityAngle: 0.0);
 

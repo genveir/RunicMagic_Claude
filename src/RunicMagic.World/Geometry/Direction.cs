@@ -2,6 +2,12 @@ namespace RunicMagic.World.Geometry;
 
 public readonly record struct Direction(double X, double Y)
 {
+    public static Direction FromAngle(double angle)
+    {
+        var direction = new Direction(X: Math.Cos(angle), Y: Math.Sin(angle));
+        return direction;
+    }
+
     // Returns a random unit direction when from and to are the same point.
     public static Direction FromPoints(Location from, Location to)
     {
@@ -16,5 +22,15 @@ public readonly record struct Direction(double X, double Y)
         }
         var direction = new Direction(dx / length, dy / length);
         return direction;
+    }
+
+    public double Angle => Math.Atan2(Y, X);
+
+    public double AngularDifferenceTo(Direction other)
+    {
+        var cross = X * other.Y - Y * other.X;
+        var dot = X * other.X + Y * other.Y;
+        var angle = Math.Atan2(cross, dot);
+        return angle;
     }
 }

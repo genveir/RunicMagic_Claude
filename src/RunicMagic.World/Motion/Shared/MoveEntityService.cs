@@ -8,7 +8,7 @@ internal static class MoveEntityService
     public static void Move(Entity entity, Location location, double angle, IWorldEventTracker tracker)
     {
         entity.Location = location;
-        entity.Angle = angle;
+        entity.FacingAngle = angle;
 
         tracker.Track(entity);
     }
