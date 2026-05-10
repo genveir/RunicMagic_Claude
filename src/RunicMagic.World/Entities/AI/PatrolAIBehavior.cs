@@ -5,19 +5,42 @@ namespace RunicMagic.World.Entities.AI;
 
 public class PatrolAIBehavior : IAIBehavior
 {
-    private const double ArrivalThresholdMm = 500.0;
+    private enum PatrolState
+    {
+        Moving,
+        Orienting,
+        Waiting
+    }
+    private PatrolState state = PatrolState.Moving;
+
+    private enum Transition
+    {
+        NoTransition,
+        Orient,
+        Wait,
+        IncrementWaypoint
+    }
+
+    private const double WaypointArrivalThresholdMm = 500.0;
+    private const double StraightThresholdRad = 0.05;
+    private const double OrientedThresholdRad = 0.05;
 
     private readonly IReadOnlyList<PatrolWaypoint> waypoints;
     private readonly double speed;
     private int currentWaypointIndex;
-    private long? arrivedAtTick;
+
+    private long arrivedAtTick;
 
     public PatrolAIBehavior(IReadOnlyList<PatrolWaypoint> waypoints, double speed)
     {
         this.waypoints = waypoints;
         this.speed = speed;
         this.currentWaypointIndex = 0;
-        this.arrivedAtTick = null;
+
+        if (waypoints.Count > 0)
+        {
+            this.arrivedAtTick = -waypoints.Max(w => w.WaitTicks);
+        }
     }
 
     public void Execute(Entity entity, WorldModel worldModel, IWorldEventTracker eventTracker, long currentTick)
@@ -32,35 +55,116 @@ public class PatrolAIBehavior : IAIBehavior
             return;
         }
 
-        if (arrivedAtTick.HasValue)
-        {
-            var waitTicks = waypoints[currentWaypointIndex].WaitTicks;
-            if (currentTick - arrivedAtTick.Value < waitTicks)
-            {
-                return;
-            }
-
-            arrivedAtTick = null;
-            currentWaypointIndex = (currentWaypointIndex + 1) % waypoints.Count;
-        }
-
         var waypoint = waypoints[currentWaypointIndex];
-        var dx = waypoint.Location.X - entity.Location.X;
-        var dy = waypoint.Location.Y - entity.Location.Y;
-        var distance = Math.Sqrt(dx * dx + dy * dy);
 
-        if (distance < ArrivalThresholdMm)
+        var nextAction = state switch
         {
-            if (waypoint.WaitTicks > 0)
-            {
-                arrivedAtTick = currentTick;
-                return;
-            }
+            PatrolState.Moving => ExecuteMove(entity, waypoint),
+            PatrolState.Orienting => ExecuteOrient(entity, waypoint),
+            PatrolState.Waiting => ExecuteWait(currentTick),
+            _ => throw new ArgumentException($"Invalid patrol state: {state}")
+        };
 
-            currentWaypointIndex = (currentWaypointIndex + 1) % waypoints.Count;
-            waypoint = waypoints[currentWaypointIndex];
+        switch (nextAction)
+        {
+            case Transition.NoTransition:
+                break;
+            case Transition.Orient:
+                ShiftToOrient();
+                break;
+            case Transition.Wait:
+                ShiftToWait(currentTick);
+                break;
+            case Transition.IncrementWaypoint:
+                IncrementWaypoint();
+                break;
+            default:
+                throw new ArgumentException($"Invalid next action: {nextAction}");
+        }
+    }
+
+    private void IncrementWaypoint()
+    {
+        currentWaypointIndex = (currentWaypointIndex + 1) % waypoints.Count;
+        state = PatrolState.Moving;
+    }
+
+    private void ShiftToWait(long currentTick)
+    {
+        arrivedAtTick = currentTick;
+        state = PatrolState.Waiting;
+    }
+
+    private void ShiftToOrient()
+    {
+        state = PatrolState.Orienting;
+    }
+
+    private Transition ExecuteMove(Entity entity, PatrolWaypoint waypoint)
+    {
+        var turnThenWalkResult = TurnThenWalkLocomotionStrategy.Execute(
+            entity: entity,
+            destination: waypoint.Location,
+            forceFraction: speed,
+            arrivalThresholdMm: WaypointArrivalThresholdMm,
+            straightThresholdRad: StraightThresholdRad);
+
+        if (turnThenWalkResult is TurnThenWalkResult.NotArrived or TurnThenWalkResult.CannotMove)
+        {
+            return Transition.NoTransition;
         }
 
-        TurnThenWalkLocomotionStrategy.Execute(entity, entity.Locomotion, waypoint.Location, speed, eventTracker);
+        if (waypoint.WaitTicks > 0)
+        {
+            if (waypoint.Facing.HasValue)
+            {
+                return Transition.Orient;
+            }
+            else
+            {
+                return Transition.Wait;
+            }
+        }
+        else
+        {
+            return Transition.IncrementWaypoint;
+        }
+    }
+
+    private Transition ExecuteOrient(Entity entity, PatrolWaypoint waypoint)
+    {
+        if (waypoint.Facing == null)
+        {
+            return Transition.Wait;
+        }
+
+        var targetDirection = Direction.FromAngle(waypoint.Facing.Value);
+
+        var isOriented = TurnInPlaceLocomotionStrategy.Execute(entity, targetDirection, speed, OrientedThresholdRad);
+
+        if (isOriented is TurnInPlaceResult.NotOriented or TurnInPlaceResult.CannotMove)
+        {
+            return Transition.NoTransition;
+        }
+
+        if (waypoint.WaitTicks > 0)
+        {
+            return Transition.Wait;
+        }
+        else
+        {
+            return Transition.IncrementWaypoint;
+        }
+    }
+
+    private Transition ExecuteWait(long currentTick)
+    {
+        var waitTicks = waypoints[currentWaypointIndex].WaitTicks;
+        if (currentTick - arrivedAtTick >= waitTicks)
+        {
+            return Transition.IncrementWaypoint;
+        }
+
+        return Transition.NoTransition;
     }
 }

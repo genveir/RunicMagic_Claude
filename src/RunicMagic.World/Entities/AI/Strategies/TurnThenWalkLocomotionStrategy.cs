@@ -1,63 +1,55 @@
-using RunicMagic.World.Entities.Capabilities;
 using RunicMagic.World.Geometry;
 
 namespace RunicMagic.World.Entities.AI.Strategies;
 
+public enum TurnThenWalkResult
+{
+    CannotMove,
+    Arrived,
+    NotArrived
+}
+
 public static class TurnThenWalkLocomotionStrategy
 {
-    private const double ArrivalThresholdMm = 100.0;
-    private const double StraightThresholdRad = 0.05;
-
-    public static void Execute(Entity entity, LocomotionCapability locomotion, Location destination, double forceFraction, IWorldEventTracker tracker)
+    public static TurnThenWalkResult Execute(Entity entity, Location destination, double forceFraction, double arrivalThresholdMm, double straightThresholdRad)
     {
+        if (entity.Locomotion == null)
+        {
+            return TurnThenWalkResult.CannotMove;
+        }
+        var locomotion = entity.Locomotion;
+
         var dx = destination.X - entity.Location.X;
         var dy = destination.Y - entity.Location.Y;
         var remainingDistance = Math.Sqrt(dx * dx + dy * dy);
 
-        if (remainingDistance < ArrivalThresholdMm)
+        if (remainingDistance < arrivalThresholdMm)
         {
             if (entity.Velocity.Speed > 0.0)
             {
                 locomotion.ApplyLinearBrake(entity, forceFraction);
             }
-            return;
+            return TurnThenWalkResult.Arrived;
         }
 
         var desiredDirection = Direction.FromPoints(entity.Location, destination);
-        var facing = Direction.FromAngle(entity.FacingAngle);
-        var angularError = facing.AngularDifferenceTo(desiredDirection);
+        var turnInPlaceResult = TurnInPlaceLocomotionStrategy.Execute(entity, desiredDirection, forceFraction, straightThresholdRad);
 
-        if (Math.Abs(angularError) >= StraightThresholdRad || entity.Velocity.Omega != 0.0)
+        if (turnInPlaceResult == TurnInPlaceResult.NotOriented)
         {
-            var (_, brakingAngle) = locomotion.GetAngularStopInfo(entity, forceFraction);
-            var shouldBrake = brakingAngle >= Math.Abs(angularError);
-            var shouldCoast = !shouldBrake && Math.Abs(entity.Velocity.Omega) + brakingAngle >= Math.Abs(angularError);
-            if (shouldCoast)
-            {
-                return;
-            }
-
-            if (shouldBrake)
-            {
-                locomotion.ApplyAngularBrake(entity, forceFraction);
-            }
-            else
-            {
-                locomotion.ApplyTurnForce(entity, Math.Sign(angularError) * forceFraction);
-            }
-            return;
+            return TurnThenWalkResult.NotArrived;
         }
 
         var (_, brakingDistance) = locomotion.GetLinearStopInfo(entity, forceFraction);
-        var shouldBrakeLinear = brakingDistance >= remainingDistance;
-        var shouldCoastLinear = !shouldBrakeLinear && entity.Velocity.Speed + brakingDistance >= remainingDistance;
+        var shouldBrake = brakingDistance >= remainingDistance;
+        var shouldCoast = !shouldBrake && entity.Velocity.Speed + brakingDistance >= remainingDistance;
 
-        if (shouldCoastLinear)
+        if (shouldCoast)
         {
-            return;
+            return TurnThenWalkResult.NotArrived;
         }
 
-        if (shouldBrakeLinear)
+        if (shouldBrake)
         {
             locomotion.ApplyLinearBrake(entity, forceFraction);
         }
@@ -65,5 +57,7 @@ public static class TurnThenWalkLocomotionStrategy
         {
             locomotion.ApplyLinearForce(entity, forceFraction);
         }
+
+        return TurnThenWalkResult.NotArrived;
     }
 }

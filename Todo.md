@@ -8,15 +8,15 @@ The Key column in every table uses right-padded cells. The baseline is 7 charact
 
 ## To Do — Milestone 3.5 — Maintenance
 
-Next ticket number: RMC-119
+Next ticket number: RMC-121
 Next bugfix number: BUG-11
 
 | Key | Title | Description | Blocked By |
 |-----|-------|-------------|------------|
-| RMC-112 | Add Position type | Add a `Position` record to the geometry layer combining a `Location` and a facing `double Angle`. Represents a point in the world with an orientation — useful anywhere a destination also implies a facing direction (patrol waypoints, spawn points, etc.). | |
-| RMC-113 | Patrol waypoints use Position | Replace the `Location` in `PatrolWaypoint` with a `Position`. When the guard arrives at a waypoint, it should adopt the waypoint's facing angle in addition to reaching its location. Requires updating `PatrolWaypointData` (add `Angle float` column to `PatrolWaypoints` table), `PatrolAIBehavior`, and the locomotion/turning logic to orient the entity at the destination. | RMC-112 |
+| RMC-119 | Store angles as compass degrees, convert in WorldLoader | All angle columns in the database (`PatrolWaypoints.Angle` and any future angle fields) store compass degrees (0° = North, clockwise). `WorldLoader` is responsible for converting compass angles to drawing angles (0° = East, counter-clockwise) when constructing domain objects. No other layer should know about this conversion. | |
 | RMC-110 | Rewrite Strength as a capability | Extract `Strength` from its current form and rewrite it as a proper capability on `Entity`, following the same pattern as `LocomotionCapability`. | |
 | RMC-99  | Camera controls on the canvas | Replace the auto-fit viewBox (currently recalculated from the entity bounding box on every tick) with a persistent camera state. Scroll wheel zooms; click-and-drag pans. The keyboard stays reserved for spell input, so no WASD/arrow controls. Initial view on first entity load can still auto-fit, but after that the camera is user-controlled. | |
+| RMC-120 | Add locomotion to EntityBuilder | `EntityBuilder` should expose a fluent method for configuring locomotion so callers don't have to construct a `LocomotionCapability` manually. Currently test helpers and world models build `LocomotionCapability` (with its `Leg` list and efficiency value) outside the builder and pass the assembled object in via `WithLocomotion()`. The builder should accept the locomotion parameters directly and own the assembly. | |
 
 ## To Do — Other
 
@@ -63,3 +63,5 @@ Next bugfix number: BUG-11
 | RMC-107 | Show facing direction on canvas entities |
 | RMC-118 | Refactor app.js SVG rendering |
 | RMC-106 | Change base motion constant from 56 to 98 ticks |
+| RMC-112 | Add Position type |
+| RMC-113 | Patrol waypoints use Position |

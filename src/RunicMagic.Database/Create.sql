@@ -75,7 +75,8 @@ create table PatrolWaypoints (
     Sequence         int    not null,
     X                bigint not null,
     Y                bigint not null,
-    WaitTicks        bigint not null constraint DF_PatrolWaypoints_WaitTicks default 0
+    WaitTicks        bigint not null constraint DF_PatrolWaypoints_WaitTicks default 0,
+    Facing           float  null
 );
 
 create table Inscription (

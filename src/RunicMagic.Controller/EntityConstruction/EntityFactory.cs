@@ -137,7 +137,7 @@ public class EntityFactory
             foreach (var patrolData in aiData.PatrolBehaviors)
             {
                 var waypoints = patrolData.Waypoints
-                    .Select(w => new PatrolWaypoint(new Location(w.X, w.Y), w.WaitTicks))
+                    .Select(w => new PatrolWaypoint(new Location(w.X, w.Y), w.WaitTicks, w.Facing))
                     .ToList();
                 behaviors.Add(new PatrolAIBehavior(waypoints, patrolData.Speed));
             }

@@ -41,12 +41,12 @@ public class WorldLoader
             .AsList();
 
         var patrolWaypointsByBehavior = (await conn.QueryAsync<PatrolWaypointRow>(
-            "select PatrolBehaviorId, Sequence, X, Y, WaitTicks from PatrolWaypoints"))
+            "select PatrolBehaviorId, Sequence, X, Y, WaitTicks, Facing from PatrolWaypoints"))
             .GroupBy(r => r.PatrolBehaviorId)
             .ToDictionary(
                 g => g.Key,
                 g => g.OrderBy(r => r.Sequence)
-                      .Select(r => new PatrolWaypointData(r.Sequence, r.X, r.Y, r.WaitTicks))
+                      .Select(r => new PatrolWaypointData(r.Sequence, r.X, r.Y, r.WaitTicks, r.Facing))
                       .ToArray());
 
         var patrolBehaviorsByEntity = patrolBehaviorRows
@@ -103,5 +103,5 @@ public class WorldLoader
     private record LocomotionRow(Guid EntityId, double LocomotionEfficiency);
     private record InscriptionRow(Guid EntityId, string SpellText);
     private record PatrolBehaviorRow(long Id, Guid EntityId, double Speed);
-    private record PatrolWaypointRow(long PatrolBehaviorId, int Sequence, long X, long Y, long WaitTicks);
+    private record PatrolWaypointRow(long PatrolBehaviorId, int Sequence, long X, long Y, long WaitTicks, double? Facing);
 }

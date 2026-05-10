@@ -69,11 +69,11 @@ values
 insert into PatrolBehaviors (EntityId, Speed) values (@guard, 0.7);
 declare @guardPatrol bigint = scope_identity();
 
-insert into PatrolWaypoints (PatrolBehaviorId, Sequence, X, Y, WaitTicks) values
-    (@guardPatrol, 1, -1000, 10000, 120),
-    (@guardPatrol, 2, -1000, -1000, 120),
-    (@guardPatrol, 3, 8125, -1000, 120),
-    (@guardPatrol, 4, -1000, -1000, 0);
+insert into PatrolWaypoints (PatrolBehaviorId, Sequence, X, Y, WaitTicks, Facing) values
+    (@guardPatrol, 1, -1000, 10000, 120, null),
+    (@guardPatrol, 2, -1000, -1000, 120, 225 * PI() / 180),
+    (@guardPatrol, 3, 8125, -1000, 120, null),
+    (@guardPatrol, 4, -1000, -1000, 0, null);
 
 insert into Inscription (EntityId, SpellText)
 values
