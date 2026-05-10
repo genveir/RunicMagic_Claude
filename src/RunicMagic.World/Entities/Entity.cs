@@ -57,8 +57,8 @@ public class Entity
 
     public bool HasAgency { get; set; }
     public bool IsTranslucent { get; set; }
+
     public long Weight { get; set; }
-    public long Strength { get; set; }
     public double DragCoefficient { get; set; }
     public double AngularDragCoefficient { get; set; }
     public double GroundFrictionCoefficient { get; set; }
@@ -70,16 +70,17 @@ public class Entity
     public ReservoirCapability? Reservoir { get; set; }
     public LifeCapability? Life { get; set; }
     public ChargeCapability? Charge { get; set; }
-    public StructuralIntegrityCapability StructuralIntegrity { get; set; }
+    public LocomotionCapability? Locomotion { get; set; }
     public AICapability AI { get; set; }
+    public long Strength { get; set; }
+
+    public StructuralIntegrityCapability StructuralIntegrity { get; set; }
 
     public Direction? PointingDirection { get; set; }
     public IndicateTarget? IndicateTarget { get; set; }
 
     public string[] RawInscriptions { get; set; } = [];
     public IStatement[] ParsedInscriptions { get; set; } = [];
-
-    public LocomotionCapability? Locomotion { get; set; }
 
     public bool IsUnderEngineMotion { get; set; } = false;
 

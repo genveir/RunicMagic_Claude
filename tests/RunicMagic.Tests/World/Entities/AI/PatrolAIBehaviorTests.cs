@@ -1,7 +1,7 @@
 using RunicMagic.Controller.Services;
 using RunicMagic.World;
 using RunicMagic.World.Entities;
-using RunicMagic.World.Entities.AI;
+using RunicMagic.World.Entities.AI.Behaviors;
 using RunicMagic.World.Entities.Capabilities;
 using RunicMagic.World.Geometry;
 

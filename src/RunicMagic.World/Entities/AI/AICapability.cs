@@ -1,4 +1,6 @@
-﻿namespace RunicMagic.World.Entities.AI;
+﻿using RunicMagic.World.Entities.AI.Behaviors;
+
+namespace RunicMagic.World.Entities.AI;
 
 public class AICapability
 {

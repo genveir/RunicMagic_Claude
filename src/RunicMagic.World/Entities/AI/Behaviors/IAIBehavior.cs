@@ -1,4 +1,4 @@
-﻿namespace RunicMagic.World.Entities.AI;
+﻿namespace RunicMagic.World.Entities.AI.Behaviors;
 
 public interface IAIBehavior
 {

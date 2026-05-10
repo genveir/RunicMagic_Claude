@@ -1,7 +1,7 @@
 using RunicMagic.World.Entities.AI.Strategies;
 using RunicMagic.World.Geometry;
 
-namespace RunicMagic.World.Entities.AI;
+namespace RunicMagic.World.Entities.AI.Behaviors;
 
 public class PatrolAIBehavior : IAIBehavior
 {
