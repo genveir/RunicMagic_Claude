@@ -13,7 +13,6 @@ Next bugfix number: BUG-11
 
 | Key | Title | Description | Blocked By |
 |-----|-------|-------------|------------|
-| RMC-119 | Store angles as compass degrees, convert in WorldLoader | All angle columns in the database (`PatrolWaypoints.Angle` and any future angle fields) store compass degrees (0° = North, clockwise). `WorldLoader` is responsible for converting compass angles to drawing angles (0° = East, counter-clockwise) when constructing domain objects. No other layer should know about this conversion. | |
 | RMC-110 | Rewrite Strength as a capability | Extract `Strength` from its current form and rewrite it as a proper capability on `Entity`, following the same pattern as `LocomotionCapability`. | |
 | RMC-99  | Camera controls on the canvas | Replace the auto-fit viewBox (currently recalculated from the entity bounding box on every tick) with a persistent camera state. Scroll wheel zooms; click-and-drag pans. The keyboard stays reserved for spell input, so no WASD/arrow controls. Initial view on first entity load can still auto-fit, but after that the camera is user-controlled. | |
 | RMC-120 | Add locomotion to EntityBuilder | `EntityBuilder` should expose a fluent method for configuring locomotion so callers don't have to construct a `LocomotionCapability` manually. Currently test helpers and world models build `LocomotionCapability` (with its `Leg` list and efficiency value) outside the builder and pass the assembled object in via `WithLocomotion()`. The builder should accept the locomotion parameters directly and own the assembly. | |
@@ -65,3 +64,4 @@ Next bugfix number: BUG-11
 | RMC-106 | Change base motion constant from 56 to 98 ticks |
 | RMC-112 | Add Position type |
 | RMC-113 | Patrol waypoints use Position |
+| RMC-119 | Store angles as compass radians, convert in WorldLoader |

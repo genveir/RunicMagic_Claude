@@ -65,7 +65,7 @@ public class EntityFactory
             weight: entityData.Weight,
             strength: entityData.Strength,
             isTranslucent: entityData.IsTranslucent,
-            angle: entityData.Angle,
+            angle: entityData.Facing,
             structuralIntegrity: new StructuralIntegrityCapability(currentIntegrity: entityData.CurrentStructuralIntegrity, maxIntegrity: entityData.MaxStructuralIntegrity),
             aiCapability: aiCapability,
             dragCoefficient: entityData.DragCoefficient,

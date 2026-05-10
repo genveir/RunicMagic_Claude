@@ -25,7 +25,7 @@ public class EntityFactoryTests
             Weight: 0,
             Strength: 0,
             IsTranslucent: false,
-            Angle: 0,
+            Facing: 0,
             MaxHitPoints: null,
             CurrentHitPoints: null,
             MaxCharge: null,

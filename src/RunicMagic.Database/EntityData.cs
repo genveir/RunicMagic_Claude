@@ -12,7 +12,7 @@ public record EntityData(
     long Weight,
     long Strength,
     bool IsTranslucent,
-    double Angle,
+    double Facing,
     long? MaxHitPoints,
     long? CurrentHitPoints,
     long? MaxCharge,

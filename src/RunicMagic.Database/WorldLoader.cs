@@ -17,7 +17,7 @@ public class WorldLoader
         await using var conn = new SqlConnection(connectionString);
 
         var entityRows = (await conn.QueryAsync<EntityRow>(
-            "select Id, EntityTypeId, Label, X, Y, Width, Height, HasAgency, Weight, Strength, IsTranslucent, Angle, MaxStructuralIntegrity, CurrentStructuralIntegrity, DragCoefficient, AngularDragCoefficient, GroundFrictionCoefficient from Entities")).AsList();
+            "select Id, EntityTypeId, Label, X, Y, Width, Height, HasAgency, Weight, Strength, IsTranslucent, Facing, MaxStructuralIntegrity, CurrentStructuralIntegrity, DragCoefficient, AngularDragCoefficient, GroundFrictionCoefficient from Entities")).AsList();
 
         var lifeRows = (await conn.QueryAsync<LifeRow>(
             "select EntityId, MaxHitPoints, CurrentHitPoints from EntityLife"))
@@ -46,7 +46,12 @@ public class WorldLoader
             .ToDictionary(
                 g => g.Key,
                 g => g.OrderBy(r => r.Sequence)
-                      .Select(r => new PatrolWaypointData(r.Sequence, r.X, r.Y, r.WaitTicks, r.Facing))
+                      .Select(r => new PatrolWaypointData(
+                          r.Sequence,
+                          r.X,
+                          r.Y,
+                          r.WaitTicks,
+                          r.Facing.HasValue ? CompassToDrawRadians(r.Facing.Value) : (double?)null))
                       .ToArray());
 
         var patrolBehaviorsByEntity = patrolBehaviorRows
@@ -81,7 +86,7 @@ public class WorldLoader
                 Weight: row.Weight,
                 Strength: row.Strength,
                 IsTranslucent: row.IsTranslucent,
-                Angle: row.Angle,
+                Facing: CompassToDrawRadians(row.Facing),
                 MaxHitPoints: life?.MaxHitPoints,
                 CurrentHitPoints: life?.CurrentHitPoints,
                 MaxCharge: charge?.MaxCharge,
@@ -97,7 +102,13 @@ public class WorldLoader
         });
     }
 
-    private record EntityRow(Guid Id, long EntityTypeId, string Label, long X, long Y, long Width, long Height, bool HasAgency, long Weight, long Strength, bool IsTranslucent, double Angle, long MaxStructuralIntegrity, long CurrentStructuralIntegrity, double DragCoefficient, double AngularDragCoefficient, double GroundFrictionCoefficient);
+    internal static double CompassToDrawRadians(double compassRadians)
+    {
+        return (Math.PI / 2) - compassRadians;
+
+    }
+
+    private record EntityRow(Guid Id, long EntityTypeId, string Label, long X, long Y, long Width, long Height, bool HasAgency, long Weight, long Strength, bool IsTranslucent, double Facing, long MaxStructuralIntegrity, long CurrentStructuralIntegrity, double DragCoefficient, double AngularDragCoefficient, double GroundFrictionCoefficient);
     private record LifeRow(Guid EntityId, long MaxHitPoints, long CurrentHitPoints);
     private record ChargeRow(Guid EntityId, long MaxCharge, long CurrentCharge);
     private record LocomotionRow(Guid EntityId, double LocomotionEfficiency);
