@@ -13,7 +13,6 @@ Next bugfix number: BUG-11
 
 | Key | Title | Description | Blocked By |
 |-----|-------|-------------|------------|
-| RMC-99  | Camera controls on the canvas | Replace the auto-fit viewBox (currently recalculated from the entity bounding box on every tick) with a persistent camera state. Scroll wheel zooms; click-and-drag pans. The keyboard stays reserved for spell input, so no WASD/arrow controls. Initial view on first entity load can still auto-fit, but after that the camera is user-controlled. | |
 | RMC-120 | Add locomotion to EntityBuilder | `EntityBuilder` should expose a fluent method for configuring locomotion so callers don't have to construct a `LocomotionCapability` manually. Currently test helpers and world models build `LocomotionCapability` (with its `Leg` list and efficiency value) outside the builder and pass the assembled object in via `WithLocomotion()`. The builder should accept the locomotion parameters directly and own the assembly. | |
 
 ## To Do — Other
@@ -66,3 +65,4 @@ Next bugfix number: BUG-11
 | RMC-119 | Store angles as compass radians, convert in WorldLoader |
 | RMC-110 | Rewrite Strength as a capability |
 | RMC-121 | Rename StructuralIntegrityCapability |
+| RMC-99  | Camera controls on the canvas |

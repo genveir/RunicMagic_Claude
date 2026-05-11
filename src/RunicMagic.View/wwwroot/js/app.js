@@ -145,6 +145,9 @@ async function sendCommand(cmd) {
 // ── SSE ───────────────────────────────────────────────────────────────────────
 
 let latestEntities = null;
+let camera = null;
+let lastRenderedEntities = null;
+let cameraDirty = false;
 
 const eventSource = new EventSource('/events');
 eventSource.onmessage = (e) => {
@@ -168,6 +171,10 @@ eventSource.onmessage = (e) => {
     if (latestEntities) {
         updateCanvas(latestEntities);
         latestEntities = null;
+        cameraDirty = false;
+    } else if (cameraDirty && lastRenderedEntities) {
+        updateCanvas(lastRenderedEntities);
+        cameraDirty = false;
     }
     requestAnimationFrame(renderLoop);
 })();
@@ -192,9 +199,14 @@ function updateBar(name, current, max) {
 const SVG_NS = 'http://www.w3.org/2000/svg';
 const svg    = document.getElementById('world-canvas');
 
-const FLAGS_HAS_LIFE      = 1;
-const FLAGS_HAS_AGENCY    = 2;
+const FLAGS_HAS_LIFE = 1;
+const FLAGS_HAS_AGENCY = 2;
 const FLAGS_IS_TRANSLUCENT = 4;
+
+function applyCamera() {
+    svg.setAttribute('viewBox',
+        `${camera.cx - camera.w / 2} ${camera.cy - camera.h / 2} ${camera.w} ${camera.h}`);
+}
 
 function entityClass(entity) {
     let cls;
@@ -215,6 +227,8 @@ function svgEl(tag, attrs) {
 }
 
 function updateCanvas(entities) {
+    lastRenderedEntities = entities;
+
     while (svg.firstChild) {
         svg.removeChild(svg.firstChild);
     }
@@ -233,31 +247,40 @@ function updateCanvas(entities) {
         return;
     }
 
-    let minX = Infinity;
-    let minY = Infinity;
-    let maxX = -Infinity;
-    let maxY = -Infinity;
+    if (!camera) {
+        let minX = Infinity;
+        let minY = Infinity;
+        let maxX = -Infinity;
+        let maxY = -Infinity;
 
-    for (const e of entities) {
-        const hw = e.width / 2;
-        const hh = e.height / 2;
-        const cos = Math.abs(Math.cos(e.facing));
-        const sin = Math.abs(Math.sin(e.facing));
-        const extX = hw * cos + hh * sin;
-        const extY = hw * sin + hh * cos;
-        minX = Math.min(minX, e.x - extX);
-        minY = Math.min(minY, -e.y - extY);
-        maxX = Math.max(maxX, e.x + extX);
-        maxY = Math.max(maxY, -e.y + extY);
+        for (const e of entities) {
+            const hw = e.width / 2;
+            const hh = e.height / 2;
+            const cos = Math.abs(Math.cos(e.facing));
+            const sin = Math.abs(Math.sin(e.facing));
+            const extX = hw * cos + hh * sin;
+            const extY = hw * sin + hh * cos;
+            minX = Math.min(minX, e.x - extX);
+            minY = Math.min(minY, -e.y - extY);
+            maxX = Math.max(maxX, e.x + extX);
+            maxY = Math.max(maxY, -e.y + extY);
+        }
+
+        const pad = 100;
+        const vbWidth = maxX - minX + pad * 2;
+        const vbHeight = maxY - minY + pad * 2;
+        camera = {
+            cx: (minX + maxX) / 2,
+            cy: (minY + maxY) / 2,
+            w: vbWidth,
+            h: vbHeight,
+        };
     }
 
-    const pad = 100;
-    const vbWidth = maxX - minX + pad * 2;
-    const vbHeight = maxY - minY + pad * 2;
-    svg.setAttribute('viewBox', `${minX - pad} ${minY - pad} ${vbWidth} ${vbHeight}`);
+    applyCamera();
 
     const svgRect = svg.getBoundingClientRect();
-    const screenScale = Math.min(svgRect.width / vbWidth, svgRect.height / vbHeight);
+    const screenScale = Math.min(svgRect.width / camera.w, svgRect.height / camera.h);
     const labelSize = 13 / screenScale;
 
     for (const e of entities) {
@@ -361,6 +384,26 @@ function appendVector(parent, sx, sy, ex, ey, cls, arrowLen) {
 }
 
 
+// ── Zoom ──────────────────────────────────────────────────────────────────────
+
+svg.addEventListener('wheel', e => {
+    e.preventDefault();
+    if (!camera) return;
+
+    const pt = svg.createSVGPoint();
+    pt.x = e.clientX;
+    pt.y = e.clientY;
+    const svgPt = pt.matrixTransform(svg.getScreenCTM().inverse());
+
+    const factor = e.deltaY < 0 ? 1 / 1.15 : 1.15;
+    camera.cx = svgPt.x + (camera.cx - svgPt.x) * factor;
+    camera.cy = svgPt.y + (camera.cy - svgPt.y) * factor;
+    camera.w *= factor;
+    camera.h *= factor;
+    cameraDirty = true;
+}, { passive: false });
+
+
 // ── Mode toggle ───────────────────────────────────────────────────────────────
 
 let currentMode = null;
@@ -392,10 +435,34 @@ document.addEventListener('contextmenu', e => {
 });
 
 let svgMousedownX = 0, svgMousedownY = 0;
+let panArmed = false;
+let isPanning = false;
+let panStartScreenX = 0, panStartScreenY = 0;
+let panStartCamCX = 0, panStartCamCY = 0;
+let panScale = 1;
 
-svg.addEventListener('mousedown', e => { svgMousedownX = e.clientX; svgMousedownY = e.clientY; });
+svg.addEventListener('mousedown', e => {
+    svgMousedownX = e.clientX;
+    svgMousedownY = e.clientY;
+    if (!currentMode && camera) {
+        panArmed = true;
+        isPanning = false;
+        panStartScreenX = e.clientX;
+        panStartScreenY = e.clientY;
+        panStartCamCX = camera.cx;
+        panStartCamCY = camera.cy;
+        const svgRect = svg.getBoundingClientRect();
+        panScale = Math.min(svgRect.width / camera.w, svgRect.height / camera.h);
+    }
+});
 
 svg.addEventListener('mouseup', async e => {
+    if (isPanning) {
+        isPanning = false;
+        panArmed = false;
+        return;
+    }
+    panArmed = false;
     if (!currentMode) return;
 
     const dx = e.clientX - svgMousedownX;
@@ -441,15 +508,31 @@ divider.addEventListener('mousedown', e => {
 });
 
 document.addEventListener('mousemove', e => {
-    if (!dragging) return;
-    const delta     = dragStartY - e.clientY;          // drag up → terminal grows
-    const newHeight = Math.max(50, Math.min(window.innerHeight - 100, dragStartHeight + delta));
-    terminalContainer.style.height = newHeight + 'px';
+    if (dragging) {
+        const delta = dragStartY - e.clientY;
+        const newHeight = Math.max(50, Math.min(window.innerHeight - 100, dragStartHeight + delta));
+        terminalContainer.style.height = newHeight + 'px';
+    }
+    if (panArmed && e.buttons === 1) {
+        const dx = e.clientX - panStartScreenX;
+        const dy = e.clientY - panStartScreenY;
+        if (!isPanning && Math.sqrt(dx * dx + dy * dy) > 5) {
+            isPanning = true;
+        }
+        if (isPanning) {
+            camera.cx = panStartCamCX - dx / panScale;
+            camera.cy = panStartCamCY - dy / panScale;
+            cameraDirty = true;
+        }
+    }
 });
 
 document.addEventListener('mouseup', () => {
-    if (!dragging) return;
-    dragging                       = false;
-    document.body.style.cursor     = '';
-    document.body.style.userSelect = '';
+    if (dragging) {
+        dragging = false;
+        document.body.style.cursor = '';
+        document.body.style.userSelect = '';
+    }
+    panArmed = false;
+    isPanning = false;
 });
