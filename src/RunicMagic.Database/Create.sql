@@ -33,7 +33,7 @@ create table Entities (
     Height        bigint           not null,
     HasAgency     bit              not null constraint DF_Entities_HasAgency default 0,
     Weight        bigint           not null,
-    Strength      bigint           not null,
+    Strength      bigint           null     constraint DF_Entities_Strength default null,
     IsTranslucent bit              not null constraint DF_Entities_IsTranslucent default 0,
     Facing        float            not null,
     MaxStructuralIntegrity     bigint not null,

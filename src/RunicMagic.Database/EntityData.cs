@@ -10,7 +10,7 @@ public record EntityData(
     long Height,
     bool HasAgency,
     long Weight,
-    long Strength,
+    long? Strength,
     bool IsTranslucent,
     double Facing,
     long? MaxHitPoints,

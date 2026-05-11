@@ -27,11 +27,11 @@ public class LocomotionCapability
         }
     }
 
-    public (long Ticks, double Distance) GetLinearStopInfo(Entity entity, double forceFraction)
+    public (long Ticks, double Distance) GetLinearStopInfo(Entity entity, double forceFraction, int maxTicks = 10)
     {
         var facing = Direction.FromAngle(entity.FacingAngle);
 
-        var perLegForce = entity.Strength * locomotionEfficiency * forceFraction;
+        var perLegForce = (entity.Strength?.Value ?? 0.0) * locomotionEfficiency * forceFraction;
         var totalBrakingForce = legs.Count * perLegForce;
 
         var brakingFx = -facing.X * totalBrakingForce;
@@ -47,15 +47,16 @@ public class LocomotionCapability
             dragCoefficient: entity.DragCoefficient,
             bounds: bounds,
             groundFrictionCoefficient: entity.GroundFrictionCoefficient,
-            isGrounded: entity.IsGrounded);
+            isGrounded: entity.IsGrounded,
+            maxTicks: maxTicks);
 
         return result;
     }
 
-    public (long Ticks, double Angle) GetAngularStopInfo(Entity entity, double forceFraction)
+    public (long Ticks, double Angle) GetAngularStopInfo(Entity entity, double forceFraction, int maxTicks = 10)
     {
         var facing = Direction.FromAngle(entity.FacingAngle);
-        var perLegForce = entity.Strength * locomotionEfficiency * forceFraction;
+        var perLegForce = (entity.Strength?.Value ?? 0.0) * locomotionEfficiency * forceFraction;
 
         var maxTurnForce = GetLegVectors(
             legs: legs,
@@ -80,7 +81,8 @@ public class LocomotionCapability
             angularDragCoefficient: entity.AngularDragCoefficient,
             groundFrictionCoefficient: entity.GroundFrictionCoefficient,
             groundContactRadius: entity.GroundContactRadius,
-            isGrounded: entity.IsGrounded);
+            isGrounded: entity.IsGrounded,
+            maxTicks: maxTicks);
 
         return result;
     }
@@ -89,8 +91,13 @@ public class LocomotionCapability
 
     public void ApplyLinearForce(Entity entity, double forceFraction)
     {
+        if ((entity.Strength?.Value ?? 0.0) == 0.0 || forceFraction == 0.0)
+        {
+            return;
+        }
+
         var facing = Direction.FromAngle(entity.FacingAngle);
-        var perLegForce = entity.Strength * locomotionEfficiency;
+        var perLegForce = entity.Strength!.Value * locomotionEfficiency;
 
         foreach (var leg in legs)
         {
@@ -105,13 +112,13 @@ public class LocomotionCapability
 
     public void ApplyTurnForce(Entity entity, double forceFraction)
     {
-        if (forceFraction == 0.0)
+        if ((entity.Strength?.Value ?? 0.0) == 0.0 || forceFraction == 0.0)
         {
             return;
         }
 
         var facing = Direction.FromAngle(entity.FacingAngle);
-        var perLegForce = entity.Strength * locomotionEfficiency;
+        var perLegForce = entity.Strength!.Value * locomotionEfficiency;
         var scale = Math.Abs(forceFraction);
         var turnDirection = Math.Sign(forceFraction);
 
@@ -130,6 +137,11 @@ public class LocomotionCapability
 
     public void ApplyLegForce(Entity entity, string legName, double forceFraction)
     {
+        if ((entity.Strength?.Value ?? 0.0) == 0.0 || forceFraction == 0.0)
+        {
+            return;
+        }
+
         var leg = legs.FirstOrDefault(l => l.Name == legName);
         if (leg == null)
         {
@@ -137,7 +149,7 @@ public class LocomotionCapability
         }
 
         var facing = Direction.FromAngle(entity.FacingAngle);
-        var perLegForce = entity.Strength * locomotionEfficiency;
+        var perLegForce = entity.Strength!.Value * locomotionEfficiency;
         var (rx, ry) = leg.GetWorldOffset(entity.FacingAngle);
 
         entity.PendingImpulses.Add(new ForceVector(
@@ -149,13 +161,18 @@ public class LocomotionCapability
 
     public void ApplyLinearBrake(Entity entity, double forceFraction)
     {
+        if ((entity.Strength?.Value ?? 0.0) == 0.0 || forceFraction == 0.0)
+        {
+            return;
+        }
+
         if (entity.Velocity.Speed == 0.0)
         {
             return;
         }
 
         var facing = Direction.FromAngle(entity.FacingAngle);
-        var perLegForce = entity.Strength * locomotionEfficiency * forceFraction;
+        var perLegForce = entity.Strength!.Value * locomotionEfficiency * forceFraction;
         var totalBrakingForce = legs.Count * perLegForce;
 
         var brakingFx = -facing.X * totalBrakingForce;
@@ -203,13 +220,18 @@ public class LocomotionCapability
 
     public void ApplyAngularBrake(Entity entity, double forceFraction)
     {
+        if ((entity.Strength?.Value ?? 0.0) == 0.0 || forceFraction == 0.0)
+        {
+            return;
+        }
+
         if (entity.Velocity.Omega == 0.0)
         {
             return;
         }
 
         var facing = Direction.FromAngle(entity.FacingAngle);
-        var perLegForce = entity.Strength * locomotionEfficiency * forceFraction;
+        var perLegForce = entity.Strength!.Value * locomotionEfficiency * forceFraction;
 
         var maxTurnForce = GetLegVectors(
             legs: legs,
@@ -278,7 +300,7 @@ public class LocomotionCapability
         return vectors;
     }
 
-    private static (long Ticks, double Distance) SimulateLinearStop(double vx, double vy, double brakingFx, double brakingFy, double weight, double dragCoefficient, Rectangle bounds, double groundFrictionCoefficient, bool isGrounded)
+    private static (long Ticks, double Distance) SimulateLinearStop(double vx, double vy, double brakingFx, double brakingFy, double weight, double dragCoefficient, Rectangle bounds, double groundFrictionCoefficient, bool isGrounded, int maxTicks)
     {
         var speed = Math.Sqrt(vx * vx + vy * vy);
         if (speed == 0.0)
@@ -290,7 +312,7 @@ public class LocomotionCapability
         var ticks = 0L;
         var currentVelocity = new VelocityVector(vx, vy, 0.0);
 
-        while (true)
+        for (int n = 0; n < maxTicks; n++)
         {
             var (newVx, newVy) = PhysicsService.CalculateLinearVelocity(
                 initialVelocity: currentVelocity,
@@ -323,7 +345,7 @@ public class LocomotionCapability
         return (ticks, totalDistance);
     }
 
-    private static (long Ticks, double Angle) SimulateAngularStop(double omega, double maxCounterTorque, double weight, double width, double height, double angularDragCoefficient, double groundFrictionCoefficient, double groundContactRadius, bool isGrounded)
+    private static (long Ticks, double Angle) SimulateAngularStop(double omega, double maxCounterTorque, double weight, double width, double height, double angularDragCoefficient, double groundFrictionCoefficient, double groundContactRadius, bool isGrounded, int maxTicks)
     {
         if (omega == 0.0)
         {
@@ -336,7 +358,7 @@ public class LocomotionCapability
         var ticks = 0L;
         var currentVelocity = new VelocityVector(0.0, 0.0, omega);
 
-        while (true)
+        for (int n = 0; n < maxTicks; n++)
         {
             var newOmega = PhysicsService.CalculateAngularVelocity(
                 initialVelocity: currentVelocity,

@@ -1,6 +1,7 @@
 using RunicMagic.World.Entities;
 using RunicMagic.World.Entities.AI;
 using RunicMagic.World.Entities.Capabilities;
+using RunicMagic.World.Entities.ComplexAttributes;
 using RunicMagic.World.Execution;
 using RunicMagic.World.Geometry;
 using RunicMagic.World.Runes.RuneTypes;
@@ -16,19 +17,19 @@ internal class EntityBuilder
     private long height = 100;
     private bool hasAgency = false;
     private long weight = 1000;
-    private long strength = 0;
     private bool isTranslucent = false;
     private double angle = 0;
     private double dragCoefficient = 0.0;
     private double angularDragCoefficient = 0.0;
     private double groundFrictionCoefficient = 0.0;
     private double? groundContactRadius = 0.0;
-    private StructuralIntegrityCapability structuralIntegrity = new StructuralIntegrityCapability(currentIntegrity: 1000, maxIntegrity: 1000);
+    private StructuralIntegrityAttribute structuralIntegrity = new StructuralIntegrityAttribute(currentIntegrity: 1000, maxIntegrity: 1000);
     private AICapability aiCapability = new AICapability([]);
 
     private LifeCapability? life;
     private ChargeCapability? charge;
     private LocomotionCapability? locomotion;
+    private StrengthCapability? strength;
     private Func<Entity[]>? scope;
     private ReservoirCapability? reservoir;
     private Direction? pointingDirection;
@@ -77,7 +78,7 @@ internal class EntityBuilder
 
     public EntityBuilder WithStrength(long strength)
     {
-        this.strength = strength;
+        this.strength = new StrengthCapability(strength);
         return this;
     }
 
@@ -125,7 +126,7 @@ internal class EntityBuilder
 
     public EntityBuilder WithStructuralIntegrity(long current, long max)
     {
-        structuralIntegrity = new StructuralIntegrityCapability(currentIntegrity: current, maxIntegrity: max);
+        structuralIntegrity = new StructuralIntegrityAttribute(currentIntegrity: current, maxIntegrity: max);
         return this;
     }
 
@@ -203,7 +204,6 @@ internal class EntityBuilder
             height: height,
             hasAgency: hasAgency,
             weight: weight,
-            strength: strength,
             isTranslucent: isTranslucent,
             angle: angle,
             structuralIntegrity: structuralIntegrity,
@@ -216,6 +216,7 @@ internal class EntityBuilder
             Life = life,
             Charge = charge,
             Locomotion = locomotion,
+            Strength = strength,
             Scope = scope,
             Reservoir = reservoir,
             PointingDirection = pointingDirection,

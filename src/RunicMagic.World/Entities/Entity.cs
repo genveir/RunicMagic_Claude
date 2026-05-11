@@ -1,5 +1,6 @@
 using RunicMagic.World.Entities.AI;
 using RunicMagic.World.Entities.Capabilities;
+using RunicMagic.World.Entities.ComplexAttributes;
 using RunicMagic.World.Execution;
 using RunicMagic.World.Geometry;
 using RunicMagic.World.Motion.Simulated;
@@ -17,10 +18,9 @@ public class Entity
         long height,
         bool hasAgency,
         long weight,
-        long strength,
         bool isTranslucent,
         double angle,
-        StructuralIntegrityCapability structuralIntegrity,
+        StructuralIntegrityAttribute structuralIntegrity,
         AICapability aiCapability,
         double dragCoefficient,
         double angularDragCoefficient,
@@ -34,7 +34,6 @@ public class Entity
         Height = height;
         HasAgency = hasAgency;
         Weight = weight;
-        Strength = strength;
         IsTranslucent = isTranslucent;
         FacingAngle = angle;
         StructuralIntegrity = structuralIntegrity;
@@ -71,10 +70,10 @@ public class Entity
     public LifeCapability? Life { get; set; }
     public ChargeCapability? Charge { get; set; }
     public LocomotionCapability? Locomotion { get; set; }
+    public StrengthCapability? Strength { get; set; }
     public AICapability AI { get; set; }
-    public long Strength { get; set; }
 
-    public StructuralIntegrityCapability StructuralIntegrity { get; set; }
+    public StructuralIntegrityAttribute StructuralIntegrity { get; set; }
 
     public Direction? PointingDirection { get; set; }
     public IndicateTarget? IndicateTarget { get; set; }

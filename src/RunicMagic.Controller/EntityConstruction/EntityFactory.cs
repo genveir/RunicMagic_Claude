@@ -5,6 +5,7 @@ using RunicMagic.World.Entities;
 using RunicMagic.World.Entities.AI;
 using RunicMagic.World.Entities.AI.Behaviors;
 using RunicMagic.World.Entities.Capabilities;
+using RunicMagic.World.Entities.ComplexAttributes;
 using RunicMagic.World.Geometry;
 using RunicMagic.World.Runes.RuneTypes;
 
@@ -64,10 +65,9 @@ public class EntityFactory
             height: entityData.Height,
             hasAgency: entityData.HasAgency,
             weight: entityData.Weight,
-            strength: entityData.Strength,
             isTranslucent: entityData.IsTranslucent,
             angle: entityData.Facing,
-            structuralIntegrity: new StructuralIntegrityCapability(currentIntegrity: entityData.CurrentStructuralIntegrity, maxIntegrity: entityData.MaxStructuralIntegrity),
+            structuralIntegrity: new StructuralIntegrityAttribute(currentIntegrity: entityData.CurrentStructuralIntegrity, maxIntegrity: entityData.MaxStructuralIntegrity),
             aiCapability: aiCapability,
             dragCoefficient: entityData.DragCoefficient,
             angularDragCoefficient: entityData.AngularDragCoefficient,
@@ -79,6 +79,9 @@ public class EntityFactory
 
         if (entityData.MaxCharge.HasValue && entityData.CurrentCharge.HasValue)
             entity.Charge = new ChargeCapability(currentCharge: entityData.CurrentCharge.Value, maxCharge: entityData.MaxCharge.Value);
+
+        if (entityData.Strength.HasValue)
+            entity.Strength = new StrengthCapability(entityData.Strength.Value);
 
         if (legs != null)
         {
