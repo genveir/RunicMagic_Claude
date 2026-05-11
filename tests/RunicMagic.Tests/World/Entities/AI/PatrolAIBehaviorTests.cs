@@ -2,7 +2,6 @@ using RunicMagic.Controller.Services;
 using RunicMagic.World;
 using RunicMagic.World.Entities;
 using RunicMagic.World.Entities.AI.Behaviors;
-using RunicMagic.World.Entities.Capabilities;
 using RunicMagic.World.Geometry;
 
 namespace RunicMagic.Tests.World.Entities.AI;
@@ -11,20 +10,13 @@ public class PatrolAIBehaviorTests
 {
     private static Entity MakeEntity(long x = 0, long y = 0, double angle = 0)
     {
-        var legs = new List<Leg>
-        {
-            new Leg(name: "Left", lateralOffset: -100, forwardOffset: 0),
-            new Leg(name: "Right", lateralOffset: 100, forwardOffset: 0),
-        };
-        var locomotion = new LocomotionCapability(legs, locomotionEfficiency: 1.0);
-
         var entity = new EntityBuilder()
             .WithLocation(x, y)
             .WithStrength(1000)
             .WithWeight(1000)
             .WithSize(200, 200)
             .WithAngle(angle)
-            .WithLocomotion(locomotion)
+            .WithLocomotion(efficiency: 1.0)
             .Build();
 
         return entity;

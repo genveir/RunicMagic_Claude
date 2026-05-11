@@ -136,9 +136,14 @@ internal class EntityBuilder
         return this;
     }
 
-    public EntityBuilder WithLocomotion(LocomotionCapability locomotion)
+    public EntityBuilder WithLocomotion(double efficiency, IReadOnlyList<Leg>? legs = null)
     {
-        this.locomotion = locomotion;
+        var resolvedLegs = legs ?? new List<Leg>
+        {
+            new Leg("Left", lateralOffset: -(width / 4), forwardOffset: 0),
+            new Leg("Right", lateralOffset: width / 4, forwardOffset: 0)
+        };
+        locomotion = new LocomotionCapability(resolvedLegs, efficiency);
         return this;
     }
 

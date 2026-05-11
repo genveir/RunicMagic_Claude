@@ -13,7 +13,6 @@ Next bugfix number: BUG-11
 
 | Key | Title | Description | Blocked By |
 |-----|-------|-------------|------------|
-| RMC-120 | Add locomotion to EntityBuilder | `EntityBuilder` should expose a fluent method for configuring locomotion so callers don't have to construct a `LocomotionCapability` manually. Currently test helpers and world models build `LocomotionCapability` (with its `Leg` list and efficiency value) outside the builder and pass the assembled object in via `WithLocomotion()`. The builder should accept the locomotion parameters directly and own the assembly. | |
 
 ## To Do — Other
 
@@ -66,3 +65,4 @@ Next bugfix number: BUG-11
 | RMC-110 | Rewrite Strength as a capability |
 | RMC-121 | Rename StructuralIntegrityCapability |
 | RMC-99  | Camera controls on the canvas |
+| RMC-120 | Add locomotion to EntityBuilder |

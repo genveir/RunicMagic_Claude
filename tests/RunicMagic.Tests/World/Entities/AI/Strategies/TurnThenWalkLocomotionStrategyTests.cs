@@ -1,6 +1,5 @@
 using RunicMagic.World.Entities;
 using RunicMagic.World.Entities.AI.Strategies;
-using RunicMagic.World.Entities.Capabilities;
 using RunicMagic.World.Geometry;
 using RunicMagic.World.Motion.Simulated;
 
@@ -13,20 +12,13 @@ public class TurnThenWalkLocomotionStrategyTests
 
     private static Entity MakeEntity(long x = 0, long y = 0, double angle = 0, long strength = 1000, long weight = 1000)
     {
-        var legs = new List<Leg>
-        {
-            new Leg(name: "Left", lateralOffset: -100, forwardOffset: 0),
-            new Leg(name: "Right", lateralOffset: 100, forwardOffset: 0),
-        };
-        var locomotion = new LocomotionCapability(legs, locomotionEfficiency: 1.0);
-
         return new EntityBuilder()
             .WithLocation(x, y)
             .WithStrength(strength)
             .WithWeight(weight)
             .WithSize(200, 200)
             .WithAngle(angle)
-            .WithLocomotion(locomotion)
+            .WithLocomotion(efficiency: 1.0)
             .Build();
     }
 
