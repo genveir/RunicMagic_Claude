@@ -36,7 +36,6 @@ public class LocomotionCapability
 
         var brakingFx = -facing.X * totalBrakingForce;
         var brakingFy = -facing.Y * totalBrakingForce;
-        var bounds = new Rectangle(entity.Location, Width: entity.Width, Height: entity.Height, Angle: entity.FacingAngle);
 
         var result = SimulateLinearStop(
             vx: entity.Velocity.Vx,
@@ -45,7 +44,7 @@ public class LocomotionCapability
             brakingFy: brakingFy,
             weight: entity.Weight,
             dragCoefficient: entity.DragCoefficient,
-            bounds: bounds,
+            bounds: entity.Bounds,
             groundFrictionCoefficient: entity.GroundFrictionCoefficient,
             isGrounded: entity.IsGrounded,
             maxTicks: maxTicks);
@@ -177,14 +176,13 @@ public class LocomotionCapability
 
         var brakingFx = -facing.X * totalBrakingForce;
         var brakingFy = -facing.Y * totalBrakingForce;
-        var bounds = new Rectangle(entity.Location, Width: entity.Width, Height: entity.Height, Angle: entity.FacingAngle);
         var currentVelocity = new VelocityVector(entity.Velocity.Vx, entity.Velocity.Vy, 0.0);
 
         var (nextVx, nextVy) = PhysicsService.CalculateLinearVelocity(
             initialVelocity: currentVelocity,
             weight: entity.Weight,
             dragCoefficient: entity.DragCoefficient,
-            bounds: bounds,
+            bounds: entity.Bounds,
             fx: brakingFx,
             fy: brakingFy,
             groundFrictionCoefficient: entity.GroundFrictionCoefficient,
@@ -202,7 +200,7 @@ public class LocomotionCapability
                 originalVy: entity.Velocity.Vy,
                 weight: entity.Weight,
                 dragCoefficient: entity.DragCoefficient,
-                bounds: bounds,
+                entity.Bounds,
                 groundFrictionCoefficient: entity.GroundFrictionCoefficient,
                 isGrounded: entity.IsGrounded);
         }

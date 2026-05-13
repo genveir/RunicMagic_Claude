@@ -21,19 +21,13 @@ public class HORO : IEntitySet
     {
         var radius = HowFar.Evaluate(context);
         var originSet = Origin.Resolve(context);
-        var originRects = originSet.Entities.Select(e => Bounds(e)).ToList();
+        var originRects = originSet.Entities.Select(e => e.Bounds).ToList();
         var entities = context.World.GetAll()
             .Where(e => e.GetDistanceFromSet(originRects) <= (double)radius.Value)
             .ToList();
         var result = new EntitySet(entities);
         context.EntityResolutionCount?.UnionWith(result.Entities.Select(e => e.Id));
         return result;
-    }
-
-    private static Rectangle Bounds(Entity e)
-    {
-        var bounds = new Rectangle(e.Location, e.Width, e.Height, e.FacingAngle);
-        return bounds;
     }
 
     public override string ToString()

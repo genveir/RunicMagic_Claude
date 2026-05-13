@@ -34,7 +34,7 @@ public static class PhysicsService
             return;
         }
 
-        var bounds = new Rectangle(entity.Location, Width: entity.Width, Height: entity.Height, Angle: entity.FacingAngle);
+        var bounds = entity.Bounds;
         var (vx, vy) = CalculateLinearVelocity(
             initialVelocity: initialVelocity,
             weight: entity.Weight,

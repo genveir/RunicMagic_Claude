@@ -23,7 +23,7 @@ public class RayCastService
             if (entity.Id == sourceId) continue;
             if (skipTranslucent && entity.IsTranslucent) continue;
 
-            var bounds = new Rectangle(entity.Location, entity.Width, entity.Height, entity.FacingAngle);
+            var bounds = entity.Bounds;
             if (bounds.IntersectsRay(origin, direction, out var t))
             {
                 if (t < closestT)

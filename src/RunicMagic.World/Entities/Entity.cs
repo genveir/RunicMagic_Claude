@@ -54,6 +54,12 @@ public class Entity
     public long Height { get; set; }
     public double FacingAngle { get; set; }
 
+    public Rectangle Bounds => new(
+        Location: Location,
+        Width: Width,
+        Height: Height,
+        Angle: FacingAngle);
+
     public bool HasAgency { get; set; }
     public bool IsTranslucent { get; set; }
 

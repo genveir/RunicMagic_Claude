@@ -8,7 +8,7 @@ The Key column in every table uses right-padded cells. The baseline is 7 charact
 
 ## To Do — Milestone 4 — Kill the guard before he attacks
 
-Next ticket number: RMC-128
+Next ticket number: RMC-129
 Next bugfix number: BUG-11
 
 | Key     | Title | Description | Blocked By |
@@ -37,15 +37,16 @@ Next bugfix number: BUG-11
 | RMC-117 | Right-click move on canvas | Right-clicking a position on the canvas should move the caster to that location. | |
 
 ## In Progress
-| Key | Title | Description | Remarks |
-|-----|-------|-------------|---------|
+| Key     | Title | Description | Remarks |
+|---------|-------|-------------|---------|
 
 ## Ready For Review
 
-| Key | Title | Description |
-|-----|-------|-------------|
+| Key     | Title | Description |
+|---------|-------|-------------|
 
 ## Done
 
 | Key     | Title |
 |---------|-------|
+| RMC-128 | Cone cast |

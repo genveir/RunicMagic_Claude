@@ -26,7 +26,7 @@ public class HORIL : IEntitySet
         var lower = Lower.Evaluate(context);
         var upper = Upper.Evaluate(context);
         var originSet = Origin.Resolve(context);
-        var originRects = originSet.Entities.Select(e => Bounds(e)).ToList();
+        var originRects = originSet.Entities.Select(e => e.Bounds).ToList();
         var filtered = source.Entities
             .Where(e =>
             {
@@ -36,12 +36,6 @@ public class HORIL : IEntitySet
             .ToList();
         var result = new EntitySet(filtered);
         return result;
-    }
-
-    private static Rectangle Bounds(Entity e)
-    {
-        var bounds = new Rectangle(e.Location, e.Width, e.Height, e.FacingAngle);
-        return bounds;
     }
 
     public override string ToString()

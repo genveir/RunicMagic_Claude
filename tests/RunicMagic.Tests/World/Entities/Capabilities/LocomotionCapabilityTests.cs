@@ -1,8 +1,5 @@
-using RunicMagic.World;
 using RunicMagic.World.Entities;
 using RunicMagic.World.Entities.Capabilities;
-using RunicMagic.World.Execution;
-using RunicMagic.World.Geometry;
 using RunicMagic.World.Motion.Simulated;
 
 namespace RunicMagic.Tests.World.Entities.Capabilities;
@@ -243,12 +240,11 @@ public class LocomotionCapabilityTests
         // After applying the impulses, check the next velocity would not reverse direction.
         // We verify indirectly: total braking Fx must not exceed what would zero out the velocity.
         var totalFx = entity.PendingImpulses.Sum(v => v.Fx);
-        var bounds = new Rectangle(new Location(0, 0), Width: 200, Height: 200, Angle: 0);
         var (nextVx, _) = PhysicsService.CalculateLinearVelocity(
             initialVelocity: new VelocityVector(Vx: 1, Vy: 0, Omega: 0),
             weight: 1000,
             dragCoefficient: 0,
-            bounds: bounds,
+            bounds: entity.Bounds,
             fx: totalFx,
             fy: 0,
             groundFrictionCoefficient: 0,

@@ -24,19 +24,13 @@ public class HORSE : IEntitySet
             return new EntitySet([]);
         }
         var originSet = Origin.Resolve(context);
-        var originRects = originSet.Entities.Select(e => Bounds(e)).ToList();
+        var originRects = originSet.Entities.Select(e => e.Bounds).ToList();
         var maxDistance = source.Entities.Max(e => e.GetDistanceFromSet(originRects));
         var farthest = source.Entities
             .Where(e => e.GetDistanceFromSet(originRects) == maxDistance)
             .ToList();
         var result = new EntitySet(farthest);
         return result;
-    }
-
-    private static Rectangle Bounds(Entity e)
-    {
-        var bounds = new Rectangle(e.Location, e.Width, e.Height, e.FacingAngle);
-        return bounds;
     }
 
     public override string ToString()

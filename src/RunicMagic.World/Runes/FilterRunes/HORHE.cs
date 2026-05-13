@@ -24,19 +24,13 @@ public class HORHE : IEntitySet
             return new EntitySet([]);
         }
         var originSet = Origin.Resolve(context);
-        var originRects = originSet.Entities.Select(e => Bounds(e)).ToList();
+        var originRects = originSet.Entities.Select(e => e.Bounds).ToList();
         var minDistance = source.Entities.Min(e => e.GetDistanceFromSet(originRects));
         var closest = source.Entities
             .Where(e => e.GetDistanceFromSet(originRects) == minDistance)
             .ToList();
         var result = new EntitySet(closest);
         return result;
-    }
-
-    private static Rectangle Bounds(Entity e)
-    {
-        var bounds = new Rectangle(e.Location, e.Width, e.Height, e.FacingAngle);
-        return bounds;
     }
 
     public override string ToString()

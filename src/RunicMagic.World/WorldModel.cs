@@ -43,31 +43,25 @@ public class WorldModel : IGameLoopWorldModel
 
     public IReadOnlyList<Entity> GetEntitiesAtPoint(Location location)
     {
-        return entities.Values.Where(e => Bounds(e).Contains(location)).ToList();
+        return entities.Values.Where(e => e.Bounds.Contains(location)).ToList();
     }
 
     public IReadOnlyList<Entity> GetEntitiesWithinDistance(Entity source, double distance)
     {
-        var sourceBounds = Bounds(source);
+        var sourceBounds = source.Bounds;
         return entities.Values
             .Where(e => e.Id != source.Id)
-            .Where(e => Bounds(e).IsWithinDistanceFromRectangle(sourceBounds, distance))
+            .Where(e => e.Bounds.IsWithinDistanceFromRectangle(sourceBounds, distance))
             .ToList();
     }
 
     public IReadOnlyList<Entity> GetContainedEntities(Entity container)
     {
-        return entities.Values.Where(e => e.Id != container.Id && Bounds(container).Contains(Bounds(e))).ToList();
+        return entities.Values.Where(e => e.Id != container.Id && container.Bounds.Contains(e.Bounds)).ToList();
     }
 
     public void AddMotionEffect(IEngineMotionEffect effect)
     {
         engineMotionCollection.AddMotionEffect(effect);
-    }
-
-    private static Rectangle Bounds(Entity e)
-    {
-        var bounds = new Rectangle(e.Location, e.Width, e.Height, e.FacingAngle);
-        return bounds;
     }
 }

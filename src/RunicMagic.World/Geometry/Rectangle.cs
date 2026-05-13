@@ -15,8 +15,8 @@ public readonly record struct Rectangle(Location Location, double Width, double 
 
         // Narrow-phase: containment check first (handles one rect fully inside the other),
         // then edge-edge intersection.
-        var cornersA = Corners();
-        var cornersB = other.Corners();
+        var cornersA = GetCorners();
+        var cornersB = other.GetCorners();
 
         foreach (var c in cornersB)
             if (Contains(new Location(c.X, c.Y))) return true;
@@ -41,7 +41,7 @@ public readonly record struct Rectangle(Location Location, double Width, double 
         var local = relative.RotateAroundWorldOrigin(-Angle);
         var halfW = Width / 2;
         var halfH = Height / 2;
-        var result = local.Corners().All(c => Math.Abs(c.X) <= halfW && Math.Abs(c.Y) <= halfH);
+        var result = local.GetCorners().All(c => Math.Abs(c.X) <= halfW && Math.Abs(c.Y) <= halfH);
         return result;
     }
 
@@ -144,8 +144,8 @@ public readonly record struct Rectangle(Location Location, double Width, double 
             return 0;
         }
 
-        var cornersA = Corners();
-        var cornersB = other.Corners();
+        var cornersA = GetCorners();
+        var cornersB = other.GetCorners();
         var minDistance = double.MaxValue;
 
         for (var i = 0; i < 4; i++)
@@ -212,7 +212,7 @@ public readonly record struct Rectangle(Location Location, double Width, double 
     }
 
     // Returns the 4 corners of this rectangle in world space.
-    private (double X, double Y)[] Corners()
+    public (double X, double Y)[] GetCorners()
     {
         var hw = Width / 2;
         var hh = Height / 2;
