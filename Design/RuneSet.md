@@ -37,10 +37,13 @@ Liveness propagates upward: if any argument of a compound expression is live, th
 | `VAR` | pull | (Set, Number, Location = PAR(OH)) → Statement |
 | `CJIR` | rotate clockwise | (Set, Number, Location = SA PAR(Set)) → Statement |
 | `CJAR` | rotate counterclockwise | (Set, Number, Location = SA PAR(Set)) → Statement |
+| `TIORJ` | fill | (Set from, Set to, Number) → Statement |
 
 `CJIR` rotates each entity in the Set clockwise around the given origin by `Number` rune-rotation units, where TOT (2 744) = one full turn. The default origin is `SA PAR(Set)` — a live centroid of the rotating Set itself. Because it is live, the pivot tracks the entities as they move, keeping the rotation anchor at the group's actual centre on every tick.
 
 `CJAR` is identical to `CJIR` but rotates counterclockwise. Power cost is the same for both directions.
+
+`TIORJ` draws `Number` units of power from the `from` Set and fills the `to` Set with that power. Any excess beyond each target entity's capacity is applied as overcharge.
 
 ## Power Sourcing
 
