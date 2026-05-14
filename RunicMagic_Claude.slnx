@@ -1,5 +1,6 @@
 <Solution>
   <Folder Name="/Design/">
+    <File Path="Design/Decomposition.md" />
     <File Path="Design/Fiction.md" />
     <File Path="Design/Locomotion.md" />
     <File Path="Design/MagicSystem.md" />

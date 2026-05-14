@@ -6,14 +6,29 @@ Most tickets in this file are written by an assistant with incomplete informatio
 
 The Key column in every table uses right-padded cells. The baseline is 7 characters (RMC-NNN). When inserting a row, pad the key with trailing spaces to reach 7 characters before the closing "|"
 
-## To Do — Milestone 4 — Kill the guard before he attacks
-
-Next ticket number: RMC-132
+Next ticket number: RMC-146
 Next bugfix number: BUG-11
+
+## To Do - Milestone 4 - Decomposed runes
+| Key     | Title | Description | Blocked By |
+|---------|-------|-------------|------------|
+| RMC-132 | Decompose filter runes into Property type | Introduce a Property rune type and decompose the monolithic property-selector runes into a Property root and shared filter/selector runes. See Design/FilterRunes.md. | |
+| RMC-139 | EntitySetSelectService | Introduce a service that is the sole gateway through which spells retrieve entity sets from WorldModel. Exposes distinct methods per retrieval strategy — spatial proximity query, full-world scan, etc. — so that selection breadth costs and query routing flow from the method chosen, not from post-hoc hacks. | |
+| RMC-138 | GA exception for HOR in O selector | When O HOR is evaluated against GA, the engine routes through the spatial proximity method on EntitySetSelectService rather than a full-world scan. The bounded breadth cost is a natural consequence of the method used, not a special case. | RMC-132 RMC-139 |
+| RMC-133 | Lift parser type grammar to full type expressions | Generalise the parser so that a single rune can satisfy a span of N consecutive expected argument types by producing exactly those N types in order. Required for multi-value runes such as DAR(pointing direction). | |
+| RMC-134 | Add DAR(pointing direction) rune | DAR is a EntitySet -> [Location, Location] rune: consumes one EntitySet from the token stream and produces their averaged pointing directions. | RMC-133 |
+| RMC-137 | Add ISTRANSPARENT filter rune | Filters a Set to entities that are transparent — i.e. do not occlude a ray passing through them. Required for DAN(pointing at) decomposition, where the ray must pass through windows and similar entities to reach the intended target. | |
+| RMC-135 | Decompose DAN(pointing at) | Introduce RAY as a property root (along-ray distance, engine-native). Decompose DAN as a shorthand for HE RAY DAR. | RMC-132 RMC-134 RMC-137 |
+| RMC-142 | Update VUN and VAR to take a direction | Replace the single origin Location argument on VUN(push) and VAR(pull) with two Location arguments expressing a direction: directionFrom (default PAR OH) and directionTo (default PAR of the target Set). Consistent with the direction-as-two-locations design established for ANG and RAY. | |
+| RMC-136 | Decompose CJODAN(cone) | Introduce ANG as a property root (angular difference from a direction). Decompose CJODAN as a shorthand for DU (O HOR PAR OH range) (O ANG DAR halfAngle). Occlusion is dropped. | RMC-132 RMC-134 |
+| RMC-129 | Cone angle guide overlay | A toolbar-toggle button that shows a cone guide on the caster: the pointing direction as a centerline, a half-circle arc, and 14 evenly-spaced radial division lines so the player can read off cone angles in base-14. Rendered as SVG overlaid on the caster entity. | RMC-74 |
+| RMC-144 | Seed sheep and pasture | Add a small flock of sheep (living entities) behind the rotated wall near the caster. The sheep must not be reachable by DAN from the caster's starting position — the wall occludes line-of-sight. | |
+| RMC-145 | 🏁 Milestone 4 — Herd the sheep through the gate | The caster selects living entities in a cone behind the wall and pushes them toward a nearby gate using a directional push. | RMC-135 RMC-136 RMC-142 RMC-144 |
+
+## To Do — Milestone 5 — Kill the guard before he attacks
 
 | Key     | Title | Description | Blocked By |
 |---------|-------|-------------|------------|
-| RMC-129 | Cone angle guide overlay | A toolbar-toggle button that shows a cone guide on the caster: the pointing direction as a centerline, a half-circle arc, and 14 evenly-spaced radial division lines so the player can read off cone angles in base-14. Rendered as SVG overlaid on the caster entity. | RMC-74 |
 | RMC-98  | Velocity-imparting runes | Runes that impart velocity to entities in a Set, handing them off to the simulation layer for physics-driven motion. Contrast with VUN/VAR/CJIR/CJAR which are engine-layer instructions that bypass physics. | |
 | RMC-115 | Encapsulate life and structural integrity mutation on Entity | Life and structural integrity must only be altered through dedicated methods on `Entity` — never by directly setting the backing field or property. Audit all sites that currently write these values and replace them with method calls. | |
 | RMC-37  | Kill creatures when they run out of life | At any point during spell execution, living entities may run out of hitpoints. In this case the game should register that they're dead and remove their living and agency properties. | RMC-115 |
@@ -26,7 +41,7 @@ Next bugfix number: BUG-11
 | RMC-124 | Vision capability | An entity can perceive other entities within a configurable range and cone. Structured similarly to LocomotionCapability. | |
 | RMC-125 | Aggressive AI behavior | When the guard detects the caster via vision, pursue and strike. Includes vision strategies and fighting strategies. | RMC-123 RMC-124 |
 | RMC-126 | Seed aggressive guard | Add a new guard entity (distinct from the patrol guard) inside the building, equipped with a club. | RMC-48 RMC-60 RMC-122 RMC-123 RMC-124 RMC-125 |
-| RMC-127 | 🏁 Milestone 4 — The caster smashes the aggressive guard into the wall with a spell hard enough to kill him before he can attack | | RMC-126 |
+| RMC-127 | 🏁 Milestone 5 — The caster smashes the aggressive guard into the wall with a spell hard enough to kill him before he can attack | | RMC-126 |
 
 ## To Do — Other
 
@@ -36,6 +51,9 @@ Next bugfix number: BUG-11
 | RMC-101 | Save game state to database | Persist current world state (entities and their properties) to the database. | |
 | RMC-14  | Design channeling and persistent effects | Written runes stay active while power is channeled. Define what "channeling" means mechanically — what keeps a spell alive, how it is terminated, and how the executor tracks ongoing effects. | |
 | RMC-117 | Right-click move on canvas | Right-clicking a position on the canvas should move the caster to that location. | |
+| RMC-143 | Facing angle rune | A rune that returns the facing direction of an entity as two Locations — the entity's center and the point on the unit circle matching its facing angle. Signature: (Set = OH) → [Location, Location]. Requires RMC-133. | RMC-133 |
+| RMC-140 | EntityAccessService | Introduce a service that is the sole gateway through which spells read properties from entities. Mirrors EntitySetSelectService — spells do not reach into entity internals directly, they ask the service what the engine exposes. | |
+| RMC-141 | Migrate magic system to a dedicated Magic assembly | Extract all magic evaluation and rune logic into a RunicMagic.Magic assembly. Magic must not access Entity, WorldModel, or any world internals directly — it speaks exclusively through the API surface World exposes (EntitySetSelectService, EntityAccessService, and any effect-execution interfaces). World owns the contract; Magic is a client of it. | RMC-139 RMC-140 |
 | RMC-131 | Engine-layer collision response | When VUN(push) or other engine-layer motion detects a collision, the engine moves the obstacle aside by the minimum needed to complete the ordered motion, drawing additional spell power to do so. No damage is dealt to either party. Distinct from simulation-layer collision response (RMC-48). | RMC-130 |
 
 ## In Progress

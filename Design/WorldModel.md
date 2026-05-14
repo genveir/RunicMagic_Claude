@@ -6,24 +6,25 @@ The world is a 2D coordinate space measured in millimeters. Every Entity has a p
 
 Spatial relationships between entities:
 
-- **Containment** — entity A is contained by entity B if all of A's corners lie within B's rectangle
-- **Touch** — entities whose rectangles intersect or are adjacent
 - **Proximity** — the measurable surface-to-surface distance between two entities
+
+Directions are never expressed as numeric values. A direction is always "from this location to that location" — two explicit points. Angles are only meaningful relative to such a root direction, never as absolute values. There is no zero vector and no direction literal; a direction without two grounding points is not a valid concept in this world model.
+
+**Exception — entity facing.** Every entity has a facing: the direction from the back-center to the front-center of its oriented rectangle. This is the one privileged direction in the model.
 
 ## Entity Taxonomy
 
 Everything in the world is an `Entity`. There is no type hierarchy in the magic system — the magic system operates purely on entities and their data.
 
-Entity data falls into four categories:
+Entity data falls into three categories:
 
 | Category | Meaning | Absent expressed as |
 |---|---|---|
-| **Attribute** | Mandatory, always present, persisted | N/A |
-| **Property** | Optional, persisted | `false` (boolean), `null` (scalar or complex) |
+| **Attribute** | Persisted; present or optional | `false` (boolean), `null` (scalar or complex) |
 | **Transient** | Session-only, not persisted | `null` |
 | **Derived** | Computed from other state; no own storage | N/A |
 
-A complex property's null object is its own "absent" marker — no separate boolean needed. A boolean property uses `false` as its absent marker.
+A complex attribute's null object is its own "absent" marker — no separate boolean needed. A boolean attribute uses `false` as its absent marker.
 
 ## Capabilities
 
