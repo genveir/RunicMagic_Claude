@@ -8,18 +8,20 @@ The Key column in every table uses right-padded cells. The baseline is 7 charact
 
 ## To Do — Milestone 4 — Kill the guard before he attacks
 
-Next ticket number: RMC-129
+Next ticket number: RMC-132
 Next bugfix number: BUG-11
 
 | Key     | Title | Description | Blocked By |
 |---------|-------|-------------|------------|
+| RMC-129 | Cone angle guide overlay | A toolbar-toggle button that shows a cone guide on the caster: the pointing direction as a centerline, a half-circle arc, and 14 evenly-spaced radial division lines so the player can read off cone angles in base-14. Rendered as SVG overlaid on the caster entity. | RMC-74 |
 | RMC-98  | Velocity-imparting runes | Runes that impart velocity to entities in a Set, handing them off to the simulation layer for physics-driven motion. Contrast with VUN/VAR/CJIR/CJAR which are engine-layer instructions that bypass physics. | |
 | RMC-115 | Encapsulate life and structural integrity mutation on Entity | Life and structural integrity must only be altered through dedicated methods on `Entity` — never by directly setting the backing field or property. Audit all sites that currently write these values and replace them with method calls. | |
 | RMC-37  | Kill creatures when they run out of life | At any point during spell execution, living entities may run out of hitpoints. In this case the game should register that they're dead and remove their living and agency properties. | RMC-115 |
 | RMC-38  | Register entity destruction | It should be possible to destroy entities. When this happens, the game should register that the entity is destroyed. | RMC-115 |
 | RMC-60  | Small items | Physical entities that a creature can carry (e.g. a club or a mana gem). Carrying means the item moves with the carrier. Covers how items are represented and how carrying works. | |
 | RMC-122 | Hardness property | Add an explicit hardness property to Entity. Governs how much collision damage an entity deals and absorbs on impact. Distinct from density (weight/surface), which does not fully substitute for the material resistance of the 3D objects these 2D entities represent. | |
-| RMC-48  | Motion with collision | Simulation-moving entities detect and respond to collisions. Both parties take damage proportional to collision energy. | RMC-122 |
+| RMC-130 | Collision detection service | A service that, given the world state, detects when two entities overlap. Returns collision pairs with enough data (positions, masses, velocities) for any collision responder to act on. Used by both the simulation layer and the engine layer, which respond differently. | |
+| RMC-48  | Motion with collision | Simulation-moving entities respond to detected collisions. Both parties take damage proportional to collision energy. | RMC-122 RMC-130 |
 | RMC-123 | Strike capability | An entity can have arms: defined by arm length, swing arc, and acceleration. A strike swings a carried item through the arc; the collision system handles impact damage on contact. | |
 | RMC-124 | Vision capability | An entity can perceive other entities within a configurable range and cone. Structured similarly to LocomotionCapability. | |
 | RMC-125 | Aggressive AI behavior | When the guard detects the caster via vision, pursue and strike. Includes vision strategies and fighting strategies. | RMC-123 RMC-124 |
@@ -33,8 +35,8 @@ Next bugfix number: BUG-11
 | RMC-100 | In-game entity creation and modification | Add the ability to create new entities and modify existing ones while the game is running — without restarting or editing seed data. This is a prerequisite for conveniently populating the world during development. | |
 | RMC-101 | Save game state to database | Persist current world state (entities and their properties) to the database. | |
 | RMC-14  | Design channeling and persistent effects | Written runes stay active while power is channeled. Define what "channeling" means mechanically — what keeps a spell alive, how it is terminated, and how the executor tracks ongoing effects. | |
-| RMC-74  | Cone selection rune | A spatial selector that selects all entities within a cone projected from an origin entity in its pointing direction. Parametrised by angle (half-width) and range. | |
 | RMC-117 | Right-click move on canvas | Right-clicking a position on the canvas should move the caster to that location. | |
+| RMC-131 | Engine-layer collision response | When VUN(push) or other engine-layer motion detects a collision, the engine moves the obstacle aside by the minimum needed to complete the ordered motion, drawing additional spell power to do so. No damage is dealt to either party. Distinct from simulation-layer collision response (RMC-48). | RMC-130 |
 
 ## In Progress
 | Key     | Title | Description | Remarks |
@@ -50,3 +52,4 @@ Next bugfix number: BUG-11
 | Key     | Title |
 |---------|-------|
 | RMC-128 | Cone cast |
+| RMC-74  | Cone selection rune |

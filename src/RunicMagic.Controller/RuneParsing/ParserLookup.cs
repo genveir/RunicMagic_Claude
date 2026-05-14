@@ -90,6 +90,7 @@ internal static class ParserLookup
         entitySetRuneParsers["DAN"] = new DANParser(); // pointing at
         entitySetRuneParsers["KAL"] = new KALParser(); // indicating
         entitySetRuneParsers["HORO"] = new HOROParser(); // near
+        entitySetRuneParsers["CJODAN"] = new CJODANParser(); // cone
         entitySetRuneParsers["ZYIL"] = new ZYILParser(); // weight range filter
         entitySetRuneParsers["ZYHE"] = new ZYHEParser(); // lightest
         entitySetRuneParsers["ZYSE"] = new ZYSEParser(); // heaviest
