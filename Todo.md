@@ -6,15 +6,14 @@ Most tickets in this file are written by an assistant with incomplete informatio
 
 The Key column in every table uses right-padded cells. The baseline is 7 characters (RMC-NNN). When inserting a row, pad the key with trailing spaces to reach 7 characters before the closing "|"
 
-Next ticket number: RMC-146
+Next ticket number: RMC-147
 Next bugfix number: BUG-11
 
 ## To Do - Milestone 4 - Decomposed runes
 | Key     | Title | Description | Blocked By |
 |---------|-------|-------------|------------|
-| RMC-132 | Decompose filter runes into Property type | Introduce a Property rune type and decompose the monolithic property-selector runes into a Property root and shared filter/selector runes. See Design/FilterRunes.md. | |
 | RMC-139 | EntitySetSelectService | Introduce a service that is the sole gateway through which spells retrieve entity sets from WorldModel. Exposes distinct methods per retrieval strategy — spatial proximity query, full-world scan, etc. — so that selection breadth costs and query routing flow from the method chosen, not from post-hoc hacks. | |
-| RMC-138 | GA exception for HOR in O selector | When O HOR is evaluated against GA, the engine routes through the spatial proximity method on EntitySetSelectService rather than a full-world scan. The bounded breadth cost is a natural consequence of the method used, not a special case. | RMC-132 RMC-139 |
+| RMC-132 | Decompose filter runes into Property type | Introduce a Property rune type and decompose the monolithic property-selector runes into a Property root and shared filter/selector runes. See Design/FilterRunes.md. | RMC-139 |
 | RMC-133 | Lift parser type grammar to full type expressions | Generalise the parser so that a single rune can satisfy a span of N consecutive expected argument types by producing exactly those N types in order. Required for multi-value runes such as DAR(pointing direction). | |
 | RMC-134 | Add DAR(pointing direction) rune | DAR is a EntitySet -> [Location, Location] rune: consumes one EntitySet from the token stream and produces their averaged pointing directions. | RMC-133 |
 | RMC-137 | Add ISTRANSPARENT filter rune | Filters a Set to entities that are transparent — i.e. do not occlude a ray passing through them. Required for DAN(pointing at) decomposition, where the ray must pass through windows and similar entities to reach the intended target. | |
@@ -71,3 +70,4 @@ Next bugfix number: BUG-11
 |---------|-------|
 | RMC-128 | Cone cast |
 | RMC-74  | Cone selection rune |
+| RMC-146 | Promote GA(global) to EntitySet rune |

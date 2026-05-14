@@ -1,7 +1,7 @@
-﻿using RunicMagic.World.Runes.DebugRunes;
+﻿using RunicMagic.World.Runes.EntitySetRunes;
 using RunicMagic.World.Runes.RuneTypes;
 
-namespace RunicMagic.Controller.RuneParsing.DebugRunes;
+namespace RunicMagic.Controller.RuneParsing.EntitySetRunes;
 
 internal class GAParser : IRuneParser<IEntitySet>
 {

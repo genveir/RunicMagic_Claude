@@ -59,6 +59,7 @@ SHU can be nested. Each SHU pushes onto whatever stack is current at the point o
 
 | Rune | Meaning | Signature |
 |------|---------|-----------|
+| `GA` | global | () → Set |
 | `LA` | scope of | (Set = OH) → Set |
 | `PA` | intersection of scopes | (Set = OH) → Set |
 | `HORO` | near | (Number, Set = OH) → Set |
@@ -76,6 +77,8 @@ SHU can be nested. Each SHU pushes onto whatever stack is current at the point o
 | `AN` | union | (Set, Set) → Set |
 | `DU` | intersection | (Set, Set) → Set |
 | `RAL` | difference | (Set, Set) → Set |
+
+`GA` returns every entity in the world — the global scope, as opposed to `LA`'s local scope. It takes no arguments. Because it spans the entire world, it carries an exorbitant selection breadth cost.
 
 `LA` maps each member of the input Set to its scope (via the entity's scope delegate) and returns the union. Defaults to `OH`, so bare `LA` maps the executor's scope.
 

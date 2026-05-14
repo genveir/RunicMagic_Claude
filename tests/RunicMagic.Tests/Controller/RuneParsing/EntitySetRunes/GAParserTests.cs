@@ -1,9 +1,9 @@
 using RunicMagic.Controller.RuneParsing;
-using RunicMagic.Controller.RuneParsing.DebugRunes;
-using RunicMagic.World.Runes.DebugRunes;
+using RunicMagic.Controller.RuneParsing.EntitySetRunes;
+using RunicMagic.World.Runes.EntitySetRunes;
 using RunicMagic.World.Runes.RuneTypes;
 
-namespace RunicMagic.Tests.Controller.RuneParsing.DebugRunes;
+namespace RunicMagic.Tests.Controller.RuneParsing.EntitySetRunes;
 
 public class GAParserTests
 {
