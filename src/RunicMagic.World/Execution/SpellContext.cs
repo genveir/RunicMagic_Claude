@@ -53,7 +53,7 @@ public class SpellContext
         }
         foreach (var selection in resolutionStack.Reverse())
         {
-            forked.resolutionStack.Push(selection with { EntityIds = [.. selection.EntityIds] });
+            forked.resolutionStack.Push(selection.Clone());
         }
         return forked;
     }

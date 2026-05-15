@@ -56,14 +56,14 @@ public class EntitySetSelectionCostResolver : IEntitySet
             return 0;
         }
 
-        var highest = Math.Max(context.EntityResolutionCount.Value.FictionalResults, previouslySeenFictionalResults);
+        var highest = Math.Max(context.EntityResolutionCount.FictionalResults, previouslySeenFictionalResults);
 
         return highest - previouslySeenFictionalResults;
     }
 
     private HashSet<EntityId> GetNewBreadthIds(SpellContext context)
     {
-        var allSeen = context.EntityResolutionCount?.EntityIds ?? [];
+        var allSeen = context.EntityResolutionCount?.EntityIds ?? new HashSet<EntityId>();
         var newIds = new HashSet<EntityId>();
         foreach (var id in allSeen)
         {

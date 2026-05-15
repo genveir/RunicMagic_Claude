@@ -3,18 +3,33 @@ using RunicMagic.World.Entities;
 
 namespace RunicMagic.World.Execution;
 
-public readonly record struct EntitySelection(HashSet<EntityId> EntityIds, long FictionalResults)
+public class EntitySelection
 {
-    public EntitySelection UnionWith(EntitySelection other)
+    public HashSet<EntityId> EntityIds { get; }
+    public long FictionalResults { get; private set; }
+
+    public EntitySelection(HashSet<EntityId> EntityIds, long FictionalResults)
     {
-        var newIds = new HashSet<EntityId>(EntityIds);
-        foreach (var id in other.EntityIds)
-        {
-            newIds.Add(id);
-        }
-        return new EntitySelection(newIds, Math.Max(FictionalResults, other.FictionalResults));
+        this.EntityIds = EntityIds;
+        this.FictionalResults = FictionalResults;
     }
 
-    public EntitySelection UnionWith(EntitySetSelectionResult selectionResult) =>
+    public void UnionWith(EntitySelection other)
+    {
+        EntityIds.UnionWith(other.EntityIds);
+
+        FictionalResults = Math.Max(FictionalResults, other.FictionalResults);
+    }
+
+    public void UnionWith(EntitySetSelectionResult selectionResult)
+    {
         UnionWith(new EntitySelection(selectionResult.Entities.Select(e => e.Id).ToHashSet(), selectionResult.FictionalResults));
+    }
+
+    public EntitySelection Clone()
+    {
+        var result = new EntitySelection(EntityIds.ToHashSet(), FictionalResults);
+
+        return result;
+    }
 }
