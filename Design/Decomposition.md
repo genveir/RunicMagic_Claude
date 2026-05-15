@@ -61,16 +61,6 @@ A direction is expressed as two `Location` values — an origin and a point the 
 
 This requires a parser change: an expression may satisfy a span of N consecutive expected argument types if it produces exactly those N types in order. This is the general rule — `DAR` is the first instance of multi-value production, not a special case.
 
-### CJODAN decomposed
-
-`CJODAN(range, halfAngle)` is now a shorthand for:
-
-```
-DU (O HOR PAR OH range) (O ANG DAR halfAngle)
-```
-
-Entities within `range` mm of the caster AND within `halfAngle` rotation units of the pointing direction. Occlusion is dropped in favour of the expressive clarity of full decomposition.
-
 ### DAN decomposed
 
 `DAN` is a shorthand for:

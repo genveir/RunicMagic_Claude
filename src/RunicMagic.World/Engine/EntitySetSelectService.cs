@@ -110,9 +110,11 @@ public class EntitySetSelectService
 
     public EntitySetSelectionResult GetInAllInRayExceptSourceEntities(IEnumerable<Entity> filter, Location from, Direction direction, long range)
     {
-        var result = GetAllInRay(from, direction, range) with
+        var baseResults = GetAllInRay(from, direction, range);
+
+        var result = baseResults with
         {
-            Entities = GetAllInRay(from, direction, range).Entities
+            Entities = baseResults.Entities
                 .Except(filter)
                 .ToList()
         };
