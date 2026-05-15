@@ -49,18 +49,15 @@ public class DETAILS : IStatement
 
         context.EventTracker.Add(new DebugOutputEvent($"DETAILS: Caster is pointing at {caster.PointingDirection.Value.X}, {caster.PointingDirection.Value.Y}."));
 
-        var rayCast = new RayCastService(context.World);
-        var castResult = rayCast.Cast(caster.Id, caster.Location, caster.PointingDirection.Value);
+        var rayCast = context.EngineAPI.EntitySetSelectService.GetInAllInRayExceptSourceEntities(
+            filter: context.Caster.Entities,
+            from: caster.Location,
+            direction: caster.PointingDirection.Value,
+            range: int.MaxValue);
 
-        if (castResult.HitEntity == null)
+        foreach (var entity in rayCast.Entities)
         {
-            context.EventTracker.Add(new DebugOutputEvent("DETAILS: Ray cast hit nothing."));
+            context.EventTracker.Add(new DebugOutputEvent($"DETAILS: Ray cast passed through {entity.Label}."));
         }
-        else
-        {
-            var hitEntity = castResult.HitEntity;
-            context.EventTracker.Add(new DebugOutputEvent($"DETAILS: Ray cast hit {hitEntity.Label} at {castResult.LocationOfIntersect}."));
-        }
-
     }
 }

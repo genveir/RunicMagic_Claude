@@ -37,7 +37,7 @@ public class VAR : IStatement
             isAway: false,
             effectName: "VAR"
         );
-        context.World.AddMotionEffect(effect);
+        context.EngineAPI.EngineMotion.AddMotionEffect(effect);
     }
 
     public override string ToString()

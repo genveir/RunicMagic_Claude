@@ -37,7 +37,7 @@ public class CJIR : IStatement
             isClockwise: true,
             effectName: "CJIR"
         );
-        context.World.AddMotionEffect(effect);
+        context.EngineAPI.EngineMotion.AddMotionEffect(effect);
     }
 
     public override string ToString()

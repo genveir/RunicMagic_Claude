@@ -23,8 +23,18 @@ public class TIORJ : IStatement
         var toSet = To.Resolve(context);
         var amount = Amount.Evaluate(context).Value;
 
-        var drawn = PowerService.DrawPower(fromSet, amount, context.EventTracker);
-        PowerService.FillWithOvercharge(toSet, fromSet, drawn, context);
+        var drawn = context.EngineAPI.PowerService.DrawPower(
+            entitySet: fromSet,
+            amount: amount,
+            eventTracker: context.EventTracker);
+
+        context.EngineAPI.PowerService.FillWithOvercharge(
+            toFill: toSet,
+            returnSource: fromSet,
+            caster: context.Caster,
+            executor: context.Executor,
+            amount: drawn, eventTracker:
+            context.EventTracker);
     }
 
     public override string ToString()

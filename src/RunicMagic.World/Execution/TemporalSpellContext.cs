@@ -1,14 +1,16 @@
-﻿namespace RunicMagic.World.Execution;
+﻿using RunicMagic.World.Engine;
 
-internal record TemporalSpellContext(EntitySet Caster, EntitySet Executor, WorldModel World)
+namespace RunicMagic.World.Execution;
+
+internal record TemporalSpellContext(EntitySet Caster, EntitySet Executor, EngineAPI EngineAPI)
 {
     public TemporalSpellContext(SpellContext spellContext)
-        : this(spellContext.Caster, spellContext.Executor, spellContext.World)
+        : this(spellContext.Caster, spellContext.Executor, spellContext.EngineAPI)
     {
     }
 
     public SpellContext ToSpellContext(IWorldEventTracker eventTracker)
     {
-        return new SpellContext(Caster, Executor, World, eventTracker);
+        return new SpellContext(Caster, Executor, EngineAPI, eventTracker);
     }
 }

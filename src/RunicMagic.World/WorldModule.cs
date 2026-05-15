@@ -11,16 +11,19 @@ public static class WorldModule
 {
     public static IServiceCollection RegisterWorldModule(this IServiceCollection services)
     {
-        services.AddSingleton(svc => new WorldModel(svc.GetRequiredService<EngineMotionCollection>()));
+        services.AddSingleton(svc => new WorldModel());
         services.AddSingleton<IGameLoopWorldModel>(svc => svc.GetRequiredService<WorldModel>());
         services.AddSingleton<IWorldTicker, WorldTicker>();
         services.AddSingleton<EngineMotionCollection>();
+        services.AddSingleton<IEngineMotionSink>(svc => svc.GetRequiredService<EngineMotionCollection>());
 
         services.AddSingleton<SpellExecutor>();
         services.AddSingleton<RayCastService>();
 
         services.AddSingleton<EngineAPI>();
         services.AddSingleton<EntitySetSelectService>();
+        services.AddSingleton<DamageService>();
+        services.AddSingleton<PowerService>();
         return services;
     }
 }

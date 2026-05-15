@@ -1,5 +1,4 @@
 using RunicMagic.World.Execution;
-using RunicMagic.World.Geometry;
 using RunicMagic.World.Runes.RuneTypes;
 
 namespace RunicMagic.World.Runes.EntityReferenceRunes;
@@ -23,16 +22,21 @@ public class DAN : IEntitySet
             return new EntitySet([]);
         }
 
-        var rayCast = new RayCastService(context.World);
-        var castResult = rayCast.Cast(caster.Id, caster.Location, caster.PointingDirection.Value);
+        var rayResult = context.EngineAPI.EntitySetSelectService
+            .GetFirstInRay(
+                filter: [caster],
+                from: caster.Location,
+                direction: caster.PointingDirection.Value,
+                range: 50_000,
+                filterTranslucent: true);
 
-        if (castResult.HitEntity == null)
+        if (rayResult.Entities.Count == 0)
         {
             return new EntitySet([]);
         }
 
-        var result = new EntitySet([castResult.HitEntity]);
-        context.EntityResolutionCount?.Add(castResult.HitEntity.Id);
+        var result = new EntitySet([rayResult.Entities.Single()]);
+        context.EntityResolutionCount?.UnionWith(rayResult);
         return result;
     }
 

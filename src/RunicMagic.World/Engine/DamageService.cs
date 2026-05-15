@@ -1,10 +1,18 @@
+using RunicMagic.World.Entities;
 using RunicMagic.World.Execution;
 
-namespace RunicMagic.World.Entities.Services;
+namespace RunicMagic.World.Engine;
 
-internal static class DamageService
+public class DamageService
 {
-    public static long Damage(EntitySet entitySet, long amount, SpellContext context)
+    private readonly WorldModel world;
+
+    public DamageService(WorldModel world)
+    {
+        this.world = world;
+    }
+
+    public long Damage(EntitySet entitySet, long amount, IWorldEventTracker eventTracker)
     {
         var entities = entitySet.Entities.ToList();
 
@@ -15,7 +23,7 @@ internal static class DamageService
             var nextEntities = new List<Entity>();
             foreach (var entity in entities)
             {
-                var actual = Damage(entity, perEntity, context);
+                var actual = Damage(entity, perEntity, eventTracker);
                 remaining -= actual;
                 if (entity.StructuralIntegrity.CurrentIntegrity > 0)
                 {
@@ -28,15 +36,15 @@ internal static class DamageService
         return amount - remaining;
     }
 
-    public static long Damage(Entity entity, long amount, SpellContext context)
+    public long Damage(Entity entity, long amount, IWorldEventTracker eventTracker)
     {
         var actual = Math.Min(amount, entity.StructuralIntegrity.CurrentIntegrity);
         entity.StructuralIntegrity.CurrentIntegrity -= actual;
 
         if (entity.StructuralIntegrity.CurrentIntegrity == 0)
         {
-            context.EventTracker.Add(new EntityDisintegratedEvent(entity));
-            context.World.Remove(entity.Id);
+            eventTracker.Add(new EntityDisintegratedEvent(entity));
+            world.Remove(entity.Id);
         }
 
         if (entity.Life != null && entity.Life.CurrentHitPoints > entity.StructuralIntegrity.CurrentIntegrity)
@@ -46,7 +54,7 @@ internal static class DamageService
 
         if (entity.StructuralIntegrity.CurrentIntegrity > 0 && actual > 0)
         {
-            context.EventTracker.Add(new EntityDamagedEvent(entity, actual));
+            eventTracker.Add(new EntityDamagedEvent(entity, actual));
         }
         return actual;
     }

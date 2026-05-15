@@ -11,7 +11,7 @@ public class A : IEntitySet
     public EntitySet Resolve(SpellContext context)
     {
         var result = context.Caster;
-        context.EntityResolutionCount?.UnionWith(result.Entities.Select(e => e.Id));
+        context.EntityResolutionCount?.UnionWith(new EntitySelection(context.Caster.Entities.Select(e => e.Id).ToHashSet(), 0));
         return result;
     }
 

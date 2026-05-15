@@ -1,19 +1,14 @@
 using RunicMagic.World.Abstractions;
 using RunicMagic.World.Entities;
 using RunicMagic.World.Geometry;
-using RunicMagic.World.Motion.Engine;
 
 namespace RunicMagic.World;
 
 public class WorldModel : IGameLoopWorldModel
 {
     private readonly Dictionary<EntityId, Entity> entities = new();
-    private readonly EngineMotionCollection engineMotionCollection;
 
-    internal WorldModel(EngineMotionCollection engineMotionCollection)
-    {
-        this.engineMotionCollection = engineMotionCollection;
-    }
+    internal WorldModel() { }
 
     public void Add(Entity entity)
     {
@@ -53,15 +48,5 @@ public class WorldModel : IGameLoopWorldModel
             .Where(e => e.Id != source.Id)
             .Where(e => e.Bounds.IsWithinDistanceFromRectangle(sourceBounds, distance))
             .ToList();
-    }
-
-    public IReadOnlyList<Entity> GetContainedEntities(Entity container)
-    {
-        return entities.Values.Where(e => e.Id != container.Id && container.Bounds.Contains(e.Bounds)).ToList();
-    }
-
-    public void AddMotionEffect(IEngineMotionEffect effect)
-    {
-        engineMotionCollection.AddMotionEffect(effect);
     }
 }

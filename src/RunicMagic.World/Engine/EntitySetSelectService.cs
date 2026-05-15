@@ -3,8 +3,6 @@ using RunicMagic.World.Geometry;
 
 namespace RunicMagic.World.Engine;
 
-public readonly record struct EntitySetSelectionResult(IReadOnlyList<Entity> Entities, long FictionalResults);
-
 public class EntitySetSelectService
 {
     // Maximum range from the origin at which we expect to actually simulate entities, beyond this we assume there is a living world with fictional entities.
@@ -87,6 +85,23 @@ public class EntitySetSelectService
         return new EntitySetSelectionResult(entitiesOnRay, fictionalResults);
     }
 
+    public EntitySetSelectionResult GetFirstInRay(IEnumerable<Entity> filter, Location from, Direction direction, long range, bool filterTranslucent)
+    {
+        var selection = GetInAllInRayExceptSourceEntities(filter, from, direction, range);
+
+        var entitiesOnRay = selection.Entities;
+        var fictionalResults = selection.FictionalResults;
+
+        var firstEntity = filterTranslucent ? entitiesOnRay.FirstOrDefault(e => !e.IsTranslucent) : entitiesOnRay.FirstOrDefault();
+
+        if (firstEntity != null)
+        {
+            return new EntitySetSelectionResult([firstEntity], 0);
+        }
+
+        return new EntitySetSelectionResult(Array.Empty<Entity>(), fictionalResults > 0 ? 1 : 0);
+    }
+
     public EntitySetSelectionResult GetInAllInRayExceptSourceEntities(IEnumerable<Entity> filter, Location from, Direction direction, long range)
     {
         var result = GetAllInRay(from, direction, range) with
@@ -127,5 +142,55 @@ public class EntitySetSelectService
 
         var result = (long)(fictionalLength / 10_000);
         return result;
+    }
+
+    public EntitySetSelectionResult GetUnionScope(IEnumerable<Entity> entities)
+    {
+        IEnumerable<Entity> union = new List<Entity>();
+        long fictionalResults = 0;
+
+        foreach (var entity in entities)
+        {
+            var scope = entity.Scope?.Invoke() ?? new EntitySetSelectionResult([], 0);
+
+            fictionalResults = Math.Max(fictionalResults, scope.FictionalResults);
+
+            union = union.Union(scope.Entities);
+        }
+
+        return new EntitySetSelectionResult(union.ToList(), fictionalResults);
+    }
+
+    public EntitySetSelectionResult GetIntersectScope(IEnumerable<Entity> entities)
+    {
+        if (entities.Count() == 0)
+        {
+            return new EntitySetSelectionResult(Array.Empty<Entity>(), 0);
+        }
+
+        long fictionalResults = long.MaxValue;
+
+        IEnumerable<Entity> intersect = new List<Entity>();
+
+        bool isFirst = true;
+
+        foreach (var entity in entities)
+        {
+            var scope = entity.Scope?.Invoke() ?? new EntitySetSelectionResult([], 0);
+
+            fictionalResults = Math.Min(fictionalResults, scope.FictionalResults);
+
+            if (isFirst)
+            {
+                intersect = scope.Entities;
+                isFirst = false;
+            }
+            else
+            {
+                intersect = intersect.Intersect(scope.Entities);
+            }
+        }
+
+        return new EntitySetSelectionResult(intersect.ToList(), fictionalResults);
     }
 }

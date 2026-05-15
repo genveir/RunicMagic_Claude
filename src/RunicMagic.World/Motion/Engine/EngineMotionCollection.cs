@@ -1,6 +1,11 @@
 ﻿namespace RunicMagic.World.Motion.Engine;
 
-internal class EngineMotionCollection
+public interface IEngineMotionSink
+{
+    void AddMotionEffect(IEngineMotionEffect effect);
+}
+
+internal class EngineMotionCollection : IEngineMotionSink
 {
     private readonly List<IEngineMotionEffect> engineMotionEffects = new();
 

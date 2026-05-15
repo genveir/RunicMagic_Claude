@@ -1,5 +1,4 @@
 using RunicMagic.World.Execution;
-using RunicMagic.World.Geometry;
 using RunicMagic.World.Runes.RuneTypes;
 
 namespace RunicMagic.World.Runes.EntityReferenceRunes;
@@ -23,36 +22,34 @@ public class KAL : IEntitySet
             return new EntitySet([]);
         }
 
-        var target = context.World.Find(caster.IndicateTarget.EntityId);
-        if (target == null)
-        {
-            return new EntitySet([]);
-        }
-
         // Self-indicate: no raycast needed
-        if (caster.IndicateTarget.Direction == null)
+        if (caster.IndicateTarget.EntityId == caster.Id)
         {
-            var selfResult = new EntitySet([target]);
-            context.EntityResolutionCount?.Add(target.Id);
+            var selfResult = new EntitySet([caster]);
+            context.EntityResolutionCount?.UnionWith(new EntitySelection([caster.Id], 0));
             return selfResult;
         }
 
-        var rayCast = new RayCastService(context.World);
-        var castResult = rayCast.Cast(caster.Id, caster.Location, caster.IndicateTarget.Direction.Value, skipTranslucent: false);
-
-        if (castResult.HitEntity?.Id != caster.IndicateTarget.EntityId)
+        if (caster.IndicateTarget.Direction == null)
         {
             return new EntitySet([]);
         }
 
-        var distance = castResult.LocationOfIntersect.GetDistanceTo(caster.Location);
-        if (distance > 1000)
+        var rayResult = context.EngineAPI.EntitySetSelectService
+            .GetFirstInRay(
+                filter: [caster],
+                from: caster.Location,
+                direction: caster.IndicateTarget.Direction.Value,
+                range: 1000,
+                filterTranslucent: false);
+
+        if (rayResult.Entities.Count == 0)
         {
             return new EntitySet([]);
         }
 
-        var result = new EntitySet([target]);
-        context.EntityResolutionCount?.Add(target.Id);
+        var result = new EntitySet([rayResult.Entities.Single()]);
+        context.EntityResolutionCount?.UnionWith(rayResult);
         return result;
     }
 
