@@ -24,8 +24,14 @@ public class EntitySetSelectService
 
     public EntitySetSelectionResult GetAllInRangeFrom(IEnumerable<Entity> entities, long range)
     {
+        var originEntities = entities.ToList();
+        if (originEntities.Count == 0)
+        {
+            return new EntitySetSelectionResult(Array.Empty<Entity>(), 0);
+        }
+
         var entitySet = new HashSet<Entity>();
-        foreach (var entity in entities)
+        foreach (var entity in originEntities)
         {
             var nearbyEntities = worldModel.GetEntitiesWithinDistance(entity, range);
             foreach (var nearbyEntity in nearbyEntities)
@@ -34,7 +40,7 @@ public class EntitySetSelectService
             }
         }
 
-        var fictionalResults = GetFictionalResultForGetAllInRangeFrom(entities.Select(e => e.Location).Centroid(), range);
+        var fictionalResults = GetFictionalResultForGetAllInRangeFrom(originEntities.Select(e => e.Location).Centroid(), range);
 
         return new EntitySetSelectionResult(entitySet.ToList(), fictionalResults);
     }

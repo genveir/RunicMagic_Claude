@@ -1,6 +1,7 @@
+using RunicMagic.Controller.Services;
 using RunicMagic.World;
+using RunicMagic.World.Engine;
 using RunicMagic.World.Entities;
-using RunicMagic.World.Entities.Services;
 
 namespace RunicMagic.Tests.World.Entities.Capabilities;
 
@@ -15,7 +16,7 @@ public class DamageServiceTests
 
     private static WorldModel MakeWorldWithEntity(Entity entity)
     {
-        var world = new WorldModelBuilder().Build();
+        var world = new WorldModel();
         world.Add(entity);
         return world;
     }
@@ -25,9 +26,9 @@ public class DamageServiceTests
     {
         var entity = MakeEntity(maxIntegrity: 1000, currentIntegrity: 1000);
         var world = MakeWorldWithEntity(entity);
-        var context = TestFixtures.MakeContext(world: world);
+        var damageService = new DamageService(world);
 
-        DamageService.Damage(entity, 300, context);
+        damageService.Damage(entity, 300, new EventTracker());
 
         entity.StructuralIntegrity.CurrentIntegrity.Should().Be(700);
     }
@@ -37,9 +38,9 @@ public class DamageServiceTests
     {
         var entity = MakeEntity(maxIntegrity: 1000, currentIntegrity: 1000);
         var world = MakeWorldWithEntity(entity);
-        var context = TestFixtures.MakeContext(world: world);
+        var damageService = new DamageService(world);
 
-        var dealt = DamageService.Damage(entity, 400, context);
+        var dealt = damageService.Damage(entity, 400, new EventTracker());
 
         dealt.Should().Be(400);
     }
@@ -49,9 +50,9 @@ public class DamageServiceTests
     {
         var entity = MakeEntity(maxIntegrity: 1000, currentIntegrity: 200);
         var world = MakeWorldWithEntity(entity);
-        var context = TestFixtures.MakeContext(world: world);
+        var damageService = new DamageService(world);
 
-        var dealt = DamageService.Damage(entity, 500, context);
+        var dealt = damageService.Damage(entity, 500, new EventTracker());
 
         dealt.Should().Be(200);
         entity.StructuralIntegrity.CurrentIntegrity.Should().Be(0);
@@ -62,9 +63,9 @@ public class DamageServiceTests
     {
         var entity = MakeEntity(maxIntegrity: 1000, currentIntegrity: 1000, maxHp: 1000, currentHp: 800);
         var world = MakeWorldWithEntity(entity);
-        var context = TestFixtures.MakeContext(world: world);
+        var damageService = new DamageService(world);
 
-        DamageService.Damage(entity, 300, context);
+        damageService.Damage(entity, 300, new EventTracker());
 
         entity.StructuralIntegrity.CurrentIntegrity.Should().Be(700);
         entity.Life!.CurrentHitPoints.Should().Be(700);
@@ -75,9 +76,9 @@ public class DamageServiceTests
     {
         var entity = MakeEntity(maxIntegrity: 1000, currentIntegrity: 1000, maxHp: 1000, currentHp: 400);
         var world = MakeWorldWithEntity(entity);
-        var context = TestFixtures.MakeContext(world: world);
+        var damageService = new DamageService(world);
 
-        DamageService.Damage(entity, 300, context);
+        damageService.Damage(entity, 300, new EventTracker());
 
         entity.StructuralIntegrity.CurrentIntegrity.Should().Be(700);
         entity.Life!.CurrentHitPoints.Should().Be(400);
@@ -88,9 +89,9 @@ public class DamageServiceTests
     {
         var entity = MakeEntity(maxIntegrity: 1000, currentIntegrity: 1000);
         var world = MakeWorldWithEntity(entity);
-        var context = TestFixtures.MakeContext(world: world);
+        var damageService = new DamageService(world);
 
-        var act = () => DamageService.Damage(entity, 500, context);
+        var act = () => damageService.Damage(entity, 500, new EventTracker());
 
         act.Should().NotThrow();
         entity.StructuralIntegrity.CurrentIntegrity.Should().Be(500);
@@ -101,9 +102,9 @@ public class DamageServiceTests
     {
         var entity = MakeEntity(maxIntegrity: 1000, currentIntegrity: 100, maxHp: 1000, currentHp: 600);
         var world = MakeWorldWithEntity(entity);
-        var context = TestFixtures.MakeContext(world: world);
+        var damageService = new DamageService(world);
 
-        DamageService.Damage(entity, 200, context);
+        damageService.Damage(entity, 200, new EventTracker());
 
         entity.StructuralIntegrity.CurrentIntegrity.Should().Be(0);
         entity.Life!.CurrentHitPoints.Should().Be(0);
@@ -114,9 +115,9 @@ public class DamageServiceTests
     {
         var entity = MakeEntity(maxIntegrity: 1000, currentIntegrity: 100);
         var world = MakeWorldWithEntity(entity);
-        var context = TestFixtures.MakeContext(world: world);
+        var damageService = new DamageService(world);
 
-        DamageService.Damage(entity, 200, context);
+        damageService.Damage(entity, 200, new EventTracker());
 
         world.GetAll().Should().NotContain(entity);
     }

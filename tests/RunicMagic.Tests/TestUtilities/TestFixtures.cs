@@ -1,5 +1,5 @@
 using RunicMagic.Controller.Services;
-using RunicMagic.World;
+using RunicMagic.World.Engine;
 using RunicMagic.World.Execution;
 using RunicMagic.World.Geometry;
 using RunicMagic.World.Runes.RuneTypes;
@@ -11,13 +11,14 @@ internal static class TestFixtures
     internal static SpellContext MakeContext(
         EntitySet? caster = null,
         EntitySet? executor = null,
-        WorldModel? world = null,
+        EngineAPI? engineAPI = null,
         EventTracker? result = null)
     {
+        var resolvedEngineAPI = engineAPI ?? new EngineAPIBuilder().Build();
         return new SpellContext(
             caster ?? new EntitySet([]),
             executor ?? new EntitySet([]),
-            world ?? new WorldModelBuilder().Build(),
+            resolvedEngineAPI,
             result ?? new EventTracker()
         );
     }

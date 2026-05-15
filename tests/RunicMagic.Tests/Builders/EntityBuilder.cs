@@ -1,3 +1,4 @@
+using RunicMagic.World.Engine;
 using RunicMagic.World.Entities;
 using RunicMagic.World.Entities.AI;
 using RunicMagic.World.Entities.Capabilities;
@@ -30,7 +31,7 @@ internal class EntityBuilder
     private ChargeCapability? charge;
     private LocomotionCapability? locomotion;
     private StrengthCapability? strength;
-    private Func<Entity[]>? scope;
+    private Func<EntitySetSelectionResult>? scope;
     private ReservoirCapability? reservoir;
     private Direction? pointingDirection;
     private IndicateTarget? indicateTarget;
@@ -170,7 +171,7 @@ internal class EntityBuilder
         return this;
     }
 
-    public EntityBuilder WithScope(Func<Entity[]> scope)
+    public EntityBuilder WithScope(Func<EntitySetSelectionResult> scope)
     {
         this.scope = scope;
         return this;

@@ -22,7 +22,7 @@ public class PatrolAIBehaviorTests
         return entity;
     }
 
-    private static WorldModel MakeWorld() => new WorldModelBuilder().Build();
+    private static WorldModel MakeWorld() => new WorldModel();
     private static EventTracker MakeTracker() => new EventTracker();
 
     // --- No locomotion / no waypoints ---

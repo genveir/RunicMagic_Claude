@@ -26,7 +26,7 @@ public class OHTests
 
         new OH().Resolve(context);
 
-        context.EntityResolutionCount.Should().Contain(executorEntity.Id);
+        context.EntityResolutionCount!.EntityIds.Should().Contain(executorEntity.Id);
     }
 
     [Fact]

@@ -18,11 +18,11 @@ public class RayCastServiceTests
     [Fact]
     public void Cast_NoEntities_ReturnsFallbackPoint()
     {
-        var world = new WorldModelBuilder().Build();
+        var world = new WorldModel();
         var service = new RayCastService(world);
         var sourceId = EntityId.New();
 
-        var result = service.Cast(sourceId, new Location(0, 0), Right);
+        var result = service.Cast(sourceId, new Location(0, 0), Right, maxRangeMillimeters: 3000);
 
         result.LocationOfIntersect.X.Should().Be(3000);
         result.LocationOfIntersect.Y.Should().Be(0);
@@ -32,14 +32,14 @@ public class RayCastServiceTests
     [Fact]
     public void Cast_SkipsSourceEntity()
     {
-        var world = new WorldModelBuilder().Build();
+        var world = new WorldModel();
         var source = MakeEntity(x: 0, y: 0);
         world.Add(source);
         var service = new RayCastService(world);
 
         // If source were not skipped, the ray would start inside it and be rejected by
         // IntersectsRay, but it should be excluded by ID before geometry is checked.
-        var result = service.Cast(source.Id, new Location(0, 0), Right);
+        var result = service.Cast(source.Id, new Location(0, 0), Right, maxRangeMillimeters: 3000);
 
         result.LocationOfIntersect.X.Should().Be(3000);
     }
@@ -47,14 +47,14 @@ public class RayCastServiceTests
     [Fact]
     public void Cast_TranslucentEntityInPath_IsIgnored()
     {
-        var world = new WorldModelBuilder().Build();
+        var world = new WorldModel();
         var source = MakeEntity(x: 0, y: 0);
         var ice = MakeEntity(x: 500, y: 0, isTranslucent: true);
         world.Add(source);
         world.Add(ice);
         var service = new RayCastService(world);
 
-        var result = service.Cast(source.Id, new Location(0, 0), Right);
+        var result = service.Cast(source.Id, new Location(0, 0), Right, maxRangeMillimeters: 3000);
 
         result.LocationOfIntersect.X.Should().Be(3000);
         result.HitEntity.Should().BeNull();
@@ -63,14 +63,14 @@ public class RayCastServiceTests
     [Fact]
     public void Cast_NonTranslucentEntityInPath_ReturnsEntryPoint()
     {
-        var world = new WorldModelBuilder().Build();
+        var world = new WorldModel();
         var source = MakeEntity(x: 0, y: 0);
         var wall = MakeEntity(x: 500, y: 0);
         world.Add(source);
         world.Add(wall);
         var service = new RayCastService(world);
 
-        var result = service.Cast(source.Id, new Location(0, 0), Right);
+        var result = service.Cast(source.Id, new Location(0, 0), Right, maxRangeMillimeters: 3000);
 
         result.LocationOfIntersect.X.Should().Be(450); // left edge of wall at x=500, width=100
         result.HitEntity.Should().BeSameAs(wall);
@@ -79,7 +79,7 @@ public class RayCastServiceTests
     [Fact]
     public void Cast_MultipleEntities_ReturnsClosestHit()
     {
-        var world = new WorldModelBuilder().Build();
+        var world = new WorldModel();
         var source = MakeEntity(x: 0, y: 0);
         var near = MakeEntity(x: 500, y: 0);
         var far = MakeEntity(x: 1000, y: 0);
@@ -88,7 +88,7 @@ public class RayCastServiceTests
         world.Add(far);
         var service = new RayCastService(world);
 
-        var result = service.Cast(source.Id, new Location(0, 0), Right);
+        var result = service.Cast(source.Id, new Location(0, 0), Right, maxRangeMillimeters: 3000);
 
         result.LocationOfIntersect.X.Should().Be(450); // near wall entry, not far
         result.HitEntity.Should().BeSameAs(near);
@@ -97,7 +97,7 @@ public class RayCastServiceTests
     [Fact]
     public void Cast_TranslucentBeforeNonTranslucent_ReturnsNonTranslucentHit()
     {
-        var world = new WorldModelBuilder().Build();
+        var world = new WorldModel();
         var source = MakeEntity(x: 0, y: 0);
         var ice = MakeEntity(x: 300, y: 0, isTranslucent: true);
         var wall = MakeEntity(x: 700, y: 0);
@@ -106,9 +106,56 @@ public class RayCastServiceTests
         world.Add(wall);
         var service = new RayCastService(world);
 
-        var result = service.Cast(source.Id, new Location(0, 0), Right);
+        var result = service.Cast(source.Id, new Location(0, 0), Right, maxRangeMillimeters: 3000);
 
         result.LocationOfIntersect.X.Should().Be(650); // wall entry, ice skipped
         result.HitEntity.Should().BeSameAs(wall);
+    }
+
+    // ── GetAllEntitiesOnRay ───────────────────────────────────────────────────
+
+    [Fact]
+    public void GetAllEntitiesOnRay_ReturnsEntitiesOrderedByDistance()
+    {
+        var world = new WorldModel();
+        var far = MakeEntity(x: 1000, y: 0);
+        var near = MakeEntity(x: 500, y: 0);
+        world.Add(far);
+        world.Add(near);
+        var service = new RayCastService(world);
+
+        var result = service.GetAllEntitiesOnRay(new Location(0, 0), Right, range: 50_000);
+
+        result.Should().Equal(near, far);
+    }
+
+    [Fact]
+    public void GetAllEntitiesOnRay_IncludesTranslucentEntities()
+    {
+        // Unlike Cast (which skips translucent by default), GetAllEntitiesOnRay
+        // reports everything the ray passes through.
+        var world = new WorldModel();
+        var ice = MakeEntity(x: 500, y: 0, isTranslucent: true);
+        world.Add(ice);
+        var service = new RayCastService(world);
+
+        var result = service.GetAllEntitiesOnRay(new Location(0, 0), Right, range: 50_000);
+
+        result.Should().ContainSingle().Which.Should().BeSameAs(ice);
+    }
+
+    [Fact]
+    public void GetAllEntitiesOnRay_ExcludesEntitiesBeyondRange()
+    {
+        var world = new WorldModel();
+        var near = MakeEntity(x: 500, y: 0);  // left edge ~450
+        var far = MakeEntity(x: 1000, y: 0);  // left edge ~950
+        world.Add(near);
+        world.Add(far);
+        var service = new RayCastService(world);
+
+        var result = service.GetAllEntitiesOnRay(new Location(0, 0), Right, range: 600);
+
+        result.Should().ContainSingle().Which.Should().BeSameAs(near);
     }
 }

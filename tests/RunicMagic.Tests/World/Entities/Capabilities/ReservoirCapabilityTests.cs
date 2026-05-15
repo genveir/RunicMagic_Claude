@@ -1,3 +1,4 @@
+using RunicMagic.World.Engine;
 using RunicMagic.World.Entities;
 
 namespace RunicMagic.Tests.World.Entities.Capabilities;
@@ -15,7 +16,7 @@ public class ReservoirCapabilityTests
     {
         return new EntityBuilder()
             .WithReservoir(max: () => max, current: () => current)
-            .WithScope(scope)
+            .WithScope(() => new EntitySetSelectionResult(Entities: scope(), FictionalResults: 0))
             .Build();
     }
 

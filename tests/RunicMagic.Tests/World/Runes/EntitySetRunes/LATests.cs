@@ -1,3 +1,4 @@
+using RunicMagic.World.Engine;
 using RunicMagic.World.Runes.EntitySetRunes;
 
 namespace RunicMagic.Tests.World.Runes.EntitySetRunes;
@@ -10,7 +11,7 @@ public class LATests
         var scopeMember1 = new EntityBuilder().WithLocation(x: 10, y: 0).Build();
         var scopeMember2 = new EntityBuilder().WithLocation(x: 20, y: 0).Build();
         var container = new EntityBuilder().Build();
-        container.Scope = () => [scopeMember1, scopeMember2];
+        container.Scope = () => new EntitySetSelectionResult(Entities: [scopeMember1, scopeMember2], FictionalResults: 0);
 
         var inputSet = new FixedEntitySet(container);
         var la = new LA(inputSet);
@@ -28,8 +29,8 @@ public class LATests
         var unique = new EntityBuilder().Build();
         var entity1 = new EntityBuilder().Build();
         var entity2 = new EntityBuilder().Build();
-        entity1.Scope = () => [shared, unique];
-        entity2.Scope = () => [shared];
+        entity1.Scope = () => new EntitySetSelectionResult(Entities: [shared, unique], FictionalResults: 0);
+        entity2.Scope = () => new EntitySetSelectionResult(Entities: [shared], FictionalResults: 0);
 
         var inputSet = new FixedEntitySet(entity1, entity2);
         var la = new LA(inputSet);
@@ -60,7 +61,7 @@ public class LATests
     {
         var scopeMember = new EntityBuilder().Build();
         var container = new EntityBuilder().Build();
-        container.Scope = () => [scopeMember];
+        container.Scope = () => new EntitySetSelectionResult(Entities: [scopeMember], FictionalResults: 0);
 
         var la = new LA(new FixedEntitySet(container));
         var context = TestFixtures.MakeContext();
@@ -68,7 +69,7 @@ public class LATests
 
         la.Resolve(context);
 
-        context.EntityResolutionCount.Should().Contain(scopeMember.Id);
+        context.EntityResolutionCount!.EntityIds.Should().Contain(scopeMember.Id);
     }
 
     [Fact]
@@ -76,7 +77,7 @@ public class LATests
     {
         var scopeMember = new EntityBuilder().Build();
         var container = new EntityBuilder().Build();
-        container.Scope = () => [scopeMember];
+        container.Scope = () => new EntitySetSelectionResult(Entities: [scopeMember], FictionalResults: 0);
 
         var la = new LA(new FixedEntitySet(container));
         var context = TestFixtures.MakeContext();
@@ -85,7 +86,7 @@ public class LATests
         la.Resolve(context);
 
         // container is added by the inner leaf (FixedEntitySet); scopeMember is added by LA's expansion
-        context.EntityResolutionCount.Should().Contain(container.Id);
-        context.EntityResolutionCount.Should().Contain(scopeMember.Id);
+        context.EntityResolutionCount!.EntityIds.Should().Contain(container.Id);
+        context.EntityResolutionCount!.EntityIds.Should().Contain(scopeMember.Id);
     }
 }

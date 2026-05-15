@@ -1,3 +1,4 @@
+using RunicMagic.World.Engine;
 using RunicMagic.World.Entities;
 using RunicMagic.World.Execution;
 using RunicMagic.World.Runes.RuneTypes;
@@ -23,7 +24,7 @@ public class FixedEntitySet : IEntitySet
 
     public EntitySet Resolve(SpellContext context)
     {
-        context.EntityResolutionCount?.UnionWith(resolved.Entities.Select(e => e.Id));
+        context.EntityResolutionCount?.UnionWith(new EntitySetSelectionResult(resolved.Entities, 0));
         return resolved;
     }
 }

@@ -26,7 +26,7 @@ public class ATests
 
         new A().Resolve(context);
 
-        context.EntityResolutionCount.Should().Contain(casterEntity.Id);
+        context.EntityResolutionCount!.EntityIds.Should().Contain(casterEntity.Id);
     }
 
     [Fact]
