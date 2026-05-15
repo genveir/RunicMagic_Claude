@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using RunicMagic.World.Abstractions;
+using RunicMagic.World.Engine;
 using RunicMagic.World.Execution;
 using RunicMagic.World.Geometry;
 using RunicMagic.World.Motion.Engine;
@@ -17,6 +18,9 @@ public static class WorldModule
 
         services.AddSingleton<SpellExecutor>();
         services.AddSingleton<RayCastService>();
+
+        services.AddSingleton<EngineAPI>();
+        services.AddSingleton<EntitySetSelectService>();
         return services;
     }
 }
