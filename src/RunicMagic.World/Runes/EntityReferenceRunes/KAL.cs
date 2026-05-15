@@ -48,7 +48,14 @@ public class KAL : IEntitySet
             return new EntitySet([]);
         }
 
-        var result = new EntitySet([rayResult.Entities.Single()]);
+        var singleEntity = rayResult.Entities.Single();
+
+        if (singleEntity.Id != caster.IndicateTarget.EntityId)
+        {
+            return new EntitySet([]);
+        }
+
+        var result = new EntitySet(rayResult.Entities);
         context.EntityResolutionCount?.UnionWith(rayResult);
         return result;
     }
