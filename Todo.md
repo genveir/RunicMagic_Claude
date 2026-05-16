@@ -12,14 +12,13 @@ Next bugfix number: BUG-11
 ## To Do - Milestone 4 - Decomposed runes
 | Key     | Title | Description | Blocked By |
 |---------|-------|-------------|------------|
-| RMC-139 | EntitySetSelectService | Introduce a service that is the sole gateway through which spells retrieve entity sets from WorldModel. Exposes distinct methods per retrieval strategy — spatial proximity query, full-world scan, etc. — so that selection breadth costs and query routing flow from the method chosen, not from post-hoc hacks. | |
 | RMC-132 | Decompose filter runes into Property type | Introduce a Property rune type and decompose the monolithic property-selector runes into a Property root and shared filter/selector runes. See Design/FilterRunes.md. | RMC-139 |
 | RMC-133 | Lift parser type grammar to full type expressions | Generalise the parser so that a single rune can satisfy a span of N consecutive expected argument types by producing exactly those N types in order. Required for multi-value runes such as DAR(pointing direction). | |
 | RMC-134 | Add DAR(pointing direction) rune | DAR is a EntitySet -> [Location, Location] rune: consumes one EntitySet from the token stream and produces their averaged pointing directions. | RMC-133 |
 | RMC-137 | Add ISTRANSPARENT filter rune | Filters a Set to entities that are transparent — i.e. do not occlude a ray passing through them. Required for DAN(pointing at) decomposition, where the ray must pass through windows and similar entities to reach the intended target. | |
 | RMC-135 | Decompose DAN(pointing at) | Introduce RAY as a property root (along-ray distance, engine-native). Decompose DAN as a shorthand for HE RAY DAR. | RMC-132 RMC-134 RMC-137 |
 | RMC-142 | Update VUN and VAR to take a direction | Replace the single origin Location argument on VUN(push) and VAR(pull) with two Location arguments expressing a direction: directionFrom (default PAR OH) and directionTo (default PAR of the target Set). Consistent with the direction-as-two-locations design established for ANG and RAY. | |
-| RMC-136 | Decompose CJODAN(cone) | Introduce ANG as a property root (angular difference from a direction). Decompose CJODAN as a shorthand for DU (O HOR PAR OH range) (O ANG DAR halfAngle). Occlusion is dropped. | RMC-132 RMC-134 |
+| RMC-74  | Cone selection rune | Either introduce a cone selection rune (CJODAN?) or decide that it must be expressed as a composition of more primitive runes. The cone is defined by an origin, a direction, and an angle. The direction is the ray from the origin to the point on the unit circle in the caster's pointing direction (DAR). The angle is a property of the target entities: their angular difference from that ray (ANG). | RMC-132 RMC-133 RMC-134 |
 | RMC-129 | Cone angle guide overlay | A toolbar-toggle button that shows a cone guide on the caster: the pointing direction as a centerline, a half-circle arc, and 14 evenly-spaced radial division lines so the player can read off cone angles in base-14. Rendered as SVG overlaid on the caster entity. | RMC-74 |
 | RMC-144 | Seed sheep and pasture | Add a small flock of sheep (living entities) behind the rotated wall near the caster. The sheep must not be reachable by DAN from the caster's starting position — the wall occludes line-of-sight. | |
 | RMC-145 | 🏁 Milestone 4 — Herd the sheep through the gate | The caster selects living entities in a cone behind the wall and pushes them toward a nearby gate using a directional push. | RMC-135 RMC-136 RMC-142 RMC-144 |
@@ -69,5 +68,5 @@ Next bugfix number: BUG-11
 | Key     | Title |
 |---------|-------|
 | RMC-128 | Cone cast |
-| RMC-74  | Cone selection rune |
 | RMC-146 | Promote GA(global) to EntitySet rune |
+| RMC-139 | EntitySetSelectService |
