@@ -1,6 +1,7 @@
 using RunicMagic.Controller.RuneParsing;
 using RunicMagic.Database;
 using RunicMagic.World;
+using RunicMagic.World.Engine;
 using RunicMagic.World.Entities;
 using RunicMagic.World.Entities.AI;
 using RunicMagic.World.Entities.AI.Behaviors;
@@ -15,11 +16,13 @@ public class EntityFactory
 {
     private readonly WorldModel world;
     private readonly ILogger<EntityFactory> logger;
+    private readonly EngineAPI engineAPI;
 
-    public EntityFactory(WorldModel world, ILogger<EntityFactory> logger)
+    public EntityFactory(WorldModel world, ILogger<EntityFactory> logger, EngineAPI engineAPI)
     {
         this.world = world;
         this.logger = logger;
+        this.engineAPI = engineAPI;
     }
 
     public Entity Create(EntityData entityData)
@@ -115,7 +118,7 @@ public class EntityFactory
 
     private void WireDelegates(EntityType type, Entity entity)
     {
-        entity.Scope = () => world.GetEntitiesWithinDistance(entity, distance: 500).ToArray();
+        entity.Scope = () => engineAPI.EntitySetSelectService.GetAllInRangeFrom(entities: [entity], range: 500);
 
         switch (type)
         {

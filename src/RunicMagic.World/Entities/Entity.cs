@@ -1,3 +1,4 @@
+using RunicMagic.World.Engine;
 using RunicMagic.World.Entities.AI;
 using RunicMagic.World.Entities.Capabilities;
 using RunicMagic.World.Entities.ComplexAttributes;
@@ -70,7 +71,7 @@ public class Entity
     public double GroundContactRadius { get; set; }
     public bool IsGrounded { get; set; } = true;
 
-    public Func<Entity[]>? Scope { get; set; }
+    public Func<EntitySetSelectionResult>? Scope { get; set; }
 
     public ReservoirCapability? Reservoir { get; set; }
     public LifeCapability? Life { get; set; }

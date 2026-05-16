@@ -1,4 +1,5 @@
 using RunicMagic.Controller.Services;
+using RunicMagic.World.Engine;
 using RunicMagic.World.Entities.Capabilities;
 using RunicMagic.World.Execution;
 using RunicMagic.World.Runes.RuneTypes;
@@ -15,7 +16,7 @@ public class EntitySetSelectionCostResolverTests
 
         public EntitySet Resolve(SpellContext context)
         {
-            context.EntityResolutionCount?.UnionWith(NextResult.Entities.Select(e => e.Id));
+            context.EntityResolutionCount?.UnionWith(new EntitySetSelectionResult(Entities: NextResult.Entities, FictionalResults: 0));
             return NextResult;
         }
     }
@@ -238,7 +239,7 @@ public class EntitySetSelectionCostResolverTests
         resolver.Resolve(context);
 
         // the inner resolution window was opened and closed; the outer window should be untouched
-        context.EntityResolutionCount.Should().BeEmpty();
+        context.EntityResolutionCount!.EntityIds.Should().BeEmpty();
         context.CloseResolutionWindow();
     }
 
@@ -332,5 +333,69 @@ public class EntitySetSelectionCostResolverTests
 
         firstDraw.Should().Be(1_000_000);
         drawn.Sum().Should().Be(0);
+    }
+
+    // ── Fictional results ─────────────────────────────────────────────────────────────────────────
+
+    // Contributes a configurable count of fictional results to the active resolution
+    // window (as a ranged/ray query would) while resolving to an empty concrete set,
+    // so the only cost is the fictional breadth contribution.
+    private class FictionalContributingSet : IEntitySet
+    {
+        public long FictionalResults { get; set; }
+
+        public EntitySet Resolve(SpellContext context)
+        {
+            context.EntityResolutionCount?.UnionWith(
+                new EntitySetSelectionResult(Entities: [], FictionalResults: FictionalResults));
+            return new EntitySet([]);
+        }
+    }
+
+    [Fact]
+    public void Resolve_FictionalResults_ChargedAsBreadthCost()
+    {
+        var inner = new FictionalContributingSet { FictionalResults = 3 };
+        var resolver = new EntitySetSelectionCostResolver(inner);
+        var (caster, drawn) = MakeTrackingCaster();
+        var context = TestFixtures.MakeContext(caster: caster);
+
+        resolver.Resolve(context);
+
+        // no concrete entities → final cost 0; 3 fictional × 1_000_000
+        drawn.Sum().Should().Be(3_000_000);
+    }
+
+    [Fact]
+    public void Resolve_SecondCallWithSameFictionalResults_ChargesZeroAdditionalCost()
+    {
+        var inner = new FictionalContributingSet { FictionalResults = 3 };
+        var resolver = new EntitySetSelectionCostResolver(inner);
+        var (caster, drawn) = MakeTrackingCaster();
+        var context = TestFixtures.MakeContext(caster: caster);
+
+        resolver.Resolve(context); // first call charges 3 × 1_000_000
+        drawn.Clear();
+
+        resolver.Resolve(context); // same fictional count already seen → nothing new
+
+        drawn.Sum().Should().Be(0);
+    }
+
+    [Fact]
+    public void Resolve_SecondCallWithHigherFictionalResults_OnlyChargesDelta()
+    {
+        var inner = new FictionalContributingSet { FictionalResults = 3 };
+        var resolver = new EntitySetSelectionCostResolver(inner);
+        var (caster, drawn) = MakeTrackingCaster();
+        var context = TestFixtures.MakeContext(caster: caster);
+
+        resolver.Resolve(context); // charges 3 × 1_000_000
+        drawn.Clear();
+
+        inner.FictionalResults = 5;
+        resolver.Resolve(context); // only the delta of 2 is new → 2 × 1_000_000
+
+        drawn.Sum().Should().Be(2_000_000);
     }
 }

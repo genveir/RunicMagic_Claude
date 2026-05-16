@@ -63,7 +63,6 @@ SHU can be nested. Each SHU pushes onto whatever stack is current at the point o
 | `LA` | scope of | (Set = OH) → Set |
 | `PA` | intersection of scopes | (Set = OH) → Set |
 | `HORO` | near | (Number, Set = OH) → Set |
-| `CJODAN` | cone | (Number range, Number halfAngle = DOT) → Set |
 | `ZYIL` | weight range filter | (Set, Number lower, Number upper) → Set |
 | `ZYHE` | lightest | (Set) → Set |
 | `ZYSE` | heaviest | (Set) → Set |
@@ -83,8 +82,6 @@ SHU can be nested. Each SHU pushes onto whatever stack is current at the point o
 `LA` maps each member of the input Set to its scope (via the entity's scope delegate) and returns the union. Defaults to `OH`, so bare `LA` maps the executor's scope.
 
 `PA` maps each member of the input Set to its scope and returns the intersection — only entities that appear in every member's scope. An entity with no scope contributes an empty set, making the whole result empty. Defaults to `OH`.
-
-`CJODAN` returns all entities within `range` millimetres that fall inside a cone projected from the caster in its pointing direction. `halfAngle` is measured in rune-rotation units where `TOT` (2 744) is one full turn; the default `DOT` (196) gives a half-angle of one fourteenth of a circle (~25.7°). If the caster has no pointing direction, the result is empty. Occlusion applies: opaque entities block entities behind them.
 
 `HORO` returns all entities in the world within `Number` millimetres of any entity in the origin `Set`. Distance is measured bounding edge to bounding edge; overlapping entities have distance 0. Defaults to the executor, so `HORO HET` selects everything within 1 mm of the executor's bounding rectangle.
 

@@ -11,7 +11,7 @@ public class OH : IEntitySet
     public EntitySet Resolve(SpellContext context)
     {
         var result = context.Executor;
-        context.EntityResolutionCount?.UnionWith(result.Entities.Select(e => e.Id));
+        context.EntityResolutionCount?.UnionWith(new EntitySelection(result.Entities.Select(e => e.Id).ToHashSet(), 0));
         return result;
     }
 

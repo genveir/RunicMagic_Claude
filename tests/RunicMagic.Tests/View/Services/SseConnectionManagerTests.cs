@@ -10,7 +10,7 @@ public class SseConnectionManagerTests
 {
     private static SseConnectionManager MakeManager()
     {
-        var world = new WorldModelBuilder().Build();
+        var world = new WorldModel();
         world.Add(new EntityBuilder().WithLocation(x: 1000, y: 1000).Build());
         var worldRendering = new WorldRenderingService(world, new RayCastService(world));
         return new SseConnectionManager(worldRendering);

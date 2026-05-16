@@ -76,9 +76,9 @@ public class DETAILSTests
     }
 
     [Fact]
-    public void Execute_CasterPointingAtEntity_EmitsRayCastHitEvent()
+    public void Execute_CasterPointingAtEntity_EmitsPassedThroughEvent()
     {
-        var world = new WorldModelBuilder().Build();
+        var world = new WorldModel();
         var casterEntity = MakeEntity(x: 0, y: 0, label: "caster");
         casterEntity.PointingDirection = Right;
         var target = MakeEntity(x: 500, y: 0, label: "wall");
@@ -87,31 +87,56 @@ public class DETAILSTests
         var result = new EventTracker();
         var context = TestFixtures.MakeContext(
             caster: new EntitySet([casterEntity]),
-            world: world,
+            engineAPI: EngineAPIBuilder.ForWorldModel(world).Build(),
             result: result);
 
         new DETAILS(new FixedEntitySet()).Execute(context);
 
         result.WorldEvents.OfType<DebugOutputEvent>()
-            .Should().Contain(e => e.Text.Contains("Ray cast hit wall"));
+            .Should().Contain(e => e.Text == "DETAILS: Ray cast passed through wall.");
     }
 
     [Fact]
-    public void Execute_CasterPointingAtNothing_EmitsRayCastMissEvent()
+    public void Execute_CasterPointingThroughMultipleEntities_EmitsPassedThroughForEach()
     {
-        var world = new WorldModelBuilder().Build();
+        // DETAILS now reports every entity the ray passes through, not just the first hit.
+        var world = new WorldModel();
+        var casterEntity = MakeEntity(x: 0, y: 0, label: "caster");
+        casterEntity.PointingDirection = Right;
+        var near = MakeEntity(x: 500, y: 0, label: "near");
+        var far = MakeEntity(x: 1000, y: 0, label: "far");
+        world.Add(casterEntity);
+        world.Add(near);
+        world.Add(far);
+        var result = new EventTracker();
+        var context = TestFixtures.MakeContext(
+            caster: new EntitySet([casterEntity]),
+            engineAPI: EngineAPIBuilder.ForWorldModel(world).Build(),
+            result: result);
+
+        new DETAILS(new FixedEntitySet()).Execute(context);
+
+        var texts = result.WorldEvents.OfType<DebugOutputEvent>().Select(e => e.Text).ToList();
+        texts.Should().Contain("DETAILS: Ray cast passed through near.");
+        texts.Should().Contain("DETAILS: Ray cast passed through far.");
+    }
+
+    [Fact]
+    public void Execute_CasterPointingAtNothing_EmitsNoPassedThroughEvents()
+    {
+        var world = new WorldModel();
         var casterEntity = MakeEntity(x: 0, y: 0);
         casterEntity.PointingDirection = Right;
         world.Add(casterEntity);
         var result = new EventTracker();
         var context = TestFixtures.MakeContext(
             caster: new EntitySet([casterEntity]),
-            world: world,
+            engineAPI: EngineAPIBuilder.ForWorldModel(world).Build(),
             result: result);
 
         new DETAILS(new FixedEntitySet()).Execute(context);
 
         result.WorldEvents.OfType<DebugOutputEvent>()
-            .Should().Contain(e => e.Text == "DETAILS: Ray cast hit nothing.");
+            .Should().NotContain(e => e.Text.Contains("passed through"));
     }
 }

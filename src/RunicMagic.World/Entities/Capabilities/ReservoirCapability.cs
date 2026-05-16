@@ -1,4 +1,6 @@
-﻿namespace RunicMagic.World.Entities.Capabilities;
+﻿using RunicMagic.World.Engine;
+
+namespace RunicMagic.World.Entities.Capabilities;
 
 public readonly record struct ReservoirDraw(long Amount, bool IsDrained);
 
@@ -23,14 +25,16 @@ public class ReservoirCapability
 
     public long GetMaxIncludingScope(Entity entity)
     {
-        var entitiesInScope = entity.Scope?.Invoke() ?? [];
+        var scope = entity.Scope?.Invoke() ?? new EntitySetSelectionResult([], 0);
+        var entitiesInScope = scope.Entities;
 
         return Max() + entitiesInScope.Sum(e => e.Reservoir?.Max.Invoke() ?? 0);
     }
 
     public long GetCurrentIncludingScope(Entity entity)
     {
-        var entitiesInScope = entity.Scope?.Invoke() ?? [];
+        var scope = entity.Scope?.Invoke() ?? new EntitySetSelectionResult([], 0);
+        var entitiesInScope = scope.Entities;
 
         return Current() + entitiesInScope.Sum(e => e.Reservoir?.Current.Invoke() ?? 0);
     }

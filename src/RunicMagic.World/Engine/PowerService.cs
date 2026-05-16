@@ -1,11 +1,20 @@
 ﻿using RunicMagic.World.Entities;
-using RunicMagic.World.Entities.Services;
+using RunicMagic.World.Execution;
 
-namespace RunicMagic.World.Execution;
+namespace RunicMagic.World.Engine;
 
-internal static class PowerService
+public class PowerService
 {
-    public static long DrawPower(EntitySet entitySet, long amount, IWorldEventTracker result)
+    private readonly DamageService damageService;
+    private readonly EntitySetSelectService entitySetSelectService;
+
+    public PowerService(DamageService damageService, EntitySetSelectService entitySetSelectService)
+    {
+        this.damageService = damageService;
+        this.entitySetSelectService = entitySetSelectService;
+    }
+
+    public long DrawPower(EntitySet entitySet, long amount, IWorldEventTracker eventTracker)
     {
         var groups = entitySet.Entities
             .Where(e => e.Reservoir != null)
@@ -17,7 +26,7 @@ internal static class PowerService
         for (int n = 0; n < groups.Length; n++)
         {
             var group = groups[n];
-            var drawn = DrawPower(group, powerToDraw, result);
+            var drawn = DrawPower(group, powerToDraw, eventTracker);
             powerToDraw -= drawn;
             if (powerToDraw <= 0)
             {
@@ -28,7 +37,7 @@ internal static class PowerService
         return amount - powerToDraw;
     }
 
-    private static long DrawPower(IEnumerable<Entity> entities, long amount, IWorldEventTracker result)
+    private long DrawPower(IEnumerable<Entity> entities, long amount, IWorldEventTracker eventTracker)
     {
         var perEntity = (long)Math.Ceiling((double)amount / entities.Count());
         var totalDrawn = 0L;
@@ -38,27 +47,29 @@ internal static class PowerService
             totalDrawn += draw.Amount;
             if (draw.Amount > 0)
             {
-                result.Add(new PowerDrawnEvent(entity, draw.Amount));
-                result.Track(entity);
+                eventTracker.Add(new PowerDrawnEvent(entity, draw.Amount));
+                eventTracker.Track(entity);
             }
             if (draw.IsDrained)
             {
-                result.Add(new EntityDrainedEvent(entity));
+                eventTracker.Add(new EntityDrainedEvent(entity));
             }
         }
         return totalDrawn;
     }
 
-    public static void FillWithOvercharge(EntitySet toFill, EntitySet? returnSource, long amount, SpellContext context)
+    public void FillWithOvercharge(EntitySet toFill, EntitySet? returnSource, EntitySet caster, EntitySet executor, long amount, IWorldEventTracker eventTracker)
     {
-        var remaining = amount - FillPower(toFill, amount, context.EventTracker);
+        var remaining = amount - FillPower(toFill, amount, eventTracker);
         var currentSet = toFill;
 
         while (remaining > 0)
         {
-            var scope = new EntitySet(currentSet.GetScope().Entities.Where(e => e.Reservoir != null).ToList());
+            var scopeSelection = entitySetSelectService.GetUnionScope(currentSet.Entities);
 
-            var damageDealt = DamageService.Damage(currentSet, remaining * 2, context);
+            var scope = new EntitySet(scopeSelection.Entities.Where(e => e.Reservoir != null).ToList());
+
+            var damageDealt = damageService.Damage(currentSet, remaining * 2, eventTracker);
             remaining -= (damageDealt + 1) / 2;
 
             if (remaining <= 0 || !scope.Entities.Any())
@@ -66,29 +77,35 @@ internal static class PowerService
                 break;
             }
 
-            remaining -= FillPower(scope, remaining, context.EventTracker);
+            remaining -= FillPower(scope, remaining, eventTracker);
             currentSet = scope;
         }
 
         if (remaining > 0)
         {
-            var damageDealt = DamageService.Damage(context.Executor, remaining * 2, context);
+            var damageDealt = damageService.Damage(executor, remaining * 2, eventTracker);
             remaining -= (damageDealt + 1) / 2;
         }
 
         if (remaining > 0)
         {
-            var damageDealt = DamageService.Damage(context.Caster, remaining * 2, context);
+            var damageDealt = damageService.Damage(caster, remaining * 2, eventTracker);
             remaining -= (damageDealt + 1) / 2;
         }
 
         if (remaining > 0 && returnSource != null)
         {
-            FillWithOvercharge(returnSource, null, remaining, context);
+            FillWithOvercharge(
+                toFill: returnSource,
+                returnSource: null,
+                caster: caster,
+                executor: executor,
+                amount: remaining,
+                eventTracker: eventTracker);
         }
     }
 
-    public static long FillPower(EntitySet entitySet, long amount, IWorldEventTracker result)
+    public long FillPower(EntitySet entitySet, long amount, IWorldEventTracker result)
     {
         var groups = entitySet.Entities
             .Where(e => e.Reservoir != null)
@@ -111,7 +128,7 @@ internal static class PowerService
         return amount - powerToFill;
     }
 
-    private static long FillPower(IEnumerable<Entity> entities, long amount, IWorldEventTracker result)
+    private long FillPower(IEnumerable<Entity> entities, long amount, IWorldEventTracker result)
     {
         var perEntity = (long)Math.Ceiling((double)amount / entities.Count());
         var totalFilled = 0L;

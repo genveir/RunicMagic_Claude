@@ -1,6 +1,4 @@
-using RunicMagic.World.Entities;
 using RunicMagic.World.Execution;
-using RunicMagic.World.Geometry;
 using RunicMagic.World.Runes.RuneTypes;
 
 namespace RunicMagic.World.Runes.EntitySetRunes;
@@ -22,11 +20,12 @@ public class HORO : IEntitySet
         var radius = HowFar.Evaluate(context);
         var originSet = Origin.Resolve(context);
         var originRects = originSet.Entities.Select(e => e.Bounds).ToList();
-        var entities = context.World.GetAll()
-            .Where(e => e.GetDistanceFromSet(originRects) <= (double)radius.Value)
-            .ToList();
-        var result = new EntitySet(entities);
-        context.EntityResolutionCount?.UnionWith(result.Entities.Select(e => e.Id));
+
+        var selection = context.EngineAPI.EntitySetSelectService
+            .GetAllInRangeFrom(originSet.Entities, radius.Value);
+
+        var result = new EntitySet(selection.Entities);
+        context.EntityResolutionCount?.UnionWith(selection);
         return result;
     }
 

@@ -1,4 +1,5 @@
 using RunicMagic.Controller.Services;
+using RunicMagic.World;
 using RunicMagic.World.Entities.Capabilities;
 using RunicMagic.World.Execution;
 using RunicMagic.World.Motion.Engine;
@@ -7,12 +8,23 @@ namespace RunicMagic.Tests.World;
 
 public class WorldModel_TickMotionTests
 {
+    private static (SpellContext context, WorldTicker ticker) MakeContextAndTicker(
+        WorldModel world,
+        EntitySet? caster = null)
+    {
+        var engineMotionCollection = new EngineMotionCollection();
+        var engineAPI = EngineAPIBuilder.ForWorldModel(world).WithEngineMotionCollection(engineMotionCollection).Build();
+        var context = TestFixtures.MakeContext(caster: caster, engineAPI: engineAPI);
+        var ticker = WorldTickerBuilder.ForWorldModel(world).WithEngineMotionCollection(engineMotionCollection).Build();
+        return (context, ticker);
+    }
+
     [Fact]
     public void TickMotion_AdvancesEffect_EachCall()
     {
         var entity = new EntityBuilder().WithLocation(x: 0, y: 0).WithWeight(0).Build();
-        var world = new WorldModelBuilder().Build();
-        var context = TestFixtures.MakeContext(world: world);
+        var world = new WorldModel();
+        var (context, ticker) = MakeContextAndTicker(world);
 
         var effect = new LinearEngineMotionEffect(
             context: context,
@@ -23,8 +35,7 @@ public class WorldModel_TickMotionTests
             isAway: true,
             effectName: "VUN"
         );
-        world.AddMotionEffect(effect);
-        var ticker = WorldTickerBuilder.ForWorldModel(world).Build();
+        context.EngineAPI.EngineMotion.AddMotionEffect(effect);
 
         ticker.HandleTick(new EventTracker(), 0);
         entity.Location.X.Should().BeApproximately(10, 0.001);
@@ -37,8 +48,8 @@ public class WorldModel_TickMotionTests
     public void TickMotion_RemovesEffect_WhenComplete()
     {
         var entity = new EntityBuilder().WithLocation(x: 0, y: 0).WithWeight(0).Build();
-        var world = new WorldModelBuilder().Build();
-        var context = TestFixtures.MakeContext(world: world);
+        var world = new WorldModel();
+        var (context, ticker) = MakeContextAndTicker(world);
 
         var effect = new LinearEngineMotionEffect(
             context: context,
@@ -49,8 +60,7 @@ public class WorldModel_TickMotionTests
             isAway: true,
             effectName: "VUN"
         );
-        world.AddMotionEffect(effect);
-        var ticker = WorldTickerBuilder.ForWorldModel(world).Build();
+        context.EngineAPI.EngineMotion.AddMotionEffect(effect);
 
         for (var i = 0; i < Constants.DefaultEffectLength; i++) ticker.HandleTick(new EventTracker(), i);
 
@@ -69,8 +79,8 @@ public class WorldModel_TickMotionTests
         var caster = new EntitySet([casterEntity]);
 
         var entity = new EntityBuilder().WithLocation(x: 0, y: 0).WithWeight(1000).Build();
-        var world = new WorldModelBuilder().Build();
-        var context = TestFixtures.MakeContext(caster: caster, world: world);
+        var world = new WorldModel();
+        var (context, ticker) = MakeContextAndTicker(world, caster: caster);
 
         var effect = new LinearEngineMotionEffect(
             context: context,
@@ -81,8 +91,7 @@ public class WorldModel_TickMotionTests
             isAway: true,
             effectName: "VUN"
         );
-        world.AddMotionEffect(effect);
-        var ticker = WorldTickerBuilder.ForWorldModel(world).Build();
+        context.EngineAPI.EngineMotion.AddMotionEffect(effect);
 
         ticker.HandleTick(new EventTracker(), 0); // fails immediately
 
@@ -98,8 +107,8 @@ public class WorldModel_TickMotionTests
     {
         var entity1 = new EntityBuilder().WithLocation(x: 0, y: 0).WithWeight(0).Build();
         var entity2 = new EntityBuilder().WithLocation(x: 0, y: 0).WithWeight(0).Build();
-        var world = new WorldModelBuilder().Build();
-        var context = TestFixtures.MakeContext(world: world);
+        var world = new WorldModel();
+        var (context, ticker) = MakeContextAndTicker(world);
 
         // Two separate effects — each completes in N ticks, emitting one EntityPushedEvent
         var effect1 = new LinearEngineMotionEffect(
@@ -120,9 +129,8 @@ public class WorldModel_TickMotionTests
             isAway: true,
             effectName: "VUN"
         );
-        world.AddMotionEffect(effect1);
-        world.AddMotionEffect(effect2);
-        var ticker = WorldTickerBuilder.ForWorldModel(world).Build();
+        context.EngineAPI.EngineMotion.AddMotionEffect(effect1);
+        context.EngineAPI.EngineMotion.AddMotionEffect(effect2);
 
         EventTracker finalResult = new EventTracker();
         for (var i = 0; i < Constants.DefaultEffectLength; i++)
@@ -137,7 +145,7 @@ public class WorldModel_TickMotionTests
     [Fact]
     public void TickMotion_ReturnsEmptyResult_WhenNoEffectsActive()
     {
-        var world = new WorldModelBuilder().Build();
+        var world = new WorldModel();
         var ticker = WorldTickerBuilder.ForWorldModel(world).Build();
 
         var result = new EventTracker();
@@ -150,9 +158,9 @@ public class WorldModel_TickMotionTests
     public void HandleTick_SetsIsUnderEngineMotion_True_WhenEntityIsUnderActiveEffect()
     {
         var entity = new EntityBuilder().WithLocation(x: 0, y: 0).WithWeight(0).Build();
-        var world = new WorldModelBuilder().Build();
+        var world = new WorldModel();
         world.Add(entity);
-        var context = TestFixtures.MakeContext(world: world);
+        var (context, ticker) = MakeContextAndTicker(world);
 
         var effect = new LinearEngineMotionEffect(
             context: context,
@@ -163,8 +171,7 @@ public class WorldModel_TickMotionTests
             isAway: true,
             effectName: "VUN"
         );
-        world.AddMotionEffect(effect);
-        var ticker = WorldTickerBuilder.ForWorldModel(world).Build();
+        context.EngineAPI.EngineMotion.AddMotionEffect(effect);
 
         ticker.HandleTick(new EventTracker(), 0);
 
@@ -175,7 +182,7 @@ public class WorldModel_TickMotionTests
     public void HandleTick_SetsIsUnderEngineMotion_False_WhenEntityIsNotUnderAnyEffect()
     {
         var entity = new EntityBuilder().WithLocation(x: 0, y: 0).WithWeight(0).Build();
-        var world = new WorldModelBuilder().Build();
+        var world = new WorldModel();
         world.Add(entity);
         var ticker = WorldTickerBuilder.ForWorldModel(world).Build();
 
@@ -188,9 +195,9 @@ public class WorldModel_TickMotionTests
     public void HandleTick_ClearsIsUnderEngineMotion_AfterEffectCompletes()
     {
         var entity = new EntityBuilder().WithLocation(x: 0, y: 0).WithWeight(0).Build();
-        var world = new WorldModelBuilder().Build();
+        var world = new WorldModel();
         world.Add(entity);
-        var context = TestFixtures.MakeContext(world: world);
+        var (context, ticker) = MakeContextAndTicker(world);
 
         var effect = new LinearEngineMotionEffect(
             context: context,
@@ -201,8 +208,7 @@ public class WorldModel_TickMotionTests
             isAway: true,
             effectName: "VUN"
         );
-        world.AddMotionEffect(effect);
-        var ticker = WorldTickerBuilder.ForWorldModel(world).Build();
+        context.EngineAPI.EngineMotion.AddMotionEffect(effect);
 
         for (var i = 0; i < Constants.DefaultEffectLength; i++) ticker.HandleTick(new EventTracker(), i);
 

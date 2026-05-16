@@ -7,8 +7,10 @@ public class GA : IEntitySet
 {
     public EntitySet Resolve(SpellContext context)
     {
-        var result = new EntitySet(context.World.GetAll());
-        context.EntityResolutionCount?.UnionWith(result.Entities.Select(e => e.Id));
+        var selection = context.EngineAPI.EntitySetSelectService.GetAll();
+        context.EntityResolutionCount?.UnionWith(selection);
+
+        var result = new EntitySet(selection.Entities);
         return result;
     }
 }

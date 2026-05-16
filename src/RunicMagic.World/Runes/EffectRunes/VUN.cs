@@ -37,7 +37,7 @@ public class VUN : IStatement
             isAway: true,
             effectName: "VUN"
         );
-        context.World.AddMotionEffect(effect);
+        context.EngineAPI.EngineMotion.AddMotionEffect(effect);
     }
 
     public override string ToString()

@@ -1,4 +1,3 @@
-using RunicMagic.World.Entities;
 using RunicMagic.World.Execution;
 using RunicMagic.World.Runes.RuneTypes;
 
@@ -17,23 +16,13 @@ public class LA : IEntitySet
     public EntitySet Resolve(SpellContext context)
     {
         var inputSet = ToGetScopeOf.Resolve(context);
-        var seen = new HashSet<EntityId>();
-        var union = new List<Entity>();
 
-        foreach (var entity in inputSet.Entities)
-        {
-            var scope = entity.Scope?.Invoke() ?? [];
-            foreach (var member in scope)
-            {
-                if (seen.Add(member.Id))
-                {
-                    union.Add(member);
-                }
-            }
-        }
+        var entitySelection = context.EngineAPI.EntitySetSelectService
+            .GetUnionScope(inputSet.Entities);
 
-        var result = new EntitySet(union);
-        context.EntityResolutionCount?.UnionWith(result.Entities.Select(e => e.Id));
+        context.EntityResolutionCount?.UnionWith(entitySelection);
+
+        var result = new EntitySet(entitySelection.Entities);
         return result;
     }
 

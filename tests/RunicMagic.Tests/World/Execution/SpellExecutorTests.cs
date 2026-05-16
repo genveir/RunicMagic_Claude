@@ -1,4 +1,6 @@
 using RunicMagic.Controller.Services;
+using RunicMagic.World;
+using RunicMagic.World.Engine;
 using RunicMagic.World.Entities.Capabilities;
 using RunicMagic.World.Execution;
 using RunicMagic.World.Motion.Engine;
@@ -16,7 +18,7 @@ public class SpellExecutorTests
     [Fact]
     public void Execute_MilestoneSpell_PushesEntitiesInScope()
     {
-        var world = new WorldModelBuilder().Build();
+        var world = new WorldModel();
 
         var casterEntity = new EntityBuilder()
             .WithLocation(x: 0, y: 0)
@@ -24,10 +26,12 @@ public class SpellExecutorTests
             .WithReservoir(draw: amount => new ReservoirDraw(amount, false))
             .Build();
         var target = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(1).Build();
-        casterEntity.Scope = () => [target];
+        casterEntity.Scope = () => new EntitySetSelectionResult(Entities: [target], FictionalResults: 0);
         world.Add(casterEntity);
         world.Add(target);
-        var ticker = WorldTickerBuilder.ForWorldModel(world).Build();
+        var engineMotionCollection = new EngineMotionCollection();
+        var ticker = WorldTickerBuilder.ForWorldModel(world).WithEngineMotionCollection(engineMotionCollection).Build();
+        var engineAPI = EngineAPIBuilder.ForWorldModel(world).WithEngineMotionCollection(engineMotionCollection).Build();
 
         var caster = new EntitySet([casterEntity]);
         var executor = new EntitySet([casterEntity]);
@@ -41,7 +45,7 @@ public class SpellExecutorTests
             )
         );
 
-        var spellExecutor = new SpellExecutor(world);
+        var spellExecutor = new SpellExecutor(world, engineAPI);
         spellExecutor.Execute(spell, new EventTracker(), 11, caster, executor);
 
         EventTracker finalTickResult = new EventTracker();
@@ -61,7 +65,7 @@ public class SpellExecutorTests
     public void Execute_DrawsEvaluationCostFromCasterBeforeExecution()
     {
         var drawn = new List<long>();
-        var world = new WorldModelBuilder().Build();
+        var world = new WorldModel();
 
         var casterEntity = new EntityBuilder()
             .WithReservoir(draw: amount => { drawn.Add(amount); return new ReservoirDraw(amount, false); })
@@ -80,7 +84,7 @@ public class SpellExecutorTests
             )
         );
 
-        var spellExecutor = new SpellExecutor(world);
+        var spellExecutor = new SpellExecutor(world, EngineAPIBuilder.ForWorldModel(world).Build());
         spellExecutor.Execute(spell, new EventTracker(), 10, caster, executor);
 
         // evaluation cost = 10 runes × 1_000_000 = 10_000_000
@@ -92,7 +96,7 @@ public class SpellExecutorTests
     {
         var executorDrawn = new List<long>();
         var casterDrawn = new List<long>();
-        var world = new WorldModelBuilder().Build();
+        var world = new WorldModel();
 
         var executorEntity = new EntityBuilder()
             .WithReservoir(draw: amount => { executorDrawn.Add(amount); return new ReservoirDraw(amount / 2, false); })
@@ -109,7 +113,7 @@ public class SpellExecutorTests
 
         var spell = new ZU(new VUN(toMove: new FixedEntitySet(), howFar: new HET(), origin: new FixedLocation(0, 0)));
 
-        var spellExecutor = new SpellExecutor(world);
+        var spellExecutor = new SpellExecutor(world, EngineAPIBuilder.ForWorldModel(world).Build());
         spellExecutor.Execute(spell, new EventTracker(), 10, caster, executor);
 
         // evaluation cost = 10_000_000; executor provides 5_000_000 (amount/2), caster covers remaining 5_000_000
@@ -120,7 +124,7 @@ public class SpellExecutorTests
     [Fact]
     public void Execute_EvaluationCostCannotBeMet_ExecutorDisintegratesAndSpellAborts()
     {
-        var world = new WorldModelBuilder().Build();
+        var world = new WorldModel();
 
         var executorEntity = new EntityBuilder().WithLocation(x: 0, y: 0).Build();
         world.Add(executorEntity);
@@ -133,7 +137,7 @@ public class SpellExecutorTests
 
         // A target that should NOT be pushed if spell aborts
         var target = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(1).Build();
-        executorEntity.Scope = () => [target];
+        executorEntity.Scope = () => new EntitySetSelectionResult(Entities: [target], FictionalResults: 0);
         world.Add(target);
 
         var caster = new EntitySet([casterEntity]);
@@ -147,7 +151,7 @@ public class SpellExecutorTests
             )
         );
 
-        var spellExecutor = new SpellExecutor(world);
+        var spellExecutor = new SpellExecutor(world, EngineAPIBuilder.ForWorldModel(world).Build());
         var tracker = new EventTracker();
         spellExecutor.Execute(spell, tracker, 10, caster, executor);
 

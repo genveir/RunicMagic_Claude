@@ -1,4 +1,5 @@
 using RunicMagic.Controller.Services;
+using RunicMagic.World;
 using RunicMagic.World.Entities.Capabilities;
 using RunicMagic.World.Execution;
 using RunicMagic.World.Runes.EffectRunes;
@@ -88,7 +89,7 @@ public class TIORJTests
                 fill: amount => { sourceFilled.Add(amount); return new ReservoirFill(amount, false); })
             .Build();
 
-        var world = new WorldModelBuilder().Build();
+        var world = new WorldModel();
         // target has 1 hp: absorbs nothing, 1 damage, ceil(1/2)=1 consumed, 9 returned to source
         var target = new EntityBuilder()
             .WithStructuralIntegrity(max: 1, current: 1)
@@ -102,7 +103,7 @@ public class TIORJTests
             amount: new FixedNumber(10)
         );
 
-        tiorj.Execute(TestFixtures.MakeContext(world: world));
+        tiorj.Execute(TestFixtures.MakeContext(engineAPI: EngineAPIBuilder.ForWorldModel(world).Build()));
 
         sourceFilled.Should().ContainSingle().Which.Should().Be(9);
     }

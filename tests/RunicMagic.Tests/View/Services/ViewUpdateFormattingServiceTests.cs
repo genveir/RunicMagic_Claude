@@ -10,7 +10,7 @@ public class ViewUpdateFormattingServiceTests
 {
     private static (ViewUpdateFormattingService service, SseConnectionManager manager) MakeComponents()
     {
-        var world = new WorldModelBuilder().Build();
+        var world = new WorldModel();
         var worldRendering = new WorldRenderingService(world, new RayCastService(world));
         var manager = new SseConnectionManager(worldRendering);
         var service = new ViewUpdateFormattingService(manager);

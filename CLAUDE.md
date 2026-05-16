@@ -86,6 +86,8 @@
   - Always when a method has multiple parameters of the same type — the compiler won't catch argument order errors, so the call site must make the mapping explicit
   - Not needed when the method name already makes the argument's role obvious (e.g. `RegisterInput("look")`, `SendOutput("hello")`)
 
+- Do not use "sut" in tests. Always use descriptive variable names, even for the main object under test.
+
 ## Design
 
 - Authoritative design documents live in `Design/` as per-area markdown files. Always `glob Design/` first rather than hardcoding the list. Read them directly when working on anything they cover — never rely on a memory summary, as they evolve.

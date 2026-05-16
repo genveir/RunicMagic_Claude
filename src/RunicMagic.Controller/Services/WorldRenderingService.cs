@@ -34,7 +34,13 @@ internal class WorldRenderingService : IWorldRenderingService
             WorldCoordinate? pointingEnd = null;
             if (entity.PointingDirection.HasValue)
             {
-                var castResult = rayCast.Cast(entity.Id, entity.Location, entity.PointingDirection.Value);
+                var castResult = rayCast.Cast(
+                    sourceId: entity.Id,
+                    origin: entity.Location,
+                    direction: entity.PointingDirection.Value,
+                    maxRangeMillimeters: 3000,
+                    skipTranslucent: true);
+
                 pointingEnd = new WorldCoordinate(castResult.LocationOfIntersect.X, castResult.LocationOfIntersect.Y);
             }
 
@@ -42,14 +48,14 @@ internal class WorldRenderingService : IWorldRenderingService
             if (entity.IndicateTarget?.Direction != null)
             {
                 var direction = entity.IndicateTarget.Direction.Value;
-                var castResult = rayCast.Cast(entity.Id, entity.Location, direction, skipTranslucent: false);
-                var dist = castResult.LocationOfIntersect.GetDistanceTo(entity.Location);
+                var castResult = rayCast.Cast(
+                    sourceId: entity.Id,
+                    origin: entity.Location,
+                    direction: direction,
+                    maxRangeMillimeters: 1000,
+                    skipTranslucent: false);
 
-                var capped = Math.Min(dist, 1000);
-                var endX = entity.Location.X + direction.X * capped;
-                var endY = entity.Location.Y + direction.Y * capped;
-
-                indicateEnd = new WorldCoordinate(endX, endY);
+                indicateEnd = new WorldCoordinate(castResult.LocationOfIntersect.X, castResult.LocationOfIntersect.Y);
             }
 
             var isIndicateTarget = entity.Id == indicateTargetId;

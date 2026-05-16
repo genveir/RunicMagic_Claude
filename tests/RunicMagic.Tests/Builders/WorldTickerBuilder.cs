@@ -11,25 +11,18 @@ internal class WorldTickerBuilder
     public WorldTickerBuilder()
     {
         engineMotionCollection = new EngineMotionCollection();
-        worldModel = new WorldModelBuilder()
-            .WithEngineMotionCollection(engineMotionCollection)
-            .Build();
+        worldModel = new WorldModel();
     }
 
     public static WorldTickerBuilder ForWorldModel(WorldModel worldModel)
     {
         return new WorldTickerBuilder()
-            .WithWorldModel(worldModel, true);
+            .WithWorldModel(worldModel);
     }
 
-    public WorldTickerBuilder WithWorldModel(WorldModel worldModel, bool captureEngineMotionCollection = true)
+    public WorldTickerBuilder WithWorldModel(WorldModel worldModel)
     {
         this.worldModel = worldModel;
-
-        if (captureEngineMotionCollection)
-        {
-            engineMotionCollection = GetPrivateFieldsForTesting.GetEngineMotionCollection(worldModel);
-        }
 
         return this;
     }

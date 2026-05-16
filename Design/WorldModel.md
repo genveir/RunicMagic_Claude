@@ -59,9 +59,26 @@ Properties are orthogonal. An entity with both `Life` and `Charge` could wire a 
 
 Because delegates cannot be persisted, each entity has an `EntityType` discriminator stored in the database. `EntityFactory` uses this to wire the correct closures when the world is loaded.
 
-## Spatial Queries
+## Entity Selection
 
-`WorldModel` exposes spatial queries implemented as linear scans. The world is loaded in full at startup — there is no on-demand querying.
+The magic system never reaches into the world store directly. Every read of the world during spell execution goes through `EngineAPI`, which exposes a single entity-selection service. The surface is deliberately narrow and engine-native: a rune says *what* it wants selected and the engine decides *how*.
+
+The available selections are:
+
+- **Global** — every simulated entity in the world.
+- **Within range of a set** — every entity within a given distance of any member of an origin set.
+- **Along a ray** — every entity a ray passes through; or just the closest one, optionally skipping translucent entities.
+- **Scope union / intersection** — the union, or the intersection, of the scopes of a set's members.
+
+These primitives are the only way the magic system observes the world. There is no general query API behind them; a new selection need is added as a named engine operation, never as an ad-hoc scan from a rune.
+
+## The Simulated Boundary
+
+The simulated world is finite. Out to a fixed radius from the world origin — currently 100 000 mm — entities are loaded at startup and individually simulated. Beyond that radius nothing is modelled.
+
+This is an abstraction over a living world, not an in-fiction edge: the world is not claimed to end at the boundary, the engine simply does not simulate past it. When a selection reaches beyond the boundary — a wide `HORO(near)` query, a long ray — the engine estimates how many entities it *would* have spanned out there (by area for radial queries, by length for rays) and returns that count alongside the concrete results. Nothing beyond the boundary is ever selected, moved, or damaged; the estimate exists solely to price breadth cost (see `MagicSystem.md`), so that sweeping into the un-simulated world is charged as if it were populated.
+
+The boundary radius is an implementation tuning value, not a world-design constant.
 
 ## Motion
 

@@ -119,7 +119,12 @@ internal class PlayerService : IPlayerViewInterface, IPlayerGameLoopInterface
 
             var to = new Location(worldCoordinate.X, worldCoordinate.Y);
             var direction = Direction.FromPoints(caster.Location, to);
-            var castResult = rayCast.Cast(caster.Id, caster.Location, direction, skipTranslucent: false);
+            var castResult = rayCast.Cast(
+                sourceId: caster.Id,
+                origin: caster.Location,
+                direction: direction,
+                maxRangeMillimeters: 3000,
+                skipTranslucent: false);
 
             if (castResult.HitEntity == null || entities.All(e => e.Id != castResult.HitEntity.Id))
             {

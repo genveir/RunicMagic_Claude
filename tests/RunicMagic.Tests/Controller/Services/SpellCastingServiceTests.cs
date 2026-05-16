@@ -1,6 +1,7 @@
 using RunicMagic.Controller.RuneParsing;
 using RunicMagic.Controller.Services;
 using RunicMagic.World;
+using RunicMagic.World.Engine;
 using RunicMagic.World.Entities;
 using RunicMagic.World.Entities.Capabilities;
 using RunicMagic.World.Execution;
@@ -10,9 +11,12 @@ namespace RunicMagic.Tests.Controller.Services;
 
 public class SpellCastingServiceTests
 {
-    private static SpellCastingService MakeService(WorldModel world)
+    private static SpellCastingService MakeService(WorldModel world, EngineMotionCollection? engineMotionCollection = null)
     {
-        return new SpellCastingService(new SpellExecutor(world));
+        var engineAPI = EngineAPIBuilder.ForWorldModel(world)
+            .WithEngineMotionCollection(engineMotionCollection ?? new EngineMotionCollection())
+            .Build();
+        return new SpellCastingService(new SpellExecutor(world, engineAPI));
     }
 
     private static Entity AddCaster(WorldModel world)
@@ -25,7 +29,7 @@ public class SpellCastingServiceTests
     [Fact]
     public void Cast_EmptyInput_EmitsRanOutOfTokensEvent()
     {
-        var world = new WorldModelBuilder().Build();
+        var world = new WorldModel();
         var caster = AddCaster(world);
         var service = MakeService(world);
         var tracker = new EventTracker();
@@ -38,7 +42,7 @@ public class SpellCastingServiceTests
     [Fact]
     public void Cast_UnrecognisedRune_EmitsUnexpectedTokenEvent()
     {
-        var world = new WorldModelBuilder().Build();
+        var world = new WorldModel();
         var caster = AddCaster(world);
         var service = MakeService(world);
         var tracker = new EventTracker();
@@ -52,7 +56,7 @@ public class SpellCastingServiceTests
     [Fact]
     public void Cast_IncompleteSpell_EmitsRanOutOfTokensEvent()
     {
-        var world = new WorldModelBuilder().Build();
+        var world = new WorldModel();
         var caster = AddCaster(world);
         var service = MakeService(world);
         var tracker = new EventTracker();
@@ -66,8 +70,9 @@ public class SpellCastingServiceTests
     [Fact]
     public void Cast_MilestoneSpell_EmitsEntityPushedEventOnFinalTick()
     {
-        var world = new WorldModelBuilder().Build();
-        var ticker = WorldTickerBuilder.ForWorldModel(world).Build();
+        var world = new WorldModel();
+        var engineMotionCollection = new EngineMotionCollection();
+        var ticker = WorldTickerBuilder.ForWorldModel(world).WithEngineMotionCollection(engineMotionCollection).Build();
 
         var casterEntity = new EntityBuilder()
             .WithLocation(x: 0, y: 0)
@@ -78,12 +83,12 @@ public class SpellCastingServiceTests
 
         var target = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(1).Build();
         target.Label = "target";
-        casterEntity.Scope = () => [target];
+        casterEntity.Scope = () => new EntitySetSelectionResult(Entities: [target], FictionalResults: 0);
 
         world.Add(casterEntity);
         world.Add(target);
 
-        var service = MakeService(world);
+        var service = MakeService(world, engineMotionCollection);
         service.Cast("ZU VUN LA IR HOT IR HOT HOT", casterEntity, new EventTracker());
 
         EventTracker finalTick = new EventTracker();
@@ -100,8 +105,9 @@ public class SpellCastingServiceTests
     [Fact]
     public void Cast_MilestoneSpell_EmitsPowerDrawnEvents()
     {
-        var world = new WorldModelBuilder().Build();
-        var ticker = WorldTickerBuilder.ForWorldModel(world).Build();
+        var world = new WorldModel();
+        var engineMotionCollection = new EngineMotionCollection();
+        var ticker = WorldTickerBuilder.ForWorldModel(world).WithEngineMotionCollection(engineMotionCollection).Build();
 
         var casterEntity = new EntityBuilder()
             .WithLocation(x: 0, y: 0)
@@ -112,12 +118,12 @@ public class SpellCastingServiceTests
 
         var target = new EntityBuilder().WithLocation(x: 1000, y: 0).WithWeight(1).Build();
         target.Label = "target";
-        casterEntity.Scope = () => [target];
+        casterEntity.Scope = () => new EntitySetSelectionResult(Entities: [target], FictionalResults: 0);
 
         world.Add(casterEntity);
         world.Add(target);
 
-        var service = MakeService(world);
+        var service = MakeService(world, engineMotionCollection);
         service.Cast("ZU VUN LA IR HOT IR HOT HOT", casterEntity, new EventTracker());
 
         var allWorldEvents = new List<WorldEvent>();

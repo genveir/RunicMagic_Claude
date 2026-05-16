@@ -21,7 +21,7 @@ public class ConeCastServiceTests
     [Fact]
     public void Cast_NoEntities_ReturnsEmpty()
     {
-        var world = new WorldModelBuilder().Build();
+        var world = new WorldModel();
         var origin = MakeEntity(x: 0, y: 0);
         world.Add(origin);
         var service = new ConeCastService(world);
@@ -34,7 +34,7 @@ public class ConeCastServiceTests
     [Fact]
     public void Cast_SkipsOriginEntity()
     {
-        var world = new WorldModelBuilder().Build();
+        var world = new WorldModel();
         var origin = MakeEntity(x: 0, y: 0);
         world.Add(origin);
         var service = new ConeCastService(world);
@@ -47,7 +47,7 @@ public class ConeCastServiceTests
     [Fact]
     public void Cast_EntityInCone_IsReturned()
     {
-        var world = new WorldModelBuilder().Build();
+        var world = new WorldModel();
         var origin = MakeEntity(x: 0, y: 0);
         var target = MakeEntity(x: 500, y: 0);
         world.Add(origin);
@@ -62,7 +62,7 @@ public class ConeCastServiceTests
     [Fact]
     public void Cast_EntityBehindOrigin_IsNotReturned()
     {
-        var world = new WorldModelBuilder().Build();
+        var world = new WorldModel();
         var origin = MakeEntity(x: 0, y: 0);
         var behind = MakeEntity(x: -500, y: 0);
         world.Add(origin);
@@ -77,7 +77,7 @@ public class ConeCastServiceTests
     [Fact]
     public void Cast_EntityOutsideRange_IsNotReturned()
     {
-        var world = new WorldModelBuilder().Build();
+        var world = new WorldModel();
         var origin = MakeEntity(x: 0, y: 0);
         var far = MakeEntity(x: 3000, y: 0);
         world.Add(origin);
@@ -92,7 +92,7 @@ public class ConeCastServiceTests
     [Fact]
     public void Cast_EntityOutsideAngle_IsNotReturned()
     {
-        var world = new WorldModelBuilder().Build();
+        var world = new WorldModel();
         var origin = MakeEntity(x: 0, y: 0);
         // Directly perpendicular — well outside a narrow forward cone
         var side = MakeEntity(x: 0, y: 500);
@@ -108,7 +108,7 @@ public class ConeCastServiceTests
     [Fact]
     public void Cast_OccludedEntity_IsNotReturned()
     {
-        var world = new WorldModelBuilder().Build();
+        var world = new WorldModel();
         var origin = MakeEntity(x: 0, y: 0);
         var blocker = MakeEntity(x: 500, y: 0, width: 400, height: 400);
         var hidden = MakeEntity(x: 1000, y: 0);
@@ -129,7 +129,7 @@ public class ConeCastServiceTests
         // Origin at 0,0 facing right. A wide wall at x=1000 extends from y=-600 to y=600.
         // Two pillars at x=500, y=+/-200 occlude the centre and near-corners of the wall,
         // but leave its outer edges visible.
-        var world = new WorldModelBuilder().Build();
+        var world = new WorldModel();
         var origin = MakeEntity(x: 0, y: 0);
         var wall = MakeEntity(x: 1000, y: 0, width: 100, height: 1200);
         var pillarTop = MakeEntity(x: 500, y: 200, width: 100, height: 200);
@@ -148,7 +148,7 @@ public class ConeCastServiceTests
     [Fact]
     public void Cast_TranslucentOccluderDoesNotBlockTarget()
     {
-        var world = new WorldModelBuilder().Build();
+        var world = new WorldModel();
         var origin = MakeEntity(x: 0, y: 0);
         var glass = MakeEntity(x: 500, y: 0, width: 400, height: 400, isTranslucent: true);
         var target = MakeEntity(x: 1000, y: 0);
@@ -165,7 +165,7 @@ public class ConeCastServiceTests
     [Fact]
     public void Cast_TranslucentEntityIncludedInResults_WhenNotOccluded()
     {
-        var world = new WorldModelBuilder().Build();
+        var world = new WorldModel();
         var origin = MakeEntity(x: 0, y: 0);
         var glass = MakeEntity(x: 500, y: 0, isTranslucent: true);
         world.Add(origin);
@@ -181,7 +181,7 @@ public class ConeCastServiceTests
     [Fact]
     public void Cast_SkipTranslucentTrue_TranslucentEntityExcluded()
     {
-        var world = new WorldModelBuilder().Build();
+        var world = new WorldModel();
         var origin = MakeEntity(x: 0, y: 0);
         var glass = MakeEntity(x: 500, y: 0, isTranslucent: true);
         world.Add(origin);

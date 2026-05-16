@@ -1,4 +1,3 @@
-using RunicMagic.World.Entities;
 using RunicMagic.World.Execution;
 using RunicMagic.World.Runes.RuneTypes;
 
@@ -16,37 +15,13 @@ public class PA : IEntitySet
     public EntitySet Resolve(SpellContext context)
     {
         var inputSet = ToGetScopeOf.Resolve(context);
-        if (!inputSet.Entities.Any())
-        {
-            return new EntitySet([]);
-        }
 
-        HashSet<EntityId>? intersection = null;
-        var entityById = new Dictionary<EntityId, Entity>();
+        var entitySelection = context.EngineAPI.EntitySetSelectService
+            .GetIntersectScope(inputSet.Entities);
 
-        foreach (var entity in inputSet.Entities)
-        {
-            var scope = entity.Scope?.Invoke() ?? [];
-            foreach (var member in scope)
-            {
-                entityById[member.Id] = member;
-            }
-            var scopeIds = scope.Select(e => e.Id).ToHashSet();
-            if (intersection is null)
-            {
-                intersection = scopeIds;
-            }
-            else
-            {
-                intersection.IntersectWith(scopeIds);
-            }
-        }
+        context.EntityResolutionCount?.UnionWith(entitySelection);
 
-        var members = (intersection ?? [])
-            .Select(id => entityById[id])
-            .ToList();
-        var result = new EntitySet(members);
-        context.EntityResolutionCount?.UnionWith(result.Entities.Select(e => e.Id));
+        var result = new EntitySet(entitySelection.Entities);
         return result;
     }
 

@@ -1,5 +1,6 @@
 using RunicMagic.Controller.Services;
 using RunicMagic.World;
+using RunicMagic.World.Engine;
 using RunicMagic.World.Entities;
 using RunicMagic.World.Entities.Capabilities;
 using RunicMagic.World.Execution;
@@ -16,7 +17,7 @@ public class SpellContextTests
             .Build();
 
         var executorEntity = new EntityBuilder().Build();
-        executorEntity.Scope = () => [scopeEntity];
+        executorEntity.Scope = () => new EntitySetSelectionResult(Entities: [scopeEntity], FictionalResults: 0);
         var executor = new EntitySet([executorEntity]);
 
         var tracker = new EventTracker();
@@ -58,7 +59,7 @@ public class SpellContextTests
             .Build();
 
         var casterEntity = new EntityBuilder().Build();
-        casterEntity.Scope = () => [scopeOfCasterEntity];
+        casterEntity.Scope = () => new EntitySetSelectionResult(Entities: [scopeOfCasterEntity], FictionalResults: 0);
         var caster = new EntitySet([casterEntity]);
 
         var tracker = new EventTracker();
@@ -106,7 +107,7 @@ public class SpellContextTests
         executorEntity = new EntityBuilder()
             .WithReservoir(draw: amount => { drainOrder.Add(executorEntity); return new ReservoirDraw(0, false); })
             .Build();
-        executorEntity.Scope = () => [scopeOfExecutorEntity];
+        executorEntity.Scope = () => new EntitySetSelectionResult(Entities: [scopeOfExecutorEntity], FictionalResults: 0);
         var executor = new EntitySet([executorEntity]);
 
         Entity scopeOfCasterEntity = null!;
@@ -118,7 +119,7 @@ public class SpellContextTests
         casterEntity = new EntityBuilder()
             .WithReservoir(draw: amount => { drainOrder.Add(casterEntity); return new ReservoirDraw(amount, false); })
             .Build();
-        casterEntity.Scope = () => [scopeOfCasterEntity];
+        casterEntity.Scope = () => new EntitySetSelectionResult(Entities: [scopeOfCasterEntity], FictionalResults: 0);
         var caster = new EntitySet([casterEntity]);
 
         var context = TestFixtures.MakeContext(caster: caster, executor: executor);
@@ -171,8 +172,8 @@ public class SpellContextTests
 
         // Entities added after the inner close (as HORO would) go into the outer window
         var entityId = EntityId.New();
-        context.EntityResolutionCount!.Add(entityId);
-        context.EntityResolutionCount.Should().Contain(entityId);
+        context.EntityResolutionCount!.EntityIds.Add(entityId);
+        context.EntityResolutionCount.EntityIds.Should().Contain(entityId);
 
         context.CloseResolutionWindow();
         context.EntityResolutionCount.Should().BeNull();
@@ -205,14 +206,14 @@ public class SpellContextTests
     }
 
     [Fact]
-    public void ForkWithNewExecutor_WorldIsShared()
+    public void ForkWithNewExecutor_EngineAPIIsShared()
     {
-        var world = new WorldModelBuilder().Build();
-        var original = TestFixtures.MakeContext(world: world);
+        var engineAPI = EngineAPIBuilder.ForWorldModel(new WorldModel()).Build();
+        var original = TestFixtures.MakeContext(engineAPI: engineAPI);
 
         var forked = original.ForkWithNewExecutor(new EntitySet([]));
 
-        forked.World.Should().BeSameAs(world);
+        forked.EngineAPI.Should().BeSameAs(engineAPI);
     }
 
     [Fact]
@@ -242,12 +243,12 @@ public class SpellContextTests
         var original = TestFixtures.MakeContext();
         original.OpenResolutionWindow();
         var entityId = EntityId.New();
-        original.EntityResolutionCount!.Add(entityId);
+        original.EntityResolutionCount!.EntityIds.Add(entityId);
 
         var forked = original.ForkWithNewExecutor(new EntitySet([]));
 
         forked.EntityResolutionCount.Should().NotBeNull();
-        forked.EntityResolutionCount.Should().Contain(entityId);
+        forked.EntityResolutionCount!.EntityIds.Should().Contain(entityId);
         forked.EntityResolutionCount.Should().NotBeSameAs(original.EntityResolutionCount);
     }
 

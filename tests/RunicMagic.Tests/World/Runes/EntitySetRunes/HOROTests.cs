@@ -13,7 +13,7 @@ public class HOROTests
 
     private static WorldModel WorldWith(params Entity[] entities)
     {
-        var world = new WorldModelBuilder().Build();
+        var world = new WorldModel();
         foreach (var e in entities)
             world.Add(e);
         return world;
@@ -24,7 +24,7 @@ public class HOROTests
     {
         var near = new EntityBuilder().WithLocation(x: 200, y: 0).Build();
         var horo = new HORO(howFar: new FixedNumber(200), origin: new FixedEntitySet(Origin));
-        var context = TestFixtures.MakeContext(world: WorldWith(near));
+        var context = TestFixtures.MakeContext(engineAPI: EngineAPIBuilder.ForWorldModel(WorldWith(near)).Build());
 
         var result = horo.Resolve(context);
 
@@ -36,7 +36,7 @@ public class HOROTests
     {
         var far = new EntityBuilder().WithLocation(x: 500, y: 0).Build();
         var horo = new HORO(howFar: new FixedNumber(200), origin: new FixedEntitySet(Origin));
-        var context = TestFixtures.MakeContext(world: WorldWith(far));
+        var context = TestFixtures.MakeContext(engineAPI: EngineAPIBuilder.ForWorldModel(WorldWith(far)).Build());
 
         var result = horo.Resolve(context);
 
@@ -48,7 +48,7 @@ public class HOROTests
     {
         var near = new EntityBuilder().WithLocation(x: 200, y: 0).Build();
         var horo = new HORO(howFar: new FixedNumber(100), origin: new FixedEntitySet(Origin));
-        var context = TestFixtures.MakeContext(world: WorldWith(near));
+        var context = TestFixtures.MakeContext(engineAPI: EngineAPIBuilder.ForWorldModel(WorldWith(near)).Build());
 
         var result = horo.Resolve(context);
 
@@ -60,7 +60,7 @@ public class HOROTests
     {
         var near = new EntityBuilder().WithLocation(x: 200, y: 0).Build();
         var horo = new HORO(howFar: new FixedNumber(99), origin: new FixedEntitySet(Origin));
-        var context = TestFixtures.MakeContext(world: WorldWith(near));
+        var context = TestFixtures.MakeContext(engineAPI: EngineAPIBuilder.ForWorldModel(WorldWith(near)).Build());
 
         var result = horo.Resolve(context);
 
@@ -73,7 +73,7 @@ public class HOROTests
         var near = new EntityBuilder().WithLocation(x: 200, y: 0).Build();
         var far = new EntityBuilder().WithLocation(x: 500, y: 0).Build();
         var horo = new HORO(howFar: new FixedNumber(200), origin: new FixedEntitySet(Origin));
-        var context = TestFixtures.MakeContext(world: WorldWith(near, far));
+        var context = TestFixtures.MakeContext(engineAPI: EngineAPIBuilder.ForWorldModel(WorldWith(near, far)).Build());
 
         var result = horo.Resolve(context);
 
@@ -85,7 +85,7 @@ public class HOROTests
     {
         var near = new EntityBuilder().WithLocation(x: 200, y: 0).Build();
         var horo = new HORO(howFar: new FixedNumber(1000), origin: new FixedEntitySet());
-        var context = TestFixtures.MakeContext(world: WorldWith(near));
+        var context = TestFixtures.MakeContext(engineAPI: EngineAPIBuilder.ForWorldModel(WorldWith(near)).Build());
 
         var result = horo.Resolve(context);
 
@@ -96,7 +96,7 @@ public class HOROTests
     public void Resolve_EmptyWorld_ReturnsEmpty()
     {
         var horo = new HORO(howFar: new FixedNumber(1000), origin: new FixedEntitySet(Origin));
-        var context = TestFixtures.MakeContext(world: new WorldModelBuilder().Build());
+        var context = TestFixtures.MakeContext(engineAPI: EngineAPIBuilder.ForWorldModel(new WorldModel()).Build());
 
         var result = horo.Resolve(context);
 
@@ -108,12 +108,12 @@ public class HOROTests
     {
         var near = new EntityBuilder().WithLocation(x: 200, y: 0).Build();
         var horo = new HORO(howFar: new FixedNumber(200), origin: new FixedEntitySet(Origin));
-        var context = TestFixtures.MakeContext(world: WorldWith(near));
+        var context = TestFixtures.MakeContext(engineAPI: EngineAPIBuilder.ForWorldModel(WorldWith(near)).Build());
         context.OpenResolutionWindow();
 
         horo.Resolve(context);
 
-        context.EntityResolutionCount.Should().Contain(near.Id);
+        context.EntityResolutionCount!.EntityIds.Should().Contain(near.Id);
     }
 
     [Fact]
@@ -125,7 +125,7 @@ public class HOROTests
         var nearA = new EntityBuilder().WithLocation(x: 200, y: 0).Build();
         var nearB = new EntityBuilder().WithLocation(x: 800, y: 0).Build();
         var horo = new HORO(howFar: new FixedNumber(200), origin: new FixedEntitySet(Origin, originO2));
-        var context = TestFixtures.MakeContext(world: WorldWith(nearA, nearB));
+        var context = TestFixtures.MakeContext(engineAPI: EngineAPIBuilder.ForWorldModel(WorldWith(nearA, nearB)).Build());
 
         var result = horo.Resolve(context);
 
