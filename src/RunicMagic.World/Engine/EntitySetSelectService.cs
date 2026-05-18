@@ -91,14 +91,14 @@ public class EntitySetSelectService
         return new EntitySetSelectionResult(entitiesOnRay, fictionalResults);
     }
 
-    public EntitySetSelectionResult GetFirstInRay(IEnumerable<Entity> filter, Location from, Direction direction, long range, bool filterTranslucent)
+    public EntitySetSelectionResult GetFirstInRay(Location from, Direction direction, long range)
     {
-        var selection = GetInAllInRayExceptSourceEntities(filter, from, direction, range);
+        var selection = GetAllInRay(from, direction, range);
 
         var entitiesOnRay = selection.Entities;
         var fictionalResults = selection.FictionalResults;
 
-        var firstEntity = filterTranslucent ? entitiesOnRay.FirstOrDefault(e => !e.IsTranslucent) : entitiesOnRay.FirstOrDefault();
+        var firstEntity = entitiesOnRay.FirstOrDefault();
 
         if (firstEntity != null)
         {
@@ -106,20 +106,6 @@ public class EntitySetSelectService
         }
 
         return new EntitySetSelectionResult(Array.Empty<Entity>(), fictionalResults > 0 ? 1 : 0);
-    }
-
-    public EntitySetSelectionResult GetInAllInRayExceptSourceEntities(IEnumerable<Entity> filter, Location from, Direction direction, long range)
-    {
-        var baseResults = GetAllInRay(from, direction, range);
-
-        var result = baseResults with
-        {
-            Entities = baseResults.Entities
-                .Except(filter)
-                .ToList()
-        };
-
-        return result;
     }
 
     private long GetFictionalResultForGetAllInRay(Location from, Direction direction, long range)

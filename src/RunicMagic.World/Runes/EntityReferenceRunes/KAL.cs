@@ -1,3 +1,4 @@
+using RunicMagic.World.Engine;
 using RunicMagic.World.Execution;
 using RunicMagic.World.Runes.RuneTypes;
 
@@ -36,27 +37,28 @@ public class KAL : IEntitySet
         }
 
         var rayResult = context.EngineAPI.EntitySetSelectService
-            .GetFirstInRay(
-                filter: [caster],
+            .GetAllInRay(
                 from: caster.Location,
                 direction: caster.IndicateTarget.Direction.Value,
-                range: 1000,
-                filterTranslucent: false);
+                range: 1000);
 
         if (rayResult.Entities.Count == 0)
         {
             return new EntitySet([]);
         }
 
-        var singleEntity = rayResult.Entities.Single();
+        var singleEntity = rayResult.Entities.FirstOrDefault(
+            e => e.Id != caster.Id);
 
-        if (singleEntity.Id != caster.IndicateTarget.EntityId)
+        if (singleEntity?.Id != caster.IndicateTarget.EntityId)
         {
             return new EntitySet([]);
         }
 
+        var kalResult = new EntitySetSelectionResult { Entities = [singleEntity], FictionalResults = 0 };
+
         var result = new EntitySet(rayResult.Entities);
-        context.EntityResolutionCount?.UnionWith(rayResult);
+        context.EntityResolutionCount?.UnionWith(kalResult);
         return result;
     }
 

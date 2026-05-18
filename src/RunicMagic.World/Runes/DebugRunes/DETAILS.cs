@@ -49,8 +49,7 @@ public class DETAILS : IStatement
 
         context.EventTracker.Add(new DebugOutputEvent($"DETAILS: Caster is pointing at {caster.PointingDirection.Value.X}, {caster.PointingDirection.Value.Y}."));
 
-        var rayCast = context.EngineAPI.EntitySetSelectService.GetInAllInRayExceptSourceEntities(
-            filter: context.Caster.Entities,
+        var rayCast = context.EngineAPI.EntitySetSelectService.GetAllInRay(
             from: caster.Location,
             direction: caster.PointingDirection.Value,
             range: int.MaxValue);

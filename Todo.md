@@ -6,13 +6,13 @@ Most tickets in this file are written by an assistant with incomplete informatio
 
 The Key column in every table uses right-padded cells. The baseline is 7 characters (RMC-NNN). When inserting a row, pad the key with trailing spaces to reach 7 characters before the closing "|"
 
-Next ticket number: RMC-148
+Next ticket number: RMC-149
 Next bugfix number: BUG-11
 
 ## To Do - Milestone 4 - Decomposed runes
 | Key     | Title | Description | Blocked By |
 |---------|-------|-------------|------------|
-| RMC-147 | Remove GetInAllInRayExceptSourceEntities | `GetInAllInRayExceptSourceEntities` is not a true engine primitive — it is a composition of `GetAllInRay` and `RAL`. Remove it from `EntitySetSelectService` and rework the `KAL` and `DAN` rune implementations to not rely on it. | |
+| RMC-148 | Filtered GetFirstInRay | `DAN(pointing at)` and `KAL(touching/indicating)` both need "first entity on a ray satisfying a predicate" — currently both runes call `GetAllInRay` and filter in the rune body (skip caster, skip translucent), which prevents the engine from stopping the ray early and forces selection-cost overrides. A native `GetFirstInRay(filter)` would fix this, but expressing the filter in terms of the magic system's type model is non-trivial: the filter is conceptually an `IEntitySet → IEntitySet` transform, and rune subtrees produce values, not functions over values. Decide what form the filter should take. | |
 | RMC-132 | Decompose filter runes into Property type | Introduce a Property rune type and decompose the monolithic property-selector runes into a Property root and shared filter/selector runes. See Design/FilterRunes.md. | RMC-139 |
 | RMC-133 | Lift parser type grammar to full type expressions | Generalise the parser so that a single rune can satisfy a span of N consecutive expected argument types by producing exactly those N types in order. Required for multi-value runes such as DAR(pointing direction). | |
 | RMC-134 | Add DAR(pointing direction) rune | DAR is a EntitySet -> [Location, Location] rune: consumes one EntitySet from the token stream and produces their averaged pointing directions. | RMC-133 |
@@ -63,6 +63,7 @@ Next bugfix number: BUG-11
 
 | Key     | Title | Description |
 |---------|-------|-------------|
+| RMC-147 | Remove GetInAllInRayExceptSourceEntities | `GetInAllInRayExceptSourceEntities` is not a true engine primitive — it is a composition of `GetAllInRay` and `RAL`. Remove it from `EntitySetSelectService` and rework the `KAL` and `DAN` rune implementations to not rely on it. |
 
 ## Done
 

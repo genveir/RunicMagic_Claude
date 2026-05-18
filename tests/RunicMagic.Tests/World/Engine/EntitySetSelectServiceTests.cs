@@ -133,62 +133,30 @@ public class EntitySetSelectServiceTests
     // ── GetFirstInRay ─────────────────────────────────────────────────────────
 
     [Fact]
-    public void GetFirstInRay_ReturnsClosestNonSourceEntity()
+    public void GetFirstInRay_ReturnsClosestEntity()
     {
         var (service, world) = MakeService();
-        var caster = EntityAt(0, 0);
         var near = EntityAt(500, 0);
         var far = EntityAt(1000, 0);
-        world.Add(caster);
         world.Add(near);
         world.Add(far);
 
-        var result = service.GetFirstInRay(
-            filter: [caster],
-            from: caster.Location,
-            direction: Right,
-            range: 50_000,
-            filterTranslucent: true);
+        var result = service.GetFirstInRay(new Location(0, 0), Right, range: 50_000);
 
         result.Entities.Should().ContainSingle().Which.Should().BeSameAs(near);
     }
 
     [Fact]
-    public void GetFirstInRay_OnlyTranslucentOnRay_FilteredOut_ReturnsEmpty()
+    public void GetFirstInRay_TranslucentEntityOnRay_IsReturned()
     {
+        // The service itself does not filter translucent entities; that is the caller's responsibility.
         var (service, world) = MakeService();
-        var caster = EntityAt(0, 0);
         var glass = new EntityBuilder().WithLocation(500, 0).WithSize(100, 100).WithTranslucency().Build();
-        world.Add(caster);
         world.Add(glass);
 
-        var result = service.GetFirstInRay(
-            filter: [caster],
-            from: caster.Location,
-            direction: Right,
-            range: 50_000,
-            filterTranslucent: true);
+        var result = service.GetFirstInRay(new Location(0, 0), Right, range: 50_000);
 
-        result.Entities.Should().BeEmpty();
-    }
-
-    [Fact]
-    public void GetInAllInRayExceptSourceEntities_ExcludesFilteredEntities()
-    {
-        var (service, world) = MakeService();
-        var caster = EntityAt(0, 0);
-        var wall = EntityAt(500, 0);
-        world.Add(caster);
-        world.Add(wall);
-
-        var result = service.GetInAllInRayExceptSourceEntities(
-            filter: [caster],
-            from: caster.Location,
-            direction: Right,
-            range: 50_000);
-
-        result.Entities.Should().NotContain(caster);
-        result.Entities.Should().Contain(wall);
+        result.Entities.Should().ContainSingle().Which.Should().BeSameAs(glass);
     }
 
     // ── GetUnionScope ─────────────────────────────────────────────────────────
