@@ -74,7 +74,7 @@ These primitives are the only way the magic system observes the world. There is 
 
 ## The Simulated Boundary
 
-The simulated world is finite. Out to a fixed radius from the world origin — currently 100 000 mm — entities are loaded at startup and individually simulated. Beyond that radius nothing is modelled.
+Although the world in-fiction is just a planet, in C# it is finite. Out to a fixed radius from the world origin — currently 100 000 mm — entities are loaded at startup and individually simulated. Beyond that radius nothing is modelled.
 
 This is an abstraction over a living world, not an in-fiction edge: the world is not claimed to end at the boundary, the engine simply does not simulate past it. When a selection reaches beyond the boundary — a wide `HORO(near)` query, a long ray — the engine estimates how many entities it *would* have spanned out there (by area for radial queries, by length for rays) and returns that count alongside the concrete results. Nothing beyond the boundary is ever selected, moved, or damaged; the estimate exists solely to price breadth cost (see `MagicSystem.md`), so that sweeping into the un-simulated world is charged as if it were populated.
 

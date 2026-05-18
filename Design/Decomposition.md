@@ -21,19 +21,9 @@ Properties are intrinsic or relational:
 |------|---------|-----------|
 | `ZY` | weight | `() → Property` |
 | `FU` | power | `() → Property` |
-| `HOR` | distance from origin | `(Set origin = OH) → Property` |
+| `HOR` | distance from origin | `(Set origin) → Property` |
 
-`HOR` takes an origin `Set` because distance is not an intrinsic property of an entity — it only exists as a relation between two things. `HOR OH` and `HOR A` are genuinely different properties.
-
-## Selector Rune
-
-| Rune | Meaning | Signature |
-|------|---------|-----------|
-| `O` | less than | `(Property, Number threshold, Set = GA) → Set` |
-
-`O` is a world-level selector: it reaches into the engine and selects all entities in the input `Set` whose property value is strictly less than `threshold`. The default input set is `GA` (all entities), making it an engine-primitive operation.
-
-For `O HOR`, the engine uses its native spatial selection system rather than iterating the full entity list — this is the only exception to the general rule that `O` over `GA` iterates the world. For `O ZY` and `O FU` over `GA`, the full world is iterated and the breadth cost is proportional to the world population. This is suicidal for mortal casters but routine for the gods who built the world, who operate with near-infinite power pools.
+`HOR` takes an origin `Set` because distance is not an intrinsic property of an entity — it only exists as a relation between two things. `HOR OH` and `HOR DAN` are genuinely different properties.
 
 ## Filter Runes
 
@@ -41,11 +31,12 @@ Filters operate on an already-bounded input `Set`. They do not default to `GA` �
 
 | Rune | Meaning | Signature |
 |------|---------|-----------|
+| `O` | less than | `(Property, Number threshold, Set) → Set` |
 | `IL` | range filter | `(Property, Number lower, Number upper, Set) → Set` |
 | `HE` | minimum | `(Property, Set) → Set` |
 | `SE` | maximum | `(Property, Set) → Set` |
 
-`IL` retains entities whose property value is strictly between `lower` and `upper` (both bounds exclusive). `HE` retains all entities tied for the minimum value; `SE` retains all entities tied for the maximum.
+`O` retains all entities whose property value is strictly less than `threshold`. `IL` retains entities whose property value is strictly between `lower` and `upper` (both bounds exclusive). `HE` retains all entities tied for the minimum value; `SE` retains all entities tied for the maximum.
 
 ## Direction and the ANG Property
 
@@ -71,11 +62,27 @@ HE RAY DAR
 
 The closest entity along the ray defined by the caster's pointing direction from the caster's center. `RAY(Location from, Location through) → Property` is the along-ray distance property, engine-native like `HOR`.
 
+## Engine Selector Primitives
+
+Each engine selection method maps to a named rune. These are the only points where the magic system reaches the engine's spatial index — all other Set construction is filtering on top of a primitive result. When a new engine selection method is introduced, a corresponding named rune must accompany it. Property filter runes (`O`, `HE`, `IL`, `SE`) are never a substitute for a missing primitive — they can only filter a set that a primitive already produced.
+
+| Engine method | Rune | Notes |
+|---------------|------|-------|
+| `GetAll` | `GA` | Implemented |
+| `GetAllInRangeFrom` | `HORO` (to be renamed, RMC-132) | Surface-to-surface from origin Set |
+| `GetAllInRay` | — | No rune yet |
+| `GetFirstInRay` | — | No rune yet |
+| `GetInAllInRayExceptSourceEntities` | — | No rune yet |
+| `GetUnionScope` | `LA` | Implemented; defined in RuneSet.md |
+| `GetIntersectScope` | `PA` | Implemented; defined in RuneSet.md |
+
+Cone cast runes will be added in RMC-74 
+
 ## Replacements
 
 | Old rune | Equivalent expression |
 |----------|-----------------------|
-| `HORO N` | `O HOR N` (origin defaults to `OH`) |
+| `HORO N` | `[HORO rename] N` (direct rename, name TBD); decomposed: `O HOR OH N GA` |
 | `ZYHE S` | `HE ZY S` |
 | `ZYSE S` | `SE ZY S` |
 | `ZYIL S lower upper` | `IL ZY lower upper S` |

@@ -6,12 +6,13 @@ Most tickets in this file are written by an assistant with incomplete informatio
 
 The Key column in every table uses right-padded cells. The baseline is 7 characters (RMC-NNN). When inserting a row, pad the key with trailing spaces to reach 7 characters before the closing "|"
 
-Next ticket number: RMC-147
+Next ticket number: RMC-148
 Next bugfix number: BUG-11
 
 ## To Do - Milestone 4 - Decomposed runes
 | Key     | Title | Description | Blocked By |
 |---------|-------|-------------|------------|
+| RMC-147 | Remove GetInAllInRayExceptSourceEntities | `GetInAllInRayExceptSourceEntities` is not a true engine primitive — it is a composition of `GetAllInRay` and `RAL`. Remove it from `EntitySetSelectService` and rework the `KAL` and `DAN` rune implementations to not rely on it. | |
 | RMC-132 | Decompose filter runes into Property type | Introduce a Property rune type and decompose the monolithic property-selector runes into a Property root and shared filter/selector runes. See Design/FilterRunes.md. | RMC-139 |
 | RMC-133 | Lift parser type grammar to full type expressions | Generalise the parser so that a single rune can satisfy a span of N consecutive expected argument types by producing exactly those N types in order. Required for multi-value runes such as DAR(pointing direction). | |
 | RMC-134 | Add DAR(pointing direction) rune | DAR is a EntitySet -> [Location, Location] rune: consumes one EntitySet from the token stream and produces their averaged pointing directions. | RMC-133 |
